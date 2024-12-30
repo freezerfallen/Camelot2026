@@ -189,6 +189,7 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
         "dodgeStreak": 0,
         "damageTaken": 0,
         "executeHP": 0,
+        "negateHeal": 0, // 1: negates heal
         "ignoreShield": false,
         "damageReduction": 0,
         "damageFormula": "default", // "default": default, "log_scale_<number>": example "log_scale_1.4"
@@ -483,6 +484,8 @@ export const getDamage = (target, attacker, targetBuff, attackerBuff, matchStats
     return damage;
 };
 
+
+
 export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStats, notice, log, flags = {}) => {
     const options = { // true = enabled, false = disabled
         block: target.usedBlockRound === matchStats.round,
@@ -731,6 +734,16 @@ export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStat
     if (isCrit) matchStats.trigger("crit", attacker, target, attackerBuff, targetBuff, { damage });
 
     return damage;
+};
+
+export const addHeal = (target, attacker, caster, targetBuff, attackerBuff, matchStats, notice, log, amount, flags = {}) => {
+    const options = { // true = enabled, false = disabled
+
+    };
+    Object.keys(flags).forEach((e) => options[e] = flags[e]);
+
+    if (attacker.negateHeal && options.amount > 0 && target === caster) notice.push(`\n💖 **${attacker.name}** has negated the heal!`);
+    else target.hp += amount;
 };
 
 export const generateSubstats = (n = 4) => {

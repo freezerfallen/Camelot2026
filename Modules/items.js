@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
-import { dealDamage } from "./functions";
+import { dealDamage, addHeal } from "./functions";
 
 class itemInfo {
     constructor(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc = "", flair = "") {
