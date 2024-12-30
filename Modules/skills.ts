@@ -1,7 +1,7 @@
 
 /* eslint-disable no-unused-vars */
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message } from "discord.js";
-import { dealDamage, deleteReplyIn } from "./functions";
+import { dealDamage, deleteReplyIn, addHeal } from "./functions";
 import { items } from "./items";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
