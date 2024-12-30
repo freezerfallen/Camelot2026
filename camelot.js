@@ -4,6 +4,7 @@ import Package from './package';
 import { db, query } from "./db_handler";
 import { Client, GatewayIntentBits, Partials, Options, Collection, PermissionsBitField, EmbedBuilder } from 'discord.js';
 import { dailies } from "./Modules/dailyQuests";
+import { join } from "path";
 
 // Create Client
 const client = new Client({
@@ -27,6 +28,15 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 };
 
+// Add Handlers
+//eslint-disable-next-line
+const handlersDir = join(__dirname, "./handlers");
+fs.readdirSync(handlersDir).forEach(handler => {
+    if (!handler.endsWith(".js")) return;
+    let event = require(`${handlersDir}/${handler}`).default;
+    if (!event.disabled) event.execute(client);
+});
+
 // Patreon
 const { Campaign } = require('patreon-discord');
 const myCampaign = new Campaign({
@@ -39,96 +49,6 @@ const userCooldown = new Map();
 const channelCooldown = new Set();
 
 client.on('ready', () => {
-    console.log("Connected as " + client.user.tag);
-    if (client.user.id === "706183309943767112") client.user.setPresence({ activities: [{ name: 'Fate', type: 'WATCHING', status: 'online' }] });
-    else client.user.setPresence({ activities: [{ name: 'You', type: 'WATCHING', status: 'online' }] });
-
-    let interval = () => setInterval(async function () {
-        const now = new Date();
-
-        // Daily
-        if (now.getHours() === 0 && now.getMinutes() === 0) {
-            db.serialize(async () => {
-                // Daily Reset
-                await query(`UPDATE users SET dailyclaimed = 0, dailies = '{}', feedlimit = 0, cow_rolled_today = 0`);
-
-                // Reset Low Responses
-                await query(`UPDATE dungeon SET responsetime = "" WHERE LENGTH(responsetime)/14 < 200`);
-
-                // Start new Stampede
-                if (now.getDate() === 14 && (now.getMonth() % 2) === 1) {
-                    db.serialize(async () => {
-                        await query(`INSERT INTO stampedes (type, bosshp, bosshpmax, generalhp, generalhpmax, generalstotal, generalsleft, monsterstotal, monstersleft) values (0, 183728460, 183728460, 1582760, 1582760, 486, 486, 0, 0)`);
-                    });
-                };
-
-                // Daily Stats
-                const stats = await query(`SELECT lastpull FROM users`);
-                const chnl = client.channels.cache.find(channel => channel.id === "1029507771567190017");
-                chnl.send(`Servers: **${client.guilds.cache.size}**\nPlayers: **${stats.length}**\nActive: **${stats.filter((e) => now.getTime() - e.lastpull < 7 * 24 * 60 * 60 * 1000).length}**\nDaily: **${stats.filter((e) => now.getTime() - e.lastpull < 24 * 60 * 60 * 1000).length}**`);
-            });
-        };
-
-        // Weekly Reset (% 604'800'000ms)
-        if (now.getTime() % (7 * 24 * 60 * 60000) < 60000) {
-            db.serialize(async () => {
-                await query(`UPDATE users SET weeklyclaimed = 0`);
-            });
-        };
-
-        // 8h Dungeon Reset
-        if (now.getHours() % 8 === 0 && now.getMinutes() === 0) {
-            db.serialize(async () => {
-                // await query(`UPDATE dungeon SET 'limit' = 0`);
-                await query(`
-                    UPDATE dungeon
-                    SET 'limit' = CASE
-                        WHEN users.premium = 7 THEN 
-                            CASE 
-                                WHEN (dungeon.'limit' > 20) THEN 0
-                                WHEN (dungeon.'limit' < -20) THEN -40
-                                ELSE (dungeon.'limit' - 20)
-                            END
-                        ELSE 0
-                    END
-                    FROM users
-                    WHERE dungeon.id = users.id
-                `);
-            });
-        };
-
-        // 2h Bosshunt reset
-        if (now.getHours() % 2 === 0 && now.getMinutes() === 0) {
-            db.serialize(async () => {
-                await query(`UPDATE users SET bosshuntruns = bosshuntruns - 1 WHERE bosshuntruns > 0`);
-            });
-        };
-
-        // Monthly
-        if (now.getDate() === 1 && now.getHours() === 0 && now.getMinutes() === 0) {
-            // Reset Premium Gifts
-            fs.writeFile('Storage/premiumGifted.json', JSON.stringify({}), (err) => {
-                if (err) console.error(err);
-            });
-
-            db.serialize(async () => {
-                // Reset monthly shop
-                await query(`UPDATE users SET monthlyshop = "{}"`);
-            });
-        };
-
-        // Every 5 Minutes
-        if ((now.getMinutes() % 5) === 0) {
-            db.serialize(async () => {
-                // Stampede Energy
-                await query(`UPDATE users SET stampedeenergy = stampedeenergy - 1 WHERE stampedeenergy > 0`);
-            });
-        };
-
-    }, 60000);
-
-    setTimeout(interval, 60000 - (Date.now() % 60000));
-
     // Check if premium gift expired (every 15 min)
     setInterval(() => {
 
@@ -166,15 +86,6 @@ client.on('ready', () => {
         });
 
     }, 15 * 60 * 1000);
-
-    // POST bot stats to top.gg (only if Camelot)
-    if (client.user.id === "706183309943767112") {
-        const { AutoPoster } = require('topgg-autoposter');
-        const ap = AutoPoster(config.topgg.token, client);
-        ap.on('posted', (stats) => {
-            console.log(`Posted stats to Top.gg | ${stats.serverCount} servers`);
-        });
-    };
 
 });
 
@@ -423,228 +334,72 @@ app.listen(3000);
 })();
 
 
-// Using Donatebot API
-// const https = require("https");
-// const serverID = "927257132624130119";
-const product = {
-    // donatebot
-    "RQ-Xy86yos": [160, 60],           //   $3
-    "n9D2AeoMzr": [300, 100],          //   $5
-    "EQAnsf2I7q": [680, 160],          //  $10
-    "ExAXfcW-7J": [1000, 240],         //  $15
-    "bwSNjx7yWm": [1760, 360, 238],    //  $25 // + Rimuru Tempest
-    "O7bkg49rJD": [3680, 720],         //  $50
-    "7BsfSbcV_1": [7420, 1440, 17115], // $100 // + Luminous EX
+// const product = {
+//     // donatebot
+//     "RQ-Xy86yos": [160, 60],           //   $3
+//     "n9D2AeoMzr": [300, 100],          //   $5
+//     "EQAnsf2I7q": [680, 160],          //  $10
+//     "ExAXfcW-7J": [1000, 240],         //  $15
+//     "bwSNjx7yWm": [1760, 360, 238],    //  $25 // + Rimuru Tempest
+//     "O7bkg49rJD": [3680, 720],         //  $50
+//     "7BsfSbcV_1": [7420, 1440, 17115], // $100 // + Luminous EX
 
-    // Rank.top
-    "qw0YpPaym7": [160, 60],           //   $3
-    "VN-cmiPYuK": [300, 100],          //   $5
-    "ZC0LBngEdl": [680, 160],          //  $10
-    "Dr5P_k9Wel": [1000, 240],         //  $15
-    "z4c3JAli26": [1760, 360, 238],    //  $25 // + Rimuru Tempest
-    "CCaxvU9Ivy": [3680, 720],         //  $50
-    "q__i-jPpJJ": [7420, 1440, 17115], // $100 // + Luminous EX
-};
-// const product = { // +30% Summer Sale 
-//     "RQ-Xy86yos": [208, 60],           //   $3
-//     "n9D2AeoMzr": [390, 100],          //   $5
-//     "EQAnsf2I7q": [680+68+68+68, 160],          //  $10
-//     "ExAXfcW-7J": [1300, 240],         //  $15
-//     "bwSNjx7yWm": [1760+176+176+176, 360, 238],    //  $25 // + Rimuru Tempest
-//     "O7bkg49rJD": [3680+368+368+368, 720],         //  $50
-//     "7BsfSbcV_1": [7420+742+742+742, 1440, 17115], // $100 // + Luminous EX
+//     // Rank.top
+//     "qw0YpPaym7": [160, 60],           //   $3
+//     "VN-cmiPYuK": [300, 100],          //   $5
+//     "ZC0LBngEdl": [680, 160],          //  $10
+//     "Dr5P_k9Wel": [1000, 240],         //  $15
+//     "z4c3JAli26": [1760, 360, 238],    //  $25 // + Rimuru Tempest
+//     "CCaxvU9Ivy": [3680, 720],         //  $50
+//     "q__i-jPpJJ": [7420, 1440, 17115], // $100 // + Luminous EX
 // };
 
-// function httpGet(url, headers) {
-//     return new Promise((resolve, reject) => {
-//         const options = {
-//             headers,
-//         };
+// // Rank.top Webhook
+// app.post('/rankshop', (req, res) => {
+//     const donation = req.body;
 
-//         https.get(url, options, (res) => {
-//             let data = "";
+//     // Return when
+//     if (donation.authorization !== config.rank.auth) return;
+//     delete donation.authorization;
+//     if (!donation.buyer_id) return res.status(200).send('received');
 
-//             res.on("data", (chunk) => {
-//                 data += chunk;
-//             });
+//     // Send a response back to acknowledge receipt
+//     res.status(200).send('received');
 
-//             res.on("end", () => {
-//                 resolve(JSON.parse(data));
-//             });
-//         }).on("error", (err) => {
-//             reject(err);
-//         });
-//     });
-// };
+//     db.serialize(async () => {
+//         const { 0: stats } = await query(`SELECT users.jades, users.gems, users.transactions, users.referred_by, characters.chars FROM users JOIN characters ON users.id = characters.id WHERE users.id = ${donation.buyer_id}`);
+//         if (stats) {
+//             stats.transactions = JSON.parse(stats.transactions), stats.chars = JSON.parse(stats.chars);
+//             const jades = (product[donation.product_id]?.[0] + (donation.first_purchase ? product[donation.product_id]?.[1] : 0)) || 0;
+//             await query(`UPDATE users SET jades = jades + ${jades}, transactions = '${JSON.stringify([...stats.transactions, donation])}' WHERE id = ${donation.buyer_id}`);
+//             if (product[donation.product_id][2] && donation.first_purchase) await query(`UPDATE characters SET chars = '${JSON.stringify([...stats.chars, product[donation.product_id][2]])}' WHERE id = ${donation.buyer_id}`);
 
-// function httpPost(url, headers, body) {
-//     return new Promise((resolve, reject) => {
-//         const options = {
-//             method: "POST",
-//             headers,
-//         };
-
-//         const req = https.request(url, options, (res) => {
-//             if (res.statusCode === 200) {
-//                 resolve();
-//             } else {
-//                 reject(new Error("Error marking donation as processed."));
+//             // Send DM
+//             const dmUser = await client.users.fetch(donation.buyer_id);
+//             if (dmUser) {
+//                 const Embed = new EmbedBuilder()
+//                     .setColor(0xbbffff)
+//                     .setTitle("Thank you for your support!")
+//                     .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
+//                     .setDescription(`We have received and processed your order! <:ClaraThumbsUp:1034899843505721514>\nPlease [contact](https://discord.gg/myy9PBCdEW) us if you encounter any issues. You can see the transaction details below.\n\n\`\`\`yaml\nOrder: ${product[donation.product_id]?.[0]} eternal jades\nPrice: ${donation.price} ${donation.currency}\nProduct ID: ${donation.product_id}\nTransaction ID: ${donation.txn_id}\nStatus: ${donation.status}\nBuyer ID: ${donation.buyer_id}\nDate: ${new Date(donation.timestamp * 1000).toISOString()}\`\`\``);
+//                 dmUser.send({ embeds: [Embed] });
 //             };
-//         });
 
-//         req.on("error", (err) => {
-//             reject(err);
-//         });
+//             // Log confirmation message
+//             const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
+//             if (chnl) chnl.send(`Successfully processed transaction ${donation.txn_id}\nBuyer: <@${donation.buyer_id}> | ${donation.buyer_id}\nBalance: **${stats.jades + jades}**<:eternal_jade:1256124504141201428>\nPrice: **${donation.price} ${donation.currency}**${stats.referred_by ? `\nReferred by: <@${stats.referred_by}> | ${stats.referred_by} (+**${Math.floor(0.2 * jades)}**<:genesis_gems:1034179687720681492>)` : ""}`);
 
-//         req.write(body);
-//         req.end();
-//     });
-// };
-
-// async function getNewDonations() {
-//     const url = `https://donatebot.io/api/v1/donations/${serverID}/new`;
-//     const headers = {
-//         Authorization: config.donatebot.key,
-//     };
-//     const data = await httpGet(url, headers);
-//     return data;
-// };
-
-// async function markDonationAsProcessed(txnID, processed = true) {
-//     const url = `https://donatebot.io/api/v1/donations/${serverID}/${txnID}/mark`;
-//     const headers = {
-//         Authorization: config.donatebot.key,
-//         "Content-Type": "application/json",
-//     };
-//     const body = JSON.stringify({ markProcessed: processed });
-//     await httpPost(url, headers, body);
-// };
-
-// // // Unmark
-// // markDonationAsProcessed("2JU19147XS2779314", false).then(() => {
-// //     console.log("Unmarked");
-// // });
-
-// setInterval(() => {
-//     getNewDonations().then((donations) => {
-//         donations = donations.donations;
-//         if (donations.length) {
-//             db.serialize(async () => {
-//                 for (const donation of donations) {
-//                     const { 0: stats } = await query(`SELECT users.jades, users.gems, users.transactions, users.referred_by, characters.chars FROM users JOIN characters ON users.id = characters.id WHERE users.id = ${donation.buyer_id}`);
-//                     if (stats) {
-//                         stats.transactions = JSON.parse(stats.transactions), stats.chars = JSON.parse(stats.chars);
-//                         const jades = (product[donation.product_id]?.[0] + (stats.transactions.some((e) => e.product_id === donation.product_id) ? 0 : product[donation.product_id]?.[1])) || 0;
-//                         await query(`UPDATE users SET jades = jades + ${jades}, transactions = '${JSON.stringify([...stats.transactions, donation])}' WHERE id = ${donation.buyer_id}`);
-//                         if (product[donation.product_id][2] && !stats.transactions.some((e) => e.product_id === donation.product_id)) await query(`UPDATE characters SET chars = '${JSON.stringify([...stats.chars, product[donation.product_id][2]])}' WHERE id = ${donation.buyer_id}`);
-
-//                         // Send DM
-//                         const dmUser = await client.users.fetch(donation.buyer_id);
-//                         if (dmUser) {
-//                             const Embed = new EmbedBuilder()
-//                                 .setColor(0xbbffff)
-//                                 .setTitle("Thank you for your support!")
-//                                 .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
-//                                 .setDescription(`We have received and processed your order! <:ClaraThumbsUp:1034899843505721514>\nPlease [contact](https://discord.gg/myy9PBCdEW) us if you encounter any issues. You can see the transaction details below.\n\n\`\`\`yaml\nOrder: ${product[donation.product_id]?.[0]} eternal jades\nPrice: ${donation.price} ${donation.currency}\nProduct ID: ${donation.product_id}\nTransaction ID: ${donation.txn_id}\nStatus: ${donation.status}\nBuyer ID: ${donation.buyer_id}\nDate: ${new Date(donation.timestamp * 1000).toISOString()}\`\`\``);
-//                             dmUser.send({ embeds: [Embed] });
-//                         };
-
-//                         // Log confirmation message
-//                         const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
-
-//                         // Mark Donation as Processed
-//                         markDonationAsProcessed(donation.txn_id).then(() => {
-//                             if (chnl) chnl.send(`Successfully processed transaction ${donation.txn_id}\nBuyer: <@${donation.buyer_id}> | ${donation.buyer_id}\nBalance: **${stats.jades + jades}**<:eternal_jade:1256124504141201428>\nPrice: **${donation.price} ${donation.currency}**${stats.referred_by ? `\nReferred by: <@${stats.referred_by}> | ${stats.referred_by} (+**${Math.floor(0.2 * jades)}**<:genesis_gems:1034179687720681492>)` : ""}`);
-//                         }).catch((err) => {
-//                             console.log(err);
-//                             if (chnl) chnl.send(`Failed to mark transaction ${donation.txn_id} as processed.\nBuyer: <@${donation.buyer_id}> | ${donation.buyer_id}\nBalance: **${stats.jades}**<:eternal_jade:1256124504141201428>\nPrice: **${donation.price} ${donation.currency}**${stats.referred_by ? `\nReferred by: <@${stats.referred_by}> | ${stats.referred_by} (+**${Math.floor(0.2 * jades)}**<:genesis_gems:1034179687720681492>)` : ""}`);
-//                         });
-
-//                         // Send referral reward if any
-//                         if (stats.referred_by) {
-//                             const { 0: user } = await query(`SELECT mailbox FROM users WHERE id = ${stats.referred_by}`);
-//                             if (!user) return;
-//                             user.mailbox = JSON.parse(user.mailbox);
-//                             user.mailbox.push({ "type": "9", "rewards": `gems|${Math.floor(0.2 * jades)}`, "message": `Hey <@${stats.referred_by}>! <:MashaWave:928370055354400799>\nA player you have referred has bought some jades, here is your reward <:TohruPoint:928370972132782090>\nThank you for playing <:LoveHeart:928369932683595827>`, "date": Date.now() });
-//                             await query(`UPDATE users SET referred_gems = referred_gems + ${Math.floor(0.2 * jades)}, mailbox = '${JSON.stringify(user.mailbox)}' WHERE id = ${stats.referred_by}`);
-//                         };
-//                     } else {
-//                         const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
-//                         if (chnl) chnl.send(`User <@${donation.buyer_id}> (${donation.buyer_id}) has no profile.\nEmail: **${donation.buyer_email}**\nOrder: **${donation.product_id}**\nPrice: **${donation.price} ${donation.currency}**`);
-//                     };
-//                 };
-//             });
+//             // Send referral reward if any
+//             if (stats.referred_by && (stats.transactions.reduce((acc, transaction) => acc + parseInt(transaction.price), 0) + parseInt(donation.price)) <= 500) {
+//                 const { 0: user } = await query(`SELECT mailbox FROM users WHERE id = ${stats.referred_by}`);
+//                 if (!user) return;
+//                 user.mailbox = JSON.parse(user.mailbox);
+//                 user.mailbox.push({ "type": "9", "rewards": `gems|${Math.floor(0.2 * jades)}`, "message": `Hey <@${stats.referred_by}>! <:MashaWave:928370055354400799>\nA player you have referred has bought some jades, here is your reward <:TohruPoint:928370972132782090>\nThank you for playing <:LoveHeart:928369932683595827>`, "date": Date.now() });
+//                 await query(`UPDATE users SET referred_gems = referred_gems + ${Math.floor(0.2 * jades)}, mailbox = '${JSON.stringify(user.mailbox)}' WHERE id = ${stats.referred_by}`);
+//             };
+//         } else {
+//             const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
+//             if (chnl) chnl.send(`User <@${donation.buyer_id}> (${donation.buyer_id}) has no profile.\nEmail: **${donation.buyer_email}**\nOrder: **${donation.product_id}**\nPrice: **${donation.price} ${donation.currency}**`);
 //         };
-//     }).catch((err) => {
-//         console.log(err);
 //     });
-// }, 5 * 60 * 1000);
-
-
-// Rank.top Webhook
-app.post('/rankshop', (req, res) => {
-    const donation = req.body;
-
-    // Return when
-    if (donation.authorization !== config.rank.auth) return;
-    delete donation.authorization;
-    if (!donation.buyer_id) return res.status(200).send('received');
-
-    // Send a response back to acknowledge receipt
-    res.status(200).send('received');
-
-    db.serialize(async () => {
-        const { 0: stats } = await query(`SELECT users.jades, users.gems, users.transactions, users.referred_by, characters.chars FROM users JOIN characters ON users.id = characters.id WHERE users.id = ${donation.buyer_id}`);
-        if (stats) {
-            stats.transactions = JSON.parse(stats.transactions), stats.chars = JSON.parse(stats.chars);
-            const jades = (product[donation.product_id]?.[0] + (donation.first_purchase ? product[donation.product_id]?.[1] : 0)) || 0;
-            await query(`UPDATE users SET jades = jades + ${jades}, transactions = '${JSON.stringify([...stats.transactions, donation])}' WHERE id = ${donation.buyer_id}`);
-            if (product[donation.product_id][2] && donation.first_purchase) await query(`UPDATE characters SET chars = '${JSON.stringify([...stats.chars, product[donation.product_id][2]])}' WHERE id = ${donation.buyer_id}`);
-
-            // Send DM
-            const dmUser = await client.users.fetch(donation.buyer_id);
-            if (dmUser) {
-                const Embed = new EmbedBuilder()
-                    .setColor(0xbbffff)
-                    .setTitle("Thank you for your support!")
-                    .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
-                    .setDescription(`We have received and processed your order! <:ClaraThumbsUp:1034899843505721514>\nPlease [contact](https://discord.gg/myy9PBCdEW) us if you encounter any issues. You can see the transaction details below.\n\n\`\`\`yaml\nOrder: ${product[donation.product_id]?.[0]} eternal jades\nPrice: ${donation.price} ${donation.currency}\nProduct ID: ${donation.product_id}\nTransaction ID: ${donation.txn_id}\nStatus: ${donation.status}\nBuyer ID: ${donation.buyer_id}\nDate: ${new Date(donation.timestamp * 1000).toISOString()}\`\`\``);
-                dmUser.send({ embeds: [Embed] });
-            };
-
-            // Log confirmation message
-            const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
-            if (chnl) chnl.send(`Successfully processed transaction ${donation.txn_id}\nBuyer: <@${donation.buyer_id}> | ${donation.buyer_id}\nBalance: **${stats.jades + jades}**<:eternal_jade:1256124504141201428>\nPrice: **${donation.price} ${donation.currency}**${stats.referred_by ? `\nReferred by: <@${stats.referred_by}> | ${stats.referred_by} (+**${Math.floor(0.2 * jades)}**<:genesis_gems:1034179687720681492>)` : ""}`);
-
-            // Send referral reward if any
-            if (stats.referred_by && (stats.transactions.reduce((acc, transaction) => acc + parseInt(transaction.price), 0) + parseInt(donation.price)) <= 500) {
-                const { 0: user } = await query(`SELECT mailbox FROM users WHERE id = ${stats.referred_by}`);
-                if (!user) return;
-                user.mailbox = JSON.parse(user.mailbox);
-                user.mailbox.push({ "type": "9", "rewards": `gems|${Math.floor(0.2 * jades)}`, "message": `Hey <@${stats.referred_by}>! <:MashaWave:928370055354400799>\nA player you have referred has bought some jades, here is your reward <:TohruPoint:928370972132782090>\nThank you for playing <:LoveHeart:928369932683595827>`, "date": Date.now() });
-                await query(`UPDATE users SET referred_gems = referred_gems + ${Math.floor(0.2 * jades)}, mailbox = '${JSON.stringify(user.mailbox)}' WHERE id = ${stats.referred_by}`);
-            };
-        } else {
-            const chnl = client.channels.cache.find(channel => channel.id === "1030963832136417320");
-            if (chnl) chnl.send(`User <@${donation.buyer_id}> (${donation.buyer_id}) has no profile.\nEmail: **${donation.buyer_email}**\nOrder: **${donation.product_id}**\nPrice: **${donation.price} ${donation.currency}**`);
-        };
-    });
-});
-
-
-
-// -- -- -- PLAYGROUND -- -- -- //
-// -- -- -- PLAYGROUND -- -- -- //
-// -- -- -- PLAYGROUND -- -- -- //
-
-// // Send messages to python script and back
-// if (true || cmd === "py") {
-//     const {spawn} = require('child_process');
-//     const pythonProcess = spawn('python',["./Python/scriptl.py", "JS_input"]);
-//     console.log("A");
-//     pythonProcess.stdout.on('data', (data) => {
-//         let readableData = data.toString('utf8');
-//         console.log(readableData);
-//     });
-//     console.log("C");
-// };
+// });
