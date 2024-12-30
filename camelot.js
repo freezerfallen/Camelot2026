@@ -184,7 +184,7 @@ client.on('interactionCreate', async interaction => {
     //     interaction.user.id = "489490486734880782";
     // };
 
-    // Test
+    console.log(interaction);
 
     // Defer Buttons
     if (interaction.isButton()) {
