@@ -7,12 +7,12 @@ const exportCommand: SlashCommand = {
         const reminder = interaction.options.getString('select');
 
         if (reminder === "pulls") {
-            updateUsers(interaction.user.id, { pullreminder: { value: author.schema.pullreminder ? 0 : 1 } });
+            updateUsers(interaction.user.id, { pullreminder: { type: 'set', value: author.schema.pullreminder ? 0 : 1 } });
             return interaction.reply(`${author.schema.pullreminder ? "Disabled" : "Enabled"} pull reminders`);
         };
 
         if (reminder === "votes") {
-            updateUsers(interaction.user.id, { votereminder: { value: author.schema.votereminder ? 0 : 1 } });
+            updateUsers(interaction.user.id, { votereminder: { type: 'set', value: author.schema.votereminder ? 0 : 1 } });
             return interaction.reply(`${author.schema.votereminder ? "Disabled" : "Enabled"} vote reminders`);
         };
     },

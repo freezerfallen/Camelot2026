@@ -1,5 +1,5 @@
 import { search, searchAnimeTitle } from "../Modules/functions.js";
-import { updateUsersAppend } from "../Modules/queries.js";
+import { updateUsers } from "../Modules/queries.js";
 import { SlashCommand } from '../types';
 
 const exportCommand: SlashCommand = {
@@ -22,8 +22,8 @@ const exportCommand: SlashCommand = {
             if (chars.length > 100) return interaction.reply(`You can't lock more than 100 chars at once`);
             if (chars.length + stats.charlock.length > 100) return interaction.reply(`You can't lock more than 100 characters`);
 
-            updateUsersAppend(interaction.user.id, {
-                charlock: { value: chars.map(c => c.id), unique: true }
+            await updateUsers(interaction.user.id, {
+                charlock: { type: 'append_unique', value: chars.map(c => c.id) }
             });
 
             return interaction.reply(`Locked **${chars.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (chars.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : chars.map((c) => c.name.slice(0, 20)).join(", ")}**`);
@@ -41,8 +41,8 @@ const exportCommand: SlashCommand = {
             if (animes.length === 0) return interaction.reply(`No match found`);
             if (animes.length + stats.animelock.length > 5) return interaction.reply(`You can't lock more than 5 anime`);
 
-            updateUsersAppend(interaction.user.id, {
-                animelock: { value: animes.map(a => a.id), unique: true }
+            await updateUsers(interaction.user.id, {
+                animelock: { type: 'append_unique', value: animes.map(a => a.id) }
             });
 
             return interaction.reply(`Locked **${animes.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (animes.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : animes.map((c) => c.name.slice(0, 20)).join(", ")}**`);

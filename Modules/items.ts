@@ -1,10 +1,25 @@
 /* eslint-disable no-unused-vars */
+import { ItemRarity, PrimaryStat } from "../types";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
 
-class itemInfo {
-    constructor(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc = "", flair = "") {
+export class itemInfo {
+    private _name: string;
+    private _category: string;
+    private _type: string;
+    private _obtain: string[];
+    private _emoji: string;
+    private _image: string;
+    private _grade: ItemRarity;
+    private _id: number;
+    private _unique: boolean;
+    private _tradable: boolean;
+    private _sellable: boolean;
+    private _desc: string;
+    private _flair: string;
+
+    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean, tradable: boolean, sellable: boolean, desc: string = "", flair: string = "") {
         this._name = name;
         this._category = category; // ["weapon", "armor", "fish"]
         this._type = type; // ["sword", ..., "helmet", ..., "fish"]
@@ -88,8 +103,10 @@ class itemInfo {
     };
 };
 
-class fishInfo extends itemInfo {
-    constructor(name, category, type, obtain, consumable, emoji, image, grade, id, unique = false, tradable = true, sellable = true) {
+export class fishInfo extends itemInfo {
+    private _consumable: boolean;
+
+    constructor(name: string, category: string, type: string, obtain: string[], consumable: boolean, emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable);
         this._consumable = consumable;
     };
@@ -99,14 +116,23 @@ class fishInfo extends itemInfo {
     };
 };
 
-class lootInfo extends itemInfo {
-    constructor(name, category, type, obtain, emoji, image, grade, id, unique = false, tradable = true, sellable = false, desc, flair) {
+export class lootInfo extends itemInfo {
+    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = false, desc: string = "", flair: string = "") {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
     };
 };
 
-class weaponInfo extends itemInfo {
-    constructor(name, category, type, obtain, emoji, image, primaryStat, psmin, psmax, secondaryStat, ssmin, ssmax, buff, buffdesc, flair, grade, id, desc, unique = true, tradable = false, sellable = true) {
+export class weaponInfo extends itemInfo {
+    private _primaryStat: PrimaryStat;
+    private _psmin: number;
+    private _psmax: number;
+    private _secondaryStat: PrimaryStat;
+    private _ssmin: number;
+    private _ssmax: number;
+    private _buff: (...args: any[]) => void;
+    private _buffdesc: string;
+
+    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, primaryStat: PrimaryStat, psmin: number, psmax: number, secondaryStat: PrimaryStat, ssmin: number, ssmax: number, buff: (...args: any[]) => void, buffdesc: string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._primaryStat = primaryStat;
         this._psmin = psmin;
@@ -143,8 +169,13 @@ class weaponInfo extends itemInfo {
     };
 };
 
-class chestInfo extends itemInfo {
-    constructor(name, category, type, obtain, emoji, emoji2, image, image2, drops, droprates, grade, id, unique = false, tradable = false, sellable = false, desc, flair) {
+export class chestInfo extends itemInfo {
+    private _emoji2: string;
+    private _image2: string;
+    private _drops: number;
+    private _droprates: { [key in ItemRarity]?: number };
+
+    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, emoji2: string, image: string, image2: string, drops: number, droprates: { [key in ItemRarity]?: number; }, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = false, sellable: boolean = false, desc: string = "", flair: string = "") {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._emoji2 = emoji2;
         this._image2 = image2;
@@ -166,8 +197,15 @@ class chestInfo extends itemInfo {
     };
 };
 
-class armorInfo extends itemInfo {
-    constructor(name, category, type, setname, obtain, emoji, image, primaryStat, psmin, psmax, grade, id, buff = undefined, buffdesc = undefined, desc, unique = true, tradable = false, sellable = true) {
+export class armorInfo extends itemInfo {
+    private _setname: string;
+    private _primaryStat: string;
+    private _psmin: number;
+    private _psmax: number;
+    private _buff: ((...args: any[]) => void) | undefined;
+    private _buffdesc: string | undefined;
+
+    constructor(name: string, category: string, type: string, setname: string, obtain: string[], emoji: string, image: string, primaryStat: string, psmin: number, psmax: number, grade: ItemRarity, id: number, buff: ((...args: any[]) => void) | undefined = undefined, buffdesc: string | undefined = undefined, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc);
         this._setname = setname;
         this._primaryStat = primaryStat;
@@ -194,8 +232,12 @@ class armorInfo extends itemInfo {
     };
 };
 
-class ringInfo extends itemInfo {
-    constructor(name, category, type, obtain, emoji, image, maxlevel, buffs, buffdescs, flair, grade, id, desc = "", unique = true, tradable = false, sellable = true) {
+export class ringInfo extends itemInfo {
+    private _maxlevel: number;
+    private _buffs: (level: number) => (...args: any[]) => void;
+    private _buffdescs: (level: number) => string;
+
+    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, maxlevel: number, buffs: (level: number) => (...args: any[]) => void, buffdescs: (level: number) => string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._maxlevel = maxlevel;
         this._buffs = buffs;
@@ -212,11 +254,11 @@ class ringInfo extends itemInfo {
         return this._buffdescs;
     };
 
-    getBuff(level) {
+    getBuff(level: number) {
         level = Math.min(Math.max(level, 1), this.maxlevel) || 1;
         return this.buffs(level);
     };
-    getBuffDesc(level) {
+    getBuffDesc(level: number) {
         level = Math.min(Math.max(level, 1), this.maxlevel) || 1;
         return this.buffdescs(level);
     };
@@ -907,6 +949,7 @@ export const items = [
                     mybuff.def.push(new buffInfo("+", myStats.def * 0.15, 9999));
                     mybuff.mr.push(new buffInfo("+", myStats.mr * 0.15, 9999));
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.2), {});
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -972,6 +1015,7 @@ export const items = [
                     if (myStats.cr > 1) myStats.cr = 1;
                     mybuff.cr.push(new buffInfo("+", 0.12, 9999));
                     mybuff.cd.push(new buffInfo("+", 0.2, 9999));
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1071,6 +1115,7 @@ export const items = [
                     myStats.md += Math.floor(myStats.md * 0.25);
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.25), 9999));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.atk * 0.25), 9999));
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1264,6 +1309,7 @@ export const items = [
                 if (myStats.hp / myStats.maxhp < 0.25) {
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05), {});
                     mybuff.hp.push(new buffInfo("+", myStats.maxhp * 0.05, 9999));
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1650,6 +1696,7 @@ export const items = [
                 if (myStats.hp / myStats.maxhp < 0.5) {
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp - myStats.hp, {});
                     notice.push(`\n<:crossbow_of_zeal:1068643237750911156> ${char.name} made a complete recovery!`);
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1670,6 +1717,7 @@ export const items = [
                     mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.2), 12));
                     mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.2), 12));
                     notice.push(`\n<:draupnirs_mist:1068643241467068486> ${char.name} increased DEF and MR by **20%**!`);
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1908,6 +1956,7 @@ export const items = [
                     myStats.cd += 0.3;
                     mybuff.cd.push(new buffInfo("+", 0.3, 9999));
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.2), {});
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -1940,6 +1989,7 @@ export const items = [
                     mybuff.def.push(new buffInfo("+", myStats.def * 0.15, 9999));
                     mybuff.mr.push(new buffInfo("+", myStats.mr * 0.15, 9999));
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.3), {});
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -2002,7 +2052,7 @@ export const items = [
     new weaponInfo("Dreadknight's Demise", "weapon", "sword", ["chest"], "<:dreadknights_demise:1068720496994168852>", "https://i.imgur.com/JWP9KaW.png", "atk", 106, 1132, "cd", 0.1, 0.46, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:dreadknights_demise:1068720496994168852>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:dreadknights_demise:1068720496994168852> **${char.name}**`, { critChance: 0, magicDamage: true });
             },
         };
@@ -2095,6 +2145,7 @@ export const items = [
                     myStats.cd += 0.3;
                     mybuff.cd.push(new buffInfo("+", 0.3, 9999));
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.4), {});
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -2135,6 +2186,7 @@ export const items = [
                 myStats.md -= Math.floor(myStats.md * 0.2);
                 mybuff.md.push(new buffInfo("+", -myStats.md * 0.2, 9999));
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp - myStats.hp, {});
+                //@ts-ignore
                 this._used++;
             };
         }, 9999, 3));
@@ -2184,7 +2236,7 @@ export const items = [
     new weaponInfo("Sagitta Solis", "weapon", "bow", ["chest"], "<:sagitta_solis:1069016593356566528>", "https://i.imgur.com/xZmQlxx.png", "atk", 104, 1052, "md", 86, 857, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:sagitta_solis:1069016593356566528>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 const burn = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:sagitta_solis:1069016593356566528> **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
                 ebuff.hp.push(new buffInfo("+", -Math.floor(burn * 0.125), 3));
             },
@@ -2223,6 +2275,7 @@ export const items = [
                     myStats.cd += 0.4;
                     mybuff.cd.push(new buffInfo("+", 0.4, 9999));
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp - myStats.hp, {});
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -2254,7 +2307,7 @@ export const items = [
         myStats.selfheal.push(0.06);
         myStats.replaceButton.atk = {
             "emoji": "<:skyfall_javelin:1069018773803245638>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:skyfall_javelin:1069018773803245638> **${char.name}**`, { atkMultiplier: 1, block: false, dodge: false, magicDamage: true });
             },
         };
@@ -2272,7 +2325,7 @@ export const items = [
     new weaponInfo("Flaming Fomor", "weapon", "dagger", ["chest"], "<:flaming_fomor:1069020248398897202>", "https://i.imgur.com/7sryILJ.png", "atk", 108, 1137, "cd", 0.12, 0.54, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:flaming_fomor:1069020248398897202>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 const burn = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:flaming_fomor:1069020248398897202> **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
                 ebuff.hp.push(new buffInfo("+", -Math.floor(burn * 0.16), 2));
             },
@@ -2282,6 +2335,7 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             if (matchStats.round % 7 === 0) {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:jade_spine:1069020251775303680> **${char.name}**`, { atkMultiplier: 1.8, magicDamage: true });
+                //@ts-ignore
                 this._used++;
             };
         }, 9999, 3));
@@ -2289,7 +2343,7 @@ export const items = [
     new weaponInfo("Oath of Shifting Worlds", "weapon", "dagger", ["chest"], "<:oath_of_shifting_worlds:1069020253893443605>", "https://i.imgur.com/Ksli1ns.png", "atk", 123, 1234, "br", 0.01, 0.23, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:oath_of_shifting_worlds:1069020253893443605>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:oath_of_shifting_worlds:1069020253893443605> **${char.name}**`, { atkMultiplier: 1.23, ignoreShield: true, magicDamage: true });
             },
         };
@@ -2308,6 +2362,7 @@ export const items = [
                 eStats.def = 0;
                 eStats.mr = 0;
                 eStats.br = 0;
+                //@ts-ignore
                 this._used++;
             };
         }, 9999, 1));
@@ -2352,14 +2407,14 @@ export const items = [
         myStats.durinsBaneStacks = 0;
 
         // On hit
-        matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+        matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             if (caster === myStats) {
                 caster.durinsBaneStacks++;
             };
         });
 
         // On miss
-        matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+        matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             if (caster === myStats) {
                 caster.durinsBaneStacks = 0;
             };
@@ -2388,7 +2443,7 @@ export const items = [
     new weaponInfo("Vermillion Vane", "weapon", "staff", ["chest"], "<:vermillion_vane:1069025800965324882>", "https://i.imgur.com/ccvhu0B.png", "md", 227, 1306, "mr", 64, 254, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:vermillion_vane:1069025800965324882>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 const burn = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vermillion_vane:1069025800965324882> **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
                 ebuff.hp.push(new buffInfo("+", -Math.floor(burn * 0.25), 2));
                 ebuff.dodge.push(new buffInfo("=", 0, 2));
@@ -2421,7 +2476,7 @@ export const items = [
         }, 9999));
         myStats.replaceButton.atk = {
             "emoji": "<:elegy_of_the_glacial_heart:1069026954671570984>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:elegy_of_the_glacial_heart:1069026954671570984> **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
                 myStats.usedBlockRound = matchStats.round;
             },
@@ -2450,7 +2505,7 @@ export const items = [
     new weaponInfo("Heartseeker", "weapon", "bow", ["chest"], "<:heartseeker:1069028625019576320>", "https://i.imgur.com/UoZXFTQ.png", "atk", 777, 1333, "hp", 77, 777, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:heartseeker:1069028625019576320>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.07), {});
                 if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:heartseeker:1069028625019576320> **${char.name}**`, { atkMultiplier: 1.2, magicDamage: true });
@@ -2472,7 +2527,7 @@ export const items = [
         mybuff.cd.push(new buffInfo("+", 0.4, 9999));
         myStats.replaceButton.atk = {
             "emoji": "<:gae_bolg:1069032920733466706>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:gae_bolg:1069032920733466706> **${char.name}**`, { atkMultiplier: 1.2, ignoreShield: true, magicDamage: true });
             },
         };
@@ -2521,7 +2576,7 @@ export const items = [
     new weaponInfo("Celestial Barrier", "weapon", "shield", ["chest"], "<:celestial_barrier:1069033755676778536>", "https://i.imgur.com/k12xxmX.png", "shield", 255, 1598, "mr", 96, 246, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:celestial_barrier:1069033755676778536>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 matchStats.loot += 5;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:celestial_barrier:1069033755676778536> **${char.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
             },
@@ -2669,6 +2724,7 @@ export const items = [
                     myStats.md += Math.floor(myStats.md * 0.2);
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -2796,7 +2852,7 @@ export const items = [
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.1), 9999));
         myStats.mr += Math.floor(myStats.mr * 0.1);
         myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            mybuff.hp = mybuff.hp.filter((buff) => (buff.type === "*" && buff.val > 1) || (buff.type === "+" && buff.val > 0));
+            mybuff.hp = mybuff.hp.filter((buff: buffInfo) => (buff.type === "*" && buff.val > 1) || (buff.type === "+" && buff.val > 0));
         }, 9999));
     }, "The wearer has **10%** increased magic resistance and is immune against DoT type of damage.\n\n_DoT = Damage over Time_"),
     new armorInfo("Bloodforged Helmet", "armor", "helmet", "Bloodforged Set", ["crafting", "chest"], "<:bloodforged_helmet:1081545922317664396>", "https://i.imgur.com/lw8o5Le.png", "hp", 48, 1647, "legendary", 575),
@@ -2905,7 +2961,7 @@ export const items = [
         myStats.replaceButton.def = {
             "emoji": "<:deepsea_guardian_helmet:1081561801042444328>",
             "used": 0,
-            "run": function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            "run": function (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) {
                 if (this.used++ < 6) {
                     myStats.shield += 250;
                     myStats.usedBlockRound = matchStats.round;
@@ -2967,7 +3023,7 @@ export const items = [
         myStats.md += Math.floor(myStats.md * 0.2);
         myStats.replaceButton.def = {
             "emoji": "<:shadow_weaver_hat:1081561956114235445>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:ATK:1063214925528440832> **${char.name}**`, { magicDamage: myStats.mdChance < 0.5, mdChance: -1 });
             },
         };
@@ -2999,7 +3055,7 @@ export const items = [
     new armorInfo("Dragon's Bane Boots", "armor", "boots", "Dragon's Bane Set", ["chest"], "<:dragons_bane_boots:1081566270467604620>", "https://i.imgur.com/277hrFr.png", "hp", 212, 2379, "genesis", 654, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.def = {
             "emoji": "<:dragons_bane_gloves:1081565845643333732>",
-            "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            "run": (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any) => {
                 if (myStats.damageTaken > 5 * Math.max(myStats.atk, myStats.md)) myStats.damageTaken = 5 * Math.max(myStats.atk, myStats.md);
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:dragons_bane_gloves:1081565845643333732> **${char.name}**`, { atkMultiplier: myStats.damageTaken / Math.max(myStats.atk, myStats.md), magicDamage: true });
                 myStats.damageTaken = 0;
@@ -3092,7 +3148,7 @@ export const items = [
         console.log(`Ring of ${char.name} is at level ${level}`);
 
         // Test attack trigger
-        matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+        matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             if (caster === myStats) {
                 console.log("attack! Attacker: " + caster.name + `(${options.damage} damage)`);
             } else if (caster === eStats) {
@@ -3101,18 +3157,18 @@ export const items = [
         });
 
         // Test miss trigger
-        matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+        matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             console.log("miss! Attacker: " + caster.name);
         });
 
         // Test crit trigger
-        matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+        matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             console.log("crit! Attacker: " + caster.name + `(${options.damage} damage)`);
         });
 
         // Test ability trigger
         matchStats.on("ability", {
-            maxUsage: 2, callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
+            maxUsage: 2, callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats }: any) => {
                 console.log("ability used by " + caster.name);
                 return true;
             },

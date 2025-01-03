@@ -27,7 +27,7 @@ const exportCommand: SlashCommand = {
             };
 
             const Embed = new EmbedBuilder()
-                .setAuthor({ name: "Camelot Premium", iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+                .setAuthor({ name: "Camelot Premium", iconURL: user.displayAvatarURL({ size: 1024 }) })
                 .setColor(0xbbffff)
                 .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
                 .setDescription(`Your current tier: **${stats.premium}** 💎\n${giftLimit === 0 ? "" : `Gifts left this month: **${Math.max(0, giftLimit - premiumGifted)}**/${giftLimit} T${giftTier}\n`}\nPatreon: https://www.patreon.com/cmlt\nSee https://ko-fi.com/camelot24 for donations and lower fees`)

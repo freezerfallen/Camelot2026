@@ -10,12 +10,14 @@ import { getServerSchema, getUserRanking } from "../Modules/queries.js";
 const exportCommand: SlashCommand = {
     name: 'top',
     async execute({ interaction, author }) {
+        if (!interaction.guild) return interaction.reply("Please use this command in a server!");
+
         const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
         const blacklist = JSON.parse(fs.readFileSync('Storage/blacklist.json', 'utf8'));
 
-        let page = interaction.options.getInteger('page');
-        let flag = interaction.options.getString('flag');
-        let scope = interaction.options.getString('scope');
+        let page = interaction.options.getInteger('page') ?? 1;
+        let flag = interaction.options.getString('flag') ?? "level";
+        let scope = interaction.options.getString('scope') as "server" | "global";
 
         await interaction.deferReply().catch(() => {
             return console.log(`ERROR Interaction Failed 'deferReply()', command: "${interaction.commandName}"`);
@@ -121,7 +123,7 @@ const exportCommand: SlashCommand = {
             .setThumbnail(thumbnail)
             .setFooter({ text: `Page ${currPage}/${pagesTotal}` });
         if (pagesTotal === 1) return interaction.editReply({ embeds: [Embed] });
-        return interaction.editReply({ embeds: [Embed], components: [PageRow], fetchReply: true }).then((msg: Message) => {
+        return interaction.editReply({ embeds: [Embed], components: [PageRow] }).then((msg: Message) => {
             const collector = msg.createMessageComponentCollector({ filter: (r: ButtonInteraction) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 60000 });
 
             collector.on('collect', (r: ButtonInteraction) => {

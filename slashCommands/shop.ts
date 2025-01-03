@@ -93,10 +93,10 @@ const exportCommand: SlashCommand = {
             ];
 
             // Set balances
-            pages[0].setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) + "?size=2048" });
-            pages[1].setFooter({ text: `Balance: ${stats.gems} gems`, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) + "?size=2048" });
-            pages[2].setFooter({ text: `Balance: ${stats.items[677] || 0} mythical, ${stats.items[678] || 0} legendary exchange points`, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) + "?size=2048" });
-            pages[3].setFooter({ text: `Balance: ${stats.jades} jades, ${stats.gems} gems`, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) + "?size=2048" });
+            pages[0].setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 1024 }) });
+            pages[1].setFooter({ text: `Balance: ${stats.gems} gems`, iconURL: interaction.user.displayAvatarURL({ size: 1024 }) });
+            pages[2].setFooter({ text: `Balance: ${stats.items[677] || 0} mythical, ${stats.items[678] || 0} legendary exchange points`, iconURL: interaction.user.displayAvatarURL({ size: 1024 }) });
+            pages[3].setFooter({ text: `Balance: ${stats.jades} jades, ${stats.gems} gems`, iconURL: interaction.user.displayAvatarURL({ size: 1024 }) });
 
             return interaction.reply({ embeds: [pages[currentPage]], components: [row], fetchReply: true }).then((msg: Message) => {
                 const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 120000 });

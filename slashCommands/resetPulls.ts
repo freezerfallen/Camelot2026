@@ -20,7 +20,10 @@ const exportCommand: SlashCommand = {
         if (author.schema.pullcount < pullLimit) return interaction.reply("You still have some pulls left.");
         if (!author.schema.pullresets) return interaction.reply(`You don't have any pull resets. You can obtain them by voting (**/vote**)`);
 
-        await updateUsers(interaction.user.id, { pullcount: { value: 0 }, pullresets: { value: -1, additive: true } });
+        await updateUsers(interaction.user.id, {
+            pullcount: { type: 'set', value: 0 },
+            pullresets: { type: 'increment', value: -1 }
+        });
 
         return interaction.reply(`Resetted your pull counter. You can pull again! (**${author.schema.pullresets}** left)`);
     },

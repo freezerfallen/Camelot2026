@@ -3,7 +3,7 @@ import { formatNumberWithQuotes } from "../Modules/functions";
 import { getUserSchema, updateUsers } from "../Modules/queries";
 import { SlashCommand } from '../types';
 
-const row = new ActionRowBuilder()
+const row = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
         new ButtonBuilder()
             .setCustomId('prev')
@@ -17,7 +17,7 @@ const exportCommand: SlashCommand = {
         const subcommand = interaction.options.getSubcommand();
 
         const user = interaction.options.getUser('user') || interaction.user;
-        let amount = interaction.options.getString('amount');
+        const amountFlag = interaction.options.getString('amount') ?? "1";
 
         const stats = user.id === interaction.user.id ? author.schema : await getUserSchema(user.id);
         if (!stats) return interaction.reply(user.id === interaction.user.id ? "You don't have an account" : `${user.username} has no account`);
@@ -39,7 +39,7 @@ const exportCommand: SlashCommand = {
             const extraLvl = Math.max(0, Math.floor((Math.sqrt((2 * (stats.bank)) + (100 * (stats.level * stats.level)) + (700 * stats.level) + 1225) / 10) - 3.5 - stats.level));
             const Embed = new EmbedBuilder()
                 .setColor(0xbbffff)
-                .setAuthor({ name: `${user.username}'s Bank`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+                .setAuthor({ name: `${user.username}'s Bank`, iconURL: user.displayAvatarURL({ size: 1024 }) })
                 .setThumbnail("https://i.ibb.co/RzqnB8S/bank.png")
                 .setDescription(`**Balance**: \`${formatNumberWithQuotes(Math.max(stats.bank, 0))}/${formatNumberWithQuotes(cap)}\` <:coins:872926669055356939>\n**Additional Level**: \`${extraLvl}\``);
             return interaction.reply({ embeds: [Embed], fetchReply: true }).then(() => {
@@ -53,7 +53,7 @@ const exportCommand: SlashCommand = {
 
                         collector.on('collect', async () => {
                             collector.stop();
-                            updateUsers(interaction.user.id, { bank: { value: 1, additive: true } });
+                            updateUsers(interaction.user.id, { bank: { type: 'increment', value: 1 } });
                         });
                     });
                 };
@@ -63,16 +63,15 @@ const exportCommand: SlashCommand = {
         if (subcommand === "deposit") {
             if (Math.max(stats.bank, 0) >= cap) return interaction.reply(`Your bank has reached its max capacity. \`/levelup\` your character to increase it further.`);
 
-            if (amount.toLowerCase() === "max") amount = stats.coins;
-            else amount = parseInt(amount) || 1;
+            let amount = amountFlag.toLowerCase() === "max" ? stats.coins : (parseInt(amountFlag) || 1);
             amount = Math.min(amount, cap - Math.max(stats.bank, 0));
 
             if (stats.coins < amount) amount = stats.coins;
             if (amount < 1) return interaction.reply(`You don't have any coins to deposit.`);
 
             await updateUsers(interaction.user.id, {
-                coins: { value: -amount, additive: true },
-                bank: { value: amount + (stats.bank === -1 ? 1 : 0), additive: true }
+                coins: { type: 'increment', value: -amount },
+                bank: { type: 'increment', value: amount + (stats.bank === -1 ? 1 : 0) }
             });
 
             return interaction.reply(`Deposited **${formatNumberWithQuotes(amount)}** <:coins:872926669055356939> in your bank!\nBank balance: \`${formatNumberWithQuotes(stats.bank + (amount + (stats.bank === -1 ? 1 : 0)))}/${formatNumberWithQuotes(cap)}\` <:coins:872926669055356939>`);
@@ -81,13 +80,12 @@ const exportCommand: SlashCommand = {
         if (subcommand === "withdraw") {
             if (stats.bank < 1) return interaction.reply(`You don't have any coins in your bank.`);
 
-            if (amount.toLowerCase() === "max") amount = stats.bank;
-            else amount = parseInt(amount) || 1;
+            let amount = amountFlag.toLowerCase() === "max" ? stats.bank : (parseInt(amountFlag) || 1);
             amount = Math.min(amount, Math.max(stats.bank, 0));
 
             await updateUsers(interaction.user.id, {
-                coins: { value: amount, additive: true },
-                bank: { value: -amount, additive: true }
+                coins: { type: 'increment', value: amount },
+                bank: { type: 'increment', value: -amount }
             });
 
             return interaction.reply(`Withdrew **${formatNumberWithQuotes(amount)}** <:coins:872926669055356939> from your bank!\nBank balance: \`${formatNumberWithQuotes(stats.bank - amount)}/${formatNumberWithQuotes(cap)}\` <:coins:872926669055356939>`);

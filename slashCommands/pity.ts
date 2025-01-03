@@ -31,7 +31,7 @@ const exportCommand: SlashCommand = {
 
         const Embed = new EmbedBuilder()
             .setColor(0xbbffff)
-            .setAuthor({ name: `${user.username}'s profile`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+            .setAuthor({ name: `${user.username}'s profile`, iconURL: user.displayAvatarURL({ size: 1024 }) })
             .setDescription(`Since last <:STier:869316518675095552> pull: **${stats.lasts}**/${sPit}\nSince last <:SSTier:869316489931546644> pull: **${stats.lastss}**/${ssPit}\n\nYou have pulled a total of **${stats.pullstotal}** times!`)
             .setThumbnail(thumbnail);
         return interaction.reply({ embeds: [Embed] });

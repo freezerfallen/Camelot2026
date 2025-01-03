@@ -126,7 +126,7 @@ const event: BotEvent = {
             // Check new mails
             if (author.schema.mailbox.length > author.schema.mailreceived) {
                 await updateUsers(interaction.user.id, {
-                    mailreceived: { value: author.schema.mailbox.length }
+                    mailreceived: { type: 'set', value: author.schema.mailbox.length }
                 });
                 setTimeout(() => {
                     interaction.channel?.send(interaction.user.toString() + " you have received a **new mail**! Open it using </profile:1010583712527810641>");

@@ -9,7 +9,7 @@ const exportCommand: SlashCommand = {
         const delay = interaction.options.getInteger('int') as number;
         if (delay < 200 || delay > 1200) return interaction.reply("Please provide a number between 200-1200");
 
-        updateUsers(interaction.user.id, { animationdelay: { value: delay } });
+        updateUsers(interaction.user.id, { animationdelay: { type: 'set', value: delay } });
 
         interaction.reply(`Your animation delay was set to ${delay}ms\nTry it out in the \`/dungeon\` !`);
     },

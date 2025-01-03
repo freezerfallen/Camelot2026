@@ -743,7 +743,7 @@ export const addHeal = (target, attacker, caster, targetBuff, attackerBuff, matc
     Object.keys(flags).forEach((e) => options[e] = flags[e]);
 
     if (attacker.negateHeal && options.amount > 0 && target === caster) notice.push(`\n💖 **${attacker.name}** has negated the heal!`);
-    else { 
+    else {
         target.hp += amount;
         matchStats.trigger("heal", attacker, target, attackerBuff, targetBuff, { amount, caster });
     }

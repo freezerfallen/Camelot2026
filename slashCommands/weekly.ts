@@ -33,11 +33,11 @@ const exportCommand: SlashCommand = {
         interaction.reply(`Added ${addGems ? `**${addGems}**<:genesis_gems:1034179687720681492>, ` : ""}**${addCoins}**<:coins:872926669055356939>${ssTicket === 0 ? ` and **${sTicket}**x<:s_ticket:927642487705722890>` : `, **${sTicket}**x<:s_ticket:927642487705722890> and **${ssTicket}**x<:ss_ticket:927503239396622336>`}`);
 
         await updateUsers(interaction.user.id, {
-            coins: { value: addCoins, additive: true },
-            gems: { value: addGems, additive: true },
-            ssticket: { value: ssTicket, additive: true },
-            sticket: { value: sTicket, additive: true },
-            weeklyclaimed: { value: 1 }
+            coins: { type: 'increment', value: addCoins },
+            gems: { type: 'increment', value: addGems },
+            ssticket: { type: 'increment', value: ssTicket },
+            sticket: { type: 'increment', value: sTicket },
+            weeklyclaimed: { type: 'set', value: 1 }
         });
     },
 };

@@ -3,7 +3,7 @@ import charInfo, { characters } from "../Modules/chars.js";
 import { splitTitle, rarity, getRefinement, showPage } from "../Modules/functions.js";
 import { PageRow } from "../Modules/components.js";
 import { SlashCommand } from '../types';
-import { getUserSchema, updateUsers, updateUsersAppend } from "../Modules/queries.js";
+import { getUserSchema, updateUsers } from "../Modules/queries.js";
 
 function displayMy(thisChar: charInfo, inv: number[], ref: number, interaction: any) {
     const animeL = splitTitle(thisChar.anime);
@@ -27,15 +27,12 @@ const exportCommand: SlashCommand = {
         const ticketToOpen = interaction.options.getString('open') as "ssticket" | "sticket" | "aticket" | "bticket" | "cticket" | "dticket";
 
         if (ticketToOpen) {
-            let amount = interaction.options.getString('amount') || 1;
-            if (!isNaN(amount as any)) amount = parseInt(amount as string);
-            else if (amount.toLowerCase() === "max") amount = "max";
-            else return interaction.reply(`Please input a valid number.`);
-
             const stats = author.schema;
-            if (!stats?.[ticketToOpen]) return interaction.reply(`You don't have any tickets left.`);
+            if (!stats[ticketToOpen]) return interaction.reply(`You don't have any tickets left.`);
 
-            if (amount === "max") amount = stats?.[ticketToOpen];
+            const amountFlag = interaction.options.getString('amount') || "1";
+            let amount = amountFlag.toLowerCase() === "max" ? stats[ticketToOpen] : parseInt(amountFlag);
+            if (isNaN(amount)) return interaction.reply(`Please input a valid number.`);
             if (amount < 1) return interaction.reply(`You can't open ${amount} tickets.`);
             if (amount > 1000) return interaction.reply(`You can't open more than 1000 tickets at once.`);
             if (amount > stats?.[ticketToOpen]) return interaction.reply(`You don't have ${amount} tickets`);
@@ -50,12 +47,9 @@ const exportCommand: SlashCommand = {
             stats.chars.push(...pulled);
 
             // Update tickets
-            updateUsers(interaction.user.id, {
-                [ticketToOpen]: { value: -amount, additive: true }
-            });
-            // Update characters
-            updateUsersAppend(interaction.user.id, {
-                chars: { value: pulled }
+            await updateUsers(interaction.user.id, {
+                [ticketToOpen]: { type: 'increment', value: -amount },
+                chars: { type: 'append', value: pulled }
             });
 
             // Setup Pages
@@ -152,7 +146,7 @@ const exportCommand: SlashCommand = {
         function e1(st: any) {
             return new EmbedBuilder()
                 .setColor(0xbbffff)
-                .setAuthor({ name: `${user.username}'s inventory`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+                .setAuthor({ name: `${user.username}'s inventory`, iconURL: user.displayAvatarURL({ size: 2048 }) })
                 .setDescription("You can use a ticket with the buttons below")
                 .addFields(
                     { name: 'Tickets', value: `<:ss_ticket:927503239396622336>x${st.ssticket}\n<:b_ticket:929420396535615519>x${st.bticket}`, inline: true },
@@ -181,11 +175,10 @@ const exportCommand: SlashCommand = {
 
                 stats[ticketType]--;
 
+
                 await updateUsers(interaction.user.id, {
-                    [ticketType]: { value: -1, additive: true }
-                });
-                await updateUsersAppend(interaction.user.id, {
-                    chars: { value: [tChar[tId].id] }
+                    [ticketType]: { type: 'increment', value: -1 },
+                    chars: { type: 'append', value: [tChar[tId].id] }
                 });
 
                 msg.edit({ embeds: [e1(stats)], components: [r1(), r2()] });

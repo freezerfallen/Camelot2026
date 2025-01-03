@@ -1,5 +1,5 @@
 import { search, searchAnimeTitle } from "../Modules/functions.js";
-import { updateUsersRemove } from "../Modules/queries.js";
+import { updateUsers } from "../Modules/queries.js";
 import { SlashCommand } from '../types';
 
 const exportCommand: SlashCommand = {
@@ -22,8 +22,8 @@ const exportCommand: SlashCommand = {
 
             if (chars.length === 0) return interaction.reply(isAlreadyUnlocked ? "Your selected characters are already unlocked" : `No match found`);
 
-            updateUsersRemove(interaction.user.id, {
-                charlock: { value: chars.map((c) => c.id), removeAll: true }
+            await updateUsers(interaction.user.id, {
+                charlock: { type: 'remove_all', value: chars.map((c) => c.id) }
             });
 
             return interaction.reply(`Unlocked **${chars.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (chars.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : chars.map((c) => c.name.slice(0, 20)).join(", ")}**`);
@@ -42,8 +42,8 @@ const exportCommand: SlashCommand = {
 
             if (animes.length === 0) return interaction.reply(isAlreadyUnlocked ? "Your selected anime is already unlocked" : `No match found`);
 
-            updateUsersRemove(interaction.user.id, {
-                animelock: { value: animes.map((a) => a.id), removeAll: true }
+            await updateUsers(interaction.user.id, {
+                animelock: { type: 'remove_all', value: animes.map((a) => a.id) }
             });
 
             return interaction.reply(`Unlocked **${animes.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (animes.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : animes.map((c) => c.name.slice(0, 20)).join(", ")}**`);

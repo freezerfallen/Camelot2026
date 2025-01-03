@@ -20,7 +20,7 @@ const exportCommand: SlashCommand = {
         const Embed = new EmbedBuilder()
             .setColor(0xbbffff)
             .setThumbnail(thumbnail)
-            .setAuthor({ name: `${user.username}'s inventory`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+            .setAuthor({ name: `${user.username}'s inventory`, iconURL: user.displayAvatarURL({ size: 1024 }) })
             .setDescription("Shards are used to `/refine` characters\nObtainable through `/dungeon` and `/lootbox`")
             .addFields(
                 { name: 'Shards', value: `<:ss_shard:917203009543503892>x${stats.ssshard}\n<:b_shard:917202862851899392>x${stats.bshard}`, inline: true },

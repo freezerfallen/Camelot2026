@@ -18,7 +18,7 @@ const exportCommand: SlashCommand = {
 
         const Embed = new EmbedBuilder()
             .setColor(0xbbffff)
-            .setAuthor({ name: `${user.username}'s Balance`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" })
+            .setAuthor({ name: `${user.username}'s Balance`, iconURL: user.displayAvatarURL({ size: 1024 }) })
             .setThumbnail(thumbnail);
         if (choice === "all") Embed.setDescription(`**Coins**: \`${formatNumberWithQuotes(stats.coins)}\`<:coins:872926669055356939>\n**Gems**: \`${formatNumberWithQuotes(stats.gems)}\`<:genesis_gems:1034179687720681492>\n**Jades**: \`${formatNumberWithQuotes(stats.jades)}\`<:eternal_jade:1256124504141201428>\n**Marks**: \`${formatNumberWithQuotes(stats.guild_marks)}\`<:guild_mark:1317944450814840923>\n**Lilium**: \`${formatNumberWithQuotes(stats.lilies)}\`<:lilium:974057059618291732>`);
         else if (choice === "coins") Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`<:coins:872926669055356939>\n${stats.dailyclaimed === 1 ? "You have claimed your daily" : "Your </daily:1011371510759428136> is available!"}`);

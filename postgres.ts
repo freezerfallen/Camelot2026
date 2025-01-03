@@ -76,7 +76,7 @@ async function createTables() {
         mailbox JSONB DEFAULT '[]' NOT NULL,
         eventrewreceived INT DEFAULT 0 NOT NULL,
         gems BIGINT DEFAULT 0 NOT NULL,
-        tutorial JSONB DEFAULT '[]' NOT NULL,
+        tutorial INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         transactions JSONB DEFAULT '[]' NOT NULL,
         dailies JSONB DEFAULT '{}' NOT NULL,
         guild TEXT,
