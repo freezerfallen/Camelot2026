@@ -150,7 +150,7 @@ export interface UserSchema {
     created: Date;
 
     chars: number[];
-    char_ref: Record<string, any>;
+    char_ref: Record<string, number>;
     char_level: Record<string, any>;
     char_class: Record<string, any>;
     char_skin: Record<string, any>;
@@ -164,7 +164,7 @@ export interface UserSchema {
     stampede_responsetime: string;
 }
 
-export type CompactUserSchema = Omit<UserSchema, "transactions" | "chars" | "char_ref" | "char_level" | "char_class" | "char_skin" | "char_equipment" | "dungeon_responsetime" | "stampede_responsetime">;
+export type CompactUserSchema = Omit<UserSchema, "transactions" | "char_level" | "char_class" | "char_equipment" | "dungeon_responsetime" | "stampede_responsetime">;
 
 export interface ServerSchema {
     rowid: number;

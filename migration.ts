@@ -91,7 +91,7 @@ export const migrateData = async () => {
                     user.cow_participation, user.cow_chars, user.cow_timer,
                     user.cow_rolled_today, user.rank, user.rankscore, user.raidxp,
                     user.guild_marks, new Date(user.created),
-                    charData.chars, charData.ref, charData.level,
+                    JSON.parse(charData.chars), charData.ref, charData.level,
                     charData.class, charData.skin, charData.equipment,
                     dungeonData.floors, dungeonData.limit, dungeonData.classes,
                     dungeonData.classlevels, dungeonData.responsetime,

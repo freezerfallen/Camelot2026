@@ -90,7 +90,6 @@ async function createTables() {
         class INT,
         aboutme TEXT,
         profilecolor TEXT,
-
         jades BIGINT DEFAULT 0 NOT NULL,
         pass INT DEFAULT 0 NOT NULL,
         passlevel INT DEFAULT 0 NOT NULL,
@@ -128,7 +127,6 @@ async function createTables() {
         cow_chars TEXT,
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
-
         rank TEXT DEFAULT 'F-' NOT NULL,
         rankscore BIGINT DEFAULT 0 NOT NULL,
         raidxp INT DEFAULT 0 NOT NULL,
@@ -136,7 +134,7 @@ async function createTables() {
         created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
         -- Characters table columns
-        chars JSONB DEFAULT '[]' NOT NULL,
+        chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         char_ref JSONB DEFAULT '{}' NOT NULL,          -- renamed from 'ref' to avoid conflicts
         char_level JSONB DEFAULT '{}' NOT NULL,        -- renamed from 'level' to avoid conflicts
         char_class JSONB DEFAULT '{}' NOT NULL,        -- renamed from 'class' to avoid conflicts

@@ -2,15 +2,15 @@ import { EmbedBuilder } from "discord.js";
 import { characters } from "../Modules/chars";
 import { formatNumberWithQuotes } from "../Modules/functions";
 import { SlashCommand } from '../types';
-import { getFullUserSchema } from '../Modules/queries';
+import { getUserSchema } from '../Modules/queries';
 
 const exportCommand: SlashCommand = {
     name: 'balance',
-    async execute({ interaction }) {
+    async execute({ interaction, author }) {
         let user = interaction.options.getUser('user') || interaction.user;
         let choice = (interaction.options.getString('currency') || "all") as "all" | "coins" | "gems" | "jades" | "lilies" | "guild_marks";
 
-        const stats = await getFullUserSchema(user.id);
+        const stats = user.id === interaction.user.id ? author.schema : await getUserSchema(user.id);
         if (!stats) return interaction.reply("User not found");
 
         let thumbnail = characters[stats.chars[Math.floor(Math.random() * stats.chars.length)]].image || "https://i.imgur.com/Ta2YDBN.png";

@@ -16,7 +16,7 @@ export const getMinimalUserSchema = async (id: string): Promise<Pick<UserSchema,
 };
 
 export const getUserSchema = async (id: string): Promise<CompactUserSchema | undefined> => {
-    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, rank, rankscore, raidxp, guild_marks, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
+    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rank, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
     return user;
 };
 
@@ -98,10 +98,6 @@ export const addUserToServer = async (serverId: string, userId: string): Promise
     await query(`UPDATE servers SET user_ids = array_append(user_ids, $1) WHERE id = $2 AND NOT $1 = ANY(user_ids)`, [userId, serverId]);
 };
 
-export const updateUserMailReceived = async (userId: string, mailCount: number): Promise<void> => {
-    await query(`UPDATE users SET mailreceived = $1 WHERE id = $2`, [mailCount, userId]);
-};
-
 export const updateUsers = async (userIds: string | string[] | "*", updates: { [K in keyof Partial<UserSchema>]: { value: UserSchema[K], additive?: boolean; }; }): Promise<void> => {
     const setStatements = Object.entries(updates)
         .map(([key, { value, additive }], index) => {
@@ -109,6 +105,58 @@ export const updateUsers = async (userIds: string | string[] | "*", updates: { [
                 return `${key} = ${key} + $${index + 2}`;
             }
             return `${key} = $${index + 2}`;
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (userIds === "*") {
+        await query(
+            `UPDATE users SET ${setStatements}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(userIds) ? userIds : [userIds];
+        await query(
+            `UPDATE users SET ${setStatements} WHERE id = ANY($1)`,
+            [ids, ...values]
+        );
+    }
+};
+
+export const updateUsersAppend = async (userIds: string | string[] | "*", updates: Partial<{ [K in keyof Pick<UserSchema, { [P in keyof UserSchema]: UserSchema[P] extends any[] ? P : never }[keyof UserSchema]>]: { value: UserSchema[K], unique?: boolean; }; }>): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { unique }], index) => {
+            if (unique) {
+                return `${key} = array(select distinct unnest(array_cat(${key}, $${index + 2})))`;
+            };
+            return `${key} = array_cat(${key}, $${index + 2})`;
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (userIds === "*") {
+        await query(
+            `UPDATE users SET ${setStatements}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(userIds) ? userIds : [userIds];
+        await query(
+            `UPDATE users SET ${setStatements} WHERE id = ANY($1)`,
+            [ids, ...values]
+        );
+    }
+};
+
+export const updateUsersRemove = async (userIds: string | string[] | "*", updates: Partial<{ [K in keyof Pick<UserSchema, { [P in keyof UserSchema]: UserSchema[P] extends any[] ? P : never }[keyof UserSchema]>]: { value: UserSchema[K], removeAll?: boolean; }; }>): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { removeAll }], index) => {
+            if (removeAll) {
+                return `${key} = (SELECT array_agg(elem) FROM unnest(${key}) elem WHERE NOT elem = ANY($${index + 2}::int[]))`;
+            };
+            return `${key} = array_remove(${key}, $${index + 2})`;
         })
         .join(', ');
 
