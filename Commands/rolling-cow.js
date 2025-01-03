@@ -641,8 +641,8 @@ module.exports = {
                             eBuffs.md.push(new buffInfo("+", Math.floor(eStats.md * matchStats.round * 0.0125), 9999));
 
                             // Apply Buffs
-                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(buffs, myStatsC);
-                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eBuffs, eStatsC);
+                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice);
+                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eStatsC, eStatsC, eBuffs, buffs, matchStats, notice);
 
                             // Fix Stats
                             if (myStatsC.hp > myStatsC.maxhp) myStatsC.hp = myStatsC.maxhp;
@@ -791,6 +791,7 @@ module.exports = {
                                 }
 
                             } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
+                            matchStats.trigger("defend", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         ability.on('collect', async () => {
@@ -823,6 +824,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 } else interaction.followUp({ content: `You can use **${myChar.name}**'s ability only ${myAbility.usage == 1 ? "once" : `${myAbility.usage} times`} per fight.`, ephemeral: true });
                             };
+                            // Trigger ability
+                            matchStats.trigger("ability", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         cskill.on('collect', () => {
@@ -852,6 +855,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 };
                             };
+                            // Trigger class active
+                            matchStats.trigger("cskill", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         skip.on('collect', () => {

@@ -23,7 +23,6 @@ export interface BotHandler {
     execute: (...args?) => void;
 }
 
-
 export interface UserSchema {
     rowid: number;
     id: string;
@@ -224,7 +223,6 @@ export interface RaidSchema {
     start_date: Date;
 }
 
-
 export type RankShopTransaction = {
     authorization?: string;
     txn_id: string;
@@ -272,7 +270,7 @@ export type Buffs = {
 };
 
 
-export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute";
+export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "defend" | "cskill";
 
 export type TriggerOptions = {
     event: TriggerEvents;
@@ -331,7 +329,6 @@ export type MatchStats = {
 
     [key: string]: any;
 };
-
 
 declare global {
     namespace NodeJS {

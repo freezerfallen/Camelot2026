@@ -471,8 +471,8 @@ module.exports = {
                             if (matchStats.currentOpponent === 0) eStatsC.atk = eStats.atk, eStatsC.md = eStats.md, eStatsC.def = eStats.def, eStatsC.mr = eStats.mr, eStatsC.cd = eStats.cd, eStatsC.cr = eStats.cr, eStatsC.dodge = eStats.dodge, eStatsC.br = eStats.br, eStatsC.mg = eStats.mg;
 
                             // Apply Buffs
-                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(buffs, myStatsC);
-                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eBuffs, eStatsC);
+                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice);
+                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eStatsC, eStatsC, eBuffs, buffs, matchStats, notice);
 
                             // Fix Stats
                             if (myStatsC.hp > myStatsC.maxhp) myStatsC.hp = myStatsC.maxhp;
@@ -613,6 +613,7 @@ module.exports = {
                                 }
 
                             } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
+                            matchStats.trigger("defend", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         ability.on('collect', async r => {
@@ -645,6 +646,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 } else interaction.followUp({ content: `You can use **${myChar.name}**'s ability only ${myAbility.usage === 1 ? "once" : `${myAbility.usage} times`} per fight.`, ephemeral: true });
                             };
+                            // Trigger ability
+                            matchStats.trigger("ability", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         cskill.on('collect', async r => {
@@ -674,6 +677,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 };
                             };
+                            // Trigger class active
+                            matchStats.trigger("cskill", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         atk.on('end', async component => {

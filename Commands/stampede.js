@@ -709,8 +709,8 @@ module.exports = {
                             eBuffs.md.push(new buffInfo("+", Math.floor(eStats.md * matchStats.round * 0.01), 9999));
 
                             // Apply Buffs
-                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(buffs, myStatsC);
-                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eBuffs, eStatsC);
+                            if (matchStats.currentCharacter === 0) Avalon.applyBuffs(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice);
+                            if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eStatsC, eStatsC, eBuffs, buffs, matchStats, notice);
 
                             // Adjust Boss DEF
                             eStatsC.def += adjustDEF(myStatsC);
@@ -858,6 +858,7 @@ module.exports = {
                                 }
 
                             } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
+                            matchStats.trigger("defend", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         ability.on('collect', async r => {
@@ -891,6 +892,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 } else interaction.channel.send(`You can use **${myChar.name}**'s ability only ${myAbility.usage == 1 ? "once" : `${myAbility.usage} times`} per fight.`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
                             };
+                            // Trigger ability
+                            matchStats.trigger("ability", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         cskill.on('collect', async r => {
@@ -922,6 +925,8 @@ module.exports = {
                                     } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                                 };
                             };
+                            // Trigger class active
+                            matchStats.trigger("cskill", myStatsC, eStatsC, buffs, eBuffs);
                         });
 
                         atk.on('end', () => {
