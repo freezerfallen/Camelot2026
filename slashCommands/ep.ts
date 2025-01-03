@@ -1,9 +1,10 @@
 import { cat1 } from "../Modules/functions";
+import { EmbedBuilder } from 'discord.js';
+import { SlashCommand } from '../types';
 
-module.exports = {
+const exportCommand: SlashCommand = {
     name: 'ep',
-    description: 'EP calculator',
-    execute(interaction) {
+    async execute({ interaction }) {
 
         let hp = interaction.options.getNumber('hp');
         let atk = interaction.options.getNumber('atk');
@@ -14,6 +15,7 @@ module.exports = {
         if (hp > 1000000 || atk > 1000000 || def > 1000000 || cr > 1000000 || cd > 1000000 || dodge > 1000000) return interaction.reply("Please use values smaller than 1000000");
 
         return interaction.reply("" + Math.floor(((1 / (1 - cat1(dodge))) * (hp / Math.pow(0.99895, def)) / (200 / (atk * (1 + (cat1(cr) * (cd - 1)))))) * 100) / 100);
-
     },
 };
+
+export default exportCommand;

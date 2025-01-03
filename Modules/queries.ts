@@ -74,6 +74,19 @@ export const getTotalPlayers = async (): Promise<number> => {
     return result.players;
 };
 
+export const getUserRanking = async (scope: "server" | "global", user_ids: string[], orderBy: "xp" | "pullstotal" | "chars" | "uniqueChars"): Promise<Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[]> => {
+    const orderByClause = orderBy === "uniqueChars"
+        ? "COALESCE(array_length(array(select distinct unnest(chars)), 1), 0) DESC"
+        : orderBy === "chars"
+            ? "COALESCE(array_length(chars, 1), 0) DESC"
+            : `${orderBy} DESC`;
+
+    const result = await query(
+        `SELECT name, id, xp, pullstotal, favchar, premium, chars, char_skin FROM users ${scope === "server" ? `WHERE id = ANY($1)` : ""} ORDER BY ${orderByClause} LIMIT 1501`,
+        scope === "server" ? [user_ids] : []
+    ) as Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[];
+    return result ?? [];
+};
 
 
 //-------------------------------------------//

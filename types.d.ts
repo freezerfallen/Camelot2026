@@ -85,7 +85,7 @@ export interface UserSchema {
     pullreminder: number;
     votereminder: number;
     items: Record<string, any>;
-    skins: any[];
+    skins: number[];
     eventpts: number;
     brbest: number;
     mailbox: any[];
