@@ -1,3 +1,4 @@
+import { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 
 export type Gender = 'M' | 'F' | 'NB';
@@ -21,6 +22,23 @@ export interface BotHandler {
     once?: boolean,
     disabled?: boolean,
     execute: (...args?) => void;
+}
+
+interface executeSlashCommand {
+    interaction: ChatInputCommandInteraction,
+    locale: Locale,
+    author: { schema: CompactUserSchema; },
+    // server: { schema?: ServerSchema; },
+    reply?: any,
+    warn?: any,
+    customFlag?: any,
+}
+
+export interface SlashCommand {
+    name: string,
+    execute: ({ }: executeSlashCommand) => void,
+    autocomplete?: ({ }: { interaction: AutocompleteInteraction; }) => Promise<Array<{ name: string, value: string; }>>,
+    cooldown?: number, // in seconds
 }
 
 export interface UserSchema {
@@ -88,13 +106,50 @@ export interface UserSchema {
     class: number | null;
     aboutme: string | null;
     profilecolor: string | null;
+    jades: number;
+    pass: number;
+    passlevel: number;
+    freepassclaimed: number;
+    premiumpassclaimed: number;
+    celebrateclaimed: number;
+    expulls: number;
+    level: number;
+    bank: number;
+    charxp: number;
+    feedlimit: number;
+    findoption: number;
+    referred_by: string | null;
+    referred_gems: number;
+    referrals_claimed: number;
+    passpurchaselimit: number;
+    expity: number;
+    craze_equipment: Record<string, any>;
+    equipment: Record<string, any>;
+    trial_equipment: Record<string, any>;
+    craze_levels: Record<string, any>;
+    shield_slot: number;
+    lastguildjoin: Date | null;
+    valentine: string | null;
+    bosshuntruns: number;
+    bosshuntrevreceived: number | null;
+    monthlyshop: Record<string, any>;
+    itemwishlist: any[];
+    stampedeenergy: number;
+    background: string | null;
+    backgrounds: string[];
+    charlock: number[];
+    animelock: number[];
+    cow_participation: number | null;
+    cow_chars: string | null;
+    cow_timer: number | null;
+    cow_rolled_today: number;
     rank: string;
     rankscore: number;
     raidxp: number;
     guild_marks: number;
     created: Date;
 
-    chars: any[];
+    chars: number[];
     char_ref: Record<string, any>;
     char_level: Record<string, any>;
     char_class: Record<string, any>;
@@ -363,5 +418,6 @@ declare global {
 declare module "discord.js" {
     export interface Client {
         commands: Collection<string, any>;
+        slashCommands: Collection<string, SlashCommand>;
     }
 }

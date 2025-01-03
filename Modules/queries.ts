@@ -65,6 +65,17 @@ export const getRaidSchema = async (id: string): Promise<RaidSchema | undefined>
     return raid;
 };
 
+//---------------------------------- ---------//
+//               GET STATEMENTS               //
+//---------------------------------- ---------//
+
+export const getTotalPlayers = async (): Promise<number> => {
+    const [result] = await query(`SELECT COUNT(rowid) AS players FROM users`) as [{ players: number; }];
+    return result.players;
+};
+
+
+
 //-------------------------------------------//
 //             INSERT STATEMENTS             //
 //-------------------------------------------//
@@ -89,4 +100,30 @@ export const addUserToServer = async (serverId: string, userId: string): Promise
 
 export const updateUserMailReceived = async (userId: string, mailCount: number): Promise<void> => {
     await query(`UPDATE users SET mailreceived = $1 WHERE id = $2`, [mailCount, userId]);
+};
+
+export const updateUsers = async (userIds: string | string[] | "*", updates: { [K in keyof Partial<UserSchema>]: { value: UserSchema[K], additive?: boolean; }; }): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { value, additive }], index) => {
+            if (additive) {
+                return `${key} = ${key} + $${index + 2}`;
+            }
+            return `${key} = $${index + 2}`;
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (userIds === "*") {
+        await query(
+            `UPDATE users SET ${setStatements}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(userIds) ? userIds : [userIds];
+        await query(
+            `UPDATE users SET ${setStatements} WHERE id = ANY($1)`,
+            [ids, ...values]
+        );
+    }
 };
