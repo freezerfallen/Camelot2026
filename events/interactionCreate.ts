@@ -2,7 +2,7 @@ import fs from "fs";
 import Package from '../package.json';
 import { Interaction, EmbedBuilder, PermissionsBitField } from "discord.js";
 import { BotEvent } from "../types";
-import { query } from "../db_handler";
+import { addUserToServer, getServerSchema, getUserSchema, insertNewServer, insertNewUser, updateUserMailReceived } from "../Modules/queries";
 
 const userCooldown = new Map();
 const channelCooldown = new Set();
@@ -107,31 +107,25 @@ const event: BotEvent = {
             };
 
             // ADD NEW PLAYERS
-            const entryExists = await query(`SELECT name FROM users WHERE id = ${interaction.user.id}`); // Check if user exists in the db
-            if (entryExists.length) { // Update username if changed
-                if (entryExists[0].name !== interaction.user.username) await query(`UPDATE users SET name = "${interaction.user.username}" WHERE id = ${interaction.user.id}`, 'run');
-            } else { // Add new player if not exists
-                await query(`INSERT INTO users (id, name, created) VALUES (${interaction.user.id}, "${interaction.user.username}", "${new Date().toISOString().replace('T', ' ').slice(0, 19)}")`, 'run');
-                await query(`INSERT INTO characters (id) VALUES (${interaction.user.id})`, 'run');
-                await query(`INSERT INTO dungeon (id) VALUES (${interaction.user.id})`, 'run');
+            const author = {
+                schema: await getUserSchema(interaction.user.id) ?? await insertNewUser(interaction.user.id, interaction.user.username),
             };
+            if (author.schema.name !== interaction.user.username) author.schema = await insertNewUser(interaction.user.id, interaction.user.username);
+
             // ADD NEW SERVERS
-            const serverExists = await query(`SELECT user_ids FROM servers WHERE id = ${interaction.guild.id}`); // Check if server exists in the db
-            if (serverExists.length) { // Add players to guild
-                if (!serverExists[0].user_ids.split(",").includes(interaction.user.id)) await query(`UPDATE servers SET user_ids = "${serverExists[0].user_ids + "," + interaction.user.id}" WHERE id = ${interaction.guild.id}`, 'run');
+            const serverExists = await getServerSchema(interaction.guild.id); // Check if server exists in the db
+            if (serverExists) { // Add players to guild
+                if (!serverExists.user_ids.includes(interaction.user.id)) await addUserToServer(interaction.guild.id, interaction.user.id);
             } else { // Add new server if not exists
-                await query(`INSERT INTO servers (id, name, user_ids) VALUES (${interaction.guild.id}, "${interaction.guild.name.split('"').join('""')}", "${interaction.user.id}")`, 'run');
+                await insertNewServer(interaction.guild.id, interaction.guild.name, interaction.user.id);
             };
 
             // TUTORIAL
-            const { 0: userStats } = await query(`SELECT tutorial, mailbox, mailreceived FROM users WHERE id = ${interaction.user.id}`);
-            userStats.tutorial = JSON.parse(userStats.tutorial);
-            if (!([0, 1, 2, 3, 4, 5, 6, 7].every((e) => userStats.tutorial.includes(e)))) return interaction.client.commands.get('tutorial').execute(interaction);
+            if (!([0, 1, 2, 3, 4, 5, 6, 7].every((e) => author.schema.tutorial.includes(e)))) return interaction.client.commands.get('tutorial').execute(interaction);
 
             // Check new mails
-            userStats.mailbox = JSON.parse(userStats.mailbox);
-            if (userStats.mailbox.length > userStats.mailreceived) {
-                await query(`UPDATE users SET mailreceived = ${userStats.mailbox.length} WHERE id = ${interaction.user.id}`);
+            if (author.schema.mailbox.length > author.schema.mailreceived) {
+                await updateUserMailReceived(interaction.user.id, author.schema.mailbox.length);
                 setTimeout(() => {
                     interaction.channel?.send(interaction.user.toString() + " you have received a **new mail**! Open it using </profile:1010583712527810641>");
                 }, 1000);

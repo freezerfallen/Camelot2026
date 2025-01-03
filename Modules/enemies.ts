@@ -183,9 +183,10 @@ export const crazeMobs: enemyInfo[] = [
     /* 9 - Lelouch: Use 2B to prevent eye contact */ new enemyInfo("Lelouch vi Britannia", "Human", "the Demon Emperor", "M", false, {}, { hp: 6.283 }, { def: 1000000000, mr: 1000000000 }, [], ["https://i.ibb.co/0jWj3bn/c.png"], [], 9),
     /* 10 - Larry: Twinshot Megumin */ new enemyInfo("Larry", "Cockroach", "Larry", "M", false, {}, { hp: 3.42, atk: 12.8, md: 12.8 }, { dodge: 1, br: 1, def: 1200, mr: 1200 }, [], ["https://i.ibb.co/YXSRsCL/larry.png"], [], 10),
     /* 11 - Wamuu: Run away */ new enemyInfo("Wamuu", "Human", "the Warrior of Wind", "M", false, {}, { atk: 1.8, md: 1.8, hp: 69.69 }, { def: 5000, mr: 5000 }, [], ["https://i.ibb.co/PzR845y/wamuu.png"], [], 11),
-    /* 12 - Fuutarou Uesugi: Try QQ Girls, only one is correct */ new enemyInfo("Fuutarou Uesugi", "Human", "Mr. Honor-Roll", "M", false, {}, {}, {}, [], ["https://i.ibb.co/GT9fLQ8/c.png"], [], 12),
-    /* 13 - Mob: Reach round 100 without dealing damage */ new enemyInfo("Mob", "Human", "the Psycho Helmet", "M", false, {}, { atk: 42, md: 42, hp: 99.99 }, { dodge: 0, br: 0 }, [], ["https://i.ibb.co/f8HX8Y9/c.png"], [], 13),
-    /* 14 - Sukuna */
+    /* 12 - Floor: Use Arima Kana */ new enemyInfo("Floor", "Floor", "the Floor", "M", true, {}, { hp: 3.42, atk: 12.8, md: 12.8 }, { dodge: 1, br: 1, def: 1200, mr: 1200 }, [], ["https://i.ibb.co/YtXbDwp/floor.png"], [], 12),
+    /* 13 - Fuutarou Uesugi: Try QQ Girls, only one is correct */ new enemyInfo("Fuutarou Uesugi", "Human", "Mr. Honor-Roll", "M", false, {}, {}, {}, [], ["https://i.ibb.co/GT9fLQ8/c.png"], [], 13),
+    /* 14 - Mob: Reach round 100 without dealing damage */ new enemyInfo("Mob", "Human", "the Psycho Helmet", "M", false, {}, { atk: 42, md: 42, hp: 99.99 }, { dodge: 0, br: 0 }, [], ["https://i.ibb.co/f8HX8Y9/c.png"], [], 14),
+    /* 15 - Sukuna */ new enemyInfo("Sukuna", "Cursed Spirit", "the King of Curses", "M", true, {}, { hp: 333.33, atk: 5, md: 5 }, { def: 1000000000, mr: 1000000000 }, [], ["https://i.ibb.co/9p7zvsV/c.png"], [], 15),
 
 ];
 
@@ -250,9 +251,9 @@ export const raidBosses: enemyInfo[] = [
 
             eStats.retaliationDamage += 0.1;
             notice.push(`\n⚜️ **${enemy.name}** increases her retaliation damage by **10%**`);
-            
+
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            
+
             eStats.lightningImmunity = true;
 
             eStats.retaliationDamage = 0.2;
@@ -262,23 +263,23 @@ export const raidBosses: enemyInfo[] = [
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${enemy.name}** retaliates`, { atkMultiplier: eStats.retaliationDamage });
                 }
             });
-            
+
         }, [["Immune to lightning damage", "Possibly retaliates every 2nd hit on herself, dealing **20%** damage", "**Active**: Increases her retaliation damage by 10% (**90** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Veloura", "Doppelgänger", "the Void Harbinger", "F", true, { mg: 0 }, {}, { mana: 120 }, [], ["https://i.ibb.co/DCDzxsp/n.png"], [], 3,
         new skillInfo(3, 90, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            
+
             eStats.retaliationDamage += 0.15;
             notice.push(`\n⚜️ **${enemy.name}** increases her retaliation damage by **15%**`);
-            
+
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            
+
             eStats.lightningImmunity = true;
- 
+
             eStats.retaliationDamage = 0.3;
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }: { trigger: Trigger, caster: any, target: any, casterBuff: Buffs, targetBuff: Buffs, matchStats: MatchStats, options: any; }) => {
                 if (caster === char && Math.random() < 0.4) {
-                    eStats.mana += 40
+                    eStats.mana += 40;
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${enemy.name}** retaliates`, { atkMultiplier: eStats.retaliationDamage });
                 }
             });
@@ -287,15 +288,15 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
 
-            
+
         }, [["Immune to lightning damage", "applies some DoT, proportional to her retaliation damage, to herself", "Possibly retaliates every hit on herself, dealing **30%** damage", "**Active**: Increases her retaliation damage by 15% (**90** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Velia", "Doppelgänger", "the Void Harbinger", "F", true, { mg: 0 }, {}, { mana: 120 }, [], ["https://i.ibb.co/Js46cdL/l.png"], [], 4,
         new skillInfo(4, 100, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            
+
             eStats.retaliationDamage += 0.15;
             notice.push(`\n⚜️ **${enemy.name}** increases her retaliation damage by **15%**`);
-            
+
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             eStats.lightningImmunity = true;
@@ -419,7 +420,7 @@ export const raidBosses: enemyInfo[] = [
             eStats.mr = Math.floor(eStats.mr * statScale);
             eStats.mana = 40;
             eStats.mg = 0;
-            
+
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: { trigger: Trigger, caster: any, target: any, casterBuff: Buffs, targetBuff: Buffs, matchStats: MatchStats, options: any; }) => {
                 if (caster === char) {
@@ -484,10 +485,10 @@ export const raidBosses: enemyInfo[] = [
 
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (Math.random() < 0.33) {
-                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${enemy.name}**`, { });
+                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${enemy.name}**`, {});
                 }
             }, 2));
-            
+
             const satk = Math.floor(myStats.atk * 0.2); eStats.atk += satk * 5; myStats.atk -= satk;
             const sdef = Math.floor(myStats.def * 0.2); eStats.def += sdef * 5; myStats.def -= sdef;
             const smd = Math.floor(myStats.md * 0.2); eStats.md += smd * 5; myStats.md -= smd;
@@ -508,8 +509,8 @@ export const raidBosses: enemyInfo[] = [
 
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                const drain = myStats.hp > myStats.maxhp * 0.5 ? Math.floor(myStats.hp * 0.05) : Math.floor(myStats.hp * 0.1) //? maxhp or current hp
-                myStats.hp -= drain
+                const drain = myStats.hp > myStats.maxhp * 0.5 ? Math.floor(myStats.hp * 0.05) : Math.floor(myStats.hp * 0.1); //? maxhp or current hp
+                myStats.hp -= drain;
                 eStats.hp += drain;
                 if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
                 if (eStats.hp < 0) eStats.hp = 0;
