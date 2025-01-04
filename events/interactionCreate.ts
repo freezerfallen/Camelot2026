@@ -113,12 +113,11 @@ const event: BotEvent = {
             if (author.schema.name !== interaction.user.username) author.schema = await insertNewUser(interaction.user.id, interaction.user.username);
 
             // ADD NEW SERVERS
-            const serverExists = await getServerSchema(interaction.guild.id); // Check if server exists in the db
-            if (serverExists) { // Add players to guild
-                if (!serverExists.user_ids.includes(interaction.user.id)) await addUserToServer(interaction.guild.id, interaction.user.id);
-            } else { // Add new server if not exists
-                await insertNewServer(interaction.guild.id, interaction.guild.name, interaction.user.id);
+
+            const server = {
+                schema: await getServerSchema(interaction.guild.id) ?? await insertNewServer(interaction.guild.id, interaction.guild.name, interaction.user.id),
             };
+            if (!server.schema.user_ids.includes(interaction.user.id)) await addUserToServer(interaction.guild.id, interaction.user.id);
 
             // TUTORIAL
             if (!([0, 1, 2, 3, 4, 5, 6, 7].every((e) => author.schema.tutorial.includes(e)))) return interaction.client.commands.get('tutorial').execute(interaction);
@@ -135,7 +134,7 @@ const event: BotEvent = {
 
             // Slash Commands
             const command = interaction.client.slashCommands.get(interaction.commandName) as SlashCommand | undefined;
-            if (command) return command.execute({ interaction, author, locale: 'en_US' });
+            if (command) return command.execute({ interaction, author, server, locale: 'en_US' });
 
             // Execute command
             if (interaction.commandName === "arena" && interaction.options.getUser('user')?.id === "706183309943767112") return interaction.client.commands.get('trial').execute(interaction);

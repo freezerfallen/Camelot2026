@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import fs, { cp } from 'fs';
-import { EmbedBuilder, AttachmentBuilder } from "discord.js";
+import fs from 'fs';
+import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User } from "discord.js";
 import imagesize from 'imagesize';
 import axios from 'axios';
 import sharp from 'sharp';
@@ -8,17 +8,19 @@ import https from "https";
 import { createCanvas } from '@napi-rs/canvas';
 import crypto from 'crypto';
 import { db, query } from "../db_handler";
-import { characters } from "./chars";
+import charInfo, { characters } from "./chars";
 import { anime } from "./anime";
 import { achievements } from "./achievements";
-import { dailies } from "../Modules/dailyQuests";
-import { classes } from "./classes";
+import { dailies } from "./dailyQuests";
+import classInfo, { classes } from "./classes";
 import { rankLowerRanges } from "./components";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
+import { itemInfo, items, lootInfo } from "./items";
 import _ from 'lodash';
+import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, MatchStats, PrimaryStat, WeaponSchema } from '../types';
 
-const statsOp = {
+const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>; def: Record<number, number>; expertise: Record<number, string>; }; } = {
     "base": {
         "hp": { "238": -20, "405": -6, "460": 54, "512": 60, "2016": -10, "2079": 12, "2360": 12, "2597": 24, "3150": 6, "3307": -20, "3408": -20, "3409": 12, "3886": 20, "4769": -20, "5032": -9, "5341": 20, "5344": 16, "5819": -20, "8188": 30, "8189": 40, "8521": 12, "8582": 20, "9606": -6, "10520": 37, "10521": -14, "10523": 30, "10530": 40, "12000": 16, "12121": 10, "12424": 1, "17583": -11, "17688": -25, "17689": 12, "17871": -13, "18011": -9 },
         "atk": { "238": -11, "405": 12, "460": -12, "512": -10, "2079": 9, "2016": -2, "3150": 4, "3409": 14, "3886": 4, "4250": 10, "4712": -8, "5341": 6, "5344": 10, "6082": -13, "8187": 7, "8189": 10, "8521": 5, "9606": 3, "10517": 10, "10520": 20, "10521": -4, "10523": 5, "10530": 8, "12000": 10, "12121": 7, "12393": -5, "12424": 15, "17583": -10, "17689": -2, "17871": -4, "18011": -6 },
@@ -27,7 +29,7 @@ const statsOp = {
     },
 };
 
-export const getDimensions = (url) => {
+export const getDimensions = (url: string) => {
     return new Promise((resolve, rejects) => {
         let request = https.get(url, (response) => {
             imagesize(response, (err, result) => {
@@ -38,7 +40,7 @@ export const getDimensions = (url) => {
     });
 };
 
-export const strCode = (id) => {
+export const strCode = (id: number) => {
     let inp = characters[id].anime + characters[id].gender + characters[id].name;
     let hash = 0;
     if (inp.length < 2) return 111;
@@ -51,7 +53,7 @@ export const strCode = (id) => {
     return hash;
 };
 
-export const baseHP = (id) => {
+export const baseHP = (id: number) => {
     let hash = strCode(id) % 10;
     switch (characters[id].rarity) {
         case "EX": hash = Math.floor(420 + (20 * (hash / 9))); break; // 420-440
@@ -67,7 +69,7 @@ export const baseHP = (id) => {
     return hash;
 };
 
-export const baseATK = (id) => {
+export const baseATK = (id: number) => {
     let hash = Math.round(((strCode(id) % 100) / 10) + 0.01);
     switch (characters[id].rarity) {
         case "EX": hash = Math.floor(70 + (1 * hash)); break;  // 70-80
@@ -83,7 +85,7 @@ export const baseATK = (id) => {
     return hash;
 };
 
-export const baseDEF = (id) => {
+export const baseDEF = (id: number) => {
     let hash = strCode(id);
     let sum = 0;
     while (hash) {
@@ -106,11 +108,11 @@ export const baseDEF = (id) => {
     return hash;
 };
 
-export const baseEP = (id, hp = baseHP(id), atk = baseATK(id), def = baseDEF(id), md = atk, mr = def, cd = 1.25, cr = 0.18, dodge = 0.1) => {
+export const baseEP = (id: number, hp = baseHP(id), atk = baseATK(id), def = baseDEF(id), md = atk, mr = def, cd = 1.25, cr = 0.18, dodge = 0.1) => {
     return Math.floor(((1 / (1 - dodge)) * (hp / Math.pow(0.99895, Math.max(def, mr))) / (200 / (Math.max(atk, md) * (1 + (cat1(cr) * (cd - 1)))))) * 100) / 100;
 };
 
-export const baseExpertise = (id) => {
+export const baseExpertise = (id: number) => {
     if (statsOp.base.expertise[id]) return statsOp.base.expertise[id];
     let hash = Math.floor(((strCode(id) % 60) / 10) + 0.01);
 
@@ -125,7 +127,7 @@ export const baseExpertise = (id) => {
     };
 };
 
-export const cat1 = (num) => {
+export const cat1 = (num: number) => {
     if (num > 1) return 1;
     if (num < 0) return 0;
     return num;
@@ -143,9 +145,9 @@ const lvlupStats = {
 
 const retainItemStats = new Map();
 
-export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = false) => {
+export const getDetailedStats = async (id: number, inv: CompactUserSchema, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
 
-    let dStats = {
+    let dStats: DetailedStats = {
         "name": characters[id].name,
         "hp": baseHP(id),
         "maxhp": 1,
@@ -196,14 +198,14 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
         "delayedBuffs": [],
         "replaceButton": {},
         "lvl": (inv.level ?? 1) + lu,
-        "ref": Math.min(6, ((inv.ref[id] ?? 0) + refine)),
+        "ref": Math.min(6, ((inv.char_ref[id] ?? 0) + (refine ? 1 : 0))),
         "class": -1,
         "clvl": 1,
-        "expertise": baseExpertise(id),
+        "expertise": baseExpertise(id) as Expertise,
         "weapon": -1,
         "weaponinfo": {},
         "weaponicon": "<:sword_empty:1034502134474997790>",
-        "uniqueids": []
+        "uniqueids": [] as string[],
     };
 
     // Expertise change
@@ -219,21 +221,15 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
         "any": "<:any_empty:1113010026664169494>",
     }[dStats.expertise];
 
-    // if (inv.level[id]) dStats.lvl = inv.level[id];
-    // dStats.lvl += lu;
-    // if (inv.ref[id]) dStats.ref = inv.ref[id];
-    // if (refine) dStats.ref++;
-    // if (dStats.ref > 5) dStats.ref = 5;
-
-    let clsStats;
+    let clsStats: ClassStats;
     if (inv.class !== null) {
         dStats.class = inv.class;
-        dStats.clvl = getClassLvl(dStats.class, classLevel);
+        dStats.clvl = getClassLvl(dStats.class, classLevels);
         clsStats = classes[dStats.class].stats;
-        Object.keys(clsStats).forEach((s) => dStats[s] = dStats[s] * clsStats[s][0] + clsStats[s][1]);
-        ["mana", "mg", "sm"].forEach((stat) => dStats[stat] = Math.floor(dStats[stat]));
-        dStats.brCap = (dStats.brCap * clsStats.br[0] * 100).toFixed(2) / 100;
-        dStats.dodgeCap = (dStats.dodgeCap * clsStats.dodge[0] * 100).toFixed(2) / 100;
+        (Object.keys(clsStats) as (keyof ClassStats)[]).forEach((s) => dStats[s] = dStats[s] * clsStats[s][0] + clsStats[s][1]);
+        ["mana", "mg", "sm"].forEach((s) => dStats[s] = Math.floor(dStats[s]));
+        dStats.brCap = parseFloat((dStats.brCap * clsStats.br[0] * 100).toFixed(2)) / 100;
+        dStats.dodgeCap = parseFloat((dStats.dodgeCap * clsStats.dodge[0] * 100).toFixed(2)) / 100;
     };
 
     // Add level bonus
@@ -244,13 +240,14 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
     dStats.bhp = dStats.hp, dStats.td = dStats.atk, dStats.md = dStats.atk, dStats.batk = dStats.atk, dStats.bmd = dStats.atk, dStats.mr = dStats.def, dStats.bdef = dStats.def, dStats.bmr = dStats.def;
 
     if (dStats.class !== -1) {
-        let scale = [{},
+        const clsStats = classes[dStats.class].stats;
+        let scale: Record<string, number> = [{},
         { "hp": 1.25, "atk": 0.75, "md": 0.75, "def": 0.3, "mr": 0.3, "mana": 0.15 },
         { "hp": 1.6, "atk": 1, "md": 1, "def": 0.5, "mr": 0.5, "mana": 0.2 },
         { "hp": 2.25, "atk": 1.1, "md": 1.1, "def": 0.6, "mr": 0.6, "mana": 0.25 },
         { "hp": 3, "atk": 1.4, "md": 1.4, "def": 0.8, "mr": 0.8, "mana": 0.32 }
         ][classes[dStats.class].tier];
-        ["hp", "atk", "md", "mana"].forEach((s) => dStats[s] += Math.floor((scale[s] * clsStats[s][0]) * (dStats.clvl - 1)));
+        (["hp", "atk", "md", "mana"] as (keyof ClassStats)[]).forEach((s) => dStats[s] += Math.floor((scale[s] * clsStats[s][0]) * (dStats.clvl - 1)));
         dStats["def"] += Math.floor(Math.min(scale["def"] * clsStats["def"][0] * (dStats.clvl - 1), classes[dStats.class].tier * 100 * clsStats["def"][0]));
         dStats["mr"] += Math.floor(Math.min(scale["mr"] * clsStats["mr"][0] * (dStats.clvl - 1), classes[dStats.class].tier * 100 * clsStats["mr"][0]));
 
@@ -289,7 +286,7 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
                 // Primary Stat
                 if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.primaryStat)) {
                     if (item.primaryStat.endsWith("%")) {
-                        const statBuff = dStats["b" + item.primaryStat.slice(0, -1)] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((weapon.level - 1) + (weapon.ascension * 3))) / 100);
+                        const statBuff = dStats[("b" + item.primaryStat.slice(0, -1))] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((weapon.level - 1) + (weapon.ascension * 3))) / 100);
                         dStats[item.primaryStat.slice(0, -1)] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
                     } else {
                         const statBuff = (item.psmin + ((item.psmax - item.psmin) * ((weapon.level - 1) + (weapon.ascension * 3)) / 150)) / 100;
@@ -458,7 +455,7 @@ export const getDetailedStats = async (id, inv, classLevel, lu = 0, refine = fal
     return dStats;
 };
 
-export const getDamage = (target, attacker, targetBuff, attackerBuff, matchStats, notice, log, flags = {}) => {
+export const getDamage = (target: DetailedStats, attacker: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, flags = {}) => {
     const options = { // true = enabled, false = disabled
         overwriteDamage: 0,
         atkMultiplier: 1,
@@ -471,7 +468,11 @@ export const getDamage = (target, attacker, targetBuff, attackerBuff, matchStats
         defMultiplier: 1,
         combodmg: false,
     };
-    Object.keys(flags).forEach((e) => options[e] = flags[e]);
+    Object.keys(flags).forEach((e) => {
+        if (e in options) {
+            (options as any)[e] = (flags as any)[e];
+        };
+    });
 
     // Calculate damage
     let damage;
@@ -486,7 +487,7 @@ export const getDamage = (target, attacker, targetBuff, attackerBuff, matchStats
 
 
 
-export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStats, notice, log, flags = {}) => {
+export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, flags = {}): number => {
     const options = { // true = enabled, false = disabled
         block: target.usedBlockRound === matchStats.round,
         dodge: true,
@@ -513,7 +514,7 @@ export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStat
         damageFormula: attacker.damageFormula ?? matchStats.damageFormula,
         canTwinshot: false,
     };
-    Object.keys(flags).forEach((e) => options[e] = flags[e]);
+    Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
     // Try blocking or dodging
     if (options.block && Math.random() < Math.min(target.br, target.brCap ?? target.br)) {
@@ -705,7 +706,7 @@ export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStat
     };
     if (options.selfdmg && Math.random() < matchStats.selfdmg) attacker.hp -= damage;
     if ("gintokiStacks" in attacker && isCrit) attacker.gintokiStacks = 0;
-    if (damage && attacker.guinaifenStackRounds?.filter((e) => e >= (matchStats.round - attacker.guinaifenStackLast)).length < attacker.guinaifenStackMax) {
+    if (damage && attacker.guinaifenStackRounds?.filter((e: number) => e >= (matchStats.round - attacker.guinaifenStackLast)).length < attacker.guinaifenStackMax) {
         targetBuff.hp.push(new buffInfo("+", -Math.floor(0.06 * damage), attacker.guinaifenStackLast));
         attacker.guinaifenStackRounds.push(matchStats.round);
     };
@@ -725,8 +726,7 @@ export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStat
 
     // Twinshot
     if (options.canTwinshot && matchStats.twinshot > Math.random()) {
-        flags.canTwinshot = false;
-        return damage + dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, log, flags);
+        return damage + dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, log, { ...flags, canTwinshot: false });
     };
 
     // Event Triggers
@@ -736,11 +736,11 @@ export const dealDamage = (target, attacker, targetBuff, attackerBuff, matchStat
     return damage;
 };
 
-export const addHeal = (target, attacker, caster, targetBuff, attackerBuff, matchStats, notice, log, amount, flags = {}) => {
+export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, amount: number, flags = {}) => {
     const options = { // true = enabled, false = disabled
 
     };
-    Object.keys(flags).forEach((e) => options[e] = flags[e]);
+    Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
     if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) notice.push(`\n💖 **${attacker.name}** has negated the heal!`);
     else {
@@ -750,13 +750,8 @@ export const addHeal = (target, attacker, caster, targetBuff, attackerBuff, matc
     if (log) notice.push(`\n💖 **${target.name}** has healed **${amount}** HP`);
 };
 
-export const generateSubstats = (n = 4) => {
-    const stats = ["hp", "atk", "atk%", "def", "md", "md%", "mr", "shield", "cr", "cd", "dodge", "br", "mana", "mg", "sm"];
-    return stats.sort((a, b) => 0.5 - Math.random()).slice(0, n).reduce((acc, curr) => (acc[curr] = 1, acc), {});
-};
-
-export const getAscensionMaterial = (id, ascItems) => {
-    id += "camelot";
+export const getAscensionMaterial = (id: string | number, ascItems: lootInfo[]) => {
+    id = `${id}camelot`;
     let hash = 3;
     for (let i = 0; i < id.length; i++) {
         hash = ((hash << 5) - hash) + id.charCodeAt(i);
@@ -765,11 +760,10 @@ export const getAscensionMaterial = (id, ascItems) => {
     return ascItems[Math.abs(hash) % ascItems.length];
 };
 
-export const filterItems = (userItems, choice, exclude = [], sellGrade = false, sellType = false, stats = false) => {
-    const { items } = require("./items.js");
+export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude: string[] = [], sellGrade: string | boolean = false, sellType: string | false = false, stats?: CompactUserSchema) => {
     const itemsToDisassemble = [];
     const itemIdsToDisassemble = [];
-    const loot = {};
+    const loot: { [key: string]: number; } = {};
 
     for (const item of userItems) {
         const fItem = items[item.itemid];
@@ -785,11 +779,11 @@ export const filterItems = (userItems, choice, exclude = [], sellGrade = false, 
         };
 
         const ascItem = getAscensionMaterial(fItem.id, items.filter((e) => e.type === "ascension material"));
-        const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade);
+        const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade) as lootInfo;
         const levelItem = items[fItem.category === "weapon" ? 56 : 57];
         const awakenItem = items[683];
 
-        let exchangeItem = false;
+        let exchangeItem: itemInfo | false = false;
         if (fItem.grade === "genesis") exchangeItem = items[676];
         else if (fItem.grade === "mythical") exchangeItem = items[677];
         else if (fItem.grade === "legendary") exchangeItem = items[678];
@@ -821,17 +815,23 @@ export const filterItems = (userItems, choice, exclude = [], sellGrade = false, 
     return { itemsToDisassemble, itemIdsToDisassemble, loot };
 };
 
-export const showPage = (currPage, arr, elements = 15) => {
+export const showPage = (currPage: number, arr: any[], elements = 15) => {
     return arr.slice((currPage - 1) * elements, currPage * elements);
 };
 
-export const search = (name, inv, interaction, silent = false) => {
-    name = name.toLowerCase().split(" ").filter((e) => e).join(" ");
+export const search = (name: string | number, inv: number[], interaction: ChatInputCommandInteraction, silent: boolean = false): charInfo | undefined => {
+    name = name.toString().toLowerCase().split(" ").filter((e) => e).join(" ");
     if (name === "last" || name === "latest") name = inv[inv.length - 1].toString();
 
-    if (!isNaN(name)) {
-        if (name < 0) return silent ? false : interaction.reply("The ID can't be negative.");
-        if (name >= characters.length) return silent ? false : interaction.reply(`The ID must be smaller than ${characters.length}`);
+    if (!isNaN(parseInt(name))) {
+        if (parseInt(name) < 0) {
+            if (!silent) interaction.reply("The ID can't be negative.");
+            return;
+        };
+        if (parseInt(name) >= characters.length) {
+            if (!silent) interaction.reply(`The ID must be smaller than ${characters.length}`);
+            return;
+        };
         if (!(name[0] === "0" && name.length > 1)) return characters[parseInt(name)];
     };
 
@@ -840,14 +840,20 @@ export const search = (name, inv, interaction, silent = false) => {
     if (fastCheck[0] !== undefined) return fastCheck[0];
 
     // Filter
-    const fArray = characters.filter((e) => e.name.toLowerCase().startsWith(name) || e.alias.some((a) => a.toLowerCase().startsWith(name)));
+    const fArray = characters.filter((e) => e.name.toLowerCase().startsWith(`${name}`) || e.alias.some((a) => a.toLowerCase().startsWith(`${name}`)));
 
-    if (fArray.length === 0) return silent ? false : interaction.reply("No match found");
-    if (fArray.length > 1) return silent ? false : interaction.reply(`${fArray.length} matches found:\n> ‧ ${fArray.sort((a, b) => b.name.toLowerCase().startsWith(name) - a.name.toLowerCase().startsWith(name)).map((e) => e.name.toLowerCase().startsWith(name) ? e.name : e.name + " (alias: " + e.alias.find((a) => a.toLowerCase().startsWith(name)) + ")").slice(0, 8).join('\n> ‧ ')}${fArray.length > 8 ? `\n+ ${fArray.length - 8} more` : ""}`);
+    if (fArray.length === 0) {
+        if (!silent) interaction.reply("No match found");
+        return;
+    };
+    if (fArray.length > 1) {
+        if (!silent) interaction.reply(`${fArray.length} matches found:\n> ‧ ${fArray.sort((a, b) => (b.name.toLowerCase().startsWith(name.toString()) ? 1 : 0) - (a.name.toLowerCase().startsWith(name.toString()) ? 1 : 0)).map((e) => e.name.toLowerCase().startsWith(name.toString()) ? e.name : e.name + " (alias: " + e.alias.find((a) => a.toLowerCase().startsWith(name.toString())) + ")").slice(0, 8).join('\n> ‧ ')}${fArray.length > 8 ? `\n+ ${fArray.length - 8} more` : ""}`);
+        return;
+    };
     return fArray[0];
 };
 
-export const searchAnimeTitle = (name, interaction, silent = false) => {
+export const searchAnimeTitle = (name: string, interaction: ChatInputCommandInteraction, silent: boolean = false) => {
     name = name.toLowerCase().split(" ").filter((e) => e).join(" ");
 
     // Full Name Search
@@ -857,12 +863,18 @@ export const searchAnimeTitle = (name, interaction, silent = false) => {
     // Filter
     const fArray = anime.filter((e) => e.name.toLowerCase().startsWith(name) || e.alias.some((a) => a.toLowerCase().startsWith(name)));
 
-    if (fArray.length === 0) return silent ? false : interaction.reply("No match found");
-    if (fArray.length > 1) return silent ? false : interaction.reply(`${fArray.length} matches found:\n> ‧ ${fArray.sort((a, b) => b.name.toLowerCase().startsWith(name) - a.name.toLowerCase().startsWith(name)).map((e) => e.name.toLowerCase().startsWith(name) ? e.name : e.name + " (alias: " + e.alias.find((a) => a.toLowerCase().startsWith(name)) + ")").slice(0, 8).join('\n> ‧ ')}${fArray.length > 8 ? `\n+ ${fArray.length - 8} more` : ""}`);
+    if (fArray.length === 0) {
+        if (!silent) interaction.reply("No match found");
+        return;
+    }
+    if (fArray.length > 1) {
+        if (!silent) interaction.reply(`${fArray.length} matches found:\n> ‧ ${fArray.sort((a, b) => (b.name.toLowerCase().startsWith(name) ? 1 : 0) - (a.name.toLowerCase().startsWith(name) ? 1 : 0)).map((e) => e.name.toLowerCase().startsWith(name) ? e.name : e.name + " (alias: " + e.alias.find((a) => a.toLowerCase().startsWith(name)) + ")").slice(0, 8).join('\n> ‧ ')}${fArray.length > 8 ? `\n+ ${fArray.length - 8} more` : ""}`);
+        return;
+    };
     return fArray[0];
 };
 
-export const rarity = (rar) => {
+export const rarity = (rar: CharacterRarity) => {
     switch (rar) {
         case "EX": return "https://i.ibb.co/1GDqXkg/extra-dark.gif"; // "https://i.ibb.co/0V1bDLm/ex.png";
         case "SS": return "https://i.ibb.co/GdhDTj1/n3qj4i2.png";
@@ -875,7 +887,7 @@ export const rarity = (rar) => {
     };
 };
 
-export const getSingleRefinement = (cid) => {
+export const getSingleRefinement = (cid: number) => {
     if (cid > 5) return "<:refinement_gold:1046869941011365899>";
     switch (cid) {
         case 5: return "<:refinement:869132309125824552>";
@@ -887,7 +899,7 @@ export const getSingleRefinement = (cid) => {
     };
 };
 
-export const getRefinement = (cid) => {
+export const getRefinement = (cid: number) => {
     if (cid > 5) return "<:refinement_gold:1046869941011365899><:refinement_gold:1046869941011365899><:refinement_gold:1046869941011365899><:refinement_gold:1046869941011365899><:refinement_gold:1046869941011365899>";
     switch (cid) {
         case 5: return "<:refinement:869132309125824552><:refinement:869132309125824552><:refinement:869132309125824552><:refinement:869132309125824552><:refinement:869132309125824552>";
@@ -899,7 +911,7 @@ export const getRefinement = (cid) => {
     };
 };
 
-export const splitTitle = (title) => {
+export const splitTitle = (title: string) => {
     if (title.length <= 30) return title;
     let add = "";
     while (title.length > 30) {
@@ -911,15 +923,15 @@ export const splitTitle = (title) => {
     return add;
 };
 
-export const displayPull = (user, thisChar, pCount, dupes, pullsMade, lastVote, refinement) => {
+export const displayPull = (user: User, thisChar: charInfo, pCount: number, dupes: number, pullsMade: number, lastVote: Date, refNumber: number) => {
     let animeL = splitTitle(thisChar.anime);
-    refinement = getRefinement(refinement);
+    let refinement = getRefinement(refNumber);
 
     // Check if vote
     let canVote = "";
     if ((pCount - pullsMade) === 0) {
         canVote = ` | You can /vote`;
-        if (lastVote && ((new Date().getTime() - lastVote) < 12 * 60 * 60 * 1000)) canVote = "";
+        if (lastVote && ((new Date().getTime() - lastVote.getTime()) < 12 * 60 * 60 * 1000)) canVote = "";
     };
 
     const Embed = new EmbedBuilder()
@@ -927,11 +939,11 @@ export const displayPull = (user, thisChar, pCount, dupes, pullsMade, lastVote, 
         .setImage(thisChar.image)
         .setThumbnail(rarity(thisChar.rarity))
         .setDescription(`**${thisChar.name}**\n${animeL}\n\n**Ref**. ${refinement}`)
-        .setFooter({ text: `You have ${dupes} ${dupes === 1 ? "copy" : "copies"} of this\n${pCount - pullsMade} ${pCount - pullsMade == 1 ? "pull" : "pulls"} left${canVote}`, iconURL: user.displayAvatarURL({ dynamic: true }) + "?size=2048" });
+        .setFooter({ text: `You have ${dupes} ${dupes === 1 ? "copy" : "copies"} of this\n${pCount - pullsMade} ${pCount - pullsMade == 1 ? "pull" : "pulls"} left${canVote}`, iconURL: user.displayAvatarURL({ size: 2048 }) });
     return { embeds: [Embed] };
 };
 
-export const searchAnime = (name, inv, interaction) => {
+export const searchAnime = (name: string, inv: number[], interaction: ChatInputCommandInteraction) => {
     name = name.toLowerCase();
     if (name === "last" || name === "latest") name = characters[inv[inv.length - 1]].anime.toLowerCase();
 
@@ -940,7 +952,7 @@ export const searchAnime = (name, inv, interaction) => {
     if (fastCheck[0] !== undefined) return fastCheck;
 
     // Acronym Search
-    fastCheck = characters.filter((e) => e.anime.toLowerCase().match(/\b(\w)/g).join('') === name.toLowerCase() || e.anialias.some((a => a.toLowerCase().match(/\b(\w)/g).join('') === name.toLowerCase())));
+    fastCheck = characters.filter((e) => (e.anime.toLowerCase().match(/\b(\w)/g) ?? []).join('') === name.toLowerCase() || e.anialias.some((a => (a.toLowerCase().match(/\b(\w)/g) ?? []).join('') === name.toLowerCase())));
     for (let i = 0; i < fastCheck.length; i++) {
         if (fastCheck[i].anime != fastCheck[0].anime) fastCheck = [];
     };
@@ -950,11 +962,11 @@ export const searchAnime = (name, inv, interaction) => {
     const fArray = characters.filter((e) => e.anime.toLowerCase().startsWith(name) || e.anialias.some((a) => a.toLowerCase().startsWith(name)));
 
     if (fArray.length === 0) return interaction.reply("No match found");
-    if ([...new Set(fArray.map((e) => e.anime))].length > 1) return interaction.reply(`${[...new Set(fArray.map((e) => e.anime))].length} matches found:\n> ‧ ${[...new Set(fArray.sort((a, b) => b.anime.toLowerCase().startsWith(name) - a.anime.toLowerCase().startsWith(name)).map((e) => e.anime.toLowerCase().startsWith(name) ? e.anime : e.anime + " (alias: " + e.anialias.find((a) => a.toLowerCase().startsWith(name)) + ")"))].slice(0, 8).join('\n> ‧ ')}${[...new Set(fArray.map((e) => e.anime))].length > 8 ? `\n+ ${[...new Set(fArray.map((e) => e.anime))].length - 8} more` : ""}`);
+    if ([...new Set(fArray.map((e) => e.anime))].length > 1) return interaction.reply(`${[...new Set(fArray.map((e) => e.anime))].length} matches found:\n> ‧ ${[...new Set(fArray.sort((a, b) => (b.anime.toLowerCase().startsWith(name) ? 1 : 0) - (a.anime.toLowerCase().startsWith(name) ? 1 : 0)).map((e) => e.anime.toLowerCase().startsWith(name) ? e.anime : e.anime + " (alias: " + e.anialias.find((a) => a.toLowerCase().startsWith(name)) + ")"))].slice(0, 8).join('\n> ‧ ')}${[...new Set(fArray.map((e) => e.anime))].length > 8 ? `\n+ ${[...new Set(fArray.map((e) => e.anime))].length - 8} more` : ""}`);
     return fArray;
 };
 
-export const userLevel = (xpr) => {
+export const userLevel = (xpr: number) => {
     let level = 0;
     for (let i = 1; xpr >= 0; i++) {
         xpr -= Math.floor(5 * Math.log(i) ** 4 + 30);
@@ -963,9 +975,9 @@ export const userLevel = (xpr) => {
     return level;
 };
 
-export const getClassLvl = (cls, classLvl) => {
+export const getClassLvl = (cls: number, classLevels: Record<string, number>) => {
     let clvl = 1, classxp = 0;
-    if (cls in classLvl) classxp = classLvl[cls];
+    if (cls in classLevels) classxp = classLevels[cls];
     for (let ci = 1; classxp > 0; ci++) {
         clvl++;
         classxp -= ci * 50;
@@ -981,14 +993,14 @@ export const getClassLvl = (cls, classLvl) => {
     return clvl;
 };
 
-export const classLevelToXP = (clvl) => {
+export const classLevelToXP = (clvl: number) => {
     if (clvl < 1) return 0;
     let classxp = 0;
     while (--clvl) classxp += clvl * 50;
     return classxp;
 };
 
-export const getItemLevel = (xp) => {
+export const getItemLevel = (xp: number) => {
     let level = 1;
     while (xp >= 0) {
         xp -= Math.floor(20 * Math.pow(level, 1.290349));
@@ -997,18 +1009,24 @@ export const getItemLevel = (xp) => {
     return level - 1;
 };
 
-export const formatNumberWithQuotes = (num) => {
+export const formatNumberWithQuotes = (num: number) => {
     const [integerPart, decimalPart] = num.toString().split('.');
     const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
     return decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
 };
 
-export const searchClass = (name, interaction, silent = false) => {
-    name = name.toLowerCase();
+export const searchClass = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false): classInfo | undefined => {
+    name = name.toString().toLowerCase();
 
-    if (!isNaN(name)) {
-        if (name < 0) return silent ? false : interaction.reply("The ID can't be negative.");
-        if (name >= classes.length) return silent ? false : interaction.reply("The ID must be smaller than " + classes.length);
+    if (!isNaN(Number(name))) {
+        if (Number(name) < 0) {
+            if (!silent) interaction.reply("The ID can't be negative.");
+            return;
+        };
+        if (Number(name) >= classes.length) {
+            if (!silent) interaction.reply("The ID must be smaller than " + classes.length);
+            return;
+        };
         return classes[parseInt(name)];
     };
 
@@ -1032,18 +1050,23 @@ export const searchClass = (name, interaction, silent = false) => {
         letter = 0;
     };
 
-    if (fArray.length === 0) return silent ? false : interaction.reply("No match found");
-    if (fArray.length > 1) return silent ? false : interaction.reply(fArray.length + " matches found");
+    if (fArray.length === 0) {
+        if (!silent) interaction.reply("No match found");
+        return;
+    }
+    if (fArray.length > 1) {
+        if (!silent) interaction.reply(fArray.length + " matches found");
+        return;
+    };
     return fArray[0];
 };
 
-export const searchItem = (name, interaction, silent = false, options = { returnSet: false }) => {
-    const { items } = require("./items.js");
-    name = name.toLowerCase();
+export const searchItem = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false, options: { returnSet: boolean; } = { returnSet: false }) => {
+    name = name.toString().toLowerCase();
 
-    if (!isNaN(name)) {
-        if (name < 0) return silent ? false : interaction.reply("The ID can't be negative.");
-        if (name >= items.length) return silent ? false : interaction.reply("The ID must be smaller than " + items.length);
+    if (!isNaN(Number(name))) {
+        if (Number(name) < 0) return silent ? false : interaction.reply("The ID can't be negative.");
+        if (Number(name) >= items.length) return silent ? false : interaction.reply("The ID must be smaller than " + items.length);
         return items[parseInt(name)];
     };
 
@@ -1069,13 +1092,13 @@ export const searchItem = (name, interaction, silent = false, options = { return
 
     if (fArray.length === 0) return silent ? false : interaction.reply("No match found");
     if (fArray.length > 1) {
-        if (options.returnSet && fArray.length === 4 && fArray[0].setname === fArray[1].setname && fArray[0].setname === fArray[2].setname && fArray[0].setname === fArray[3].setname) return fArray[0];
+        if (options.returnSet && fArray.length === 4 && "setname" in fArray[0] && "setname" in fArray[1] && "setname" in fArray[2] && "setname" in fArray[3] && fArray[0].setname === fArray[1].setname && fArray[0].setname === fArray[2].setname && fArray[0].setname === fArray[3].setname) return fArray[0];
         return silent ? false : interaction.reply(fArray.length + " matches found");
     };
     return fArray[0];
 };
 
-export const searchGuild = (name, guilds) => {
+export const searchGuild = (name: string, guilds: GuildSchema[]) => {
     name = name.toLowerCase();
     if (!name) return guilds.sort((a, b) => 0.5 - Math.random());
 
@@ -1094,9 +1117,9 @@ export const searchGuild = (name, guilds) => {
 //     return Buffer.from(response.data, 'binary');
 // };
 
-export const daysSince = (lastOnlineDate) => {
+export const daysSince = (lastOnlineDate: Date | number) => {
     if (!lastOnlineDate) return 0;
-    if (!isNaN(lastOnlineDate)) lastOnlineDate = new Date(lastOnlineDate);
+    if (typeof lastOnlineDate === "number") lastOnlineDate = new Date(lastOnlineDate);
     const now = new Date();
 
     // set to midnight
@@ -1108,12 +1131,12 @@ export const daysSince = (lastOnlineDate) => {
     return diffDays;
 };
 
-const downloadImage = async (url) => {
+const downloadImage = async (url: string) => {
     try {
         const response = await axios.get(url, { responseType: 'arraybuffer' });
         // eslint-disable-next-line no-undef
         return Buffer.from(response.data, 'binary');
-    } catch (error) {
+    } catch (error: any) {
         if (error.response && error.response.status === 429) {
             console.log("Too many requests. Please try again later.");
             // you could throw the error again to handle it further up in your call stack, or just return null or a default value
@@ -1124,7 +1147,7 @@ const downloadImage = async (url) => {
     };
 };
 
-export const generateImage = async (base, effect, filename = `${Math.floor(Math.random() * 100000)}.png`) => {
+export const generateImage = async (base: string, effect: string, filename: string = `${Math.floor(Math.random() * 100000)}.png`) => {
     // Download images
     const [charImageBuffer, effectImageBuffer] = await Promise.all([
         downloadImage(base),
@@ -1184,7 +1207,7 @@ export const generateCaptcha = () => {
     };
 
     // Add 1-3 random lines
-    for (let i = 0; i < (2 + (Math.random() < 0.3)); i++) {
+    for (let i = 0; i < (2 + (Math.random() < 0.3 ? 1 : 0)); i++) {
         ctx.beginPath();
         ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
         ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
@@ -1192,7 +1215,7 @@ export const generateCaptcha = () => {
     };
 
     // Add 1-3 random dots
-    for (let i = 0; i < (3 + (Math.random() < 0.3)); i++) {
+    for (let i = 0; i < (3 + (Math.random() < 0.3 ? 1 : 0)); i++) {
         ctx.beginPath();
         ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
         ctx.fill();
@@ -1208,7 +1231,7 @@ export const generateCaptcha = () => {
 
 export const donationWeekStart = new Date('2024-02-12T00:00:00');
 
-export const addGuildDonation = async (user, guildid, amount, type = "coins") => {
+export const addGuildDonation = async (user: User, guildid: string, amount: number, type: "coins" | "gems" = "coins") => {
     const week = Math.ceil((Date.now() - donationWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
 
     const { 0: donation } = await query(`SELECT * FROM guild_donations WHERE userid = ${user.id} AND guildid = '${guildid}' AND week = ${week} AND type = '${type}'`);
@@ -1222,11 +1245,11 @@ export const addGuildDonation = async (user, guildid, amount, type = "coins") =>
     await query(`UPDATE guilds SET ${type === "coins" ? `treasury = treasury + ${amount}` : `treasury_gems = treasury_gems + ${amount}`} WHERE id = '${guildid}'`);
 };
 
-const dateString = (date) => {
+const dateString = (date: Date) => {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }).replace(/\//g, '/');
 };
 
-export const getDonationsPageWeek = (donations, members, currentWeek, currPage) => {
+export const getDonationsPageWeek = (donations: GuildDonationSchema[], members: { name: string; status: string; id: string; }[], currentWeek: number, currPage: number) => {
     const startDate = new Date(donationWeekStart);
     startDate.setDate(donationWeekStart.getDate() + (7 * (currentWeek - currPage)));
     const endDate = new Date(donationWeekStart);
@@ -1235,7 +1258,7 @@ export const getDonationsPageWeek = (donations, members, currentWeek, currPage) 
     return `### Week ${currentWeek - currPage + 1} ➜ ${dateString(startDate)} - ${dateString(endDate)}\n${members.map((e) => `${e.name}${e.status} ➜ __${donations.filter((e) => e.week === (currentWeek - currPage + 1)).find((dono) => dono.userid === e.id)?.amount ?? 0}__ <:coins:872926669055356939>`).join("\n")}`;
 };
 
-export const lastActive = (timestamp) => {
+export const lastActive = (timestamp: Date | number) => {
     const now = new Date(), date = new Date(timestamp);
 
     // Check if the date is today
@@ -1247,7 +1270,7 @@ export const lastActive = (timestamp) => {
     if (date.toDateString() === yesterday.toDateString()) return "yesterday";
 
     // Calculate the number of days between the date and today
-    const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
     return `${diff === 1 ? diff + " day" : diff + " days"} ago`;
 };
 
@@ -1279,7 +1302,11 @@ export const deleteReplyIn = 2400;
 
 
 class idInfo {
-    constructor(symbols) {
+    private _symbols: string[];
+    private _length: number;
+    private _blacklisted: string[];
+
+    constructor(symbols: string) {
         this._symbols = symbols.split("");
         this._length = symbols.split("").length;
         this._blacklisted = ["", "shit", "poo", "poop", "jiz", "jizz", "fuck", "fck", "fick", "fock", "fuk", "fik", "anal", "dick", "cock", "porn", "tit", "tits", "nude", "boob", "sex", "s3x", "seks", "sexy", "bitch", "ass", "arse", "gay", "gey", "jew", "lgbt", "isis", "damn", "cunt", "nigger", "niga", "nigga", "neger", "negro", "whore", "wench", "slut", "thot", "penis", "pussy", "vagina", "coon", "rape", "suck", "sucker", "suk", "lick", "anus", "blow", "bum", "bums", "but", "butt", "clit", "cum", "horny", "god", "jerk", "piss", "trump", "biden", "cp", "pedo"];
@@ -1301,7 +1328,7 @@ class idInfo {
 };
 const itemIDs = new idInfo("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_");
 
-export const generateUniqueItemId = (userid, existing, len = 2) => {
+export const generateUniqueItemId = (userid: string, existing: string[], len: number = 2) => {
     let gen = itemIDs.generate();
     while (existing.includes(gen + ":" + userid)) {
         gen = itemIDs.generate(Math.floor(len));
@@ -1310,7 +1337,7 @@ export const generateUniqueItemId = (userid, existing, len = 2) => {
     return gen;
 };
 
-export const generateUniqueGuildId = (existing, len = 5) => {
+export const generateUniqueGuildId = (existing: string[], len: number = 5) => {
     let gen = itemIDs.generate(len);
     while (existing.includes(gen)) {
         gen = itemIDs.generate(Math.floor(len));
@@ -1319,8 +1346,8 @@ export const generateUniqueGuildId = (existing, len = 5) => {
     return gen;
 };
 
-export const getLetterRank = (score) => {
-    const ranks = Object.keys(rankLowerRanges);
+export const getLetterRank = (score: number) => {
+    const ranks = Object.keys(rankLowerRanges) as (keyof typeof rankLowerRanges)[];
     let highestRank = "F-", highestRankScore = 0;
     for (const rank of ranks) {
         if (score >= rankLowerRanges[rank] && rankLowerRanges[rank] > highestRankScore) {

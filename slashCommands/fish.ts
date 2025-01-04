@@ -1,14 +1,14 @@
-import { db, query } from "../db_handler";
 import { fishing } from "../Modules/items";
 import { dailies } from "../Modules/dailyQuests";
 import { achievements } from "../Modules/achievements";
+import { ItemRarity, SlashCommand } from "../types";
+import { updateUsers } from "../Modules/queries";
 
 const fishingCooldown = new Map();
 
-module.exports = {
+const exportCommand: SlashCommand = {
     name: 'fish',
-    description: 'fishing command',
-    execute(interaction) {
+    async execute({ interaction, author }) {
 
         // Set up restrictions
         if (fishingCooldown.has(interaction.user.id)) return interaction.reply({ content: `You can fish again in ${30 - Math.floor((new Date().getTime() - fishingCooldown.get(interaction.user.id)) / 1000)} seconds`, ephemeral: true });
@@ -20,32 +20,25 @@ module.exports = {
 
         // Roll a rarit (normal: 0.47, special: 0.30, rare: 0.18, unique: 0.045, legendary: 0.0047, mythical: 0.0003)
         let ranRar = Math.floor(Math.random() * 10000); // 0-9999
-        let rar = "normal"; //, eventpts = 20;
+        let rar: ItemRarity = "normal"; //, eventpts = 20;
         if (ranRar < 3) rar = "mythical"; //, eventpts = 500;
         else if (ranRar < 50) rar = "legendary"; //, eventpts = 500;
         else if (ranRar < 500) rar = "unique"; //, eventpts = 160;
         else if (ranRar < 2300) rar = "rare"; //, eventpts = 75;
         else if (ranRar < 5300) rar = "special"; //, eventpts = 40;
 
-        let caught = fishing.filter((e) => e.grade === rar);
-        caught = caught[Math.floor(caught.length * Math.random())];
+        const caught = fishing.filter((e) => e.grade === rar).sort((a, b) => Math.random() - 0.5)[0];
 
         // Event
         // eventpts = Math.floor(eventpts * (0.9+(0.35*Math.random())))
         // eventpts = Math.floor(eventpts*2);
         // interaction.reply(`🎣 | You've caught a __${caught.grade}__ **${caught.name}** ${caught.emoji}\nAdded **${eventpts}**🍬`);
-
         interaction.reply(`🎣 | ${caught.grade === "mythical" ? "Wow, you've" : "You've"} caught a __${caught.grade}__ **${caught.name}**${caught.grade === "mythical" ? "!" : ""} ${caught.emoji}`);
 
-        db.serialize(async () => {
-            let inv = await query(`SELECT items FROM users WHERE id = ${interaction.user.id}`);
-            inv = JSON.parse(inv[0].items);
-
-            if (caught.id in inv) inv[caught.id]++;
-            else inv[caught.id] = 1;
-
-            await query(`UPDATE users SET items = '${JSON.stringify(inv)}' WHERE id = ${interaction.user.id}`);
-            // await query(`UPDATE users SET items = '${JSON.stringify(inv)}', eventpts = eventpts + ${eventpts}, eventpts2 = eventpts2 + ${eventpts} WHERE id = ${interaction.user.id}`);
+        await updateUsers(interaction.user.id, {
+            items: { type: "merge_json", value: { [caught.id]: 1 } },
+            // eventpts: { type: "increment", value: eventpts },
+            // eventpts2: { type: "increment", value: eventpts },
         });
 
         // Daily Quests
@@ -58,6 +51,7 @@ module.exports = {
 
         // Achievements
         achievements[52].check(interaction, interaction.user, caught.grade), achievements[53].check(interaction, interaction.user, caught.grade), achievements[54].check(interaction, interaction.user, caught.grade); // Angler's Triumph
-
     },
 };
+
+export default exportCommand;

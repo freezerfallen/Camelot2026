@@ -2,12 +2,28 @@ import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
 import { query } from "../db_handler";
 import { charactersA } from "../Modules/chars";
 import { achievements } from "../Modules/achievements";
-import { classes } from "../Modules/classes";
+import classInfo, { classes } from "../Modules/classes";
 import { skills } from "../Modules/skills";
 import { items, weaponInfo } from "../Modules/items";
 import { splitTitle, getRefinement, rarity, searchClass, customEmojis, generateUniqueItemId } from "../Modules/functions";
 import { SlashCommand } from "../types";
 import { getUserSchema, updateUsers } from "../Modules/queries";
+
+function formatPath(fClass: classInfo) {
+    if (!fClass.path.length) return "Unique\n";
+    let beginner = classes[fClass.path[0][0]];
+    let formatted = `${fClass.id === beginner.id ? `**${beginner.emblem + beginner.name}**` : beginner.emblem + beginner.name} `;
+    fClass.path.forEach((e: number[], i: number) => {
+        if (i) formatted += ["<:blank:917804200363171860><:blank:917804200363171860><:blank:917804200363171860> ", "<:blank:917804200363171860> <:blank:917804200363171860><:blank:917804200363171860> ", "<:blank:917804200363171860> <:blank:917804200363171860> <:blank:917804200363171860> "][beginner.name.length % 3]
+            + "<:blank:917804200363171860>".repeat(beginner.name.length / 3);
+        for (let j = 1; j < e.length; j++) {
+            formatted += isNaN(e[j]) ? "➥ undefined" : `➥${classes[e[j]].emblem}${fClass.id === e[j] ? `**${classes[e[j]].name}**` : classes[e[j]].name} `;
+        }
+        formatted += "\n";
+        // formatted += e.map((a) => isNaN(a) ? "NaN" : classes[a].emblem + classes[a].name + " ").join("➥") + "\n";
+    });
+    return formatted;
+};
 
 const exportCommand: SlashCommand = {
     name: 'tutorial',
@@ -129,33 +145,16 @@ const exportCommand: SlashCommand = {
                     triggerTutorial();
                 } else {
                     if (interaction.commandName === "class" && interaction.options.getSubcommand() === "info") {
-                        let choice = interaction.options.getString('class');
+                        let choice = interaction.options.getString('class', true);
 
                         let fClass = searchClass(choice, interaction);
-                        if (!fClass?.name) return;
-
-                        // eslint-disable-next-line no-inner-declarations
-                        function formatPath() {
-                            if (!fClass.path.length) return "Unique\n";
-                            let beginner = classes[fClass.path[0][0]];
-                            let formatted = `${fClass.id === beginner.id ? `**${beginner.emblem + beginner.name}**` : beginner.emblem + beginner.name} `;
-                            fClass.path.forEach((e: number[], i: number) => {
-                                if (i) formatted += ["<:blank:917804200363171860><:blank:917804200363171860><:blank:917804200363171860> ", "<:blank:917804200363171860> <:blank:917804200363171860><:blank:917804200363171860> ", "<:blank:917804200363171860> <:blank:917804200363171860> <:blank:917804200363171860> "][beginner.name.length % 3]
-                                    + "<:blank:917804200363171860>".repeat(beginner.name.length / 3);
-                                for (let j = 1; j < e.length; j++) {
-                                    formatted += isNaN(e[j]) ? "➥ undefined" : `➥${classes[e[j]].emblem}${fClass.id === e[j] ? `**${classes[e[j]].name}**` : classes[e[j]].name} `;
-                                }
-                                formatted += "\n";
-                                // formatted += e.map((a) => isNaN(a) ? "NaN" : classes[a].emblem + classes[a].name + " ").join("➥") + "\n";
-                            });
-                            return formatted;
-                        };
+                        if (!fClass) return;
 
                         const Embed = new EmbedBuilder()
                             .setColor(0xbbffff)
                             .setTitle(fClass.name)
                             .setThumbnail(fClass.image)
-                            .setDescription(`**Skill Cost**: ${skills[fClass.id].cost}\\💧\n**Grade**: ${["None", "Beginner", "Advanced", "Master", "Champion"][fClass.tier]}\n**Path**: ${formatPath()}\n**Active**: ${fClass.active}\n\n**Passive**: ${fClass.passive}\n`)
+                            .setDescription(`**Skill Cost**: ${skills[fClass.id].cost}\\💧\n**Grade**: ${["None", "Beginner", "Advanced", "Master", "Champion"][fClass.tier]}\n**Path**: ${formatPath(fClass)}\n**Active**: ${fClass.active}\n\n**Passive**: ${fClass.passive}\n`)
                             .addFields(
                                 { name: 'Stats', value: `\\💖 **HP**: ${Math.round(fClass.stats.hp[0] * 100)}%\n\\⚔️ **ATK**: ${Math.round(fClass.stats.atk[0] * 100)}%\n\\🛡️ **DEF**: ${Math.round(fClass.stats.def[0] * 100)}%\n<:magic_dmg:948568336621527040> **Magic Dmg**: ${fClass.stats.md[0] * 100}%\n\\🔰 **Magic Resist**: ${Math.floor(fClass.stats.mr[0] * 100)}%`, inline: true },
                                 { name: '_ _', value: `\\🎯 **Crit Rate**: x${fClass.stats.cr[0]}\n\\💥 **Crit Damage**: x${fClass.stats.cd[0]}\n\\🛡️ **Block Rate**: x${fClass.stats.br[0]}\n\\💨 **Dodge**: x${fClass.stats.dodge[0]}`, inline: true },

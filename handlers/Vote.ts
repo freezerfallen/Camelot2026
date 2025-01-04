@@ -32,7 +32,7 @@ const handler: BotHandler = {
             };
 
             // Daily Quest
-            dailies[10].update(false, 1, { id: vote.user }); // Knight's Ballot
+            dailies[10].update(undefined, 1, { id: vote.user }); // Knight's Ballot
         }));
         app.listen(3000);
 

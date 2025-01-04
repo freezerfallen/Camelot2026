@@ -7,13 +7,13 @@ const tokens = ["ddecd222cd3fc3150f6404c0cc85a4e5", "f4f213791cdfb57e8c35a1b1a67
 let rot = Math.floor(Math.random() * 5);
 
 // Download images
-const downloadImage = async (url) => {
+const downloadImage = async (url: string) => {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     // eslint-disable-next-line no-undef
     return Buffer.from(response.data, 'binary');
 };
 
-export const upload = async (char, effect) => {
+export const upload = async (char: string, effect: string) => {
     try {
         // Download images
         const [charImageBuffer, effectImageBuffer] = await Promise.all([
@@ -46,7 +46,6 @@ export const upload = async (char, effect) => {
         // Upload image to imgbb.com
         const response = await axios.post(`https://api.imgbb.com/1/upload?key=${tokens[rot % 5]}`, formData, {
             headers: formData.getHeaders(),
-            name: filename,
         });
 
         // Delete local file after 20 seconds

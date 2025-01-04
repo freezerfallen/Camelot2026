@@ -11,7 +11,87 @@ export type PrimaryStat = 'hp' | 'hp%' | 'atk' | 'atk%' | 'def' | 'def%' | 'md' 
 
 export type RaidRank = 'F-' | 'F' | 'F+' | 'E-' | 'E' | 'E+' | 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'S-' | 'S' | 'S+' | 'SS-' | 'SS' | 'SS+' | 'SSS-' | 'SSS' | 'SSS+' | 'EX-' | 'EX' | 'EX+';
 
+export type Expertise = 'sword' | 'staff' | 'axe' | 'bow' | 'lance' | 'dagger' | 'shield' | 'any';
+
 export type BuffType = "*" | "+" | "=";
+
+export type ClassStats = {
+    hp: [number, number];
+    atk: [number, number];
+    def: [number, number];
+    md: [number, number];
+    mr: [number, number];
+    cr: [number, number];
+    cd: [number, number];
+    br: [number, number];
+    agility: [number, number];
+    dodge: [number, number];
+    td: [number, number];
+    mana: [number, number];
+    mg: [number, number];
+};
+
+export type DetailedStats = {
+    name: string;
+    hp: number;
+    maxhp: number;
+    bhp: number;
+    atk: number;
+    batk: number;
+    def: number;
+    bdef: number;
+    ep: number;
+    md: number;
+    bmd: number;
+    mr: number;
+    bmr: number;
+    cr: number;
+    cd: number;
+    td: number;
+    br: number;
+    brCap: number;
+    agility: number;
+    dodge: number;
+    dodgeCap: number;
+    mana: number;
+    mg: number;
+    sm: number;
+    shield: number;
+    mdChance: number;
+    rev: number;
+    revhp: number;
+    revivedTotal: number;
+    maxRevivals: number;
+    attackStreak: number;
+    crittedTotal: number;
+    selfheal: Array<number>;
+    selfhealChance: Array<number>;
+    dodgeHeal: number;
+    critmana: number;
+    usedBlockRound: number;
+    blockBuffDef: number;
+    blockBurn: number;
+    blockStreak: number;
+    dodgeStreak: number;
+    damageTaken: number;
+    executeHP: number;
+    negateHeal: number;
+    ignoreShield: boolean;
+    damageReduction: number;
+    damageFormula: string;
+    delayedBuffs: Array<any>;
+    replaceButton: Record<string, any>;
+    lvl: number;
+    ref: number;
+    class: number;
+    clvl: number;
+    expertise: Expertise;
+    weapon: number;
+    weaponinfo: Record<string, any>;
+    weaponicon: string;
+    uniqueids: Array<string>;
+    [key: string]: any;
+};
 
 
 export interface BotEvent {
@@ -32,7 +112,7 @@ interface executeSlashCommand {
     interaction: ChatInputCommandInteraction,
     locale: Locale,
     author: { schema: CompactUserSchema; },
-    // server: { schema?: ServerSchema; },
+    server: { schema?: ServerSchema; },
     reply?: any,
     warn?: any,
     customFlag?: any,
@@ -84,7 +164,7 @@ export interface UserSchema {
     arenawins: number;
     arenalosses: number;
     animationdelay: number;
-    achievements: any[];
+    achievements: number[];
     lastpull: Date | null;
     pullreminder: number;
     votereminder: number;
@@ -95,14 +175,14 @@ export interface UserSchema {
     mailbox: any[];
     eventrewreceived: number;
     gems: number;
-    tutorial: any[];
+    tutorial: number[];
     transactions: any[];
-    dailies: Record<string, any>;
+    dailies: Record<string, number>;
     guild: string | null;
     donatedtotal: number;
     genesispity: number;
     presets: any[];
-    itemlock: any[];
+    itemlock: string[];
     party: string | null;
     stampedechar: number | null;
     mailreceived: number;
@@ -137,7 +217,7 @@ export interface UserSchema {
     bosshuntruns: number;
     bosshuntrevreceived: number | null;
     monthlyshop: Record<string, any>;
-    itemwishlist: any[];
+    itemwishlist: number[];
     stampedeenergy: number;
     background: string | null;
     backgrounds: string[];
@@ -162,7 +242,7 @@ export interface UserSchema {
 
     dungeon_floors: Record<string, number>;
     dungeon_limit: number;
-    dungeon_classes: any[];
+    dungeon_classes: number[];
     dungeon_classlevels: Record<string, any>;
     dungeon_responsetime: string;
     stampede_responsetime: string;

@@ -20,6 +20,18 @@ export const getUserSchema = async (id: string): Promise<CompactUserSchema | und
     return user;
 };
 
+export const getUserSchemas = async (ids: string[] | "*"): Promise<CompactUserSchema[]> => {
+    const query_str = `SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rank, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels FROM users`;
+
+    if (ids === "*") {
+        const users = await query(query_str, []) as CompactUserSchema[];
+        return users;
+    } else {
+        const users = await query(`${query_str} WHERE id = ANY($1)`, [ids]) as CompactUserSchema[];
+        return users;
+    }
+};
+
 export const getServerSchema = async (id: string): Promise<ServerSchema | undefined> => {
     const [server] = await query(`SELECT * FROM servers WHERE id = $1`, [id]) as [ServerSchema];
     return server;
@@ -264,7 +276,21 @@ export const updateUsers = async (
                 case 'set_json':
                     return `${key} = $${paramIndex}::jsonb`;
                 case 'merge_json':
-                    return `${key} = COALESCE(${key}, '{}'::jsonb) || $${paramIndex}::jsonb`;
+                    return `${key} = (
+                        SELECT jsonb_object_agg(key,
+                            CASE
+                                WHEN ${key}->key IS NOT NULL AND $${paramIndex}::jsonb->key IS NOT NULL 
+                                    AND jsonb_typeof(${key}->key) = 'number' 
+                                    AND jsonb_typeof($${paramIndex}::jsonb->key) = 'number' THEN
+                                        to_jsonb((${key}->key)::numeric + ($${paramIndex}::jsonb->key)::numeric)
+                                WHEN $${paramIndex}::jsonb->key IS NOT NULL THEN
+                                    $${paramIndex}::jsonb->key
+                                ELSE
+                                    ${key}->key
+                            END
+                        )
+                        FROM jsonb_each(COALESCE(${key}, '{}'::jsonb) || $${paramIndex}::jsonb)
+                    )`;
                 default:
                     throw new Error(`Unknown update type: ${type}`);
             };

@@ -2,7 +2,12 @@ import { Worker } from 'worker_threads';
 import os from 'os';
 
 export default class WorkerPool {
-    constructor(workerScript, numWorkers = os.cpus().length) {
+    private _workerScript: string;
+    private _numWorkers: number;
+    private _workers: Worker[];
+    private _queue: any[];
+
+    constructor(workerScript: string, numWorkers: number = os.cpus().length) {
         this._workerScript = workerScript;
         this._numWorkers = numWorkers;
         this._workers = [];
@@ -32,8 +37,8 @@ export default class WorkerPool {
         };
     };
 
-    createMessageHandler(worker) {
-        return (message) => {
+    createMessageHandler(worker: any) {
+        return (message: any) => {
             worker.currentTask.resolve(message);
             worker.currentTask = null;
             worker.busy = false;
@@ -41,8 +46,8 @@ export default class WorkerPool {
         };
     };
 
-    createErrorHandler(worker) {
-        return (error) => {
+    createErrorHandler(worker: any) {
+        return (error: any) => {
             if (worker.currentTask) {
                 worker.currentTask.reject(error);
                 worker.currentTask = null;
@@ -52,7 +57,7 @@ export default class WorkerPool {
         };
     };
 
-    runTask(data) {
+    runTask(data: any) {
         return new Promise((resolve, reject) => {
             const task = { data, resolve, reject };
             this.queue.push(task);
@@ -61,10 +66,12 @@ export default class WorkerPool {
     };
 
     processQueue() {
-        const availableWorker = this.workers.find(worker => !worker.busy);
+        const availableWorker = this.workers.find((worker: any) => !worker.busy);
         if (availableWorker && this.queue.length > 0) {
             const task = this.queue.shift();
+            // @ts-ignore
             availableWorker.busy = true;
+            // @ts-ignore
             availableWorker.currentTask = task;
             availableWorker.postMessage(task.data);
         };

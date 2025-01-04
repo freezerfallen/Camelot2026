@@ -64,12 +64,12 @@ async function createTables() {
         arenawins INT DEFAULT 0 NOT NULL,
         arenalosses INT DEFAULT 0 NOT NULL,
         animationdelay INT DEFAULT 1200 NOT NULL,
-        achievements JSONB DEFAULT '[]' NOT NULL,
+        achievements INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         lastpull TIMESTAMP,
         pullreminder INT DEFAULT 0 NOT NULL,
         votereminder INT DEFAULT 0 NOT NULL,
         items JSONB DEFAULT '{}' NOT NULL,
-        skins JSONB DEFAULT '[]' NOT NULL,
+        skins INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         eventpts INT DEFAULT 0 NOT NULL,
         eventpts2 INT DEFAULT 0 NOT NULL,
         brbest INT DEFAULT 0 NOT NULL,
@@ -83,7 +83,7 @@ async function createTables() {
         donatedtotal BIGINT DEFAULT 0 NOT NULL,
         genesispity INT DEFAULT 0 NOT NULL,
         presets JSONB DEFAULT '[]' NOT NULL,
-        itemlock JSONB DEFAULT '[]' NOT NULL,
+        itemlock TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         party TEXT,
         stampedechar INT,
         mailreceived INT DEFAULT 0,
@@ -117,7 +117,7 @@ async function createTables() {
         bosshuntruns INT DEFAULT 0 NOT NULL,
         bosshuntrevreceived INT DEFAULT 0,
         monthlyshop JSONB DEFAULT '{}' NOT NULL,
-        itemwishlist JSONB DEFAULT '[]' NOT NULL,
+        itemwishlist INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         stampedeenergy INT DEFAULT 0 NOT NULL,
         background TEXT,
         backgrounds TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
@@ -142,12 +142,12 @@ async function createTables() {
         char_equipment JSONB DEFAULT '{}' NOT NULL,    -- renamed from 'equipment' to avoid conflicts
 
         -- Dungeon table columns
-        dungeon_floors JSONB DEFAULT '{"1":0}' NOT NULL,  -- renamed from 'floors' to avoid conflicts
-        dungeon_limit INT DEFAULT 0 NOT NULL,             -- renamed from 'limit' to avoid conflicts
-        dungeon_classes JSONB DEFAULT '[]' NOT NULL,      -- renamed from 'classes' to avoid conflicts
-        dungeon_classlevels JSONB DEFAULT '{}' NOT NULL, -- renamed from 'classlevels' to avoid conflicts
-        dungeon_responsetime TEXT DEFAULT '' NOT NULL,    -- renamed from 'responsetime' to avoid conflicts
-        stampede_responsetime TEXT DEFAULT '' NOT NULL   -- renamed from 's_responsetime' to avoid conflicts
+        dungeon_floors JSONB DEFAULT '{"1":0}' NOT NULL,            -- renamed from 'floors' to avoid conflicts
+        dungeon_limit INT DEFAULT 0 NOT NULL,                       -- renamed from 'limit' to avoid conflicts
+        dungeon_classes INT[] DEFAULT ARRAY[]::INT[] NOT NULL,      -- renamed from 'classes' to avoid conflicts
+        dungeon_classlevels JSONB DEFAULT '{}' NOT NULL,            -- renamed from 'classlevels' to avoid conflicts
+        dungeon_responsetime TEXT DEFAULT '' NOT NULL,              -- renamed from 'responsetime' to avoid conflicts
+        stampede_responsetime TEXT DEFAULT '' NOT NULL              -- renamed from 's_responsetime' to avoid conflicts
     )`);
 
     // Servers table
@@ -193,9 +193,9 @@ async function createTables() {
         lootbuff INT DEFAULT 0 NOT NULL,
         cdreduction INT DEFAULT 0 NOT NULL,
         master TEXT NOT NULL,
-        elders JSONB DEFAULT '[]' NOT NULL,
-        members JSONB DEFAULT '[]' NOT NULL,
-        banned JSONB DEFAULT '[]' NOT NULL,
+        elders TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
+        members TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
+        banned TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         eventpoints INT DEFAULT 0 NOT NULL,
         bosshuntstage INT DEFAULT 1 NOT NULL,
         boss1 BIGINT DEFAULT 124080 NOT NULL,
@@ -243,7 +243,7 @@ async function createTables() {
         color TEXT,
         icon TEXT,
         banner TEXT DEFAULT '',
-        members JSONB DEFAULT '[]' NOT NULL,
+        members TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         created TIMESTAMP
     )`);
 

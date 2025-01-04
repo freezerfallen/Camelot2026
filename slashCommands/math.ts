@@ -14,7 +14,7 @@ const exportCommand: SlashCommand = {
             resp = math.evaluate(calculation);
         } catch (e) {
             return interaction.reply({ content: "Please input a valid calculation", ephemeral });
-        }
+        };
 
         const Embed = new EmbedBuilder()
             .setTitle('Camelot Calculator')
