@@ -1,12 +1,8 @@
-import { Gender, CharacterRarity } from "../types";
+import { Gender, CharacterRarity, IcharInfo, CharInfoOptions } from "../types";
 import { skins } from "./skins";
 import animeInfoClass, { anime } from "./anime";
 
-type CharInfoOptions = {
-    staticImage?: string;
-};
-
-export default class charInfo {
+export default class charInfo implements IcharInfo {
     private _name: string;
     private _alias: string[];
     private _animeInfo: animeInfoClass;

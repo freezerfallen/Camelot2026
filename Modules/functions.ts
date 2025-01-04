@@ -16,7 +16,7 @@ import classInfo, { classes } from "./classes";
 import { rankLowerRanges } from "./components";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
-import { itemInfo, items, lootInfo } from "./items";
+import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
 import _ from 'lodash';
 import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, MatchStats, PrimaryStat, WeaponSchema } from '../types';
 
@@ -260,7 +260,6 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
 
     // Item Stats
     if (inv?.equipment) {
-        const { items } = require("./items.js");
         let weapon, shield, helmet, cuirass, gloves, boots;
 
         // Add weapon stats if available
@@ -275,37 +274,38 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(weapon[0].uniqueid.split(":")[0]);
                 weapon = { id: weapon[0].itemid, level: getItemLevel(weapon[0].level), ascension: weapon[0].ascension };
                 const item = items[weapon.id];
+                if (item instanceof weaponInfo) {
+                    // Set item to dStats
+                    dStats.weapon = weapon.id;
+                    dStats.weaponicon = item.emoji;
+                    dStats.weaponinfo = { ...weapon };
 
-                // Set item to dStats
-                dStats.weapon = weapon.id;
-                dStats.weaponicon = item.emoji;
-                dStats.weaponinfo = { ...weapon };
+                    if (item.type === "staff") dStats.mdChance = 1;
 
-                if (item.type === "staff") dStats.mdChance = 1;
-
-                // Primary Stat
-                if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.primaryStat)) {
-                    if (item.primaryStat.endsWith("%")) {
-                        const statBuff = dStats[("b" + item.primaryStat.slice(0, -1))] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((weapon.level - 1) + (weapon.ascension * 3))) / 100);
-                        dStats[item.primaryStat.slice(0, -1)] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
+                    // Primary Stat
+                    if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.primaryStat)) {
+                        if (item.primaryStat.endsWith("%")) {
+                            const statBuff = dStats[("b" + item.primaryStat.slice(0, -1))] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((weapon.level - 1) + (weapon.ascension * 3))) / 100);
+                            dStats[item.primaryStat.slice(0, -1)] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
+                        } else {
+                            const statBuff = (item.psmin + ((item.psmax - item.psmin) * ((weapon.level - 1) + (weapon.ascension * 3)) / 150)) / 100;
+                            dStats[item.primaryStat] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
+                        };
                     } else {
-                        const statBuff = (item.psmin + ((item.psmax - item.psmin) * ((weapon.level - 1) + (weapon.ascension * 3)) / 150)) / 100;
+                        const statBuff = Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((weapon.level - 1) + (weapon.ascension * 3)));
                         dStats[item.primaryStat] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
                     };
-                } else {
-                    const statBuff = Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((weapon.level - 1) + (weapon.ascension * 3)));
-                    dStats[item.primaryStat] += Math.floor(statBuff * ((item.type === dStats.expertise || dStats.expertise === "any") ? 1.2 : 1));
-                };
 
-                // Secondary Stat
-                if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.secondaryStat)) {
-                    if (item.secondaryStat.endsWith("%")) {
-                        dStats[item.secondaryStat.slice(0, -1)] += Math.floor(dStats["b" + item.secondaryStat.slice(0, -1)] * (Math.floor(parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) / 10) * weapon.ascension) / 100));
+                    // Secondary Stat
+                    if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.secondaryStat)) {
+                        if (item.secondaryStat.endsWith("%")) {
+                            dStats[item.secondaryStat.slice(0, -1)] += Math.floor(dStats["b" + item.secondaryStat.slice(0, -1)] * (Math.floor(parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) / 10) * weapon.ascension) / 100));
+                        } else {
+                            dStats[item.secondaryStat] += (parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) * weapon.ascension / 10)) / 100;
+                        };
                     } else {
-                        dStats[item.secondaryStat] += (parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) * weapon.ascension / 10)) / 100;
+                        dStats[item.secondaryStat] += Math.floor(parseInt(item.ssmin) + ((parseInt(item.ssmax) - parseInt(item.ssmin)) / 10) * weapon.ascension);
                     };
-                } else {
-                    dStats[item.secondaryStat] += Math.floor(parseInt(item.ssmin) + ((parseInt(item.ssmax) - parseInt(item.ssmin)) / 10) * weapon.ascension);
                 };
             };
         };
@@ -322,32 +322,33 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(shield[0].uniqueid.split(":")[0]);
                 shield = { id: shield[0].itemid, level: getItemLevel(shield[0].level), ascension: shield[0].ascension };
                 const item = items[shield.id];
+                if (item instanceof weaponInfo) {
+                    // Set item to dStats
+                    dStats.shieldid = shield.id;
+                    dStats.shieldicon = item.emoji;
+                    dStats.shieldinfo = { ...shield };
 
-                // Set item to dStats
-                dStats.shieldid = shield.id;
-                dStats.shieldicon = item.emoji;
-                dStats.shieldinfo = { ...shield };
-
-                // Primary Stat
-                if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.primaryStat)) {
-                    if (item.primaryStat.endsWith("%")) {
-                        dStats[item.primaryStat.slice(0, -1)] += dStats["b" + item.primaryStat.slice(0, -1)] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((shield.level - 1) + (shield.ascension * 3))) / 100);
+                    // Primary Stat
+                    if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.primaryStat)) {
+                        if (item.primaryStat.endsWith("%")) {
+                            dStats[item.primaryStat.slice(0, -1)] += dStats["b" + item.primaryStat.slice(0, -1)] * (1 + Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((shield.level - 1) + (shield.ascension * 3))) / 100);
+                        } else {
+                            dStats[item.primaryStat] += (item.psmin + ((item.psmax - item.psmin) * ((shield.level - 1) + (shield.ascension * 3)) / 150)) / 100;
+                        };
                     } else {
-                        dStats[item.primaryStat] += (item.psmin + ((item.psmax - item.psmin) * ((shield.level - 1) + (shield.ascension * 3)) / 150)) / 100;
+                        dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((shield.level - 1) + (shield.ascension * 3)));
                     };
-                } else {
-                    dStats[item.primaryStat] += Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((shield.level - 1) + (shield.ascension * 3)));
-                };
 
-                // Secondary Stat
-                if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.secondaryStat)) {
-                    if (item.secondaryStat.endsWith("%")) {
-                        dStats[item.secondaryStat.slice(0, -1)] += Math.floor(dStats["b" + item.secondaryStat.slice(0, -1)] * (Math.floor(parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) / 10) * shield.ascension) / 100));
+                    // Secondary Stat
+                    if (["atk%", "md%", "cr", "cd", "dodge", "br"].includes(item.secondaryStat)) {
+                        if (item.secondaryStat.endsWith("%")) {
+                            dStats[item.secondaryStat.slice(0, -1)] += Math.floor(dStats["b" + item.secondaryStat.slice(0, -1)] * (Math.floor(parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) / 10) * shield.ascension) / 100));
+                        } else {
+                            dStats[item.secondaryStat] += (parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) * shield.ascension / 10)) / 100;
+                        };
                     } else {
-                        dStats[item.secondaryStat] += (parseInt(item.ssmin.slice(0, -1)) + ((parseInt(item.ssmax.slice(0, -1)) - parseInt(item.ssmin.slice(0, -1))) * shield.ascension / 10)) / 100;
+                        dStats[item.secondaryStat] += Math.floor(parseInt(item.ssmin) + ((parseInt(item.ssmax) - parseInt(item.ssmin)) / 10) * shield.ascension);
                     };
-                } else {
-                    dStats[item.secondaryStat] += Math.floor(parseInt(item.ssmin) + ((parseInt(item.ssmax) - parseInt(item.ssmin)) / 10) * shield.ascension);
                 };
             };
         };
@@ -363,13 +364,15 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(helmet[0].uniqueid.split(":")[0]);
                 helmet = { id: helmet[0].itemid, level: getItemLevel(helmet[0].level), ascension: helmet[0].ascension };
                 const item = items[helmet.id];
+                if (item instanceof armorInfo) {
 
-                // Set item to dStats
-                dStats.helmet = helmet.id;
-                dStats.helmeticon = item.emoji;
-                dStats.helmetinfo = { ...helmet };
+                    // Set item to dStats
+                    dStats.helmet = helmet.id;
+                    dStats.helmeticon = item.emoji;
+                    dStats.helmetinfo = { ...helmet };
 
-                dStats[item.primaryStat] += Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((helmet.level - 1) + (helmet.ascension * 3)));
+                    dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((helmet.level - 1) + (helmet.ascension * 3)));
+                };
             };
         };
 
@@ -384,13 +387,15 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(cuirass[0].uniqueid.split(":")[0]);
                 cuirass = { id: cuirass[0].itemid, level: getItemLevel(cuirass[0].level), ascension: cuirass[0].ascension };
                 const item = items[cuirass.id];
+                if (item instanceof armorInfo) {
 
-                // Set item to dStats
-                dStats.cuirass = cuirass.id;
-                dStats.cuirassicon = item.emoji;
-                dStats.cuirassinfo = { ...cuirass };
+                    // Set item to dStats
+                    dStats.cuirass = cuirass.id;
+                    dStats.cuirassicon = item.emoji;
+                    dStats.cuirassinfo = { ...cuirass };
 
-                dStats[item.primaryStat] += Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((cuirass.level - 1) + (cuirass.ascension * 3)));
+                    dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((cuirass.level - 1) + (cuirass.ascension * 3)));
+                };
             };
         };
 
@@ -405,13 +410,15 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(gloves[0].uniqueid.split(":")[0]);
                 gloves = { id: gloves[0].itemid, level: getItemLevel(gloves[0].level), ascension: gloves[0].ascension };
                 const item = items[gloves.id];
+                if (item instanceof armorInfo) {
 
-                // Set item to dStats
-                dStats.gloves = gloves.id;
-                dStats.glovesicon = item.emoji;
-                dStats.glovesinfo = { ...gloves };
+                    // Set item to dStats
+                    dStats.gloves = gloves.id;
+                    dStats.glovesicon = item.emoji;
+                    dStats.glovesinfo = { ...gloves };
 
-                dStats[item.primaryStat] += Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((gloves.level - 1) + (gloves.ascension * 3)));
+                    dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((gloves.level - 1) + (gloves.ascension * 3)));
+                };
             };
         };
 
@@ -426,13 +433,15 @@ export const getDetailedStats = async (id: number, inv: CompactUserSchema, class
                 dStats.uniqueids.push(boots[0].uniqueid.split(":")[0]);
                 boots = { id: boots[0].itemid, level: getItemLevel(boots[0].level), ascension: boots[0].ascension };
                 const item = items[boots.id];
+                if (item instanceof armorInfo) {
 
-                // Set item to dStats
-                dStats.boots = boots.id;
-                dStats.bootsicon = item.emoji;
-                dStats.bootsinfo = { ...boots };
+                    // Set item to dStats
+                    dStats.boots = boots.id;
+                    dStats.bootsicon = item.emoji;
+                    dStats.bootsinfo = { ...boots };
 
-                dStats[item.primaryStat] += Math.floor(parseInt(item.psmin) + ((parseInt(item.psmax) - parseInt(item.psmin)) / 150) * ((boots.level - 1) + (boots.ascension * 3)));
+                    dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((boots.level - 1) + (boots.ascension * 3)));
+                };
             };
         };
 

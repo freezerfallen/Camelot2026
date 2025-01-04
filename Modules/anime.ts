@@ -1,9 +1,6 @@
+import { animeInfoOptions, IanimeInfo } from "../types";
 
-type animeInfoOptions = {
-    charid?: number;
-};
-
-export default class animeInfo {
+export default class animeInfo implements IanimeInfo {
     private _name: string;
     private _alias: string[];
     private _id: number;

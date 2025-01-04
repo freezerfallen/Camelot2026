@@ -1,9 +1,21 @@
 /* eslint-disable no-unused-vars */
+import { ClassAbility } from "../types";
 import buffInfo from "./buffs";
 import { dealDamage, addHeal } from "./functions";
 
 export default class curseInfo {
-    constructor(name, id, emblem, tier, cost, skill, passive, image, descA, descP) {
+    private _name: string;
+    private _id: number;
+    private _emblem: string;
+    private _tier: number;
+    private _cost: number;
+    private _skill: ClassAbility;
+    private _passive: ClassAbility;
+    private _image: string;
+    private _descA: string;
+    private _descP: string;
+
+    constructor(name: string, id: number, emblem: string, tier: number, cost: number, skill: ClassAbility, passive: ClassAbility, image: string, descA: string, descP: string) {
         this._name = name;
         this._id = id;
         this._emblem = emblem;
@@ -51,7 +63,7 @@ export default class curseInfo {
 export const curses = [
     new curseInfo("Self Regeneration", 0, "<:Self_Regeneration:958114013244452884>", 0, 30, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const heal = Math.floor((eStats.maxhp - eStats.hp) * 0.1);
-        addHeal(eStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, { });
+        addHeal(eStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
         notice.push(`\n${curses[0].emblem} **${enemy.name}** has recovered **${heal}** HP`);
     }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         ebuff.hp.push(new buffInfo("+", Math.floor(eStats.maxhp * 0.05), 9999));
@@ -100,8 +112,8 @@ export const curses = [
         if (eStats.hp + hhp > eStats.maxhp) hhp = eStats.maxhp - eStats.hp;
         let hpt = Math.floor(myStats.maxhp * 0.03); // Heals you for 3% of your max HP
         if (myStats.hp + hpt > myStats.maxhp) hpt = myStats.maxhp - myStats.hp;
-        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hhp, { });
-        addHeal(myStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hpt, { });
+        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hhp, {});
+        addHeal(myStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hpt, {});
         notice.push(`\n${curses[6].emblem} **${enemy.name}** has recovered **${hhp}** HP and healed you for **${hpt}** HP`);
     }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         ebuff.hp.push(new buffInfo("*", 1.02, 9999));
@@ -133,7 +145,7 @@ export const curses = [
     new curseInfo("Ultraspeed Regeneration", 10, "<:Ultraspeed_Regeneration:958298070150443069>", 1, 50, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         let hhp = Math.floor(eStats.maxhp * 0.16); // Heals 20% of max HP
         if (eStats.hp + hhp > eStats.maxhp) hhp = eStats.maxhp - eStats.hp;
-        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hhp, { });
+        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, hhp, {});
         notice.push(`\n${curses[10].emblem} **${enemy.name}** has recovered **${hhp}** HP`);
     }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         ebuff.hp.push(new buffInfo("*", 1.06, 9999));
@@ -170,7 +182,7 @@ export const curses = [
         const steal = Math.floor(myStats.maxhp * 0.1); // Steals 10% of your HP
         myStats.hp -= steal;
         if (myStats.hp < 0) myStats.hp = 0;
-        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, steal, { });
+        addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, steal, {});
         if (eStats.hp > eStats.maxhp) eStats.hp = eStats.maxhp;
         notice.push(`\n${curses[14].emblem} **${enemy.name}** stole **${steal}** HP`);
     }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

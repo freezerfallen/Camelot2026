@@ -1,14 +1,28 @@
 /* eslint-disable no-unused-vars */
-import { AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder, Message, User } from "discord.js";
 import { getDetailedStats, dealDamage, deleteReplyIn, addHeal } from "./functions";
 import { db, query } from "../db_handler";
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { characters } from "./chars";
+import charInfo, { characters } from "./chars";
 import { items } from "./items";
 import delayedBuffs from "./delayedBuffs";
 import buffInfo from "./buffs";
+import { Buffs, DetailedStats, IbuffInfo, IcharInfo, MatchStats } from "../types";
+import { enemyInfo } from "./enemies";
+import { getUserSchema } from "./queries";
 
-export const abilities = {
+type Ability = {
+    usage: number;
+    used: number;
+    cost: number;
+    desc: string;
+    [key: string]: any;
+    ability?: (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, eStatsFixed: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: enemyInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, message: Message, ...list: any[]) => void;
+    passive?: (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: enemyInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+    party?: (pStats: DetailedStats, myStats: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: enemyInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+};
+
+export const abilities: Record<number, Ability> = {
     "64": {
         usage: 9999,
         used: 0,
@@ -21,23 +35,23 @@ export const abilities = {
         desc: "**Total Usage**: `unlimited`\n**Mana**: `25`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nFushi randomly transforms in one of the following 3 characters from the anime **Fumetsu no Anata e**: Gugu, March or Parona. While in this form, a second use of his ability will transform him back into his original form. To be able to transform into one of these characters, You'll need to have them in your inventory.\nWhen played correctly, Fushi can be a powerful opponent holding 4 distinct characters within himself, each with their own stats.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Fushi transforms randomly in one of 3 characters who each have their own stats.
-            let inv = await query(`SELECT users.equipment, users.shield_slot, characters.chars, characters.ref, dungeon.classlevels FROM users JOIN characters ON users.id = characters.id JOIN dungeon ON users.id = dungeon.id WHERE users.id = ${matchStats.interaction.user.id}`);
-            inv = { id: matchStats.interaction.user.id, class: myStats.class, level: myStats.lvl, bank: 0, chars: JSON.parse(inv[0].chars), ref: JSON.parse(inv[0].ref), equipment: JSON.parse(inv[0].equipment), shield_slot: inv[0].shield_slot, classlevels: JSON.parse(inv[0].classlevels) };
+            const inv = await getUserSchema(matchStats.interaction.user.id);
+            if (!inv) return matchStats.interaction.followUp({ content: "You don't have any characters to transform into", ephemeral: true });
 
-            if (!(inv.chars.includes(65) || inv.chars.includes(66) || inv.chars.includes(67))) return matchStats.interaction.channel.send("You don't have any of the characters **Parona**, **Gugu** or **March** to transform into").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+            if (!(inv.chars.includes(65) || inv.chars.includes(66) || inv.chars.includes(67))) return matchStats.interaction.followUp({ content: "You don't have any of the characters **Parona**, **Gugu** or **March** to transform into", ephemeral: true });
 
             if (this.selected === "fushi") {
-                let obtained = [];
+                let obtained: ("parona" | "gugu" | "march")[] = [];
                 if (inv.chars.includes(65)) obtained.push("parona");
                 if (inv.chars.includes(66)) obtained.push("gugu");
                 if (inv.chars.includes(67)) obtained.push("march");
-                let pick = obtained[Math.floor(Math.random() * obtained.length)];
+                let pick: "parona" | "gugu" | "march" = obtained[Math.floor(Math.random() * obtained.length)];
                 let pID = { "parona": 65, "gugu": 66, "march": 67 }[pick];
 
                 this.selected = pick;
 
                 this.fushi = myStats.hp;
-                let newStats = await getDetailedStats(pID, inv, inv.classlevels);
+                let newStats = await getDetailedStats(pID, inv, inv.dungeon_classlevels);
                 ["hp", "maxhp", "atk", "def", "md", "mr", "cr", "cd", "td", "br", "dodge"].forEach((e) => {
                     myStats[e] = newStats[e];
                 });
@@ -52,7 +66,7 @@ export const abilities = {
             } else {
                 this[this.selected] = myStats.hp;
                 this.selected = "fushi";
-                let newStats = await getDetailedStats(64, inv, inv.classlevels);
+                let newStats = await getDetailedStats(64, inv, inv.dungeon_classlevels);
                 ["hp", "maxhp", "atk", "def", "md", "mr", "cr", "cd", "td", "br", "dodge"].forEach((e) => {
                     myStats[e] = newStats[e];
                 });
@@ -91,7 +105,7 @@ export const abilities = {
             if (matchStats.interaction.commandName === "stampede") {
                 matchStats.turn = 0;
                 myStats.sm += 20;
-                return matchStats.interaction.channel.send(`Rimuru can't be used in this game mode.`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: "Rimuru can't be used in this game mode.", ephemeral: true });
             };
 
             if (myStats.ep / eStats.ep > 2) {
@@ -115,9 +129,9 @@ export const abilities = {
         ability: (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Eren increases his stats by 20% of his max HP, current DEF and current ATK
             matchStats.turn = 1;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.2), { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.2), {});
             myStats.maxhp += Math.floor(myStats.maxhp * 0.2);
-            ["atk", "def", "md", "mr"].forEach((e) => mybuff[e].push(new buffInfo("*", 1.2, 9999)));
+            ["atk", "def", "md", "mr"].forEach((e) => mybuff[e as keyof Buffs].push(new buffInfo("*", 1.2, 9999)));
             notice.push(`\n✨ **${char.name}** has transformed into a Titan! Raised HP, ATK, MD, DEF and MR by **20%**`);
             embed.setThumbnail("https://i.ibb.co/YfnG2Tn/at.png");
         },
@@ -207,18 +221,18 @@ export const abilities = {
             if (matchStats.heap1.length > 0) { // Xiao increases md by 30% by consuming 10 mana per round. Deals 200% damage if used again.
                 if (myStats.sm < 50) {
                     matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                    return matchStats.interaction.channel.send(`You need at least **50**\\💧 for this attack.`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                    return matchStats.interaction.followUp({ content: "You need at least **50**\\💧 for this attack.", ephemeral: true });
                 };
                 myStats.sm -= 40;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** lunged forward! He`, { atkMultiplier: 2, magicDamage: true, mdChance: -1 });
             } else {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                if (myStats.sm < 10) return matchStats.interaction.channel.send(`You need at least **10**\\💧 to sustain this form`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                if (myStats.sm < 10) return matchStats.interaction.followUp({ content: "You need at least **10**\\💧 to sustain this form", ephemeral: true });
                 matchStats.consumeMana = 10;
 
                 // Add new buffs to heap
-                let mdbuff = new buffInfo("+", Math.floor(myStats.md * 0.3), "9999");
-                let mgbuff = new buffInfo("=", 0, "9999");
+                let mdbuff = new buffInfo("+", Math.floor(myStats.md * 0.3), 9999);
+                let mgbuff = new buffInfo("=", 0, 9999);
                 mybuff.md.push(mdbuff); mybuff.mg.push(mgbuff);
                 matchStats.heap1 = [{ type: "md", id: mdbuff.id, buff: Math.floor(myStats.md * 0.3) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }];
                 myStats.md += Math.floor(myStats.md * 0.3);
@@ -274,7 +288,7 @@ export const abilities = {
                     // Twinshot
                     if (matchStats.twinshot > Math.random() && myStats.yoimiyaLastTwinshot !== matchStats.round) {
                         myStats.yoimiyaLastTwinshot = matchStats.round;
-                        myStats.replaceButton.atk.run(myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list);
+                        myStats.replaceButton.atk?.run?.(myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list);
                     };
                 },
             };
@@ -297,7 +311,7 @@ export const abilities = {
             myStats.atk = 0, myStats.def = 0, myStats.md = 0, myStats.mr = 0;
 
             if (matchStats.interaction.commandName === "stampede") {
-                const names = list[0].map((e) => e.name);
+                const names = list[0].map((e: IcharInfo) => e.name);
                 if (names.includes("Aqua") || names.includes("Darkness") || names.includes("Kazuma Satou")) {
                     myStats.shield += Math.floor(myStats.maxhp * 0.1);
                 };
@@ -390,7 +404,7 @@ export const abilities = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
                 myStats.sm += 60;
-                return matchStats.interaction.channel.send(`Zoro needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Zoro needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
             this.pause = matchStats.round + 6;
             myStats.replaceButton.atk = {
@@ -429,7 +443,7 @@ export const abilities = {
         ability: (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Ryuuko sacrifices 30% of her current HP for a 90% ATK increase of lost HP
             let sacrifice = Math.floor(myStats.hp * 0.3);
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, {});
             myStats.atk += Math.floor(sacrifice * 0.9);
             mybuff.atk.push(new buffInfo("+", Math.floor(sacrifice * 0.9), 9999));
             myStats.md += Math.floor(sacrifice * 0.9);
@@ -464,7 +478,7 @@ export const abilities = {
             // Shalltear drains the equivalent of 20% of her max HP from the enemy and adds it to herself.
             const drain = Math.floor(myStats.maxhp * 0.2);
             eStats.hp -= drain;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
             if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
             if (eStats.hp < 0) eStats.hp = 0;
             notice.push(`\n✨ **${char.name}** has drained **${drain}**HP from **${enemy.name}**`);
@@ -475,7 +489,7 @@ export const abilities = {
                 if (matchStats.round % 4 === 0) {
                     const drain = Math.floor(myStats.maxhp * 0.08);
                     eStats.hp -= drain;
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
                     if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
                     if (eStats.hp < 0) eStats.hp = 0;
                     notice.push(`\n✨ **${name}** drained **${drain}**HP from **${enemy.name}**`);
@@ -509,7 +523,7 @@ export const abilities = {
             if (myStats.hp / myStats.maxhp > 0.25) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
-                return matchStats.interaction.channel.send(`Self destruct can only be used once your hp is below 15% of your max HP (${Math.floor(myStats.maxhp * 0.15)})`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Self destruct can only be used once your hp is below 15% of your max HP (${Math.floor(myStats.maxhp * 0.15)})`, ephemeral: true });
             };
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used self destruct! She`, { atkMultiplier: 3, magicDamage: true, dodge: false });
             myStats.hp = 1;
@@ -541,7 +555,7 @@ export const abilities = {
             mybuff.mr.push(new buffInfo("+", -incmr, 3));
             myStats.mr -= incmr;
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.15), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.15), {});
             }, 3));
             notice.push(`\n✨ **${char.name}** turned **75%** of her DEF and MR into ATK and MD respectively`);
         },
@@ -571,10 +585,8 @@ export const abilities = {
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
 
             // Active: Sung Jin Woo summons either Igris, Beru or Iron (SL) from the users inventory. Passive:
-            let inv = await query(`SELECT users.equipment, users.shield_slot, characters.chars, characters.ref, dungeon.classlevels FROM users JOIN characters ON users.id = characters.id JOIN dungeon ON users.id = dungeon.id WHERE users.id = ${matchStats.interaction.user.id}`);
-            inv = { id: matchStats.interaction.user.id, class: myStats.class, level: myStats.lvl, bank: 0, chars: JSON.parse(inv[0].chars), ref: JSON.parse(inv[0].ref), equipment: JSON.parse(inv[0].equipment), shield_slot: inv[0].shield_slot, classlevels: JSON.parse(inv[0].classlevels) };
-
-            if (!inv.chars.filter((e) => e === 3156 || e === 3159 || e === 3174).length) return matchStats.interaction.channel.send("You don't have any of the characters **Igris**, **Beru** or **Iron (SL)** to summon.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+            const inv = await getUserSchema(matchStats.interaction.user.id);
+            if (!inv || !inv.chars.filter((e) => e === 3156 || e === 3159 || e === 3174).length) return matchStats.interaction.followUp({ content: "You don't have any of the characters **Igris**, **Beru** or **Iron (SL)** to summon.", ephemeral: true });
 
             myStats.sm -= this.cost;
             matchStats.myStatsCC = { ...myStats };
@@ -584,14 +596,14 @@ export const abilities = {
             if (inv.chars.includes(3156) && !this.summoned.includes(3156)) obtained.push(3156);
             if (inv.chars.includes(3159) && !this.summoned.includes(3159)) obtained.push(3159);
             if (inv.chars.includes(3174) && !this.summoned.includes(3174)) obtained.push(3174);
-            if (!obtained.length) return matchStats.interaction.channel.send("All your shadow soldiers have been defeated.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+            if (!obtained.length) return matchStats.interaction.followUp({ content: "All your shadow soldiers have been defeated.", ephemeral: true });
 
             let pick = obtained[Math.floor(Math.random() * obtained.length)];
             this.summoned.push(pick);
 
             embed.setThumbnail(characters[pick].image);
 
-            let newStats = await getDetailedStats(pick, inv, inv.classlevels);
+            let newStats = await getDetailedStats(pick, inv, inv.dungeon_classlevels);
             ["hp", "maxhp", "def", "mr", "cr", "cd", "td", "br", "dodge"].forEach((e) => {
                 myStats[e] = newStats[e];
             });
@@ -640,7 +652,7 @@ export const abilities = {
             if (this.pause > matchStats.round) {
                 this.used--;
                 myStats.sm += this.cost;
-                return matchStats.interaction.channel.send(`Tetsuya Kuroko needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Tetsuya Kuroko needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
             this.pause = matchStats.round + 4;
 
@@ -709,7 +721,7 @@ export const abilities = {
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             if (this.roundUsed === -1) {
                 this.used--;
-                if (myStats.sm < 20) return matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/20\\💧)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                if (myStats.sm < 20) return matchStats.interaction.followUp({ content: "You don't have enough mana! (**${myStats.sm}**/20\\💧)", ephemeral: true });
                 myStats.sm -= 20; this.roundUsed = matchStats.round;
 
                 const mgPause = new buffInfo("=", 0, 9999);
@@ -735,7 +747,7 @@ export const abilities = {
                 "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     let hits = 0;
                     for (let i = 0; i < 10; i++) {
-                        hits += Math.random() > eStats.dodge;
+                        hits += (Math.random() > eStats.dodge ? 1 : 0);
                     };
                     mybuff.cd.push(new buffInfo("+", 0.03 * hits, 2));
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**'s ${hits}/10 bullets hit! He`, { atkMultiplier: 0.09 * hits, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true }); // normal magical damage
@@ -777,7 +789,7 @@ export const abilities = {
             // Delayed Buff
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.5) {
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.3), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.3), {});
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.25), 9999));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.25), 9999));
                     myStats.atk += Math.floor(myStats.atk * 0.25);
@@ -798,6 +810,7 @@ export const abilities = {
                     };
                     notice.push(`\n✨ **${char.name}** entered his shadow form!`);
                     embed.setThumbnail("https://i.imgur.com/2VZTpDS.png");
+                    //@ts-ignore
                     this._used++;
                 } else {
                     myStats.atk = Math.floor(myStats.atk * 0.8);
@@ -853,7 +866,7 @@ export const abilities = {
             mybuff.mr.push(new buffInfo("+", hmr, 9999));
             myStats.mr += hmr;
             let hHp = Math.floor(myStats.atk * 0.3);
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hHp, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hHp, {});
             if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
             notice.push(`\n✨ **${char.name}** recovered **${hHp}** HP. Gained **${hmr}** Magic Resist`);
         },
@@ -887,13 +900,13 @@ export const abilities = {
         desc: "**Total Usage**: `unlimited`\n**Mana**: `0`\\💧, then `15`\\💧 continuously\n**Timeout**: `no`\n**Role**: `DPS`\n\nWith her Re-Equip magic, Erza Scarlet is able to select between 5 different armors to face her opponent as needed. With every use of her ability, she will cycle through her armors, and she'll use up 15 mana every round. She will not gain any mana while she has an armor equipped. Her inventory is as follows:\n\n__Fire Empress Armor__: Grants her **60%** ATK but decreases DEF by **20%**\n__Adamantine Armor__: Grants her **60%** DEF but decreases ATK by **20%**\n__Heaven's Wheel Armor__: Grants her **25%** ATK and DEF\n__Clear Heart Clothing__: Grants her **10%** ATK, **+20%** crit rate, **+50%** crit damage and **+10%** dodge chance\n__Armadura Fairy__: Heals her for **10%** of max HP per round",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             matchStats.turn = matchStats.turnSkill ? 0 : 1; // Erza Scarlet can change between 5 different equipment
-            if (myStats.sm < 15) return matchStats.interaction.channel.send(`You need at least **15**\\💧 to sustain this form`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+            if (myStats.sm < 15) return matchStats.interaction.followUp({ content: "You need at least **15**\\💧 to sustain this form", ephemeral: true });
             matchStats.consumeMana = 15;
 
             // clear previous armors effects
             if (matchStats.heap1.length > -1) {
-                matchStats.heap1.forEach((e) => {
-                    mybuff[e.type].forEach((a, i) => {
+                matchStats.heap1.forEach((e: { type: keyof Buffs; id: number; buff: number; }) => {
+                    mybuff[e.type].forEach((a: IbuffInfo, i: number) => {
                         if (a.id === e.id) mybuff[e.type].splice(i, 1);
                     });
                     if (e.type === "mg") myStats[e.type] += e.buff;
@@ -904,13 +917,13 @@ export const abilities = {
             };
 
             // Add new buffs to heap
-            let armorName, atkbuff, defbuff, crbuff, cdbuff, dodgebuff, hpbuff, mgbuff = new buffInfo("=", 0, "9999");
+            let armorName, atkbuff, defbuff, crbuff, cdbuff, dodgebuff, hpbuff, mgbuff = new buffInfo("=", 0, 9999);
             switch (this.armor++ % 5) {
-                case 0: embed.setThumbnail("https://i.ibb.co/KFLzdqd/f.png"); armorName = "Fire Empress Armor. She gained **60%** ATK, decreased DEF by **20%**"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.6), "9999"); defbuff = new buffInfo("+", -Math.floor(myStats.def * 0.2), "9999"); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.6) }, { type: "def", id: defbuff.id, buff: -Math.floor(myStats.def * 0.2) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.6); myStats.def += -Math.floor(myStats.def * 0.2); myStats.mg = 0; break;
-                case 1: embed.setThumbnail("https://i.ibb.co/HG4tHWt/a.png"); armorName = "Adamantine Armor. She gained **60%** DEF, decreased ATK by **20%**"; atkbuff = new buffInfo("+", -Math.floor(myStats.atk * 0.2), "9999"); defbuff = new buffInfo("+", Math.floor(myStats.def * 0.6), "9999"); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: -Math.floor(myStats.atk * 0.2) }, { type: "def", id: defbuff.id, buff: Math.floor(myStats.def * 0.6) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += -Math.floor(myStats.atk * 0.2); myStats.def += Math.floor(myStats.def * 0.6); myStats.mg = 0; break;
-                case 2: embed.setThumbnail("https://i.ibb.co/VDPkR10/w.png"); armorName = "Heaven's Wheel Armor. She gained **25%** ATK and DEF"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.25), "9999"); defbuff = new buffInfo("+", Math.floor(myStats.def * 0.25), "9999"); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.25) }, { type: "def", id: defbuff.id, buff: Math.floor(myStats.def * 0.25) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.25); myStats.def += Math.floor(myStats.def * 0.25); myStats.mg = 0; break;
-                case 3: embed.setThumbnail("https://i.ibb.co/TH4gNq5/c.png"); armorName = "Clear Heart Clothing. She gained **10%** ATK, **+20%** crit rate, **+50%** crit damage, and **+10%** dodge chance"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.1), "9999"); crbuff = new buffInfo("+", 0.2, "9999"); cdbuff = new buffInfo("+", 0.5, "9999"); dodgebuff = new buffInfo("+", 0.1, "9999"); mybuff.atk.push(atkbuff); mybuff.cr.push(crbuff); mybuff.cd.push(cdbuff); mybuff.dodge.push(dodgebuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.1) }, { type: "cr", id: crbuff.id, buff: 0.2 }, { type: "cd", id: cdbuff.id, buff: 0.5 }, { type: "dodge", id: dodgebuff.id, buff: 0.1 }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.1); myStats.cr += 0.2; myStats.cd += 0.5; myStats.dodge += 0.1; myStats.mg = 0; break;
-                case 4: embed.setThumbnail("https://i.imgur.com/TDbvwEX.png"); armorName = "Armadura Fairy. She will gain **10%** HP every round"; hpbuff = new buffInfo("+", Math.floor(myStats.maxhp * 0.1), "9999"); mybuff.hp.push(hpbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "hp", id: hpbuff.id, buff: Math.floor(myStats.maxhp * 0.1) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; /* addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp*0.1), { }); myStats.hp > myStats.maxhp ? myStats.hp = myStats.maxhp : false; */ myStats.mg = 0; break;
+                case 0: embed.setThumbnail("https://i.ibb.co/KFLzdqd/f.png"); armorName = "Fire Empress Armor. She gained **60%** ATK, decreased DEF by **20%**"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.6), 9999); defbuff = new buffInfo("+", -Math.floor(myStats.def * 0.2), 9999); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.6) }, { type: "def", id: defbuff.id, buff: -Math.floor(myStats.def * 0.2) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.6); myStats.def += -Math.floor(myStats.def * 0.2); myStats.mg = 0; break;
+                case 1: embed.setThumbnail("https://i.ibb.co/HG4tHWt/a.png"); armorName = "Adamantine Armor. She gained **60%** DEF, decreased ATK by **20%**"; atkbuff = new buffInfo("+", -Math.floor(myStats.atk * 0.2), 9999); defbuff = new buffInfo("+", Math.floor(myStats.def * 0.6), 9999); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: -Math.floor(myStats.atk * 0.2) }, { type: "def", id: defbuff.id, buff: Math.floor(myStats.def * 0.6) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += -Math.floor(myStats.atk * 0.2); myStats.def += Math.floor(myStats.def * 0.6); myStats.mg = 0; break;
+                case 2: embed.setThumbnail("https://i.ibb.co/VDPkR10/w.png"); armorName = "Heaven's Wheel Armor. She gained **25%** ATK and DEF"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.25), 9999); defbuff = new buffInfo("+", Math.floor(myStats.def * 0.25), 9999); mybuff.atk.push(atkbuff); mybuff.def.push(defbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.25) }, { type: "def", id: defbuff.id, buff: Math.floor(myStats.def * 0.25) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.25); myStats.def += Math.floor(myStats.def * 0.25); myStats.mg = 0; break;
+                case 3: embed.setThumbnail("https://i.ibb.co/TH4gNq5/c.png"); armorName = "Clear Heart Clothing. She gained **10%** ATK, **+20%** crit rate, **+50%** crit damage, and **+10%** dodge chance"; atkbuff = new buffInfo("+", Math.floor(myStats.atk * 0.1), 9999); crbuff = new buffInfo("+", 0.2, 9999); cdbuff = new buffInfo("+", 0.5, 9999); dodgebuff = new buffInfo("+", 0.1, 9999); mybuff.atk.push(atkbuff); mybuff.cr.push(crbuff); mybuff.cd.push(cdbuff); mybuff.dodge.push(dodgebuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "atk", id: atkbuff.id, buff: Math.floor(myStats.atk * 0.1) }, { type: "cr", id: crbuff.id, buff: 0.2 }, { type: "cd", id: cdbuff.id, buff: 0.5 }, { type: "dodge", id: dodgebuff.id, buff: 0.1 }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; myStats.atk += Math.floor(myStats.atk * 0.1); myStats.cr += 0.2; myStats.cd += 0.5; myStats.dodge += 0.1; myStats.mg = 0; break;
+                case 4: embed.setThumbnail("https://i.imgur.com/TDbvwEX.png"); armorName = "Armadura Fairy. She will gain **10%** HP every round"; hpbuff = new buffInfo("+", Math.floor(myStats.maxhp * 0.1), 9999); mybuff.hp.push(hpbuff); mybuff.mg.push(mgbuff); matchStats.heap1 = [{ type: "hp", id: hpbuff.id, buff: Math.floor(myStats.maxhp * 0.1) }, { type: "mg", id: mgbuff.id, buff: myStats.mg }]; /* addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp*0.1), { }); myStats.hp > myStats.maxhp ? myStats.hp = myStats.maxhp : false; */ myStats.mg = 0; break;
                 default: false; break;
             };
             notice.push(`\n✨ **${char.name}** changed to ${armorName}`);
@@ -960,14 +973,14 @@ export const abilities = {
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.mdChance = 1;
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
 
                 if ((eStats.hp / eStats.maxhp) > 0.33) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.15 + (0.1 * Math.random()), magicDamage: true, mdChance: -1, combodmg: true, selfdmg: true, selfheal: true });
                 };
 
                 if (matchStats.interaction.commandName === "stampede") {
-                    const names = matchStats.partyChars.map((e) => e.name);
+                    const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                     if (names.includes("Natsu Dragneel")) {
                         dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.4, magicDamage: true, mdChance: -1 });
                     };
@@ -1035,7 +1048,7 @@ export const abilities = {
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (matchStats.round === this.roundUsed) {
                 myStats.sm += this.cost;
-                return matchStats.interaction.channel.send("You can't stack Tatsumaki's ability").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: "You can't stack Tatsumaki's ability", ephemeral: true });
             };
             eStats.mr = Math.floor(eStats.mr * 0.7);
             ebuff.mr.push(new buffInfo("*", 0.7, 3));
@@ -1062,7 +1075,7 @@ export const abilities = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
                 myStats.sm += 25;
-                return matchStats.interaction.channel.send(`Ichigo Kurosaki needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Ichigo Kurosaki needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
 
             if (myStats.sm < 50) {
@@ -1088,7 +1101,7 @@ export const abilities = {
             } else {
                 // if (this.usedFinal) {
                 //     myStats.sm += 25;
-                //     return matchStats.interaction.channel.send("Final Getsuga Tensho can only be used once").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                //     return matchStats.interaction.followUp({ content: "Final Getsuga Tensho can only be used once", ephemeral: true });
                 // };
                 // this.usedFinal = true;
                 this.pause = matchStats.round + 5;
@@ -1164,7 +1177,7 @@ export const abilities = {
             this.pause = matchStats.round + 2;
 
             // HP sacrifice
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.1), { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.1), {});
             if (myStats.hp < 0) myStats.hp = 0;
 
             // Buffs
@@ -1179,7 +1192,7 @@ export const abilities = {
                 if (damage) ebuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.5), 3));
 
                 // Heal 30% of missing HP
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(0.3 * (myStats.maxhp - myStats.hp)), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(0.3 * (myStats.maxhp - myStats.hp)), {});
 
                 // Single use
                 if (this.used === 3) {
@@ -1226,16 +1239,16 @@ export const abilities = {
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (matchStats.round < this.roundUsed + 3) {
                 myStats.sm += this.cost;
-                return matchStats.interaction.channel.send("You can't stack Luminous' ability").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: "You can't stack Luminous' ability", ephemeral: true });
             };
 
             myStats.mdChance += 1;
             mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.25), 2));
             myStats.md += Math.floor(myStats.md * 0.25);
 
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.1), { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.1), {});
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.03), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.03), {});
             }, 2));
 
             // Change image after 3 rounds
@@ -1250,14 +1263,14 @@ export const abilities = {
         },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.03), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.03), {});
             }, 9999));
         },
         party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.16), 9999));
             myStats.md += Math.floor(myStats.md * 0.16);
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
             }, 9999));
         },
     },
@@ -1275,7 +1288,7 @@ export const abilities = {
                 this.usedThisRound++;
                 if (this.usedThisRound >= 3) {
                     myStats.sm += this.cost;
-                    return matchStats.interaction.channel.send("You can stack Victorias's ability up to 3 times max.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                    return matchStats.interaction.followUp({ content: "You can stack Victorias's ability up to 3 times max.", ephemeral: true });
                 };
             } else {
                 this.usedThisRound = 0;
@@ -1283,7 +1296,7 @@ export const abilities = {
 
             // Consume HP & ATK Buff
             const sacrifice = Math.floor(myStats.maxhp * 0.05);
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, {});
             if (myStats.hp < 0) myStats.hp = 0;
             const atkbuff = Math.floor(myStatsFixed.atk * 0.25);
             myStats.atk += atkbuff;
@@ -1300,7 +1313,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (myStats.sm > 25) {
                     myStats.sm -= 25;
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.06), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.06), {});
                     if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
                 };
             }, 9999));
@@ -1316,7 +1329,7 @@ export const abilities = {
             if (eStats.sm < 20) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 myStats.sm += 30;
-                return matchStats.interaction.channel.send("Your enemy needs **20**💧 to activate").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
             };
             eStats.sm -= 20;
             let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.25, magicDamage: true, mdChance: -1 });
@@ -1351,7 +1364,7 @@ export const abilities = {
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** uses One for All at **${this.used === 1 ? 5 : (this.used === 1 ? 8 : 15)}%**! He`, { atkMultiplier, magicDamage: true, block: false });
 
             // Sacrifice
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -(myStats.hp * (0.05 + (0.05 * (this.used - 1)))), { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -(myStats.hp * (0.05 + (0.05 * (this.used - 1)))), {});
             if (myStats.hp < 0) myStats.hp = 0;
         },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1371,11 +1384,11 @@ export const abilities = {
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (matchStats.round === this.roundUsed) {
                 myStats.sm += this.cost;
-                return matchStats.interaction.channel.send("You can't stack All Might's ability").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: "You can't stack All Might's ability", ephemeral: true });
             };
             if (Math.random() < 0.1) {
                 let dmg = Math.floor(myStats.hp * 0.05);
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -dmg, { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -dmg, {});
                 return notice.push(`\n✨ **${char.name}** damaged himself by **${dmg}**!`);
             };
             myStats.atk *= 2;
@@ -1404,23 +1417,23 @@ export const abilities = {
             stats.coins = Math.min(stats.coins, 100000);
 
             if (matchStats.round === this.roundUsed) {
-                if (++this.usedThisRound >= 3) return matchStats.interaction.channel.send("You can stack **Eliza**'s ability up to **3** times max.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                if (++this.usedThisRound >= 3) return matchStats.interaction.followUp({ content: "You can stack **Eliza**'s ability up to **3** times max.", ephemeral: true });
             } else this.usedThisRound = 0;
 
             let atkbuff;
             switch (this.usedThisRound) {
-                case 0: if (myStats.sm < 70) return matchStats.interaction.channel.send(`You don't have enough mana (**${myStats.sm}**/70).`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                case 0: if (myStats.sm < 70) return matchStats.interaction.followUp({ content: `You don't have enough mana (**${myStats.sm}**/70).`, ephemeral: true });
                     myStats.sm -= 70;
                     atkbuff = Math.floor(myStats.atk * (0.2 * (stats.coins / 100000)));
                     myStats.atk += atkbuff;
                     notice.push(`\n✨ **${char.name}** gains **${atkbuff}** ATK`); break;
-                case 1: if (stats.coins < 250) return matchStats.interaction.channel.send("You don't have enough coins to activate **Eliza**'s ability.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                case 1: if (stats.coins < 250) return matchStats.interaction.followUp({ content: "You don't have enough coins to activate **Eliza**'s ability.", ephemeral: true });
                     atkbuff = Math.floor(myStats.atk * (0.1 * (stats.coins / 100000)));
                     myStats.atk += atkbuff;
                     myStats.shield += Math.floor(myStats.maxhp * 0.05);
                     notice.push(`\n✨ **${char.name}** uses 250<:coins:872926669055356939> to gain **${atkbuff}** ATK and **${Math.floor(myStats.maxhp * 0.05)}** Shield`);
                     await query(`UPDATE users SET coins = coins - 250 WHERE id = ${matchStats.interaction.user.id}`); break;
-                case 2: if (stats.coins < 250) return matchStats.interaction.channel.send("You don't have enough coins to activate **Eliza**'s ability.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                case 2: if (stats.coins < 250) return matchStats.interaction.followUp({ content: "You don't have enough coins to activate **Eliza**'s ability.", ephemeral: true });
                     atkbuff = Math.floor(myStats.atk * (0.1 * (stats.coins / 100000)));
                     myStats.atk += atkbuff;
                     myStats.shield += Math.floor(myStats.maxhp * 0.05);
@@ -1525,16 +1538,16 @@ export const abilities = {
             this.pause = matchStats.round + 7;
 
             // Get user inv
-            const { 0: inv } = await query(`SELECT items FROM users WHERE id = ${matchStats.interaction.user.id}`);
-            inv.items = JSON.parse(inv.items);
+            const inv = await getUserSchema(matchStats.interaction.user.id);
+            if (!inv) return matchStats.interaction.followUp({ content: "You don't have any fish in your inventory.", ephemeral: true });
 
             // Filter for fish
-            const fishInv = Object.entries(inv.items).filter(([key, val]) => (items[key].category === "fish" && (items[key].gradeValue === 0 || items[key].gradeValue === 1)));
-            fishInv.sort(([a, _a], [b, _b]) => items[a].gradeValue - items[b].gradeValue);
+            const fishInv = Object.entries(inv.items).filter(([key, val]) => (items[key as any].category === "fish" && (items[key as any].gradeValue === 0 || items[key as any].gradeValue === 1)));
+            fishInv.sort(([a, _a], [b, _b]) => items[a as any].gradeValue - items[b as any].gradeValue);
 
             // Select fish to be consumed
             let remainingFishCost = 10;
-            const fishToConsume = {};
+            const fishToConsume: Record<string, number> = {};
             for (const [key, val] of fishInv) {
                 fishToConsume[key] = Math.min(val, remainingFishCost);
                 remainingFishCost -= fishToConsume[key];
@@ -1575,18 +1588,18 @@ export const abilities = {
             myStats.oceansLamentStacks = 0;
 
             // Get Fish Inv
-            const { 0: inv } = await query(`SELECT items FROM users WHERE id = ${matchStats.interaction.user.id}`);
-            inv.items = JSON.parse(inv.items);
+            const inv = await getUserSchema(matchStats.interaction.user.id);
+            if (!inv) return;
 
             // Get Total Amount of Fish
-            const totalFish = Math.min(400, Object.entries(inv.items).filter(([key, val]) => (items[key].category === "fish")).reduce((acc, [key, val]) => acc + val, 0));
+            const totalFish = Math.min(400, Object.entries(inv.items).filter(([key, val]) => (items[key as any].category === "fish")).reduce((acc, [key, val]) => acc + val, 0));
 
             // Max HP buff
             const increaseHp = Math.floor(myStatsFixed.maxhp * 0.0005 * totalFish);
             myStatsFixed.maxhp += increaseHp;
             myStatsFixed.hp += increaseHp;
             myStats.maxhp += increaseHp;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
 
             // DEF buff
             mybuff.def.push(new buffInfo("+", Math.floor(totalFish / 2), 9999));
@@ -1614,15 +1627,15 @@ export const abilities = {
             // Luminous Alter
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (matchStats.round === this.roundUsed) {
-                if (++this.usedThisRound >= 1) return matchStats.interaction.channel.send("You can use Luminous (alter)'s ability only once per round.").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                if (++this.usedThisRound >= 1) return matchStats.interaction.followUp({ content: "You can use Luminous (alter)'s ability only once per round.", ephemeral: true });
             } else {
                 this.usedThisRound = 0;
             };
             this.roundUsed = matchStats.round;
 
             const sacrifice = Math.ceil(myStats.maxhp * 0.33);
-            if (myStats.hp <= sacrifice) return matchStats.interaction.channel.send("You don't have enough HP left").then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, { });
+            if (myStats.hp <= sacrifice) return matchStats.interaction.followUp({ content: "You don't have enough HP left", ephemeral: true });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -sacrifice, {});
 
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.4, selfheal: false });
         },
@@ -1662,7 +1675,7 @@ export const abilities = {
                 myStats.sm += this.cost;
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
-                return matchStats.interaction.channel.send(`Nao Tomori needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Nao Tomori needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
             this.pause = matchStats.round + 6;
 
@@ -1930,7 +1943,7 @@ export const abilities = {
             }, 9999));
 
             if (isStampede) {
-                const names = matchStats.partyChars.map((e) => e.name);
+                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (names.includes("Shigeo Kageyama")) {
                     myStats.atk *= 1.5;
                     myStats.md *= 1.5;
@@ -1992,7 +2005,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 5 === 0) { // Sacrifice 5% max HP for shield
                     myStats.shield += Math.floor(myStats.maxhp * 0.05);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.05), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.05), {});
                 };
                 if (myStats.shield > 0) {
                     myStats.def += Math.floor(myStats.def * 0.2);
@@ -2006,7 +2019,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 7 === 0) {
                     myStats.shield += Math.floor(myStats.maxhp * 0.05);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.05), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.05), {});
                 };
                 if (myStats.shield > 0) {
                     myStats.def += Math.floor(myStats.def * 0.2);
@@ -2028,7 +2041,7 @@ export const abilities = {
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (this.pause > matchStats.round) {
                 myStats.sm += this.cost;
-                return matchStats.interaction.channel.send(`Kafka needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Kafka needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
             this.pause = matchStats.round + 5;
 
@@ -2087,6 +2100,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.revivedTotal === 1) {
                     myStats.shield += Math.floor(myStats.maxhp * 0.3);
+                    //@ts-ignore
                     this._used++;
                 };
             }, 5, 1));
@@ -2120,6 +2134,7 @@ export const abilities = {
             // When HP drops below 20%
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp < myStats.maxhp * 0.2) {
+                    //@ts-ignore
                     this._used++;
 
                     // Regenerating Shield for 3 rounds
@@ -2185,7 +2200,7 @@ export const abilities = {
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor((myStats.maxhp - myStats.hp) * 0.6) : 0;
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ ${char.name}`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.33), { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.33), {});
         },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.xpboost += 0.25;
@@ -2217,7 +2232,7 @@ export const abilities = {
             else if (matchStats.round > 5) atkbuff = 1.75, mana_cost = 10;
 
             if (this.cost + mana_cost > myStats.sm) {
-                matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                matchStats.interaction.followUp({ content: "You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)", ephemeral: true });
                 return myStats.sm += this.cost;
             };
             myStats.sm -= mana_cost;
@@ -2258,7 +2273,7 @@ export const abilities = {
                     if (matchStats.round > 10) mana_cost = 30, dodge_buff = 0.75, def_debuff = 0.25;
                     else if (matchStats.round > 5) mana_cost = 25, dodge_buff = 0.625, def_debuff = 0.2;
 
-                    if (mana_cost > myStats.sm) matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                    if (mana_cost > myStats.sm) matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
 
                     myStats.sm -= mana_cost;
                     myStats.dodge = dodge_buff;
@@ -2319,7 +2334,7 @@ export const abilities = {
             // Check if day time
             if (roundTime > 2) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.channel.send(`${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                matchStats.interaction.followUp({ content: `${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`, ephemeral: true });
                 myStats.sm += this.cost;
                 this.used--;
                 return;
@@ -2329,7 +2344,7 @@ export const abilities = {
             let mana_cost = (this.used === 3) ? 30 : 0;
             if (this.cost + mana_cost > myStats.sm) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                 myStats.sm += this.cost;
                 this.used--;
                 return;
@@ -2359,7 +2374,7 @@ export const abilities = {
                     myStats.md += Math.floor(myStats.md * 0.2);
                     myStats.def += Math.floor(myStats.def * 0.2);
                     myStats.mr += Math.floor(myStats.mr * 0.2);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.04), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.04), {});
                     if (myStats.hp < 0) myStats.hp = 0;
                 } else {
                     myStats.atk -= Math.floor(myStats.atk * 0.2);
@@ -2388,7 +2403,7 @@ export const abilities = {
             // Check if enough mana
             if (mana_cost > myStats.sm) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                 this.used--;
                 return;
             };
@@ -2401,7 +2416,7 @@ export const abilities = {
                     notice.push(`\n✨ **${this.hasArtemis ? "Artemis" : char.name}** applied vulnerability, **${enemy.name}** will now take **${Math.round((eStats.vulnerability - 1) * 100)}%** more damage for the duration of the domain`);
                 } else {
                     matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                    matchStats.interaction.channel.send(`Domain of Ascendancy can only be used once`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                    matchStats.interaction.followUp({ content: "Domain of Ascendancy can only be used once", ephemeral: true });
                     this.used--;
                     return;
                 };
@@ -2537,7 +2552,7 @@ export const abilities = {
             // Check if enough mana
             if (mana_cost > myStats.sm) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.channel.send(`You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                 this.used--;
                 return;
             };
@@ -2557,7 +2572,7 @@ export const abilities = {
                     };
                 } else {
                     matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                    matchStats.interaction.channel.send(`Domain of Sanction can only be used once`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                    matchStats.interaction.followUp({ content: "Domain of Sanction can only be used once", ephemeral: true });
                     this.used--;
                     return;
                 };
@@ -2580,8 +2595,8 @@ export const abilities = {
                 myStats.replaceButton.def = {
                     "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         Object.keys(ebuff).forEach((stat) =>
-                            ebuff[stat].forEach((buff) => {
-                                if ((buff.type === "*" && buff.val < 1) || (buff.type === "+" && buff.val < 0)) buff._last++;
+                            ebuff[stat as keyof Buffs].forEach((buff) => {
+                                if ((buff.type === "*" && buff.val < 1) || (buff.type === "+" && buff.val < 0)) buff.last++;
                             }),
                         );
                         notice.push(`\n🛡️ **${char.name}** extended all debuffs on the enemy by 1 round!`);
@@ -2704,7 +2719,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (myStats.damageOnHold) {
                     const dmg = Math.floor(myStats.damageOnHold / 10);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -dmg, { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -dmg, {});
                     if (myStats.hp < 0) myStats.hp = 0;
                     mybuff.hp.push(new buffInfo("+", -dmg, 9));
                 };
@@ -2908,6 +2923,7 @@ export const abilities = {
                 myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                     if ((myStats.hp / myStats.maxhp) < 0.1 && myStats.hp > 0) {
                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used Final Gambit! She`, { atkMultiplier: 2, combodmg: true, selfdmg: true, selfheal: true });
+                        //@ts-ignore
                         this._used++;
                     };
                 }, 9999, 1));
@@ -2919,7 +2935,7 @@ export const abilities = {
             if (mask === undefined) { // Maskless
                 //
             } else if (mask === "phantasmal") { // Phantasmal Deathmask
-                const names = matchStats.partyChars.map((e) => e.name);
+                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (names.includes("Artemis EX")) {
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.25), 4));
                     myStats.md += Math.floor(myStats.md * 0.25);
@@ -2931,7 +2947,7 @@ export const abilities = {
                 myStats.selfhealChance.push(1);
                 myStats.selfheal.push(0.1);
             } else if (mask === "verdant") { // Verdant Guardian Mask
-                const names = matchStats.partyChars.map((e) => e.name);
+                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (names.includes("Apollo EX")) {
                     mybuff.hp.push(new buffInfo("+", Math.floor(myStats.maxhp * 0.05), 9999));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.1), 9999));
@@ -2946,7 +2962,7 @@ export const abilities = {
                 myStats.mr += Math.floor(myStats.mr * 0.2);
 
             } else if (mask === "valkyrie") { // Valkyrie's Battle Mask
-                const names = matchStats.partyChars.map((e) => e.name);
+                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (!names.includes("Apollo EX") && !names.includes("Artemis EX")) {
                     mybuff.cd.push(new buffInfo("+", 0.25, 9999));
                     myStats.cd += 0.25;
@@ -3016,7 +3032,7 @@ export const abilities = {
 
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (myStats.sm > 15) {
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(0.04 * myStats.maxhp), { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(0.04 * myStats.maxhp), {});
                     if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
                 };
 
@@ -3174,7 +3190,7 @@ export const abilities = {
                     myStats.sm -= 30;
 
                     const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.3);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
 
                     notice.push(`\n✨ **${char.name}** healed **${heal}** HP!`);
                 };
@@ -3187,7 +3203,7 @@ export const abilities = {
                 // Ei
                 myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     if (myStats.hp / myStats.maxhp > 0.5) {
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(0.03 * myStats.hp), { });
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(0.03 * myStats.hp), {});
                     } else {
                         if (!myStats.raidenHpDownRound) {
                             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** fell below 50% HP! She`, { atkMultiplier: 1.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, ignoreShield: true });
@@ -3197,7 +3213,7 @@ export const abilities = {
                     };
 
                     if (matchStats.round < myStats.raidenHpDownRound + 4) {
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.1), { });
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.1), {});
                     };
                 }, 9999));
 
@@ -3255,7 +3271,7 @@ export const abilities = {
             const dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.7, magicDamage: true });
 
             if (dmg) {
-                if (myStats.guinaifenStackRounds.filter((e) => e >= (matchStats.round - myStats.guinaifenStackLast)).length < myStats.guinaifenStackMax) {
+                if (myStats.guinaifenStackRounds.filter((e: number) => e >= (matchStats.round - myStats.guinaifenStackLast)).length < myStats.guinaifenStackMax) {
                     ebuff.hp.push(new buffInfo("+", -Math.floor(0.06 * dmg), myStats.guinaifenStackLast));
                     myStats.guinaifenStackRounds.push(matchStats.round);
                 };
@@ -3297,7 +3313,7 @@ export const abilities = {
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             if (matchStats.interaction.commandName === "stampede") {
-                const partyHasAbilityCharacters = matchStats.partyChars.some((e) => e.id in abilities);
+                const partyHasAbilityCharacters = matchStats.partyChars.some((e: IcharInfo) => e.id in abilities);
                 if (partyHasAbilityCharacters) {
                     myStats.hp = 0;
                     myStats.rev = 0;
@@ -3317,7 +3333,7 @@ export const abilities = {
                 myStatsFixed.maxhp += increaseHp;
                 myStatsFixed.hp += increaseHp;
                 myStats.maxhp += increaseHp;
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
             };
 
             const { 0: stats } = await query(`SELECT items FROM users WHERE id = ${matchStats.interaction.user.id}`);
@@ -3404,6 +3420,7 @@ export const abilities = {
             // 6th stack of Perfume Fever
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.perfumeFever === 6) {
+                    //@ts-ignore
                     this._used++;
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** unleashed Perfume Fever! She`, { atkMultiplier: 1.5, magicDamage: true });
 
@@ -3473,7 +3490,7 @@ export const abilities = {
                 if (this.pool.length === 0) this.pool.push(0, 1, 2, 3, 4);
                 this.pool.sort(() => Math.random() - 0.5);
                 this.rolledWisp = this.pool.pop();
-                return notice.push(`\n🔅 **${char.name}** has summoned **__${wisps[this.rolledWisp]}__**. Use ✨ to keep it.`);
+                return notice.push(`\n🔅 **${char.name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ✨ to keep it.`);
             };
 
             // Return if no wisp
@@ -3542,7 +3559,7 @@ export const abilities = {
             // Lock wisp
             this.lockedWisps.push(this.rolledWisp);
             this.pool = [0, 1, 2, 3, 4];
-            notice.push(`\n🔅 **${wisps[this.rolledWisp]}** was locked!`);
+            notice.push(`\n🔅 **${wisps[this.rolledWisp as keyof typeof wisps]}** was locked!`);
             this.rolledWisp = -1;
             return;
         },
@@ -3559,7 +3576,7 @@ export const abilities = {
             myStatsFixed.maxhp += increaseHp;
             myStatsFixed.hp += increaseHp;
             myStats.maxhp += increaseHp;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, { });
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
 
             // ATK & MD buffs
             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * (0.06 * shardStacks)), 9999));
@@ -3585,7 +3602,7 @@ export const abilities = {
             if (this.pool.length === 0) this.pool.push(1, 2, 3, 4);
             this.pool.sort(() => Math.random() - 0.5);
             this.rolledWisp = this.pool.pop();
-            notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
+            notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
 
             myStats.replaceButton.ability = {
                 emoji: tempAbility?.emoji,
@@ -3595,7 +3612,7 @@ export const abilities = {
                     if (this.pool.length === 0) this.pool.push(1, 2, 3, 4);
                     this.pool.sort(() => Math.random() - 0.5);
                     this.rolledWisp = this.pool.pop();
-                    notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
+                    notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
                 },
             };
 
@@ -3644,7 +3661,7 @@ export const abilities = {
                     };
 
                     const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis", 4: "Centauri" };
-                    return notice.push(`\n🔅 **${wisps[this.rolledWisp]}** was locked!`);
+                    return notice.push(`\n🔅 **${wisps[this.rolledWisp as keyof typeof wisps]}** was locked!`);
                 },
             };
 
@@ -3757,7 +3774,7 @@ export const abilities = {
             const dmg3 = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🪷 **${char.name}**`, { atkMultiplier: 0.77, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
             const dmg4 = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🪷 **${char.name}**`, { atkMultiplier: 0.77, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
-            const successfulHits = !!dmg1 + !!dmg2 + !!dmg3 + !!dmg4;
+            const successfulHits = Number(!!dmg1) + Number(!!dmg2) + Number(!!dmg3) + Number(!!dmg4);
 
             ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.05 * successfulHits), 3));
             ebuff.mr.push(new buffInfo("+", -Math.floor(eStats.mr * 0.05 * successfulHits), 3));
@@ -3794,10 +3811,11 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.3) {
                     const hp = Math.floor(myStats.maxhp * 0.2);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hp, { });
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hp, {});
                     const mana = Math.min(50, myStats.mana - myStats.sm);
                     myStats.sm += mana;
                     notice.push(`\n🍑 **${char.name}** has rejuvenated **${hp}** HP and **${mana}** mana!`);
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -3820,13 +3838,13 @@ export const abilities = {
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Mari EX
             Object.keys(mybuff).forEach((stat) => {
-                mybuff[stat].forEach((buff) => {
+                mybuff[stat as keyof Buffs].forEach((buff) => {
                     // Adds own buff x1.5 to enemy
-                    if (buff.isDebuff) ebuff[stat].push(new buffInfo(buff.type, buff.val * 1.5, buff.last, buff.change, buff.ctype, buff.cap));
+                    if (buff.isDebuff) ebuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val * 1.5, buff.last, buff.change, buff.ctype, buff.cap));
                 });
 
                 // Remove debuffs
-                mybuff[stat] = mybuff[stat].filter((buff) => !buff.isDebuff);
+                mybuff[stat as keyof Buffs] = mybuff[stat as keyof Buffs].filter((buff) => !buff.isDebuff);
             });
         },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -3905,7 +3923,7 @@ export const abilities = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
                 myStats.sm += 25;
-                return matchStats.interaction.channel.send(`Frieren needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`).then((msg) => setTimeout(() => msg.delete(), deleteReplyIn)).catch((err) => console.log(err));
+                return matchStats.interaction.followUp({ content: `Frieren needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
 
             // Judradjim / Vollzanbel
@@ -3960,6 +3978,7 @@ export const abilities = {
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.3) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.8 + (0.05 * Math.min(matchStats.round, 20)), dodge: false, block: false });
+                    //@ts-ignore
                     this._used++;
                 };
             }, 9999, 1));
@@ -3993,7 +4012,7 @@ export const abilities = {
 
                 // Cost
                 myStats.sm = 0;
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.4), { });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(myStats.maxhp * 0.4), {});
 
                 const stunDuration = 3;
 
@@ -4059,6 +4078,7 @@ export const abilities = {
             // Transform after revival
             myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.revivedTotal > 0) {
+                    //@ts-ignore
                     this._used++;
 
                     notice.push(`\n✨ **${char.name}** enters his Susanoo Form!`);

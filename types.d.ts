@@ -1,5 +1,7 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { EmbedBuilder, User, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
+
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Gender = 'M' | 'F' | 'NB';
 
@@ -29,6 +31,101 @@ export type ClassStats = {
     td: [number, number];
     mana: [number, number];
     mg: [number, number];
+};
+
+export type animeInfoOptions = {
+    charid?: number;
+};
+
+export interface IanimeInfo {
+    name: string;
+    alias: string[];
+    id: number;
+    options: animeInfoOptions;
+
+    thumbnailCharId?: number;
+};
+
+export type CharInfoOptions = {
+    staticImage?: string;
+};
+
+export interface IcharInfo {
+    name: string;
+    alias: string[];
+    animeInfo: IanimeInfo;
+    gender: Gender;
+    image: string;
+    id: number;
+    rarity: CharacterRarity;
+    options: CharInfoOptions;
+
+    anime: string;
+    anialias: string[];
+    staticImage?: string;
+    tryStaticImage: string;
+    rarityValue: number;
+    rarityEmoji: string;
+
+    getImage(premium: number, url: string, skin?: number, isStatic?: boolean);
+};
+
+export interface IskillInfo {
+    id: number;
+    cost: number;
+    skill: ClassAbility;
+    passive: ClassAbility;
+    list: any[];
+
+    set list(lis: any[]);
+};
+
+export interface IenemyInfo {
+    name: string;
+    species: string;
+    title: string;
+    gender: Gender;
+    boss: boolean;
+    setStats: object;
+    multStats: object;
+    addStats: object;
+    loot: number[];
+    image: string[];
+    floor: number[];
+    id: number;
+    ability?: IskillInfo;
+
+    url: string;
+};
+
+export interface IdelayedBuff {
+    round: number;
+    run: ItemAbility;
+    last: number;
+    usage: number;
+    used: number;
+
+    set used(used: number);
+
+    decrement(): void;
+}
+
+export type ClassAbility = (myStats: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IenemyInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+
+export type ItemAbility = (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IenemyInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+
+type ReplaceButtonAction = {
+    emoji?: string;
+    used?: number;
+    run?: ItemAbility;
+};
+
+type ReplaceButton = {
+    atk?: ReplaceButtonAction;
+    def?: ReplaceButtonAction;
+    ability?: ReplaceButtonAction;
+    cskill?: ReplaceButtonAction;
+    skip?: ReplaceButtonAction;
 };
 
 export type DetailedStats = {
@@ -79,8 +176,8 @@ export type DetailedStats = {
     ignoreShield: boolean;
     damageReduction: number;
     damageFormula: string;
-    delayedBuffs: Array<any>;
-    replaceButton: Record<string, any>;
+    delayedBuffs: IdelayedBuff[];
+    replaceButton: ReplaceButton;
     lvl: number;
     ref: number;
     class: number;
@@ -168,7 +265,7 @@ export interface UserSchema {
     lastpull: Date | null;
     pullreminder: number;
     votereminder: number;
-    items: Record<string, any>;
+    items: Record<string, number>;
     skins: number[];
     eventpts: number;
     brbest: number;
@@ -408,6 +505,20 @@ export type Buffs = {
     "revhp": IbuffInfo[];
 };
 
+export interface ITrigger {
+    event: TriggerEvents;
+    duration: number;
+    maxRound: number;
+    maxUsage: number;
+    used: number;
+    target?: DetailedStats;
+    caster?: DetailedStats;
+    callback: (...args: any[]) => any;
+    id: number;
+
+    set duration(duration: number);
+    set used(used: number);
+};
 
 export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "defend" | "cskill" | "minionDeath";
 
@@ -416,8 +527,8 @@ export type TriggerOptions = {
     duration?: number;
     maxRound?: number;
     maxUsage?: number;
-    target?: any;
-    caster?: any;
+    target?: DetailedStats;
+    caster?: DetailedStats;
     callback: (...args: any[]) => any;
 };
 
@@ -426,7 +537,7 @@ export type MatchStats = {
     round: number;
     roundCheck: number;
     ended: boolean;
-    interaction: any;
+    interaction: ChatInputCommandInteraction;
     turnSkill: number;
     timeout: number;
     defUsed: number;
@@ -459,11 +570,12 @@ export type MatchStats = {
     allowExecution: boolean;
     damageFormula: "default" | `log_scale_${number}`;
     consumeMana: number;
-    dodgebuff: number;
-    heap1: number;
-    listeners: Record<TriggerEvents, Trigger[]>;
-    on(event: TriggerEvents, options: TriggerOptions | (() => any)): void;
-    off(event: TriggerEvents, trigger: Trigger | number): void;
+    dodgebuffLast?: number;
+    dodgebuff?: number;
+    heap1: any;
+    listeners: Record<TriggerEvents, ITrigger[]>;
+    on(event: TriggerEvents, options: PartialBy<TriggerOptions, "event"> | ((args: { trigger: ITrigger, caster: DetailedStats, target: DetailedStats, casterBuff: Buffs, targetBuff: Buffs, matchStats: MatchStats, options: any; }) => any)): void;
+    off(event: TriggerEvents, trigger: ITrigger | number): void;
     trigger(event: TriggerEvents, caster: any, target: any, casterBuff: any, targetBuff: any, options?: any): void;
 
     [key: string]: any;
