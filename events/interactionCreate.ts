@@ -30,10 +30,16 @@ const event: BotEvent = {
 
         // Auto Complete
         if (interaction.isAutocomplete()) {
-            // const focusedValue = interaction.options.getFocused();
-            const choices = await interaction.client.commands.get(interaction.commandName)?.autocomplete({ interaction });
-            return interaction.respond(choices.slice(0, 25));
-            // return interaction.respond(choices.filter((e) => e.name.toLowerCase().includes(focusedValue.toLowerCase())).slice(0, 25));
+            const command = interaction.client.slashCommands.get(interaction.commandName) as SlashCommand | undefined;
+            if (command?.autocomplete) {
+                const choices = await command.autocomplete({ interaction });
+                return interaction.respond(choices.slice(0, 25));
+            } else {
+                // const focusedValue = interaction.options.getFocused();
+                const choices = await interaction.client.commands.get(interaction.commandName)?.autocomplete?.({ interaction });
+                return interaction.respond(choices.slice(0, 25));
+                // return interaction.respond(choices.filter((e) => e.name.toLowerCase().includes(focusedValue.toLowerCase())).slice(0, 25));
+            };
         };
 
         // return setTimeout(async () => {

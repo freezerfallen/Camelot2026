@@ -1,5 +1,5 @@
 import { query } from "../postgres";
-import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UserSchema, WeaponSchema } from "../types";
+import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateUserOptions, UserSchema, WeaponSchema } from "../types";
 
 //---------------------------------//
 //           GET SCHEMAS           //
@@ -125,6 +125,11 @@ export const insertNewServer = async (id: string, name: string, userId: string):
     return server;
 };
 
+export const insertNewWeapon = async (userId: string, itemId: number, itemType: string): Promise<WeaponSchema> => {
+    const { rows: [weapon] } = await query(`INSERT INTO weapons (id, itemid, item_type) VALUES ($1, $2, $3) RETURNING *`, [userId, itemId, itemType]) as { rows: WeaponSchema[]; };
+    return weapon;
+};
+
 //-------------------------------------------//
 //             UPDATE STATEMENTS             //
 //-------------------------------------------//
@@ -210,48 +215,6 @@ export const addUserToServer = async (serverId: string, userId: string): Promise
 //         );
 //     }
 // };
-
-// Helper type to get array keys from UserSchema
-type ArrayKeys<T> = {
-    [K in keyof T]: T[K] extends Array<any> ? K : never
-}[keyof T];
-
-// Helper type to get number keys from UserSchema
-type NumberKeys<T> = {
-    [K in keyof T]: T[K] extends number ? K : never
-}[keyof T];
-
-// Helper type to get JSON object keys from UserSchema
-type JsonKeys<T> = {
-    [K in keyof T]: T[K] extends object ? K : never
-}[keyof T];
-
-type UpdateUserOperation<K extends keyof UserSchema> =
-    // Simple set operation - works with any key
-    | { type: 'set'; value: UserSchema[K]; }
-
-    // Increment operation - only works with number fields
-    | (K extends NumberKeys<UserSchema>
-        ? { type: 'increment'; value: number; }
-        : never)
-
-    // Array operations - only work with array fields
-    | (K extends ArrayKeys<UserSchema>
-        ? { type: 'append'; value: UserSchema[K]; }
-        | { type: 'append_unique'; value: UserSchema[K]; }
-        | { type: 'remove'; value: UserSchema[K][number]; }
-        | { type: 'remove_all'; value: UserSchema[K]; }
-        : never)
-
-    // JSON operations - only work with object fields
-    | (K extends JsonKeys<UserSchema>
-        ? { type: 'set_json'; value: UserSchema[K]; }
-        | { type: 'merge_json'; value: Partial<UserSchema[K]>; }
-        : never);
-
-type UpdateUserOptions = {
-    [K in keyof Partial<UserSchema>]: UpdateUserOperation<K>;
-};
 
 export const updateUsers = async (
     userIds: string | string[] | "*",

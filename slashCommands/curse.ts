@@ -1,23 +1,23 @@
 import { EmbedBuilder, ComponentType } from "discord.js";
 import { curses } from "../Modules/curses";
 import { PageRow } from "../Modules/components";
-import { showPage } from "../Modules/functions";
+import { searchCurse, showPage } from "../Modules/functions";
+import { SlashCommand } from "../types";
 
-module.exports = {
+const exportCommand: SlashCommand = {
     name: 'curse',
-    description: 'curse related commands',
-    execute(interaction) {
+    async execute({ interaction }) {
 
-        let subcommand = interaction.options.getSubcommand();
+        const subcommand = interaction.options.getSubcommand();
 
         // Class List
         if (subcommand === "list") {
-            let page = interaction.options.getInteger('page');
+            const page = interaction.options.getInteger('page') ?? 1;
 
-            let rare = curses.filter((e) => e.tier).map((c) => `> ${c.emblem} ${c.name}`).sort();
-            let common = curses.filter((e) => e.tier === 0).map((c) => `> ${c.emblem} ${c.name}`).sort();
+            const rare = curses.filter((e) => e.tier).map((c) => `> ${c.emblem} ${c.name}`).sort();
+            const common = curses.filter((e) => e.tier === 0).map((c) => `> ${c.emblem} ${c.name}`).sort();
 
-            let showC = ["**Rare Curses** <:Rare_Curse:952175947409408041>", ...rare, "", "**Common Curses** <:Common_Curse:952175936554557530>", ...common];
+            const showC = ["**Rare Curses** <:Rare_Curse:952175947409408041>", ...rare, "", "**Common Curses** <:Common_Curse:952175936554557530>", ...common];
 
             const elementsPerPage = 15;
             const pagesTotal = Math.ceil(showC.length / elementsPerPage);
@@ -52,50 +52,15 @@ module.exports = {
                     Embed.setDescription(`Use \`/curse info <name>\` for more information\n\n` + showF.join("\n")).setFooter({ text: `Page ${currPage}/${pagesTotal}` });
                     interaction.editReply({ embeds: [Embed] });
                 });
-
             });
-        };
-
-        function findCurse(name) {
-            name = name.toLowerCase();
-
-            if (!isNaN(name)) {
-                if (name < 0) return interaction.reply("The ID can't be negative.");
-                if (name >= curses.length) return interaction.reply("The ID must be smaller than " + curses.length);
-                return curses[parseInt(name)];
-            };
-
-            let fastCheck = curses.find((e) => e.name.toLowerCase() === name);
-            if (fastCheck) return fastCheck;
-
-            let cArgs = name.split(" ");
-
-            let fArray = curses.filter((e) => e.name.toLowerCase()[0] === cArgs[0][0]);
-
-            let letter = 0;
-            for (let word = 0; word < cArgs.length; word++) {
-                let { length: wl } = cArgs[word];
-
-                while (wl--) {
-                    fArray = fArray.filter((e) => e.name.toLowerCase().split(" ")[word] === undefined ? false : e.name.toLowerCase().split(" ")[word][letter] === cArgs[word][letter]);
-                    letter++;
-                };
-
-                if (fArray.length < 2) break;
-                letter = 0;
-            };
-
-            if (fArray.length === 0) return interaction.reply("No match found");
-            if (fArray.length > 1) return interaction.reply(fArray.length + " matches found");
-            return fArray[0];
         };
 
         // Class info
         if (subcommand === "info") {
-            let choice = interaction.options.getString('curse');
+            const choice = interaction.options.getString('curse', true);
 
-            let curse = findCurse(choice);
-            if (!curse.name) return;
+            const curse = searchCurse(choice, interaction);
+            if (!curse) return;
 
             const Embed = new EmbedBuilder()
                 .setColor(0xbbffff)
@@ -108,3 +73,5 @@ module.exports = {
 
     },
 };
+
+export default exportCommand;

@@ -581,6 +581,50 @@ export type MatchStats = {
     [key: string]: any;
 };
 
+
+// Helper type to get array keys from UserSchema
+type ArrayKeys<T> = {
+    [K in keyof T]: T[K] extends Array<any> ? K : never
+}[keyof T];
+
+// Helper type to get number keys from UserSchema
+type NumberKeys<T> = {
+    [K in keyof T]: T[K] extends number ? K : never
+}[keyof T];
+
+// Helper type to get JSON object keys from UserSchema
+type JsonKeys<T> = {
+    [K in keyof T]: T[K] extends object ? K : never
+}[keyof T];
+
+type UpdateUserOperation<K extends keyof UserSchema> =
+    // Simple set operation - works with any key
+    | { type: 'set'; value: UserSchema[K]; }
+
+    // Increment operation - only works with number fields
+    | (K extends NumberKeys<UserSchema>
+        ? { type: 'increment'; value: number; }
+        : never)
+
+    // Array operations - only work with array fields
+    | (K extends ArrayKeys<UserSchema>
+        ? { type: 'append'; value: UserSchema[K]; }
+        | { type: 'append_unique'; value: UserSchema[K]; }
+        | { type: 'remove'; value: UserSchema[K][number]; }
+        | { type: 'remove_all'; value: UserSchema[K]; }
+        : never)
+
+    // JSON operations - only work with object fields
+    | (K extends JsonKeys<UserSchema>
+        ? { type: 'set_json'; value: UserSchema[K]; }
+        | { type: 'merge_json'; value: Partial<UserSchema[K]>; }
+        : never);
+
+export type UpdateUserOptions = {
+    [K in keyof Partial<UserSchema>]: UpdateUserOperation<K>;
+};
+
+
 declare global {
     namespace NodeJS {
         interface ProcessEnv {

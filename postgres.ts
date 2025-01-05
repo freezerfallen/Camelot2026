@@ -289,6 +289,75 @@ async function createTables() {
     // await query(`CREATE INDEX IF NOT EXISTS idx_trades_receiver ON trades(receiver)`);
 };
 
+async function createTriggerWeaponUniqueId() {
+    // Create a function to generate random strings
+    await query(`
+        CREATE OR REPLACE FUNCTION generate_random_string(length INT) RETURNS TEXT AS $$
+        DECLARE
+            chars TEXT := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+            result TEXT := '';
+            i INT;
+        BEGIN
+            FOR i IN 1..length LOOP
+                result := result || substr(chars, floor(random() * length(chars) + 1)::integer, 1);
+            END LOOP;
+            RETURN result;
+        END;
+        $$ LANGUAGE plpgsql;
+    `);
+
+    // Create a function for the trigger
+    await query(`
+        CREATE OR REPLACE FUNCTION generate_weapon_uniqueid()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            gen TEXT;
+            full_id TEXT;
+            len INT := 2;
+            max_attempts INT := 100;
+            attempt INT := 0;
+        BEGIN
+            LOOP
+                gen := generate_random_string(len);
+                full_id := gen || ':' || NEW.id;
+                
+                -- Check if the generated ID exists
+                IF NOT EXISTS (SELECT 1 FROM weapons WHERE uniqueid = full_id) THEN
+                    NEW.uniqueid := full_id;
+                    RETURN NEW;
+                END IF;
+                
+                attempt := attempt + 1;
+                
+                -- Increase length after some attempts
+                IF attempt % 10 = 0 THEN
+                    len := len + 1;
+                END IF;
+                
+                -- Prevent infinite loops
+                IF attempt >= max_attempts THEN
+                    RAISE EXCEPTION 'Could not generate unique ID after % attempts', max_attempts;
+                END IF;
+            END LOOP;
+        END;
+        $$ LANGUAGE plpgsql;
+    `);
+
+    // Create the trigger
+    await query(`
+        DROP TRIGGER IF EXISTS weapon_uniqueid_trigger ON weapons;
+        CREATE TRIGGER weapon_uniqueid_trigger
+        BEFORE INSERT ON weapons
+        FOR EACH ROW
+        WHEN (NEW.uniqueid IS NULL)
+        EXECUTE FUNCTION generate_weapon_uniqueid();
+    `);
+};
+
+async function createTriggers() {
+    await createTriggerWeaponUniqueId();
+};
+
 async function alterTables() {
     // This function can be used for migrations
     // Example:
@@ -315,6 +384,7 @@ async function dropTables() {
     try {
         await createTables();
         await alterTables();
+        // await createTriggers();
 
         console.log('Database initialization complete');
     } catch (error) {

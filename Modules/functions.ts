@@ -19,6 +19,7 @@ import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
 import _ from 'lodash';
 import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, MatchStats, PrimaryStat, WeaponSchema } from '../types';
+import { curses } from './curses';
 
 const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>; def: Record<number, number>; expertise: Record<number, string>; }; } = {
     "base": {
@@ -1070,12 +1071,64 @@ export const searchClass = (name: string | number, interaction: ChatInputCommand
     return fArray[0];
 };
 
+export const searchCurse = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false) => {
+    name = name.toString().toLowerCase();
+
+    if (!isNaN(Number(name))) {
+        if (Number(name) < 0) {
+            if (!silent) interaction.reply("The ID can't be negative.");
+            return;
+        };
+        if (Number(name) >= curses.length) {
+            if (!silent) interaction.reply("The ID must be smaller than " + curses.length);
+            return;
+        };
+        return curses[parseInt(name)];
+    };
+
+    let fastCheck = curses.find((e) => e.name.toLowerCase() === name);
+    if (fastCheck) return fastCheck;
+
+    let cArgs = name.split(" ");
+
+    let fArray = curses.filter((e) => e.name.toLowerCase()[0] === cArgs[0][0]);
+
+    let letter = 0;
+    for (let word = 0; word < cArgs.length; word++) {
+        let { length: wl } = cArgs[word];
+
+        while (wl--) {
+            fArray = fArray.filter((e) => e.name.toLowerCase().split(" ")[word] === undefined ? false : e.name.toLowerCase().split(" ")[word][letter] === cArgs[word][letter]);
+            letter++;
+        };
+
+        if (fArray.length < 2) break;
+        letter = 0;
+    };
+
+    if (fArray.length === 0) {
+        if (!silent) interaction.reply("No match found");
+        return;
+    };
+    if (fArray.length > 1) {
+        if (!silent) interaction.reply(fArray.length + " matches found");
+        return;
+    };
+    return fArray[0];
+};
+
 export const searchItem = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false, options: { returnSet: boolean; } = { returnSet: false }) => {
     name = name.toString().toLowerCase();
 
     if (!isNaN(Number(name))) {
-        if (Number(name) < 0) return silent ? false : interaction.reply("The ID can't be negative.");
-        if (Number(name) >= items.length) return silent ? false : interaction.reply("The ID must be smaller than " + items.length);
+        if (Number(name) < 0) {
+            if (!silent) interaction.reply("The ID can't be negative.");
+            return;
+        };
+        if (Number(name) >= items.length) {
+            if (!silent) interaction.reply("The ID must be smaller than " + items.length);
+            return;
+        };
         return items[parseInt(name)];
     };
 
@@ -1099,10 +1152,14 @@ export const searchItem = (name: string | number, interaction: ChatInputCommandI
         letter = 0;
     };
 
-    if (fArray.length === 0) return silent ? false : interaction.reply("No match found");
+    if (fArray.length === 0) {
+        if (!silent) interaction.reply("No match found");
+        return;
+    };
     if (fArray.length > 1) {
         if (options.returnSet && fArray.length === 4 && "setname" in fArray[0] && "setname" in fArray[1] && "setname" in fArray[2] && "setname" in fArray[3] && fArray[0].setname === fArray[1].setname && fArray[0].setname === fArray[2].setname && fArray[0].setname === fArray[3].setname) return fArray[0];
-        return silent ? false : interaction.reply(fArray.length + " matches found");
+        if (!silent) interaction.reply(fArray.length + " matches found");
+        return;
     };
     return fArray[0];
 };

@@ -61,7 +61,7 @@ const exportCommand: SlashCommand = {
                         { name: "Husbando Pack - 300<:coins:872926669055356939>", value: "Get a random husbando" },
                         { name: "Character Bundle - 800<:coins:872926669055356939>", value: "Get 3 characters for a discount" },
                         { name: "Rare Pack - 500<:coins:872926669055356939>", value: "Get at least a <:CTier:869316602858991657>-Tier character" },
-                        { name: "Morpheus Blessing - 2000<:coins:872926669055356939>", value: "Get a guaranteed new character\n(_<:SSTier:869316489931546644>-Tier are excluded from this pack_)" },
+                        { name: "Morpheus' Blessing - 2000<:coins:872926669055356939>", value: "Get a guaranteed new character\n(_<:SSTier:869316489931546644>-Tier are excluded from this pack_)" },
                     ),
                 new EmbedBuilder()
                     .setColor(0xbbffff)
