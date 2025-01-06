@@ -287,13 +287,13 @@ function sendRollingRewards() {
         });
         mailboxes.sort((a, b) => b.points - a.points);
 
-        let rank = 1, party = mailboxes[0].party, points = mailboxes[0].points;
+        let rank = 1, party = mailboxes[0].party;
         for (const player of mailboxes) {
             const participationPoints = Math.ceil(100 * (player.cow_chars.length / (cowSettings.days * (cowSettings.rollsPerDay + 1) * cowSettings.fightsPerCharacter)));
             const paricipationRewards = participationPrize(participationPoints);
 
             let rankingRewards = { deluxe: 0, royal: 0, glorious: 0, ssticket: 0, sticket: 0, aticket: 0, kernel: 0, gems: 0, coins: 0 };
-            if (player.party !== party || player.points !== points) rank++;
+            if (player.party !== party) rank++;
             party = player.party;
             if (rank === 1) rankingRewards = rankingPrizes[0];
             else if (rank < 6) rankingRewards = rankingPrizes[1];
@@ -302,7 +302,11 @@ function sendRollingRewards() {
             const mail = { "type": "2,4,8,9", "rewards": `coins|${paricipationRewards.coins + rankingRewards.coins},gems|${paricipationRewards.gems + rankingRewards.gems},item|458|${paricipationRewards.deluxe + rankingRewards.deluxe},item|457|${paricipationRewards.royal + rankingRewards.royal},item|454|${paricipationRewards.glorious + rankingRewards.glorious},item|683|${paricipationRewards.kernel + rankingRewards.kernel},ss ticket|${paricipationRewards.ssticket + rankingRewards.ssticket},s ticket|${paricipationRewards.sticket + rankingRewards.sticket},a ticket|${paricipationRewards.aticket + rankingRewards.aticket}`, "message": `Rolling Cow Rewards. Your party has ranked **#${rank}**!`, "date": Date.now() };
 
             player.mailbox.push(mail);
-            await query(`UPDATE users SET cow_participation = NULL, mailbox = '${JSON.stringify(player.mailbox)}' WHERE id = ${player.id}`);
+            await query(`UPDATE users SET mailbox = '${JSON.stringify(player.mailbox)}' WHERE id = ${player.id}`);
+            // await query(`UPDATE users SET cow_participation = NULL, mailbox = '${JSON.stringify(player.mailbox)}' WHERE id = ${player.id}`);
+
+            // wait for 100ms
+            await new Promise(resolve => setTimeout(resolve, 100));
         };
 
         console.log("Rolling cow rewards sent successfully!");
@@ -312,7 +316,7 @@ function sendRollingRewards() {
 // Daily
 let interval = () => setInterval(function () {
     const now = new Date();
-    if (now.getHours() === 0 && now.getMinutes() === 0) {
+    if (now.getHours() === 0 && now.getMinutes() === 5) { // 5 min delay
         const started = new Date(cowSettings.start);
         started.setHours(0, 0, 0, 0);
         now.setHours(0, 0, 0, 0);
