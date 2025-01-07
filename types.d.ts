@@ -17,6 +17,8 @@ export type Expertise = 'sword' | 'staff' | 'axe' | 'bow' | 'lance' | 'dagger' |
 
 export type BuffType = "*" | "+" | "=";
 
+export type IRoK = { name: string, id: string, char: number, ep: number; };
+
 export type ClassStats = {
     hp: [number, number];
     atk: [number, number];

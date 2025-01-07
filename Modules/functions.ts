@@ -18,7 +18,7 @@ import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
 import _ from 'lodash';
-import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, MatchStats, PrimaryStat, WeaponSchema } from '../types';
+import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, WeaponSchema } from '../types';
 import { curses } from './curses';
 
 const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>; def: Record<number, number>; expertise: Record<number, string>; }; } = {
@@ -933,7 +933,7 @@ export const splitTitle = (title: string) => {
     return add;
 };
 
-export const displayPull = (user: User, thisChar: charInfo, pCount: number, dupes: number, pullsMade: number, lastVote: Date, refNumber: number) => {
+export const displayPull = (user: User, thisChar: charInfo, pCount: number, dupes: number, pullsMade: number, lastVote: Date | null, refNumber: number) => {
     let animeL = splitTitle(thisChar.anime);
     let refinement = getRefinement(refNumber);
 
@@ -1361,6 +1361,8 @@ export const customEmojis = {
 
     "coins": "<:coins:872926669055356939>",
 };
+
+export const RoK = new Map<string, IRoK>();
 
 export const pullsToResetList = new Set();
 
