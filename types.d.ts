@@ -349,6 +349,8 @@ export interface UserSchema {
 
 export type CompactUserSchema = Omit<UserSchema, "transactions" | "char_level" | "char_class" | "char_equipment" | "dungeon_responsetime" | "stampede_responsetime">;
 
+export type UserSchemaForStats = Pick<CompactUserSchema, "id" | "name" | "premium" | "battlechar" | "level" | "bank" | "char_ref" | "equipment" | "shield_slot" | "class" | "dungeon_classlevels">;
+
 export interface ServerSchema {
     rowid: number;
     id: string;

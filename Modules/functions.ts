@@ -18,7 +18,7 @@ import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
 import _ from 'lodash';
-import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, WeaponSchema } from '../types';
+import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
 import { curses } from './curses';
 
 const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>; def: Record<number, number>; expertise: Record<number, string>; }; } = {
@@ -146,7 +146,7 @@ const lvlupStats = {
 
 const retainItemStats = new Map();
 
-export const getDetailedStats = async (id: number, inv: CompactUserSchema, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
+export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
 
     let dStats: DetailedStats = {
         "name": characters[id].name,
@@ -1368,6 +1368,7 @@ export const pullsToResetList = new Set();
 
 export const deleteReplyIn = 2400;
 
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 class idInfo {
     private _symbols: string[];
