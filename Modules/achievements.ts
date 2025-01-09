@@ -1,9 +1,8 @@
-/* eslint-disable no-extra-semi */
 import { characters, auniq } from "./chars.js";
 import { ChatInputCommandInteraction, User } from "discord.js";
 import { getUserSchema, updateUsers } from "./queries.js";
 
-class achievInfo {
+export default class achievInfo {
     private _title: string;
     private _description: string;
     private _id: number;

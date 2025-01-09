@@ -825,7 +825,7 @@ export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude
     return { itemsToDisassemble, itemIdsToDisassemble, loot };
 };
 
-export const showPage = (currPage: number, arr: any[], elements = 15) => {
+export const showPage = <T>(currPage: number, arr: T[], elements = 15): T[] => {
     return arr.slice((currPage - 1) * elements, currPage * elements);
 };
 
@@ -971,8 +971,14 @@ export const searchAnime = (name: string, inv: number[], interaction: ChatInputC
     // Filter
     const fArray = characters.filter((e) => e.anime.toLowerCase().startsWith(name) || e.anialias.some((a) => a.toLowerCase().startsWith(name)));
 
-    if (fArray.length === 0) return interaction.reply("No match found");
-    if ([...new Set(fArray.map((e) => e.anime))].length > 1) return interaction.reply(`${[...new Set(fArray.map((e) => e.anime))].length} matches found:\n> ‧ ${[...new Set(fArray.sort((a, b) => (b.anime.toLowerCase().startsWith(name) ? 1 : 0) - (a.anime.toLowerCase().startsWith(name) ? 1 : 0)).map((e) => e.anime.toLowerCase().startsWith(name) ? e.anime : e.anime + " (alias: " + e.anialias.find((a) => a.toLowerCase().startsWith(name)) + ")"))].slice(0, 8).join('\n> ‧ ')}${[...new Set(fArray.map((e) => e.anime))].length > 8 ? `\n+ ${[...new Set(fArray.map((e) => e.anime))].length - 8} more` : ""}`);
+    if (fArray.length === 0) {
+        interaction.reply("No match found");
+        return;
+    };
+    if ([...new Set(fArray.map((e) => e.anime))].length > 1) {
+        interaction.reply(`${[...new Set(fArray.map((e) => e.anime))].length} matches found:\n> ‧ ${[...new Set(fArray.sort((a, b) => (b.anime.toLowerCase().startsWith(name) ? 1 : 0) - (a.anime.toLowerCase().startsWith(name) ? 1 : 0)).map((e) => e.anime.toLowerCase().startsWith(name) ? e.anime : e.anime + " (alias: " + e.anialias.find((a) => a.toLowerCase().startsWith(name)) + ")"))].slice(0, 8).join('\n> ‧ ')}${[...new Set(fArray.map((e) => e.anime))].length > 8 ? `\n+ ${[...new Set(fArray.map((e) => e.anime))].length - 8} more` : ""}`);
+        return;
+    };
     return fArray;
 };
 
