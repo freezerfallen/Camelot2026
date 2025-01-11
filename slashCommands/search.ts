@@ -24,13 +24,14 @@ const exportCommand: SlashCommand = {
 
         let fastCheck = searchAnime(anime, stats.chars, interaction);
         if (!fastCheck || !fastCheck.length) return;
+        const animeName = fastCheck[0].anime;
 
         let sorted: SortedCharInfos = { "EX": [], "SS": [], "S": [], "A": [], "B": [], "C": [], "D": [] };
         fastCheck.forEach((b) => {
             if (searchflag !== "missing" || !stats.chars.includes(b.id)) sorted[b.rarity].push(b);
         });
         let allChars = sorted["EX"].concat(sorted["SS"]).concat(sorted["S"]).concat(sorted["A"]).concat(sorted["B"]).concat(sorted["C"]).concat(sorted["D"]);
-        let charsOwned = chars.filter((b) => b.anime === fastCheck[0].anime);
+        let charsOwned = chars.filter((b) => b.anime === animeName);
 
         if (allChars.length === 0) return interaction.reply(`You have all characters from **${fastCheck[0].anime}**`);
 

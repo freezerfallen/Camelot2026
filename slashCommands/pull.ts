@@ -108,7 +108,7 @@ const exportCommand: SlashCommand = {
             setTimeout(async () => {
                 pullsToResetList.delete(interaction.user.id);
                 await updateUsers(interaction.user.id, { pullcount: { type: "set", value: 0 } });
-                if (stats.pullreminder) interaction.channel?.send(`${interaction.user.toString()} is off </pull:1011014030103674913> cooldown!`);
+                if (stats.pullreminder && interaction.channel?.isSendable()) interaction.channel.send(`${interaction.user.toString()} is off </pull:1011014030103674913> cooldown!`);
             }, pullTimer);
         };
 
