@@ -614,7 +614,7 @@ type UpdateUserOperation<K extends keyof UserSchema> =
     | (K extends ArrayKeys<UserSchema>
         ? { type: 'append'; value: UserSchema[K]; }
         | { type: 'append_unique'; value: UserSchema[K]; }
-        | { type: 'remove'; value: UserSchema[K][number]; }
+        | { type: 'remove'; value: UserSchema[K]; }
         | { type: 'remove_all'; value: UserSchema[K]; }
         : never)
 

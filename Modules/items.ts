@@ -1,13 +1,16 @@
-/* eslint-disable no-unused-vars */
 import { Buffs, IbuffInfo, ItemAbility, ItemRarity, PrimaryStat } from "../types";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
 
+type ItemCategory = "fish" | "loot" | "weapon" | "armor" | "ring";
+
+type ItemType = "fish" | "crafting material" | "ascension material" | "levelup material" | "awakening material" | "exchange point" | "event exclusive item" | "chest" | "sword" | "staff" | "axe" | "bow" | "lance" | "dagger" | "ring" | "shield" | "helmet" | "cuirass" | "gloves" | "boots";
+
 export class itemInfo {
     private _name: string;
-    private _category: string;
-    private _type: string;
+    private _category: ItemCategory;
+    private _type: ItemType;
     private _obtain: string[];
     private _emoji: string;
     private _image: string;
@@ -19,7 +22,7 @@ export class itemInfo {
     private _desc: string;
     private _flair: string;
 
-    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean, tradable: boolean, sellable: boolean, desc: string = "", flair: string = "") {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean, tradable: boolean, sellable: boolean, desc: string = "", flair: string = "") {
         this._name = name;
         this._category = category; // ["weapon", "armor", "fish"]
         this._type = type; // ["sword", ..., "helmet", ..., "fish"]
@@ -106,7 +109,7 @@ export class itemInfo {
 export class fishInfo extends itemInfo {
     private _consumable: boolean;
 
-    constructor(name: string, category: string, type: string, obtain: string[], consumable: boolean, emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], consumable: boolean, emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable);
         this._consumable = consumable;
     };
@@ -117,7 +120,7 @@ export class fishInfo extends itemInfo {
 };
 
 export class lootInfo extends itemInfo {
-    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = false, desc: string = "", flair: string = "") {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: string, image: string, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = false, desc: string = "", flair: string = "") {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
     };
 };
@@ -132,7 +135,7 @@ export class weaponInfo extends itemInfo {
     private _buff: ItemAbility;
     private _buffdesc: string;
 
-    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, primaryStat: PrimaryStat, psmin: number, psmax: number, secondaryStat: PrimaryStat, ssmin: number, ssmax: number, buff: ItemAbility, buffdesc: string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: string, image: string, primaryStat: PrimaryStat, psmin: number, psmax: number, secondaryStat: PrimaryStat, ssmin: number, ssmax: number, buff: ItemAbility, buffdesc: string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._primaryStat = primaryStat;
         this._psmin = psmin;
@@ -178,7 +181,7 @@ export class chestInfo extends itemInfo {
     private _drops: number;
     private _droprates: { [key in ItemRarity]?: number };
 
-    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, emoji2: string, image: string, image2: string, drops: number, droprates: { [key in ItemRarity]?: number; }, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = false, sellable: boolean = false, desc: string = "", flair: string = "") {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: string, emoji2: string, image: string, image2: string, drops: number, droprates: { [key in ItemRarity]?: number; }, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = false, sellable: boolean = false, desc: string = "", flair: string = "") {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._emoji2 = emoji2;
         this._image2 = image2;
@@ -208,7 +211,7 @@ export class armorInfo extends itemInfo {
     private _buff: ItemAbility | undefined;
     private _buffdesc: string | undefined;
 
-    constructor(name: string, category: string, type: string, setname: string, obtain: string[], emoji: string, image: string, primaryStat: string, psmin: number, psmax: number, grade: ItemRarity, id: number, buff: ItemAbility | undefined = undefined, buffdesc: string | undefined = undefined, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, setname: string, obtain: string[], emoji: string, image: string, primaryStat: string, psmin: number, psmax: number, grade: ItemRarity, id: number, buff: ItemAbility | undefined = undefined, buffdesc: string | undefined = undefined, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc);
         this._setname = setname;
         this._primaryStat = primaryStat;
@@ -243,7 +246,7 @@ export class ringInfo extends itemInfo {
     private _buffs: (level: number) => ItemAbility;
     private _buffdescs: (level: number) => string;
 
-    constructor(name: string, category: string, type: string, obtain: string[], emoji: string, image: string, maxlevel: number, buffs: (level: number) => ItemAbility, buffdescs: (level: number) => string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: string, image: string, maxlevel: number, buffs: (level: number) => ItemAbility, buffdescs: (level: number) => string, flair: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc, flair);
         this._maxlevel = maxlevel;
         this._buffs = buffs;

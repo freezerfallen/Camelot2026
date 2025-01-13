@@ -1,68 +1,69 @@
-import { query } from "../db_handler";
-import { ComponentType, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import { ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { SlashCommand } from "../types";
+import { getUserSchema, updateUsers } from "../Modules/queries";
 
 // Get # of days since
-function daysAgo(lastOnlineDate) {
+function daysAgo(lastOnlineDate: Date) {
     if (!lastOnlineDate) return 0;
     const now = new Date();
     // set to midnight
     now.setHours(0, 0, 0, 0);
     lastOnlineDate.setHours(0, 0, 0, 0);
 
-    const diffTime = now - lastOnlineDate;
+    const diffTime = now.getTime() - lastOnlineDate.getTime();
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
 };
 
-module.exports = {
+export const exportCommand: SlashCommand = {
     name: 'christmas-present', // celebrate, christmas-present, valentines-chocolate, egg-hunt
-    description: 'claim daily event reward',
-    async execute(interaction) {
+    async execute({ interaction, author }) {
+
+        const stats = author.schema;
 
         // Valentine's Chocolate
-        let user = interaction.options.getUser('give');
+        const user = interaction.options.getUser('give');
         if (user) {
             if (user.id === interaction.user.id) return interaction.reply({ content: "<:Heh:928368727588757504>", ephemeral: true });
-            const { 0: stats } = await query(`SELECT valentine FROM users WHERE id = ${interaction.user.id}`);
             if (stats.valentine) return interaction.reply({ content: "You already gave away your valentine's chocolate!", ephemeral: true });
 
             const message = interaction.options.getString('message') ?? "";
 
-            const ValentinesRow = new ActionRowBuilder()
+            const ValentinesRow = new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
                     new ButtonBuilder()
                         .setCustomId('confirm')
                         .setEmoji('<:check_icon:683671903143067743>')
                         .setLabel(`Send as ${interaction.user.username}`)
-                        .setStyle('Success'),
+                        .setStyle(ButtonStyle.Success),
                     new ButtonBuilder()
                         .setCustomId('anonymous')
                         .setEmoji('<:check_icon:683671903143067743>')
                         .setLabel('Send anonymously')
-                        .setStyle('Success'),
+                        .setStyle(ButtonStyle.Success),
                     new ButtonBuilder()
                         .setCustomId('cancel')
                         .setEmoji('<:stop_icon:683671917353369600>')
                         .setLabel('Cancel')
-                        .setStyle('Danger'),
+                        .setStyle(ButtonStyle.Danger),
                 );
 
-            return interaction.reply({ content: `Are you sure you want to give __Valentine's Chocolate__ <:valentines_chocolate:1207055321839960194> to **${user.username}**?\n⚠️ This command can only be used once!\nAttached message:\n> ${message || "`None`"}`, components: [ValentinesRow], ephemeral: true, fetchReply: true }).then(msg => {
+            return interaction.reply({ content: `Are you sure you want to give __Valentine's Chocolate__ <:valentines_chocolate:1207055321839960194> to **${user.username}**?\n⚠️ This command can only be used once!\nAttached message:\n> ${message || "`None`"}`, components: [ValentinesRow], ephemeral: true }).then(msg => {
                 const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && (r.customId === "confirm" || r.customId === "anonymous"), componentType: ComponentType.Button, time: 15000 });
                 const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 15000 });
 
                 confirm.on('collect', async (r) => {
                     confirm.stop(), cancel.stop();
 
-                    const { 0: stats } = await query(`SELECT valentine FROM users WHERE id = ${interaction.user.id}`);
-                    if (stats.valentine) return interaction.followUp({ content: "You already gave away your valentine's chocolate!", ephemeral: true });
+                    const stats = await getUserSchema(interaction.user.id);
+                    if (!stats || stats.valentine) return interaction.followUp({ content: "You already gave away your valentine's chocolate!", ephemeral: true });
 
-                    const { 0: inv } = await query(`SELECT items FROM users WHERE id = ${user.id}`);
-                    inv.items = JSON.parse(inv.items);
-                    inv.items[686] = (inv.items[686] ?? 0) + 1;
-
-                    await query(`UPDATE users SET valentine = ${user.id} WHERE id = ${interaction.user.id}`);
-                    await query(`UPDATE users SET items = '${JSON.stringify(inv.items)}' WHERE id = ${user.id}`);
+                    await updateUsers(interaction.user.id, {
+                        valentine: { type: 'set', value: user.id }
+                    });
+                    await updateUsers(interaction.user.id, {
+                        items: { type: 'merge_json', value: { [686]: 1 } }
+                    });
 
                     interaction.followUp({ content: `**${user.username}** has received your chocolate!`, ephemeral: true });
 
@@ -73,23 +74,21 @@ module.exports = {
                     confirm.stop(), cancel.stop();
                     interaction.followUp({ content: "Action cancelled", ephemeral: true });
                 });
-
             });
         };
 
-        const { 0: stats } = await query(`SELECT celebrateclaimed FROM users WHERE id = ${interaction.user.id}`);
 
         if (stats.celebrateclaimed && daysAgo(new Date(stats.celebrateclaimed)) === 0) return interaction.reply("Come back in " + `${(23 - new Date().getHours()) ? `**${23 - new Date().getHours()}**h` : ""} **${60 - new Date().getMinutes()}**min`);
 
         const reward = {
             coins: Math.floor(1200 + (Math.random() * 600)),
-            gems: 1 + (Math.random() < 0.33),
-            expulls: 0 + (Math.random() < 0.4),
+            gems: 1 + (Math.random() < 0.33 ? 1 : 0),
+            expulls: 0 + (Math.random() < 0.4 ? 1 : 0),
             ssshard: Math.floor(Math.random() * 2),
             sshard: Math.floor(1 + (Math.random() * 3)),
-            ssticket: 0 + (Math.random() < 0.42),
-            sticket: 1 + (Math.random() < 0.66),
-            lootbox: 0 + (Math.random() < 0.5)
+            ssticket: 0 + (Math.random() < 0.42 ? 1 : 0),
+            sticket: 1 + (Math.random() < 0.66 ? 1 : 0),
+            lootbox: 0 + (Math.random() < 0.5 ? 1 : 0)
         };
 
         // Trick
@@ -98,7 +97,18 @@ module.exports = {
         //     return interaction.reply(`🎃 Trick! 🍬\n>>> **-${coins}** <:coins:872926669055356939>`);
         // };
 
-        await query(`UPDATE users SET coins = coins + ${reward.coins}, gems = gems + ${reward.gems}, expulls = expulls + ${reward.expulls}, ssshard = ssshard + ${reward.ssshard}, sshard = sshard + ${reward.sshard}, ssticket = ssticket + ${reward.ssticket}, sticket = sticket + ${reward.sticket}, lootbox = lootbox + ${reward.lootbox}, celebrateclaimed = ${Date.now()} WHERE id = ${interaction.user.id}`);
+        // Update user table
+        await updateUsers(interaction.user.id, {
+            coins: { type: 'increment', value: reward.coins },
+            gems: { type: 'increment', value: reward.gems },
+            expulls: { type: 'increment', value: reward.expulls },
+            ssshard: { type: 'increment', value: reward.ssshard },
+            sshard: { type: 'increment', value: reward.sshard },
+            ssticket: { type: 'increment', value: reward.ssticket },
+            sticket: { type: 'increment', value: reward.sticket },
+            lootbox: { type: 'increment', value: reward.lootbox },
+            celebrateclaimed: { type: 'set', value: Date.now() }
+        });
 
         const rewardItems = [
             { amount: reward.expulls, name: '<a:EXTRA:1138530846144462968> pull' },
@@ -118,3 +128,5 @@ module.exports = {
         return interaction.reply(`🎄 Merry Christmas! ❄️\n>>> ${rewardItems.filter(item => item.amount > 0).map(item => `**${item.amount}**x ${item.name}`).join(', ')}`);
     },
 };
+
+export default exportCommand;

@@ -1,12 +1,12 @@
 import { generateCaptcha } from "../Modules/functions";
 import { requestVerification } from "../Modules/components";
+import { SlashCommand } from "../types";
 
-module.exports = {
+const exportCommand: SlashCommand = {
     name: 'captcha',
-    description: 'captcha',
-    execute(interaction) {
+    async execute({ interaction }) {
 
-        const code = interaction.options.getString('code');
+        const code = interaction.options.getString('code', true);
 
         if (!requestVerification.has(interaction.user.id)) return interaction.reply("You don't have any pending captcha");
 
@@ -25,3 +25,5 @@ module.exports = {
 
     },
 };
+
+export default exportCommand;

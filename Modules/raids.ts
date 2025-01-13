@@ -58,19 +58,19 @@ export default class RaidInfo {
 };
 
 export const raids: RaidInfo[] = [
-    // magma bursts and eruption
+    // Magma bursts and eruption
     new RaidInfo(0, "Kael'thian", "B+", raidBosses[0], { accentColor: "#bb3838", phase: 1, phasesTotal: 2, nextPhase: 1 }),
     new RaidInfo(1, "Kael'theron", "B+", raidBosses[1], { accentColor: "#bb3838", phase: 2, phasesTotal: 2 }),
 
-    // immune to lightning damage
+    // Immune to lightning damage
     new RaidInfo(2, "Velourith", "A", raidBosses[2], { accentColor: "#42218f", phase: 1, phasesTotal: 3, nextPhase: 3 }),
     new RaidInfo(3, "Veloura", "A", raidBosses[3], { accentColor: "#42218f", phase: 2, phasesTotal: 3, nextPhase: 4 }),
     new RaidInfo(4, "Velia", "A", raidBosses[4], { accentColor: "#42218f", phase: 3, phasesTotal: 3 }),
 
-    // mana dependent boss
+    // Mana dependent boss
     new RaidInfo(5, "Zerthrax", "C+", raidBosses[5], { accentColor: "#205991" }),
 
-    // counter boss
+    // Counter boss
     new RaidInfo(6, "Deluvion", "B", raidBosses[6], { accentColor: "#1c8798", phase: 1, phasesTotal: 2, nextPhase: 7 }),
     new RaidInfo(7, "Deluvian", "B", raidBosses[7], { accentColor: "#1c8798", phase: 2, phasesTotal: 2 }),
 
@@ -84,26 +84,26 @@ export const raids: RaidInfo[] = [
     // Drains enemy and steals stats
     new RaidInfo(11, "Rootlord Morivar", "S", raidBosses[11], { accentColor: "#3d2412" }),
 
-    // negates heal, gets miss damage
+    // Negates heal, gets miss damage
     new RaidInfo(12, "Sapwyrm, the Lifedrainer", "SSS", raidBosses[12], { accentColor: "#235937", phase: 1, phasesTotal: 3, nextPhase: 13 }),
     new RaidInfo(13, "Greater Sapwyrm, the Lifebinder", "SSS", raidBosses[13], { accentColor: "#235937", phase: 2, phasesTotal: 3, nextPhase: 14 }),
     new RaidInfo(14, "Elder Sapwyrm, the Forest Ravager", "SSS", raidBosses[14], { accentColor: "#235937", phase: 3, phasesTotal: 3 }),
 
-    // true damage, but shield scales it down
+    // True damage, but shield scales it down
     new RaidInfo(15, "Sledgefist, the Stone Breaker", "S+", raidBosses[15], { accentColor: "#ff4400", phase: 1, phasesTotal: 2, nextPhase: 16 }),
     new RaidInfo(16, "Runesmith Kraghammer", "S+", raidBosses[16], { accentColor: "#ff4400", phase: 2, phasesTotal: 2 }),
 
-    // reduces max hp, when phys. hit, steals md, gets mr
+    // Reduces max hp, when phys. hit, steals md, gets mr
     new RaidInfo(17, "Cake Witch, the Baking Bad", "A+", raidBosses[17], { accentColor: "#23292f" }),
 
     // Duo Boss, gets stronger from dodge/ block
     new RaidInfo(18, "Velkris/ Kyntheris", "SSS-", raidBosses[18], { accentColor: "#2e1f3e" }),
 
-    // reflects any dot, but is weak to it
+    // Reflects any dot, but is weak to it
     new RaidInfo(19, "DoT Gimmick", "D", raidBosses[19], { accentColor: "#49212a", phase: 1, phasesTotal: 2, nextPhase: 20 }),
     new RaidInfo(20, "DoT Gimmick 2", "D", raidBosses[20], { accentColor: "#49212a", phase: 2, phasesTotal: 2 }),
 
-    // annoying mail
+    // Annoying mail
     new RaidInfo(21, "POSTMASTER MALEDICT", "F", raidBosses[21], { accentColor: "#00B4B4" }),
 
     // Shield play around it boss

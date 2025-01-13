@@ -110,6 +110,18 @@ export const getUserRanking = async (scope: "server" | "global", user_ids: strin
     return result ?? [];
 };
 
+export const getFindUsers = async (ids: string[] | "*", charId: number): Promise<Pick<CompactUserSchema, "id" | "name" | "findoption" | "chars">[]> => {
+    const query_str = `SELECT id, name, findoption, chars FROM users WHERE findoption != 2 AND chars @> ARRAY[${charId}]`;
+
+    if (ids === "*") {
+        const users = await query(query_str, []) as Pick<CompactUserSchema, "id" | "name" | "findoption" | "chars">[];
+        return users;
+    } else {
+        const users = await query(`${query_str} AND id = ANY($1)`, [ids]) as Pick<CompactUserSchema, "id" | "name" | "findoption" | "chars">[];
+        return users;
+    };
+};
+
 //-------------------------------------------//
 //              LOAD STATEMENTS              //
 //-------------------------------------------//
@@ -169,6 +181,11 @@ export const insertNewServer = async (id: string, name: string, userId: string):
 export const insertNewWeapon = async (userId: string, itemId: number, itemType: string): Promise<WeaponSchema> => {
     const { rows: [weapon] } = await query(`INSERT INTO weapons (id, itemid, item_type) VALUES ($1, $2, $3) RETURNING *`, [userId, itemId, itemType]) as { rows: WeaponSchema[]; };
     return weapon;
+};
+
+export const insertNewTrade = async (id: string, receiver: string, type: "coins" | "char", sent: number): Promise<TradeSchema> => {
+    const { rows: [trade] } = await query(`INSERT INTO trades (id, receiver, type, sent) VALUES ($1, $2, $3, $4) RETURNING *`, [id, receiver, type, sent]) as { rows: TradeSchema[]; };
+    return trade;
 };
 
 //-------------------------------------------//
@@ -275,7 +292,28 @@ export const updateUsers = async (
                 case 'append_unique':
                     return `${key} = array(select distinct unnest(array_cat(${key}, $${paramIndex})))`;
                 case 'remove':
-                    return `${key} = array_remove(${key}, $${paramIndex})`;
+                    const elemType = Array.isArray(value) && value.length > 0
+                        ? typeof value[0] === 'number'
+                            ? 'integer'
+                            : 'text'
+                        : 'text';
+                    return `${key} = (
+                        SELECT array_agg(orig.elem ORDER BY orig.idx)
+                        FROM (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn,
+                                idx
+                            FROM unnest(${key}) WITH ORDINALITY AS t(elem, idx)
+                        ) AS orig
+                        LEFT JOIN (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn
+                            FROM unnest($${paramIndex}::${elemType}[]) WITH ORDINALITY AS t(elem, idx)
+                        ) AS rem
+                        ON orig.elem = rem.elem
+                        AND orig.rn = rem.rn
+                        WHERE rem.elem IS NULL
+                    )`;
                 case 'remove_all':
                     const arrayType = Array.isArray(value) && value.length > 0
                         ? typeof value[0] === 'number'

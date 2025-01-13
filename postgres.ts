@@ -279,14 +279,16 @@ async function createTables() {
         participation JSONB DEFAULT '{}' NOT NULL,
         start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
+};
 
+async function createIndexes() {
     // Create indexes for frequently accessed columns
-    // await query(`CREATE INDEX IF NOT EXISTS idx_users_id ON users(id)`);
-    // await query(`CREATE INDEX IF NOT EXISTS idx_users_rowid ON users(rowid)`);
-    // await query(`CREATE INDEX IF NOT EXISTS idx_weapons_id ON weapons(id)`);
-    // await query(`CREATE INDEX IF NOT EXISTS idx_guild_donations_userid ON guild_donations(userid)`);
-    // await query(`CREATE INDEX IF NOT EXISTS idx_guild_donations_guildid ON guild_donations(guildid)`);
-    // await query(`CREATE INDEX IF NOT EXISTS idx_trades_receiver ON trades(receiver)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_users_id ON users(id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_users_rowid ON users(rowid)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_weapons_id ON weapons(id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_guild_donations_userid ON guild_donations(userid)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_guild_donations_guildid ON guild_donations(guildid)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_trades_receiver ON trades(receiver)`);
 };
 
 async function createTriggerWeaponUniqueId() {
@@ -383,6 +385,7 @@ async function dropTables() {
 (async () => {
     try {
         await createTables();
+        await createIndexes();
         await alterTables();
         // await createTriggers();
 

@@ -812,7 +812,7 @@ export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude
 
         // Unequip if equipped
         if (stats) {
-            let type = fItem.category;
+            let type: string = fItem.category;
             if (type === "armor" || fItem.type === "shield") type = fItem.type;
             if (type === "shield" && stats.premium < 4) type = "weapon";
             if (stats.equipment[type] === item.uniqueid) delete stats.equipment[type];

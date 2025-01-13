@@ -1,6 +1,6 @@
 import { AttachmentBuilder } from 'discord.js';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { db, query } from "../db_handler";
+import { createCanvas, loadImage, Image } from '@napi-rs/canvas';
+import { CompactUserSchema, SlashCommand } from '../types';
 
 const calendarRewards = [
     { id: 0, type: "coins", amount: 2000 },
@@ -36,19 +36,19 @@ const calendarRewards = [
     { id: 31, type: "deluxe", amount: 1, itemid: 458 },
 ];
 
-const loadedImages = {};
+const loadedImages: Record<string, Image> = {};
 
 function getDaysInCurrentMonth() {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
     const nextMonth = new Date(year, month + 1, 1);
-    const lastDayCurrentMonth = new Date(nextMonth - 1);
+    const lastDayCurrentMonth = new Date(nextMonth.getTime() - 1);
 
     return lastDayCurrentMonth.getDate();
 };
 
-async function getCalendarImage(stats) {
+async function getCalendarImage(stats: CompactUserSchema) {
     // Create a canvas
     const canvas = createCanvas(1200, 950);
     const ctx = canvas.getContext('2d');
@@ -116,8 +116,9 @@ async function getCalendarImage(stats) {
             ctx.font = 'bold 30px Arial';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'middle';
+            // @ts-ignore
             ctx.fillText(`${i + 1}`, x + (width + 10) - 15, y + 18, width, height);
-        }
+        };
 
         // Reward Icons
         loadedImages["coins"] ||= await loadImage("https://cdn.discordapp.com/emojis/872926669055356939.png");
@@ -147,19 +148,14 @@ async function getCalendarImage(stats) {
     return new AttachmentBuilder(buffer);
 };
 
-module.exports = {
+export const exportCommand: SlashCommand = {
     name: 'calendar',
-    description: 'monthly calendar',
-    execute(interaction) {
+    async execute({ interaction, author }) {
 
-        db.serialize(async () => {
-            const { 0: stats } = await query(`SELECT gems, items, pass, passlevel, freepassclaimed, premiumpassclaimed, passpurchaselimit FROM users WHERE id = ${interaction.user.id}`);
-            stats.items = JSON.parse(stats.items);
-
-            const file = await getCalendarImage(stats);
-
-            interaction.reply({ files: [file] });
-        });
+        const file = await getCalendarImage(author.schema);
+        interaction.reply({ files: [file] });
 
     },
 };
+
+export default exportCommand;
