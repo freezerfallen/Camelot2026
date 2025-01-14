@@ -30,7 +30,7 @@ const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>
     },
 };
 
-export const getDimensions = (url: string) => {
+export const getDimensions = (url: string): Promise<{ width: number; height: number; }> => {
     return new Promise((resolve, rejects) => {
         let request = https.get(url, (response) => {
             imagesize(response, (err, result) => {

@@ -72,6 +72,11 @@ export const getFAQSchema = async (id: string): Promise<FAQSchema | undefined> =
     return faq;
 };
 
+export const getFAQSchemaByName = async (name: string): Promise<FAQSchema | undefined> => {
+    const [faq] = await query(`SELECT rowid, * FROM faq WHERE name = $1`, [name]) as [FAQSchema];
+    return faq;
+};
+
 export const getRaidSchema = async (id: string): Promise<RaidSchema | undefined> => {
     const [raid] = await query(`SELECT rowid, * FROM raids WHERE id = $1`, [id]) as [RaidSchema];
     return raid;
@@ -120,6 +125,11 @@ export const getFindUsers = async (ids: string[] | "*", charId: number): Promise
         const users = await query(`${query_str} AND id = ANY($1)`, [ids]) as Pick<CompactUserSchema, "id" | "name" | "findoption" | "chars">[];
         return users;
     };
+};
+
+export const getAllFAQSchemas = async (): Promise<FAQSchema[]> => {
+    const faq = await query(`SELECT rowid, * FROM faq`) as FAQSchema[];
+    return faq;
 };
 
 //-------------------------------------------//

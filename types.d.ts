@@ -1,4 +1,4 @@
-import { EmbedBuilder, User, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { EmbedBuilder, User, ButtonInteraction, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
@@ -221,6 +221,7 @@ export interface SlashCommand {
     name: string,
     execute: ({ }: executeSlashCommand) => void,
     autocomplete?: ({ }: { interaction: AutocompleteInteraction; }) => Promise<Array<{ name: string, value: string; }>>,
+    executeButtonInteraction?: ({ }: { interaction: ButtonInteraction; }) => void,
     cooldown?: number, // in seconds
 }
 

@@ -24,7 +24,8 @@ const event: BotEvent = {
 
             if (interaction.customId?.startsWith("ref-")) {
                 const [, commandName] = interaction.customId.split("-");
-                interaction.client.commands.get(commandName)?.executeButtonInteraction(interaction);
+                const command = interaction.client.slashCommands.get(commandName) as SlashCommand | undefined;
+                if (command) return command.executeButtonInteraction?.({ interaction });
             };
         };
 
