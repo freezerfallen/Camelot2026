@@ -67,14 +67,14 @@ export const migrateData = async () => {
                     user.bshard, user.cshard, user.dshard, user.ssticket,
                     user.sticket, user.aticket, user.bticket, user.cticket,
                     user.dticket, user.votestotal, user.arenawins,
-                    user.arenalosses, user.animationdelay, user.achievements,
+                    user.arenalosses, user.animationdelay, JSON.parse(user.achievements),
                     user.lastpull ? new Date(user.lastpull) : null,
                     user.pullreminder, user.votereminder, user.items,
-                    user.skins, user.eventpts, user.brbest, user.mailbox,
-                    user.eventrewreceived, user.gems, user.tutorial,
+                    JSON.parse(user.skins), user.eventpts, user.brbest, user.mailbox,
+                    user.eventrewreceived, user.gems, JSON.parse(user.tutorial),
                     user.transactions, user.dailies, user.guild,
                     user.donatedtotal, user.genesispity, user.presets,
-                    user.itemlock, user.party, user.stampedechar,
+                    JSON.parse(user.itemlock), user.party, user.stampedechar,
                     user.mailreceived, user.eventpts2, user.class,
                     user.aboutme, user.profilecolor, user.jades, user.pass, user.passlevel,
                     user.freepassclaimed, user.premiumpassclaimed, user.celebrateclaimed,
@@ -84,7 +84,7 @@ export const migrateData = async () => {
                     user.equipment, user.trial_equipment, user.craze_levels,
                     user.shield_slot, user.lastguildjoin ? new Date(user.lastguildjoin) : null,
                     user.valentine, user.bosshuntruns, user.bosshuntrevreceived,
-                    user.monthlyshop, user.itemwishlist, user.stampedeenergy,
+                    user.monthlyshop, JSON.parse(user.itemwishlist), user.stampedeenergy,
                     user.background, user.backgrounds ? user.backgrounds.split(',').filter(Boolean) : [],
                     user.charlock ? user.charlock.split(',').map(Number).filter(Boolean) : [],
                     user.animelock ? user.animelock.split(',').map(Number).filter(Boolean) : [],
@@ -93,9 +93,9 @@ export const migrateData = async () => {
                     user.guild_marks, new Date(user.created),
                     JSON.parse(charData.chars), charData.ref, charData.level,
                     charData.class, charData.skin, charData.equipment,
-                    dungeonData.floors, dungeonData.limit, dungeonData.classes,
-                    dungeonData.classlevels, dungeonData.responsetime,
-                    dungeonData.s_responsetime
+                    dungeonData.floors, dungeonData.limit, JSON.parse(dungeonData.classes),
+                    dungeonData.classlevels, dungeonData.responsetime.split(',').filter(Boolean).map(Date.parse),
+                    dungeonData.s_responsetime.split(',').filter(Boolean).map(Date.parse)
                 ]
             );
         };
@@ -137,7 +137,7 @@ export const migrateData = async () => {
                 [guild.rowid, guild.id, guild.name, guild.description, guild.color, guild.level, guild.icon,
                 guild.banner, guild.treasury, guild.treasury_gems, guild.tax, guild.canjoin, guild.tokens,
                 guild.membercap, guild.xpbuff, guild.lootbuff, guild.cdreduction, guild.master,
-                JSON.stringify(guild.elders.split(',').filter(Boolean)), JSON.stringify(guild.members.split(',').filter(Boolean)), JSON.stringify(guild.banned.split(',').filter(Boolean)), guild.eventpoints,
+                guild.elders.split(',').filter(Boolean), guild.members.split(',').filter(Boolean), guild.banned.split(',').filter(Boolean), guild.eventpoints,
                 guild.bosshuntstage, guild.boss1, guild.boss2, guild.boss3, guild.boss4,
                 guild.lastlevelup ? new Date(guild.lastlevelup) : null, guild.raidid]
             );
@@ -178,7 +178,7 @@ export const migrateData = async () => {
                 `INSERT INTO parties (rowid, id, name, description, color, icon, banner, members, created)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
                 [party.rowid, party.id, party.name, party.description, party.color, party.icon,
-                party.banner, JSON.stringify(party.members.split(',').filter(Boolean)),
+                party.banner, party.members.split(',').filter(Boolean),
                 party.created ? new Date(party.created) : null]
             );
         };

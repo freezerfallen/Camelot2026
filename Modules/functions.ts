@@ -1346,7 +1346,7 @@ export const lastActive = (timestamp: Date | number) => {
     return `${diff === 1 ? diff + " day" : diff + " days"} ago`;
 };
 
-export const customEmojis = {
+export const customEmojis: Record<PrimaryStat, string> = {
     "hp": "<:HP:1062043800979116143>",
     "hp%": "<:HP:1062043800979116143>",
     "atk": "<:ATK:1063214925528440832>",
@@ -1365,7 +1365,7 @@ export const customEmojis = {
     "mg": "<:mana_generation:1063215562349629570>",
     "shield": "<:shield:1062050038211166310>",
 
-    "coins": "<:coins:872926669055356939>",
+    // "coins": "<:coins:872926669055356939>",
 };
 
 export const RoK = new Map<string, IRoK>();

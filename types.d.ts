@@ -11,6 +11,10 @@ export type ItemRarity = 'genesis' | 'mythical' | 'legendary' | 'unique' | 'rare
 
 export type PrimaryStat = 'hp' | 'hp%' | 'atk' | 'atk%' | 'def' | 'def%' | 'md' | 'md%' | 'mr' | 'cr' | 'cd' | 'dodge' | 'br' | 'mana' | 'sm' | 'mg' | 'shield';
 
+export type ItemCategory = "fish" | "loot" | "weapon" | "armor" | "ring";
+
+export type ItemType = "fish" | "crafting material" | "ascension material" | "levelup material" | "awakening material" | "exchange point" | "event exclusive item" | "chest" | "sword" | "staff" | "axe" | "bow" | "lance" | "dagger" | "ring" | "shield" | "helmet" | "cuirass" | "gloves" | "boots";
+
 export type RaidRank = 'F-' | 'F' | 'F+' | 'E-' | 'E' | 'E+' | 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'S-' | 'S' | 'S+' | 'SS-' | 'SS' | 'SS+' | 'SSS-' | 'SSS' | 'SSS+' | 'EX-' | 'EX' | 'EX+';
 
 export type Expertise = 'sword' | 'staff' | 'axe' | 'bow' | 'lance' | 'dagger' | 'shield' | 'any';
@@ -281,7 +285,16 @@ export interface UserSchema {
     guild: string | null;
     donatedtotal: number;
     genesispity: number;
-    presets: any[];
+    presets: Array<{
+        character?: number;
+        class?: number;
+        weapon?: string;
+        shield?: string;
+        helmet?: string;
+        cuirass?: string;
+        gloves?: string;
+        boots?: string;
+    }>;
     itemlock: string[];
     party: string | null;
     stampedechar: number | null;
@@ -344,8 +357,8 @@ export interface UserSchema {
     dungeon_limit: number;
     dungeon_classes: number[];
     dungeon_classlevels: Record<string, any>;
-    dungeon_responsetime: string;
-    stampede_responsetime: string;
+    dungeon_responsetime: Date[];
+    stampede_responsetime: Date[];
 }
 
 export type CompactUserSchema = Omit<UserSchema, "transactions" | "char_level" | "char_class" | "char_equipment" | "dungeon_responsetime" | "stampede_responsetime">;
@@ -627,6 +640,19 @@ type UpdateUserOperation<K extends keyof UserSchema> =
 
 export type UpdateUserOptions = {
     [K in keyof Partial<UserSchema>]: UpdateUserOperation<K>;
+};
+
+
+type UpdateWeaponOperation<K extends keyof WeaponSchema> =
+    // Simple set operation - works with any key
+    | { type: 'set'; value: WeaponSchema[K]; }
+    // Increment operation - only works with number fields
+    | (K extends NumberKeys<WeaponSchema>
+        ? { type: 'increment'; value: number; }
+        : never);
+
+export type UpdateWeaponOptions = {
+    [K in keyof Partial<WeaponSchema>]: UpdateWeaponOperation<K>;
 };
 
 

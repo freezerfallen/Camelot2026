@@ -1,11 +1,7 @@
-import { Buffs, IbuffInfo, ItemAbility, ItemRarity, PrimaryStat } from "../types";
+import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
-
-type ItemCategory = "fish" | "loot" | "weapon" | "armor" | "ring";
-
-type ItemType = "fish" | "crafting material" | "ascension material" | "levelup material" | "awakening material" | "exchange point" | "event exclusive item" | "chest" | "sword" | "staff" | "axe" | "bow" | "lance" | "dagger" | "ring" | "shield" | "helmet" | "cuirass" | "gloves" | "boots";
 
 export class itemInfo {
     private _name: string;
@@ -201,17 +197,29 @@ export class chestInfo extends itemInfo {
     get droprates() {
         return this._droprates;
     };
+
+    get dropratesFull() {
+        return {
+            genesis: this._droprates.genesis ?? 0,
+            mythical: this._droprates.mythical ?? 0,
+            legendary: this._droprates.legendary ?? 0,
+            unique: this._droprates.unique ?? 0,
+            rare: this._droprates.rare ?? 0,
+            special: this._droprates.special ?? 0,
+            normal: this._droprates.normal ?? 0
+        };
+    };
 };
 
 export class armorInfo extends itemInfo {
     private _setname: string;
-    private _primaryStat: string;
+    private _primaryStat: PrimaryStat;
     private _psmin: number;
     private _psmax: number;
     private _buff: ItemAbility | undefined;
     private _buffdesc: string | undefined;
 
-    constructor(name: string, category: ItemCategory, type: ItemType, setname: string, obtain: string[], emoji: string, image: string, primaryStat: string, psmin: number, psmax: number, grade: ItemRarity, id: number, buff: ItemAbility | undefined = undefined, buffdesc: string | undefined = undefined, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, setname: string, obtain: string[], emoji: string, image: string, primaryStat: PrimaryStat, psmin: number, psmax: number, grade: ItemRarity, id: number, buff: ItemAbility | undefined = undefined, buffdesc: string | undefined = undefined, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc);
         this._setname = setname;
         this._primaryStat = primaryStat;

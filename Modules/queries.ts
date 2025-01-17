@@ -1,5 +1,5 @@
 import { query } from "../postgres";
-import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateUserOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
+import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
 
 //---------------------------------//
 //           GET SCHEMAS           //
@@ -37,8 +37,8 @@ export const getServerSchema = async (id: string): Promise<ServerSchema | undefi
     return server;
 };
 
-export const getWeaponSchema = async (id: string): Promise<WeaponSchema | undefined> => {
-    const [weapon] = await query(`SELECT rowid, * FROM weapons WHERE id = $1`, [id]) as [WeaponSchema];
+export const getWeaponSchema = async (uniqueid: string): Promise<WeaponSchema | undefined> => {
+    const [weapon] = await query(`SELECT rowid, * FROM weapons WHERE uniqueid = $1`, [uniqueid]) as [WeaponSchema];
     return weapon;
 };
 
@@ -130,6 +130,16 @@ export const getFindUsers = async (ids: string[] | "*", charId: number): Promise
 export const getAllFAQSchemas = async (): Promise<FAQSchema[]> => {
     const faq = await query(`SELECT rowid, * FROM faq`) as FAQSchema[];
     return faq;
+};
+
+export const getWeaponCount = async (itemId: number): Promise<number> => {
+    const [count] = await query(`SELECT COUNT(*) AS count FROM weapons WHERE itemid = $1`, [itemId]) as [{ count: number; }];
+    return count.count;
+};
+
+export const getUserWeapons = async (userId: string): Promise<WeaponSchema[]> => {
+    const weapons = await query(`SELECT * FROM weapons WHERE id = $1`, [userId]) as WeaponSchema[];
+    return weapons;
 };
 
 //-------------------------------------------//
@@ -370,6 +380,41 @@ export const updateUsers = async (
         const ids = Array.isArray(userIds) ? userIds : [userIds];
         await query(
             `UPDATE users SET ${setStatements} WHERE id = ANY($1)`,
+            [ids, ...values]
+        );
+    };
+};
+
+export const updateWeapons = async (
+    uniqueIds: string | string[] | "*",
+    updates: UpdateWeaponOptions
+): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { type, value }], index) => {
+            const paramIndex = index + 2;
+
+            switch (type) {
+                case 'set':
+                    return `${key} = $${paramIndex}`;
+                case 'increment':
+                    return `${key} = ${key} + $${paramIndex}`;
+                default:
+                    throw new Error(`Unknown update type: ${type}`);
+            };
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (uniqueIds === "*") {
+        await query(
+            `UPDATE weapons SET ${setStatements}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(uniqueIds) ? uniqueIds : [uniqueIds];
+        await query(
+            `UPDATE weapons SET ${setStatements} WHERE uniqueid = ANY($1)`,
             [ids, ...values]
         );
     };

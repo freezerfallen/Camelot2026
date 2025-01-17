@@ -1,8 +1,8 @@
 import { parentPort } from 'worker_threads';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import GIFEncoder from 'gifencoder';
-import { Asset } from "../Modules/assets";
-import { profileSets } from "../Modules/profileDecorations";
+import { Asset } from "./assets";
+import { profileSets } from "./profileDecorations";
 import { setImmediate } from 'timers/promises';
 
 const newProfileColors = {
@@ -22,13 +22,13 @@ const newProfileColors = {
     pink: { text: '#FF46BB', floor: '#9f2b74', gradStart: '#FF46BB', gradEnd: '#000000' },
 };
 
-parentPort.on('message', async (data) => {
+parentPort?.on('message', async (data) => {
     const { user, stats } = data;
     try {
         const { buffer, format } = await getProfileImage(user, stats);
-        parentPort.postMessage({ status: 'success', image: buffer.toString('base64'), format });
+        parentPort?.postMessage({ status: 'success', image: buffer.toString('base64'), format });
     } catch (error) {
-        parentPort.postMessage({ status: 'error', error: error.message });
+        parentPort?.postMessage({ status: 'error', error: error.message });
     }
 });
 

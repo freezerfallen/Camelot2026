@@ -146,8 +146,8 @@ async function createTables() {
         dungeon_limit INT DEFAULT 0 NOT NULL,                       -- renamed from 'limit' to avoid conflicts
         dungeon_classes INT[] DEFAULT ARRAY[]::INT[] NOT NULL,      -- renamed from 'classes' to avoid conflicts
         dungeon_classlevels JSONB DEFAULT '{}' NOT NULL,            -- renamed from 'classlevels' to avoid conflicts
-        dungeon_responsetime TEXT DEFAULT '' NOT NULL,              -- renamed from 'responsetime' to avoid conflicts
-        stampede_responsetime TEXT DEFAULT '' NOT NULL              -- renamed from 's_responsetime' to avoid conflicts
+        dungeon_responsetime TIMESTAMP[] DEFAULT ARRAY[]::TIMESTAMP[] NOT NULL,              -- renamed from 'responsetime' to avoid conflicts
+        stampede_responsetime TIMESTAMP[] DEFAULT ARRAY[]::TIMESTAMP[] NOT NULL              -- renamed from 's_responsetime' to avoid conflicts
     )`);
 
     // Servers table
