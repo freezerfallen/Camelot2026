@@ -2,7 +2,30 @@ import fs from 'fs';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { RaidRank } from '../types';
 
-export const cowSettings = JSON.parse(fs.readFileSync('Storage/rolling.json', 'utf8'));
+export const cowSettings = (() => {
+    try {
+        return JSON.parse(fs.readFileSync('Storage/rolling.json', 'utf8'));
+    } catch {
+        const defaultSettings = {
+            start: Date.now() - (14 * 24 * 60 * 60 * 1000),
+            days: 5,
+            rollsPerDay: 3,
+            fightsPerCharacter: 3,
+            timeInMinutes: 30,
+            level: 600,
+            clvl: 1200,
+            goldenCowChance: 0.02
+        };
+
+        // Create Storage directory if it doesn't exist
+        if (!fs.existsSync('Storage')) {
+            fs.mkdirSync('Storage');
+        };
+
+        fs.writeFileSync('Storage/rolling.json', JSON.stringify(defaultSettings));
+        return defaultSettings;
+    };
+})();
 
 export const PageRow = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
