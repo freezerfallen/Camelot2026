@@ -142,6 +142,63 @@ export const getUserWeapons = async (userId: string): Promise<WeaponSchema[]> =>
     return weapons;
 };
 
+export const getReferredUsers = async (userId: string): Promise<(Pick<UserSchema, "id" | "name" | "created" | "dungeon_floors" | "xp"> & { age: number; floor: number; level: number; })[]> => {
+    const users = await query(`SELECT id, name, created, dungeon_floors, xp,
+        FLOOR(EXTRACT(EPOCH FROM (NOW() - created)) / 86400) AS age,
+        (SELECT COALESCE(MAX(CAST(key AS INTEGER)), 1)
+         FROM jsonb_object_keys(dungeon_floors) key) AS floor,
+        1::integer as level
+        FROM users
+        WHERE referred_by = $1
+    `, [userId]) as (Pick<UserSchema, "id" | "name" | "created" | "dungeon_floors" | "xp"> & { age: number; floor: number; level: number; })[];
+    return users;
+};
+
+export const getIndirectReferredUsers = async (userId: string): Promise<(Pick<UserSchema, "id" | "name" | "xp"> & { age: number; floor: number; level: number; })[]> => {
+    const { rows: users } = await query(`
+        SELECT u.id, u.name, u.xp,
+        FLOOR(EXTRACT(EPOCH FROM (NOW() - u.created)) / 86400) AS age,
+        (SELECT COALESCE(MAX(CAST(key AS INTEGER)), 1)
+         FROM jsonb_object_keys(u.dungeon_floors) key) AS floor,
+        1::integer as level
+        FROM users u
+        WHERE u.referred_by IN (
+            SELECT id FROM users WHERE referred_by = $1
+        )
+    `, [userId]) as { rows: (Pick<UserSchema, "id" | "name" | "xp"> & { age: number; floor: number; level: number; })[]; };
+    return users;
+};
+
+export const getReferralLeaderboard = async (type: "weekly" | "monthly" | "alltime"): Promise<{ referred_by: string; referral_count: string; }[]> => {
+    const timeFilter = type === "weekly" ?
+        "EXTRACT(EPOCH FROM (NOW() - created)) / 86400 < 7" :
+        type === "monthly" ?
+            "EXTRACT(EPOCH FROM (NOW() - created)) / 86400 < 30" :
+            "TRUE";
+
+    const leaderboard = await query(
+        `SELECT referred_by, COUNT(*)::text as referral_count 
+         FROM users 
+         WHERE referred_by IS NOT NULL 
+         AND ${timeFilter}
+         GROUP BY referred_by 
+         ORDER BY COUNT(*) DESC`,
+        []
+    ) as { referred_by: string; referral_count: string; }[];
+
+    return leaderboard;
+};
+
+
+//--------------------------------------------//
+//              CHECK STATEMENTS              //
+//--------------------------------------------//
+
+export const doesUserExist = async (userId: string): Promise<boolean> => {
+    const [exists] = await query(`SELECT id FROM users WHERE id = $1`, [userId]) as [{ id: string; }];
+    return !!exists;
+};
+
 //-------------------------------------------//
 //              LOAD STATEMENTS              //
 //-------------------------------------------//
