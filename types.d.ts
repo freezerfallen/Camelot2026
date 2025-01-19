@@ -23,6 +23,38 @@ export type BuffType = "*" | "+" | "=";
 
 export type IRoK = { name: string, id: string, char: number, ep: number; };
 
+export type ProfileImageArguments = {
+    profilecolor: string | null;
+    quality: string | null;
+    forceStatic: boolean;
+    thumbnail: string | undefined;
+
+    stats: DetailedStats;
+    ref: number;
+    classlevels: Record<string, number>;
+    floor: number;
+
+    guild: string | undefined;
+    party: string | undefined;
+
+    colorLight: string;
+    colorDark: string;
+
+    profilePicture: string;
+    classImage: string | undefined;
+    className: string | undefined;
+    classLevel: number | undefined;
+    userLvl: number;
+    lastActive: string;
+
+    weaponImage: string | undefined;
+    shieldImage: string | undefined;
+    helmetImage: string | undefined;
+    cuirassImage: string | undefined;
+    glovesImage: string | undefined;
+    bootsImage: string | undefined;
+};
+
 export type ClassStats = {
     hp: [number, number];
     atk: [number, number];
@@ -276,7 +308,7 @@ export interface UserSchema {
     skins: number[];
     eventpts: number;
     brbest: number;
-    mailbox: any[];
+    mailbox: { type: string, rewards: string, message: string, date: number; }[];
     eventrewreceived: number;
     gems: number;
     tutorial: number[];
