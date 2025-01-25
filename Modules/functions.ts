@@ -12,7 +12,7 @@ import { anime } from "./anime";
 import { achievements } from "./achievements";
 import { dailies } from "./dailyQuests";
 import classInfo, { classes } from "./classes";
-import { rankLowerRanges } from "./components";
+import { donationWeekStart, rankLowerRanges } from "./components";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
@@ -1169,7 +1169,7 @@ export const searchItem = (name: string | number, interaction: ChatInputCommandI
     return fArray[0];
 };
 
-export const searchGuild = (name: string, guilds: GuildSchema[]) => {
+export const searchGuild = <T extends GuildSchema>(name: string, guilds: T[]) => {
     name = name.toLowerCase();
     if (!name) return guilds.sort((a, b) => 0.5 - Math.random());
 
@@ -1298,22 +1298,6 @@ export const generateCaptcha = () => {
         attachement: new AttachmentBuilder(buffer),
         text: captchaText
     };
-};
-
-export const donationWeekStart = new Date('2024-02-12T00:00:00');
-
-export const addGuildDonation = async (user: User, guildid: string, amount: number, type: "coins" | "gems" = "coins") => {
-    const week = Math.ceil((Date.now() - donationWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
-
-    const { 0: donation } = await query(`SELECT * FROM guild_donations WHERE userid = ${user.id} AND guildid = '${guildid}' AND week = ${week} AND type = '${type}'`);
-
-    if (donation) {
-        await query(`UPDATE guild_donations SET amount = amount + ${amount} WHERE userid = ${user.id} AND guildid = '${guildid}' AND week = ${week} AND type = '${type}'`);
-    } else {
-        await query(`INSERT INTO guild_donations (userid, guildid, week, type, amount) values ('${user.id}', '${guildid}', ${week}, '${type}', ${amount})`);
-    };
-
-    await query(`UPDATE guilds SET ${type === "coins" ? `treasury = treasury + ${amount}` : `treasury_gems = treasury_gems + ${amount}`} WHERE id = '${guildid}'`);
 };
 
 const dateString = (date: Date) => {

@@ -1,5 +1,6 @@
 import { query } from "../postgres";
-import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
+import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
+import { donationWeekStart } from "./components";
 
 //---------------------------------//
 //           GET SCHEMAS           //
@@ -52,9 +53,41 @@ export const getGuildSchema = async (id: string): Promise<GuildSchema | undefine
     return guild;
 };
 
-export const getGuildDonationSchema = async (id: string): Promise<GuildDonationSchema | undefined> => {
-    const [guildDonation] = await query(`SELECT * FROM guild_donations WHERE id = $1`, [id]) as [GuildDonationSchema];
+export const getGuildSchemas = async (ids: string[] | "*", whereClause?: string): Promise<GuildSchema[]> => {
+    const query_str = `SELECT * FROM guilds ${whereClause ? whereClause : ""}`;
+    if (ids === "*") {
+        const guilds = await query(query_str, []) as GuildSchema[];
+        return guilds;
+    } else {
+        const guilds = await query(`${query_str} WHERE id = ANY($1)`, [ids]) as GuildSchema[];
+        return guilds;
+    };
+};
+
+export const getGuildDonationSchema = async (rowid: string): Promise<GuildDonationSchema | undefined> => {
+    const [guildDonation] = await query(`SELECT * FROM guild_donations WHERE rowid = $1`, [rowid]) as [GuildDonationSchema];
     return guildDonation;
+};
+
+export const getGuildDonationSchemas = async (id: string, week?: number, type?: "coins" | "gems"): Promise<GuildDonationSchema[]> => {
+    let str = `SELECT * FROM guild_donations WHERE guildid = $1`;
+    const params: any[] = [id];
+
+    if (week !== undefined) {
+        str += ` AND week = $2`;
+        params.push(week);
+
+        if (type !== undefined) {
+            str += ` AND type = $3`;
+            params.push(type);
+        };
+    } else if (type !== undefined) {
+        str += ` AND type = $2`;
+        params.push(type);
+    };
+
+    const guildDonation = await query(str, params) as GuildDonationSchema[];
+    return guildDonation ?? [];
 };
 
 export const getStampedeSchema = async (id: string): Promise<StampedeSchema | undefined> => {
@@ -87,25 +120,26 @@ export const getRaidSchema = async (id: string): Promise<RaidSchema | undefined>
     return raid;
 };
 
-//---------------------------------- ---------//
+//--------------------------------------------//
 //               GET STATEMENTS               //
-//---------------------------------- ---------//
+//--------------------------------------------//
 
 export const getTotalPlayers = async (): Promise<number> => {
     const [result] = await query(`SELECT COUNT(rowid) AS players FROM users`) as [{ players: number; }];
     return result.players;
 };
 
-export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasChristmasChar: boolean; } = { excludeIds: [], hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "craze_equipment">[]> => {
-    let members = await query(`SELECT id, name, party, stampedechar, craze_equipment FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "craze_equipment">[];
+export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasStampedeChar?: boolean, hasChristmasChar?: boolean; } = { excludeIds: [], hasStampedeChar: false, hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment">[]> => {
+    let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment">[];
 
+    if (options.hasStampedeChar) members = members.filter((e) => e.stampedechar !== null);
     if (options.hasChristmasChar) members = members.filter((e) => e.craze_equipment.char !== undefined);
 
     return members ?? [];
 };
 
 export const getLatestStampede = async (): Promise<StampedeSchema | undefined> => {
-    const [stampede] = await query(`SELECT rowid, * FROM stampedes ORDER BY rowid DESC LIMIT 1`) as [StampedeSchema];
+    const [stampede] = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT 1`) as [StampedeSchema];
     return stampede;
 };
 
@@ -273,6 +307,21 @@ export const insertNewTrade = async (id: string, receiver: string, type: "coins"
     return trade;
 };
 
+export const insertNewGuild = async (name: string, guildMaster: string): Promise<GuildSchema> => {
+    const { rows: [guild] } = await query(`INSERT INTO guilds (name, master, members) VALUES ($1, $2, $3) RETURNING *`, [name, guildMaster, [guildMaster]]) as { rows: GuildSchema[]; };
+    return guild;
+};
+
+
+//-------------------------------------------//
+//             DELETE STATEMENTS             //
+//-------------------------------------------//
+
+export const deleteGuild = async (guildId: string): Promise<void> => {
+    await query(`DELETE FROM guilds WHERE id = $1`, [guildId]);
+};
+
+
 //-------------------------------------------//
 //             UPDATE STATEMENTS             //
 //-------------------------------------------//
@@ -280,6 +329,60 @@ export const insertNewTrade = async (id: string, receiver: string, type: "coins"
 export const addUserToServer = async (serverId: string, userId: string): Promise<void> => {
     await query(`UPDATE servers SET user_ids = array_append(user_ids, $1) WHERE id = $2 AND NOT $1 = ANY(user_ids)`, [userId, serverId]);
 };
+
+export const addGuildDonation = async (guildId: string, userId: string, type: "coins" | "gems", amount: number): Promise<void> => {
+
+    const week = Math.ceil((Date.now() - donationWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
+
+    const [donation] = await query(`SELECT * FROM guild_donations WHERE guildid = $1 AND userid = $2 AND week = $3 AND type = $4`, [guildId, userId, week, type]) as [GuildDonationSchema | undefined];
+
+    if (donation) {
+        await query(`UPDATE guild_donations SET amount = amount + $1 WHERE userid = $2 AND guildid = $3 AND week = $4 AND type = $5`, [amount, userId, guildId, week, type]);
+    } else {
+        await query(`INSERT INTO guild_donations (userid, guildid, week, type, amount) values ($1, $2, $3, $4, $5)`, [userId, guildId, week, type, amount]);
+    };
+
+    // Update guilds table
+    await updateGuilds(guildId, {
+        [type === "coins" ? "treasury" : "treasury_gems"]: { type: "increment", value: amount }
+    });
+};
+
+export const updateStampedeParticipation = async (stampedeRowId: number, partyId: string | null, userId: string, damage: number, rounds: number): Promise<void> => {
+
+    const party = partyId ? await getPartySchema(partyId) : undefined;
+
+    const partyMembers = party ? party.members : [userId];
+
+    // stampede.participation[string]: [0: damage, 1: rounds played]
+    const participation = partyMembers.reduce<Record<string, [number, number]>>((acc, e) => ({
+        ...acc,
+        [e]: [damage, e === userId ? rounds : 0]
+    }), {});
+
+    await query(`
+        UPDATE stampedes 
+        SET participation = (
+            SELECT jsonb_object_agg(
+                key,
+                CASE
+                    WHEN participation->key IS NOT NULL AND $2::jsonb->key IS NOT NULL THEN
+                        jsonb_build_array(
+                            (COALESCE((participation->key->>0)::numeric, 0) + COALESCE(($2::jsonb->key->>0)::numeric, 0)),
+                            (COALESCE((participation->key->>1)::numeric, 0) + COALESCE(($2::jsonb->key->>1)::numeric, 0))
+                        )
+                    WHEN $2::jsonb->key IS NOT NULL THEN
+                        $2::jsonb->key
+                    ELSE
+                        participation->key
+                END
+            )
+            FROM jsonb_each(COALESCE(participation, '{}'::jsonb) || $2::jsonb)
+        )
+        WHERE rowid = $1
+    `, [stampedeRowId, participation]);
+};
+
 
 // export const updateUsers = async (userIds: string | string[] | "*", updates: { [K in keyof Partial<UserSchema>]: { value: UserSchema[K], additive?: boolean; }; }): Promise<void> => {
 //     const setStatements = Object.entries(updates)
@@ -361,7 +464,8 @@ export const addUserToServer = async (serverId: string, userId: string): Promise
 
 export const updateUsers = async (
     userIds: string | string[] | "*",
-    updates: UpdateUserOptions
+    updates: UpdateUserOptions,
+    condition?: string,
 ): Promise<void> => {
     const setStatements = Object.entries(updates)
         .map(([key, { type, value }], index) => {
@@ -438,13 +542,13 @@ export const updateUsers = async (
 
     if (userIds === "*") {
         await query(
-            `UPDATE users SET ${setStatements}`,
+            `UPDATE users SET ${setStatements} ${condition ? `WHERE ${condition}` : ""}`,
             values
         );
     } else {
         const ids = Array.isArray(userIds) ? userIds : [userIds];
         await query(
-            `UPDATE users SET ${setStatements} WHERE id = ANY($1)`,
+            `UPDATE users SET ${setStatements} WHERE id = ANY($1) ${condition ? `AND ${condition}` : ""}`,
             [ids, ...values]
         );
     };
@@ -483,4 +587,154 @@ export const updateWeapons = async (
             [ids, ...values]
         );
     };
+};
+
+export const updateGuilds = async (
+    guildIds: string | string[] | "*",
+    updates: UpdateGuildOptions,
+    condition?: string,
+): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { type, value }], index) => {
+            const paramIndex = index + 2;
+
+            switch (type) {
+                case 'set':
+                    return `${key} = $${paramIndex}`;
+                case 'increment':
+                    return `${key} = ${key} + $${paramIndex}`;
+                case 'append':
+                    return `${key} = array_cat(${key}, $${paramIndex})`;
+                case 'append_unique':
+                    return `${key} = array(select distinct unnest(array_cat(${key}, $${paramIndex})))`;
+                case 'remove':
+                    const elemType = Array.isArray(value) && value.length > 0
+                        ? typeof value[0] === 'number'
+                            ? 'integer'
+                            : 'text'
+                        : 'text';
+                    return `${key} = (
+                        SELECT array_agg(orig.elem ORDER BY orig.idx)
+                        FROM (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn,
+                                idx
+                            FROM unnest(${key}) WITH ORDINALITY AS t(elem, idx)
+                        ) AS orig
+                        LEFT JOIN (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn
+                            FROM unnest($${paramIndex}::${elemType}[]) WITH ORDINALITY AS t(elem, idx)
+                        ) AS rem
+                        ON orig.elem = rem.elem
+                        AND orig.rn = rem.rn
+                        WHERE rem.elem IS NULL
+                    )`;
+                case 'remove_all':
+                    const arrayType = Array.isArray(value) && value.length > 0
+                        ? typeof value[0] === 'number'
+                            ? 'integer[]'
+                            : 'text[]'
+                        : 'text[]';
+                    return `${key} = COALESCE((
+                        SELECT array_agg(elem) 
+                        FROM unnest(${key}) elem 
+                        WHERE NOT elem = ANY($${paramIndex}::${arrayType})
+                    ), '{}')`;
+                case 'set_json':
+                    return `${key} = $${paramIndex}::jsonb`;
+                case 'merge_json':
+                    return `${key} = (
+                        SELECT jsonb_object_agg(key,
+                            CASE
+                                WHEN ${key}->key IS NOT NULL AND $${paramIndex}::jsonb->key IS NOT NULL 
+                                    AND jsonb_typeof(${key}->key) = 'number' 
+                                    AND jsonb_typeof($${paramIndex}::jsonb->key) = 'number' THEN
+                                        to_jsonb((${key}->key)::numeric + ($${paramIndex}::jsonb->key)::numeric)
+                                WHEN $${paramIndex}::jsonb->key IS NOT NULL THEN
+                                    $${paramIndex}::jsonb->key
+                                ELSE
+                                    ${key}->key
+                            END
+                        )
+                        FROM jsonb_each(COALESCE(${key}, '{}'::jsonb) || $${paramIndex}::jsonb)
+                    )`;
+                default:
+                    throw new Error(`Unknown update type: ${type}`);
+            };
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (guildIds === "*") {
+        await query(
+            `UPDATE guilds SET ${setStatements} ${condition ? `WHERE ${condition}` : ""}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(guildIds) ? guildIds : [guildIds];
+        await query(
+            `UPDATE guilds SET ${setStatements} WHERE id = ANY($1) ${condition ? `AND ${condition}` : ""}`,
+            [ids, ...values]
+        );
+    };
+};
+
+export const updateStampedes = async (
+    stampedeRowIds: number | number[] | "*",
+    updates: UpdateStampedeOptions,
+    condition?: string,
+): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { type, value }], index) => {
+            const paramIndex = index + 2;
+
+            switch (type) {
+                case 'set':
+                    return `${key} = $${paramIndex}`;
+                case 'increment':
+                    return `${key} = ${key} + $${paramIndex}`;
+                case 'set_json':
+                    return `${key} = $${paramIndex}::jsonb`;
+                case 'merge_json':
+                    return `${key} = (
+                        SELECT jsonb_object_agg(key,
+                            CASE
+                                WHEN ${key}->key IS NOT NULL AND $${paramIndex}::jsonb->key IS NOT NULL 
+                                    AND jsonb_typeof(${key}->key) = 'number' 
+                                    AND jsonb_typeof($${paramIndex}::jsonb->key) = 'number' THEN
+                                        to_jsonb((${key}->key)::numeric + ($${paramIndex}::jsonb->key)::numeric)
+                                WHEN $${paramIndex}::jsonb->key IS NOT NULL THEN
+                                    $${paramIndex}::jsonb->key
+                                ELSE
+                                    ${key}->key
+                            END
+                        )
+                        FROM jsonb_each(COALESCE(${key}, '{}'::jsonb) || $${paramIndex}::jsonb)
+                    )`;
+                default:
+                    throw new Error(`Unknown update type: ${type}`);
+            };
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (stampedeRowIds === "*") {
+        await query(
+            `UPDATE stampedes SET ${setStatements} ${condition ? `WHERE ${condition}` : ""}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(stampedeRowIds) ? stampedeRowIds : [stampedeRowIds];
+        await query(
+            `UPDATE stampedes SET ${setStatements} WHERE rowid = ANY($1) ${condition ? `AND ${condition}` : ""}`,
+            [ids, ...values]
+        );
+    };
+};
+
+export const updateGuildDonationsGuildId = async (guildId: string, newGuildId: string): Promise<void> => {
+    await query(`UPDATE guild_donations SET guildid = $1 WHERE guildid = $2`, [newGuildId, guildId]);
 };

@@ -367,7 +367,7 @@ export interface UserSchema {
     lastguildjoin: Date | null;
     valentine: string | null;
     bosshuntruns: number;
-    bosshuntrevreceived: number | null;
+    bosshuntrevreceived: number;
     monthlyshop: Record<string, any>;
     itemwishlist: number[];
     stampedeenergy: number;
@@ -429,8 +429,8 @@ export interface GuildSchema {
     description: string;
     color: string | null;
     level: number;
-    icon: string;
-    banner: string;
+    icon: string | null;
+    banner: string | null;
     treasury: number;
     treasury_gems: number;
     tax: number;
@@ -474,7 +474,7 @@ export interface StampedeSchema {
     generalsleft: number;
     monsterstotal: number;
     monstersleft: number;
-    participation: Record<string, any>;
+    participation: Record<string, [number, number]>;
 }
 
 export interface PartySchema {
@@ -692,6 +692,54 @@ type UpdateWeaponOperation<K extends keyof WeaponSchema> =
 
 export type UpdateWeaponOptions = {
     [K in keyof Partial<WeaponSchema>]: UpdateWeaponOperation<K>;
+};
+
+
+type UpdateGuildOperation<K extends keyof GuildSchema> =
+    // Simple set operation - works with any key
+    | { type: 'set'; value: GuildSchema[K]; }
+
+    // Increment operation - only works with number fields
+    | (K extends NumberKeys<GuildSchema>
+        ? { type: 'increment'; value: number; }
+        : never)
+
+    // Array operations - only work with array fields
+    | (K extends ArrayKeys<GuildSchema>
+        ? { type: 'append'; value: GuildSchema[K]; }
+        | { type: 'append_unique'; value: GuildSchema[K]; }
+        | { type: 'remove'; value: GuildSchema[K]; }
+        | { type: 'remove_all'; value: GuildSchema[K]; }
+        : never)
+
+    // JSON operations - only work with object fields
+    | (K extends JsonKeys<GuildSchema>
+        ? { type: 'set_json'; value: GuildSchema[K]; }
+        | { type: 'merge_json'; value: Partial<GuildSchema[K]>; }
+        : never);
+
+export type UpdateGuildOptions = {
+    [K in keyof Partial<GuildSchema>]: UpdateGuildOperation<K>;
+};
+
+
+type UpdateStampedeOperation<K extends keyof StampedeSchema> =
+    // Simple set operation - works with any key
+    | { type: 'set'; value: StampedeSchema[K]; }
+
+    // Increment operation - only works with number fields
+    | (K extends NumberKeys<StampedeSchema>
+        ? { type: 'increment'; value: number; }
+        : never)
+
+    // JSON operations - only work with object fields
+    | (K extends JsonKeys<StampedeSchema>
+        ? { type: 'set_json'; value: StampedeSchema[K]; }
+        | { type: 'merge_json'; value: Partial<StampedeSchema[K]>; }
+        : never);
+
+export type UpdateStampedeOptions = {
+    [K in keyof Partial<StampedeSchema>]: UpdateStampedeOperation<K>;
 };
 
 
