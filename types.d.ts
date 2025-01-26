@@ -376,7 +376,7 @@ export interface UserSchema {
     charlock: number[];
     animelock: number[];
     cow_participation: number | null;
-    cow_chars: string | null;
+    cow_chars: number[];
     cow_timer: number | null;
     cow_rolled_today: number;
     rank: string;
@@ -483,8 +483,8 @@ export interface PartySchema {
     name: string;
     description: string;
     color: string | null;
-    icon: string;
-    banner: string;
+    icon: string | null;
+    banner: string | null;
     members: string[];
     created: Date | null;
 }
@@ -720,6 +720,34 @@ type UpdateGuildOperation<K extends keyof GuildSchema> =
 
 export type UpdateGuildOptions = {
     [K in keyof Partial<GuildSchema>]: UpdateGuildOperation<K>;
+};
+
+
+type UpdatePartyOperation<K extends keyof PartySchema> =
+    // Simple set operation - works with any key
+    | { type: 'set'; value: PartySchema[K]; }
+
+    // Increment operation - only works with number fields
+    | (K extends NumberKeys<PartySchema>
+        ? { type: 'increment'; value: number; }
+        : never)
+
+    // Array operations - only work with array fields
+    | (K extends ArrayKeys<PartySchema>
+        ? { type: 'append'; value: PartySchema[K]; }
+        | { type: 'append_unique'; value: PartySchema[K]; }
+        | { type: 'remove'; value: PartySchema[K]; }
+        | { type: 'remove_all'; value: PartySchema[K]; }
+        : never)
+
+    // JSON operations - only work with object fields
+    | (K extends JsonKeys<PartySchema>
+        ? { type: 'set_json'; value: PartySchema[K]; }
+        | { type: 'merge_json'; value: Partial<PartySchema[K]>; }
+        : never);
+
+export type UpdatePartyOptions = {
+    [K in keyof Partial<PartySchema>]: UpdatePartyOperation<K>;
 };
 
 

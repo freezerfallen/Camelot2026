@@ -1,6 +1,5 @@
 import fs from "fs";
-import Package from '../package.json';
-import { Interaction, EmbedBuilder, PermissionsBitField } from "discord.js";
+import { Interaction, PermissionsBitField } from "discord.js";
 import { BotEvent, SlashCommand } from "../types";
 import { addUserToServer, getServerSchema, getUserSchema, insertNewServer, insertNewUser, updateUsers } from "../Modules/queries";
 
@@ -91,27 +90,6 @@ const event: BotEvent = {
                 channelCooldown.add(channelId);
                 setTimeout(() => channelCooldown.delete(channelId), 750);
             }
-
-            // ADMIN ACTIONS
-            if (interaction.commandName === "admin") {
-                return interaction.client.commands.get('admin').execute(interaction, interaction.client);
-            };
-
-            // Ping!
-            if (interaction.commandName === "ping") {
-                return interaction.reply({ content: "pong! 🏓" + Math.floor(interaction.client.ws.ping) + "ms" });
-            };
-
-            // Support Server
-            if (interaction.commandName === "support") {
-                const Embed = new EmbedBuilder()
-                    .setTitle("Camelot Support")
-                    .setColor(0xbbffff)
-                    .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
-                    .setDescription("Join our support server to reach us!\nYou can ask for help and help us improve the bot <:RaphiSmile:868998036645380197>\n\nServer Link: https://discord.gg/myy9PBCdEW")
-                    .setFooter({ text: `Camelot ${Package.version} • Made by Apollo24 & PokeLinker`, iconURL: "https://i.imgur.com/RbLjdQ4.png" });
-                return interaction.reply({ embeds: [Embed] });
-            };
 
             // ADD NEW PLAYERS
             const author = {

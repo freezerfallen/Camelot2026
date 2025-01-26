@@ -73,7 +73,7 @@ async function createTables() {
         eventpts INT DEFAULT 0 NOT NULL,
         eventpts2 INT DEFAULT 0 NOT NULL,
         brbest INT DEFAULT 0 NOT NULL,
-        mailbox JSONB DEFAULT '[]' NOT NULL,
+        mailbox JSONB[] DEFAULT ARRAY[]::JSONB[] NOT NULL,
         eventrewreceived INT DEFAULT 0 NOT NULL,
         gems BIGINT DEFAULT 0 NOT NULL,
         tutorial INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
@@ -124,7 +124,7 @@ async function createTables() {
         charlock INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         animelock INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         cow_participation INT,
-        cow_chars TEXT,
+        cow_chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
         rank TEXT DEFAULT 'F-' NOT NULL,
@@ -242,7 +242,7 @@ async function createTables() {
         description TEXT DEFAULT '' NOT NULL,
         color TEXT,
         icon TEXT,
-        banner TEXT DEFAULT '',
+        banner TEXT,
         members TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         created TIMESTAMP
     )`);
@@ -403,9 +403,59 @@ async function createTriggerGuildId() {
     `);
 };
 
+// ... existing code ...
+
+async function createTriggerPartyId() {
+    // Create a function for the party ID trigger
+    await query(`
+        CREATE OR REPLACE FUNCTION generate_party_id()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            gen TEXT;
+            len INT := 5;  -- Default length of 5 characters
+            max_attempts INT := 100;
+            attempt INT := 0;
+        BEGIN
+            LOOP
+                gen := generate_random_string(len);
+                
+                -- Check if the generated ID exists
+                IF NOT EXISTS (SELECT 1 FROM parties WHERE id = gen) THEN
+                    NEW.id := gen;
+                    RETURN NEW;
+                END IF;
+                
+                attempt := attempt + 1;
+                
+                -- Increase length after some attempts
+                IF attempt % 10 = 0 THEN
+                    len := len + 1;
+                END IF;
+                
+                -- Prevent infinite loops
+                IF attempt >= max_attempts THEN
+                    RAISE EXCEPTION 'Could not generate unique party ID after % attempts', max_attempts;
+                END IF;
+            END LOOP;
+        END;
+        $$ LANGUAGE plpgsql;
+    `);
+
+    // Create the trigger
+    await query(`
+        DROP TRIGGER IF EXISTS party_id_trigger ON parties;
+        CREATE TRIGGER party_id_trigger
+        BEFORE INSERT ON parties
+        FOR EACH ROW
+        WHEN (NEW.id IS NULL)
+        EXECUTE FUNCTION generate_party_id();
+    `);
+};
+
 async function createTriggers() {
     await createTriggerWeaponUniqueId();
     await createTriggerGuildId();
+    await createTriggerPartyId();
 };
 
 async function alterTables() {

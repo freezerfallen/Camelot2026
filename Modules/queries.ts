@@ -1,5 +1,5 @@
 import { query } from "../postgres";
-import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
+import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdatePartyOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
 import { donationWeekStart } from "./components";
 
 //---------------------------------//
@@ -14,6 +14,11 @@ export const getFullUserSchema = async (id: string): Promise<UserSchema | undefi
 export const getMinimalUserSchema = async (id: string): Promise<Pick<UserSchema, "rowid" | "id" | "name"> | undefined> => {
     const [user] = await query(`SELECT rowid, id, name FROM users WHERE id = $1`, [id]) as [Pick<UserSchema, "rowid" | "id" | "name">];
     return user;
+};
+
+export const getMinimalUserSchemas = async (ids: string[]): Promise<Pick<UserSchema, "rowid" | "id" | "name">[]> => {
+    const users = await query(`SELECT rowid, id, name FROM users WHERE id = ANY($1)`, [ids]) as Pick<UserSchema, "rowid" | "id" | "name">[];
+    return users;
 };
 
 export const getUserSchema = async (id: string): Promise<CompactUserSchema | undefined> => {
@@ -129,8 +134,8 @@ export const getTotalPlayers = async (): Promise<number> => {
     return result.players;
 };
 
-export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasStampedeChar?: boolean, hasChristmasChar?: boolean; } = { excludeIds: [], hasStampedeChar: false, hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment">[]> => {
-    let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment">[];
+export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasStampedeChar?: boolean, hasChristmasChar?: boolean; } = { excludeIds: [], hasStampedeChar: false, hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[]> => {
+    let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment, battlechar, cow_chars, cow_participation, cow_timer FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[];
 
     if (options.hasStampedeChar) members = members.filter((e) => e.stampedechar !== null);
     if (options.hasChristmasChar) members = members.filter((e) => e.craze_equipment.char !== undefined);
@@ -141,6 +146,11 @@ export const getPartyMembers = async (partyId: string, options: { excludeIds: st
 export const getLatestStampede = async (): Promise<StampedeSchema | undefined> => {
     const [stampede] = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT 1`) as [StampedeSchema];
     return stampede;
+};
+
+export const getPastStampedes = async (past: number): Promise<StampedeSchema[]> => {
+    const stampedes = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT $1`, [past]) as StampedeSchema[];
+    return stampedes;
 };
 
 export const getUserRanking = async (scope: "server" | "global", user_ids: string[], orderBy: "xp" | "pullstotal" | "chars" | "uniqueChars"): Promise<Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[]> => {
@@ -231,14 +241,55 @@ export const getReferralLeaderboard = async (type: "weekly" | "monthly" | "allti
     return leaderboard;
 };
 
+export const getUsersByName = async (name: string): Promise<Pick<UserSchema, "id" | "name">[]> => {
+    const users = await query(`
+        SELECT id, name FROM users
+        WHERE LOWER(name) LIKE LOWER($1)
+        ORDER BY 
+            CASE 
+                WHEN LOWER(name) = LOWER($1) THEN 0
+                WHEN LOWER(name) LIKE LOWER($1 || '%') THEN 1
+                ELSE 2
+            END,
+            name
+    `, [`%${name}%`]) as Pick<UserSchema, "id" | "name">[];
+
+    return users;
+};
+
+export const getAllTrades = async (): Promise<TradeSchema[]> => {
+    const trades = await query(`SELECT * FROM trades`) as TradeSchema[];
+    return trades ?? [];
+};
+
+export const getTradesOfUser = async (userId: string): Promise<TradeSchema[]> => {
+    const trades = await query(`SELECT * FROM trades WHERE id = $1 OR receiver = $1`, [userId]) as TradeSchema[];
+    return trades ?? [];
+};
+
+export const getResponseTimes = async (userId: string, flags: { stampede?: boolean; } = { stampede: false }): Promise<Date[]> => {
+    const [{ responsetime }] = await query(`SELECT ${flags.stampede ? "stampede_responsetime" : "dungeon_responsetime"} AS responsetime FROM users WHERE id = $1`, [userId]) as { responsetime: Date[]; }[];
+    return responsetime ?? [];
+};
+
+export const getUserTransactions = async (userId: string[] | "*"): Promise<Pick<UserSchema, "rowid" | "id" | "name" | "transactions">[]> => {
+    const transactions = await query(`SELECT rowid, id, name, transactions FROM users ${userId === "*" ? "WHERE transactions::text <> '[]'" : "WHERE id = ANY($1)"}`, userId === "*" ? [] : [userId]) as Pick<UserSchema, "rowid" | "id" | "name" | "transactions">[];
+    return transactions ?? [];
+};
+
+export const getUserTransaction = async (userId: string): Promise<Pick<UserSchema, "rowid" | "id" | "name" | "transactions"> | undefined> => {
+    const [transactions] = await getUserTransactions([userId]);
+    return transactions;
+};
+
 
 //--------------------------------------------//
 //              CHECK STATEMENTS              //
 //--------------------------------------------//
 
 export const doesUserExist = async (userId: string): Promise<boolean> => {
-    const [exists] = await query(`SELECT id FROM users WHERE id = $1`, [userId]) as [{ id: string; }];
-    return !!exists;
+    const user = await getMinimalUserSchema(userId);
+    return !!user;
 };
 
 //-------------------------------------------//
@@ -280,7 +331,10 @@ export const loadRanking = async (pass: number, batchSize: number): Promise<User
     return users;
 };
 
-
+export const loadCowParticipants = async (): Promise<(Pick<CompactUserSchema, "id" | "name" | "party" | "cow_chars" | "cow_participation"> & { points?: number; })[]> => {
+    const users = await query(`SELECT id, name, party, cow_chars, cow_participation FROM users WHERE cow_participation IS NOT NULL ORDER BY cow_participation DESC`) as (Pick<CompactUserSchema, "id" | "name" | "party" | "cow_chars" | "cow_participation"> & { points?: number; })[];
+    return users;
+};
 
 
 //-------------------------------------------//
@@ -297,8 +351,29 @@ export const insertNewServer = async (id: string, name: string, userId: string):
     return server;
 };
 
-export const insertNewWeapon = async (userId: string, itemId: number, itemType: string): Promise<WeaponSchema> => {
-    const { rows: [weapon] } = await query(`INSERT INTO weapons (id, itemid, item_type) VALUES ($1, $2, $3) RETURNING *`, [userId, itemId, itemType]) as { rows: WeaponSchema[]; };
+export const insertNewWeapon = async (userId: string, itemId: number, itemType: string, uniqueId?: string, level?: number, ascension?: number): Promise<WeaponSchema> => {
+    const columns = ['id', 'itemid', 'item_type'];
+    const values = [userId, itemId, itemType];
+
+    if (uniqueId) {
+        columns.push('uniqueid');
+        values.push(uniqueId);
+    };
+    if (level !== undefined) {
+        columns.push('level');
+        values.push(level);
+    };
+    if (ascension !== undefined) {
+        columns.push('ascension');
+        values.push(ascension);
+    };
+
+    const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+    const { rows: [weapon] } = await query(
+        `INSERT INTO weapons (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+        values
+    ) as { rows: WeaponSchema[]; };
+
     return weapon;
 };
 
@@ -312,6 +387,15 @@ export const insertNewGuild = async (name: string, guildMaster: string): Promise
     return guild;
 };
 
+export const insertNewParty = async (name: string, members: string[]): Promise<PartySchema> => {
+    const { rows: [party] } = await query(`INSERT INTO parties (name, members, created) VALUES ($1, $2, $3) RETURNING *`, [name, members, new Date()]) as { rows: PartySchema[]; };
+    return party;
+};
+
+export const insertNewFAQ = async (id: string, name: string, body: string): Promise<FAQSchema> => {
+    const { rows: [faq] } = await query(`INSERT INTO faq (id, name, body) VALUES ($1, $2, $3) RETURNING *`, [id, name, body]) as { rows: FAQSchema[]; };
+    return faq;
+};
 
 //-------------------------------------------//
 //             DELETE STATEMENTS             //
@@ -321,6 +405,75 @@ export const deleteGuild = async (guildId: string): Promise<void> => {
     await query(`DELETE FROM guilds WHERE id = $1`, [guildId]);
 };
 
+export const deleteParty = async (partyId: string): Promise<void> => {
+    await query(`DELETE FROM parties WHERE id = $1`, [partyId]);
+};
+
+export const deleteFAQ = async (name: string): Promise<void> => {
+    await query(`DELETE FROM faq WHERE name = $1`, [name]);
+};
+
+export const deleteWeapon = async (uniqueId: string): Promise<WeaponSchema | undefined> => {
+    const { rows: [weapon] } = await query(`DELETE FROM weapons WHERE uniqueid = $1 RETURNING *`, [uniqueId]) as { rows: WeaponSchema[]; };
+    return weapon;
+};
+
+//---------------------------------------------//
+//             TRANSFER STATEMENTS             //
+//---------------------------------------------//
+
+export const transferAccount = async (oldId: string, newId: string): Promise<void> => {
+    await query(`DELETE FROM trades WHERE id = $1 OR receiver = $1`, [newId]);
+    await query(`DELETE FROM weapons WHERE id = $1`, [newId]);
+    await query(`DELETE FROM users WHERE id = $1`, [newId]);
+
+    await query(`UPDATE users SET id = $1 WHERE id = $2`, [newId, oldId]);
+    await query(`UPDATE weapons SET id = $1, uniqueid = SUBSTRING(uniqueid, 1, POSITION(':' IN uniqueid)) || $1 WHERE id = $2`, [newId, oldId]);
+    await query(`UPDATE trades SET id = $1 WHERE id = $2`, [newId, oldId]);
+    await query(`UPDATE trades SET receiver = $1 WHERE receiver = $2`, [newId, oldId]);
+
+    const stats = await getUserSchema(newId);
+    if (stats) {
+        // Guild
+        const guild = stats.guild ? await getGuildSchema(stats.guild) : undefined;
+        if (guild) {
+            // Update guild members
+            guild.members = guild.members.filter(e => e !== oldId);
+            guild.members.push(newId);
+
+            // Update guild elders
+            if (guild.elders.includes(oldId)) {
+                guild.elders = guild.elders.filter(e => e !== oldId);
+                guild.elders.push(newId);
+            };
+
+            // Update guilds table
+            if (guild.master === oldId) {
+                await updateGuilds(guild.id, {
+                    master: { type: "set", value: newId },
+                    members: { type: "set", value: guild.members },
+                    elders: { type: "set", value: guild.elders }
+                });
+            } else {
+                await updateGuilds(guild.id, {
+                    members: { type: "set", value: guild.members },
+                    elders: { type: "set", value: guild.elders }
+                });
+            };
+        };
+
+        // Party
+        const party = stats.party ? await getPartySchema(stats.party) : undefined;
+        if (party) {
+            party.members = party.members.filter(e => e !== oldId);
+            party.members.push(newId);
+
+            await updateParties(party.id, {
+                members: { type: "set", value: party.members }
+            });
+        };
+    };
+};
 
 //-------------------------------------------//
 //             UPDATE STATEMENTS             //
@@ -346,6 +499,10 @@ export const addGuildDonation = async (guildId: string, userId: string, type: "c
     await updateGuilds(guildId, {
         [type === "coins" ? "treasury" : "treasury_gems"]: { type: "increment", value: amount }
     });
+};
+
+export const updateFAQBody = async (name: string, body: string): Promise<void> => {
+    await query(`UPDATE faq SET body = $1 WHERE name = $2`, [body, name]);
 };
 
 export const updateStampedeParticipation = async (stampedeRowId: number, partyId: string | null, userId: string, damage: number, rounds: number): Promise<void> => {
@@ -680,6 +837,100 @@ export const updateGuilds = async (
         );
     };
 };
+
+export const updateParties = async (
+    partyIds: string | string[] | "*",
+    updates: UpdatePartyOptions,
+    condition?: string,
+): Promise<void> => {
+    const setStatements = Object.entries(updates)
+        .map(([key, { type, value }], index) => {
+            const paramIndex = index + 2;
+
+            switch (type) {
+                case 'set':
+                    return `${key} = $${paramIndex}`;
+                case 'increment':
+                    return `${key} = ${key} + $${paramIndex}`;
+                case 'append':
+                    return `${key} = array_cat(${key}, $${paramIndex})`;
+                case 'append_unique':
+                    return `${key} = array(select distinct unnest(array_cat(${key}, $${paramIndex})))`;
+                case 'remove':
+                    const elemType = Array.isArray(value) && value.length > 0
+                        ? typeof value[0] === 'number'
+                            ? 'integer'
+                            : 'text'
+                        : 'text';
+                    return `${key} = (
+                        SELECT array_agg(orig.elem ORDER BY orig.idx)
+                        FROM (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn,
+                                idx
+                            FROM unnest(${key}) WITH ORDINALITY AS t(elem, idx)
+                        ) AS orig
+                        LEFT JOIN (
+                            SELECT elem,
+                                ROW_NUMBER() OVER (PARTITION BY elem ORDER BY idx) AS rn
+                            FROM unnest($${paramIndex}::${elemType}[]) WITH ORDINALITY AS t(elem, idx)
+                        ) AS rem
+                        ON orig.elem = rem.elem
+                        AND orig.rn = rem.rn
+                        WHERE rem.elem IS NULL
+                    )`;
+                case 'remove_all':
+                    const arrayType = Array.isArray(value) && value.length > 0
+                        ? typeof value[0] === 'number'
+                            ? 'integer[]'
+                            : 'text[]'
+                        : 'text[]';
+                    return `${key} = COALESCE((
+                        SELECT array_agg(elem) 
+                        FROM unnest(${key}) elem 
+                        WHERE NOT elem = ANY($${paramIndex}::${arrayType})
+                    ), '{}')`;
+                case 'set_json':
+                    return `${key} = $${paramIndex}::jsonb`;
+                case 'merge_json':
+                    return `${key} = (
+                        SELECT jsonb_object_agg(key,
+                            CASE
+                                WHEN ${key}->key IS NOT NULL AND $${paramIndex}::jsonb->key IS NOT NULL 
+                                    AND jsonb_typeof(${key}->key) = 'number' 
+                                    AND jsonb_typeof($${paramIndex}::jsonb->key) = 'number' THEN
+                                        to_jsonb((${key}->key)::numeric + ($${paramIndex}::jsonb->key)::numeric)
+                                WHEN $${paramIndex}::jsonb->key IS NOT NULL THEN
+                                    $${paramIndex}::jsonb->key
+                                ELSE
+                                    ${key}->key
+                            END
+                        )
+                        FROM jsonb_each(COALESCE(${key}, '{}'::jsonb) || $${paramIndex}::jsonb)
+                    )`;
+                default:
+                    throw new Error(`Unknown update type: ${type}`);
+            };
+        })
+        .join(', ');
+
+    const values = Object.values(updates).map(update => update.value);
+
+    if (partyIds === "*") {
+        await query(
+            `UPDATE parties SET ${setStatements} ${condition ? `WHERE ${condition}` : ""}`,
+            values
+        );
+    } else {
+        const ids = Array.isArray(partyIds) ? partyIds : [partyIds];
+        await query(
+            `UPDATE parties SET ${setStatements} WHERE id = ANY($1) ${condition ? `AND ${condition}` : ""}`,
+            [ids, ...values]
+        );
+    };
+};
+
+
 
 export const updateStampedes = async (
     stampedeRowIds: number | number[] | "*",

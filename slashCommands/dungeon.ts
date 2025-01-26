@@ -138,8 +138,8 @@ const exportCommand: SlashCommand = {
         if (!requestVerification.has(interaction.user.id) && stats.dungeon_limit > 100 && Math.random() < 0.005 && !captchaCooldown.has(interaction.user.id)) requestVerification.set(interaction.user.id, { repeats: 0 });
         if (requestVerification.has(interaction.user.id)) {
             const captcha = generateCaptcha();
-            clearTimeout(requestVerification.get(interaction.user.id).timeout);
-            requestVerification.set(interaction.user.id, { text: captcha.text, repeats: requestVerification.get(interaction.user.id).repeats + 1, timeout: setTimeout(() => requestVerification.delete(interaction.user.id), 60 * 60 * 1000) });
+            clearTimeout(requestVerification.get(interaction.user.id)?.timeout);
+            requestVerification.set(interaction.user.id, { text: captcha.text, repeats: (requestVerification.get(interaction.user.id)?.repeats ?? 0) + 1, timeout: setTimeout(() => requestVerification.delete(interaction.user.id), 60 * 60 * 1000) });
 
             // Temp ban
             if (requestVerification.get(interaction.user.id).repeats > 4) {
