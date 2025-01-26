@@ -319,7 +319,7 @@ export interface UserSchema {
     eventrewreceived: number;
     gems: number;
     tutorial: number[];
-    transactions: any[];
+    transactions: RankShopTransaction[];
     dailies: Record<string, number>;
     guild: string | null;
     donatedtotal: number;

@@ -144,6 +144,11 @@ export const getTotalPlayers = async (): Promise<number> => {
     return result.players;
 };
 
+export const getPlayerbaseStats = async (): Promise<{ players: number; active: number; daily: number; }> => {
+    const [result] = await query(`SELECT COUNT(rowid) AS players, COUNT(lastpull) FILTER (WHERE lastpull > NOW() - INTERVAL '7 days') AS active, COUNT(lastpull) FILTER (WHERE lastpull > NOW() - INTERVAL '1 day') AS daily FROM users`) as [{ players: number; active: number; daily: number; }];
+    return result;
+};
+
 export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasStampedeChar?: boolean, hasChristmasChar?: boolean; } = { excludeIds: [], hasStampedeChar: false, hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[]> => {
     let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment, battlechar, cow_chars, cow_participation, cow_timer FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[];
 
@@ -151,6 +156,11 @@ export const getPartyMembers = async (partyId: string, options: { excludeIds: st
     if (options.hasChristmasChar) members = members.filter((e) => e.craze_equipment.char !== undefined);
 
     return members ?? [];
+};
+
+export const getPremiumUsers = async (): Promise<Pick<UserSchema, "id" | "premium">[]> => {
+    const users = await query(`SELECT id, premium FROM users WHERE premium > 0`, []) as Pick<UserSchema, "id" | "premium">[];
+    return users;
 };
 
 export const getLatestRaid = async (guildId: string): Promise<RaidSchema | undefined> => {
@@ -406,6 +416,22 @@ export const insertNewTrade = async (id: string, receiver: string, type: "coins"
     return trade;
 };
 
+export const insertNewStampede = async (): Promise<void> => {
+    const values = {
+        type: 0,
+        bosshp: 183_728_460,
+        bosshpmax: 183_728_460,
+        generalhp: 1_582_760,
+        generalhpmax: 1_582_760,
+        generalstotal: 486,
+        generalsleft: 486,
+        monsterstotal: 0,
+        monstersleft: 0
+    };
+
+    await query(`INSERT INTO stampedes (type, bosshp, bosshpmax, generalhp, generalhpmax, generalstotal, generalsleft, monsterstotal, monstersleft) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [values.type, values.bosshp, values.bosshpmax, values.generalhp, values.generalhpmax, values.generalstotal, values.generalsleft, values.monsterstotal, values.monstersleft]);
+};
+
 export const insertNewGuild = async (name: string, guildMaster: string): Promise<GuildSchema> => {
     const { rows: [guild] } = await query(`INSERT INTO guilds (name, master, members) VALUES ($1, $2, $3) RETURNING *`, [name, guildMaster, [guildMaster]]) as { rows: GuildSchema[]; };
     return guild;
@@ -527,6 +553,25 @@ export const addGuildDonation = async (guildId: string, userId: string, type: "c
     await updateGuilds(guildId, {
         [type === "coins" ? "treasury" : "treasury_gems"]: { type: "increment", value: amount }
     });
+};
+
+export const resetDailyResponses = async (): Promise<void> => {
+    await query(`UPDATE dungeon SET dungeon_responsetime = ARRAY[]::timestamp[] WHERE array_length(dungeon_responsetime, 1) < 200`);
+};
+
+export const resetDungeonLimit = async (): Promise<void> => {
+    await query(`
+        UPDATE users
+        SET dungeon_limit = CASE
+            WHEN premium = 7 THEN 
+                CASE 
+                    WHEN dungeon_limit > 20 THEN 0
+                    WHEN dungeon_limit < -20 THEN -40
+                    ELSE dungeon_limit - 20
+                END
+            ELSE 0
+        END
+    `);
 };
 
 export const updateFAQBody = async (name: string, body: string): Promise<void> => {
