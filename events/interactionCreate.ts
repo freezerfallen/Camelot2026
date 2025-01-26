@@ -33,13 +33,9 @@ const event: BotEvent = {
             const command = interaction.client.slashCommands.get(interaction.commandName) as SlashCommand | undefined;
             if (command?.autocomplete) {
                 const choices = await command.autocomplete({ interaction });
-                return interaction.respond(choices.slice(0, 25));
-            } else {
-                // const focusedValue = interaction.options.getFocused();
-                const choices = await interaction.client.commands.get(interaction.commandName)?.autocomplete?.({ interaction });
-                return interaction.respond(choices.slice(0, 25));
-                // return interaction.respond(choices.filter((e) => e.name.toLowerCase().includes(focusedValue.toLowerCase())).slice(0, 25));
+                interaction.respond(choices.slice(0, 25));
             };
+            return;
         };
 
         // return setTimeout(async () => {
@@ -120,14 +116,15 @@ const event: BotEvent = {
                 }, 1000);
             };
 
+            // NPC Arena Easter Egg
+            if (interaction.commandName === "arena" && interaction.options.getUser('user')?.id === interaction.client.user.id) {
+                const command = interaction.client.slashCommands.get("npc-arena") as SlashCommand | undefined;
+                if (command) return command.execute({ interaction, author, server, locale: 'en_US' });
+            };
+
             // Slash Commands
             const command = interaction.client.slashCommands.get(interaction.commandName) as SlashCommand | undefined;
             if (command) return command.execute({ interaction, author, server, locale: 'en_US' });
-
-            // Execute command
-            if (interaction.commandName === "arena" && interaction.options.getUser('user')?.id === "706183309943767112") return interaction.client.commands.get('trial').execute(interaction);
-            if (interaction.commandName === "boss" && interaction.options.getSubcommand() === "hunt") return interaction.client.commands.get('bosshunt').execute(interaction);
-            else interaction.client.commands.get(interaction.commandName)?.execute(interaction);
         };
 
     },

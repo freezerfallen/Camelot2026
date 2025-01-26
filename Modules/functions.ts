@@ -6,7 +6,6 @@ import sharp from 'sharp';
 import https from "https";
 import { createCanvas } from '@napi-rs/canvas';
 import crypto from 'crypto';
-import { db, query } from "../db_handler";
 import charInfo, { characters } from "./chars";
 import { anime } from "./anime";
 import { achievements } from "./achievements";
@@ -19,6 +18,7 @@ import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
 import _ from 'lodash';
 import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
 import { curses } from './curses';
+import { getWeaponSchema } from './queries';
 
 const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>; def: Record<number, number>; expertise: Record<number, string>; }; } = {
     "base": {
@@ -143,7 +143,7 @@ const lvlupStats = {
     "D": { "hp": { "base": 2, "add": 0.4 }, "atk": { "base": 0.75, "add": 0.25 }, "def": { "base": 0.4, "add": 0.1 } },
 };
 
-const retainItemStats = new Map();
+const retainItemStats = new Map<string, { timeout: NodeJS.Timeout, stats: WeaponSchema; }>();
 
 export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
 
@@ -260,23 +260,23 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
 
     // Item Stats
     if (inv?.equipment) {
-        let weapon, shield, helmet, cuirass, gloves, boots;
+        let weapon: WeaponSchema | undefined, shield: WeaponSchema | undefined, helmet: WeaponSchema | undefined, cuirass: WeaponSchema | undefined, gloves: WeaponSchema | undefined, boots: WeaponSchema | undefined;
 
         // Add weapon stats if available
         if (inv.equipment.weapon) {
-
             clearTimeout(retainItemStats.get(inv.equipment.weapon)?.timeout);
-            weapon = retainItemStats.get(inv.equipment.weapon)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.weapon}'`);
-            retainItemStats.set(inv.equipment.weapon, { stats: weapon, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.weapon), 10 * 1000) });
+            weapon = retainItemStats.get(inv.equipment.weapon)?.stats ?? await getWeaponSchema(inv.equipment.weapon);
 
-            // weapon = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.weapon}'`);
-            if (weapon[0]) {
-                dStats.uniqueids.push(weapon[0].uniqueid.split(":")[0]);
-                weapon = { id: weapon[0].itemid, level: getItemLevel(weapon[0].level), ascension: weapon[0].ascension };
-                const item = items[weapon.id];
+            if (weapon) {
+                retainItemStats.set(inv.equipment.weapon, { stats: weapon, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.weapon), 10 * 1000) });
+
+                dStats.uniqueids.push(weapon.uniqueid.split(":")[0]);
+                weapon.level = getItemLevel(weapon.level);
+
+                const item = items[weapon.itemid];
                 if (item instanceof weaponInfo) {
                     // Set item to dStats
-                    dStats.weapon = weapon.id;
+                    dStats.weapon = weapon.itemid;
                     dStats.weaponicon = item.emoji;
                     dStats.weaponinfo = { ...weapon };
 
@@ -312,19 +312,19 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
 
         // Add shield stats if available
         if (inv.equipment.shield && (inv.premium > 3 || inv.shield_slot)) {
-
             clearTimeout(retainItemStats.get(inv.equipment.shield)?.timeout);
-            shield = retainItemStats.get(inv.equipment.shield)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.shield}'`);
-            retainItemStats.set(inv.equipment.shield, { stats: shield, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.shield), 10 * 1000) });
+            shield = retainItemStats.get(inv.equipment.shield)?.stats ?? await getWeaponSchema(inv.equipment.shield);
 
-            // shield = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.shield}'`);
-            if (shield[0]) {
-                dStats.uniqueids.push(shield[0].uniqueid.split(":")[0]);
-                shield = { id: shield[0].itemid, level: getItemLevel(shield[0].level), ascension: shield[0].ascension };
-                const item = items[shield.id];
+            if (shield) {
+                retainItemStats.set(inv.equipment.shield, { stats: shield, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.shield), 10 * 1000) });
+
+                dStats.uniqueids.push(shield.uniqueid.split(":")[0]);
+                shield.level = getItemLevel(shield.level);
+
+                const item = items[shield.itemid];
                 if (item instanceof weaponInfo) {
                     // Set item to dStats
-                    dStats.shieldid = shield.id;
+                    dStats.shieldid = shield.itemid;
                     dStats.shieldicon = item.emoji;
                     dStats.shieldinfo = { ...shield };
 
@@ -356,18 +356,19 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add helmet stat if available
         if (inv.equipment.helmet) {
             clearTimeout(retainItemStats.get(inv.equipment.helmet)?.timeout);
-            helmet = retainItemStats.get(inv.equipment.helmet)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.helmet}'`);
-            retainItemStats.set(inv.equipment.helmet, { stats: helmet, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.helmet), 10 * 1000) });
+            helmet = retainItemStats.get(inv.equipment.helmet)?.stats ?? await getWeaponSchema(inv.equipment.helmet);
 
-            // helmet = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.helmet}'`);
-            if (helmet[0]) {
-                dStats.uniqueids.push(helmet[0].uniqueid.split(":")[0]);
-                helmet = { id: helmet[0].itemid, level: getItemLevel(helmet[0].level), ascension: helmet[0].ascension };
-                const item = items[helmet.id];
+            if (helmet) {
+                retainItemStats.set(inv.equipment.helmet, { stats: helmet, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.helmet), 10 * 1000) });
+
+                dStats.uniqueids.push(helmet.uniqueid.split(":")[0]);
+                helmet.level = getItemLevel(helmet.level);
+
+                const item = items[helmet.itemid];
                 if (item instanceof armorInfo) {
 
                     // Set item to dStats
-                    dStats.helmet = helmet.id;
+                    dStats.helmet = helmet.itemid;
                     dStats.helmeticon = item.emoji;
                     dStats.helmetinfo = { ...helmet };
 
@@ -379,18 +380,18 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add cuirass stat if available
         if (inv.equipment.cuirass) {
             clearTimeout(retainItemStats.get(inv.equipment.cuirass)?.timeout);
-            cuirass = retainItemStats.get(inv.equipment.cuirass)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.cuirass}'`);
-            retainItemStats.set(inv.equipment.cuirass, { stats: cuirass, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.cuirass), 10 * 1000) });
+            cuirass = retainItemStats.get(inv.equipment.cuirass)?.stats ?? await getWeaponSchema(inv.equipment.cuirass);
+            if (cuirass) {
+                retainItemStats.set(inv.equipment.cuirass, { stats: cuirass, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.cuirass), 10 * 1000) });
 
-            // cuirass = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.cuirass}'`);
-            if (cuirass[0]) {
-                dStats.uniqueids.push(cuirass[0].uniqueid.split(":")[0]);
-                cuirass = { id: cuirass[0].itemid, level: getItemLevel(cuirass[0].level), ascension: cuirass[0].ascension };
-                const item = items[cuirass.id];
+                dStats.uniqueids.push(cuirass.uniqueid.split(":")[0]);
+                cuirass.level = getItemLevel(cuirass.level);
+
+                const item = items[cuirass.itemid];
                 if (item instanceof armorInfo) {
 
                     // Set item to dStats
-                    dStats.cuirass = cuirass.id;
+                    dStats.cuirass = cuirass.itemid;
                     dStats.cuirassicon = item.emoji;
                     dStats.cuirassinfo = { ...cuirass };
 
@@ -402,18 +403,19 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.gloves) {
             clearTimeout(retainItemStats.get(inv.equipment.gloves)?.timeout);
-            gloves = retainItemStats.get(inv.equipment.gloves)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.gloves}'`);
-            retainItemStats.set(inv.equipment.gloves, { stats: gloves, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.gloves), 10 * 1000) });
+            gloves = retainItemStats.get(inv.equipment.gloves)?.stats ?? await getWeaponSchema(inv.equipment.gloves);
 
-            // gloves = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.gloves}'`);
-            if (gloves[0]) {
-                dStats.uniqueids.push(gloves[0].uniqueid.split(":")[0]);
-                gloves = { id: gloves[0].itemid, level: getItemLevel(gloves[0].level), ascension: gloves[0].ascension };
-                const item = items[gloves.id];
+            if (gloves) {
+                retainItemStats.set(inv.equipment.gloves, { stats: gloves, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.gloves), 10 * 1000) });
+
+                dStats.uniqueids.push(gloves.uniqueid.split(":")[0]);
+                gloves.level = getItemLevel(gloves.level);
+
+                const item = items[gloves.itemid];
                 if (item instanceof armorInfo) {
 
                     // Set item to dStats
-                    dStats.gloves = gloves.id;
+                    dStats.gloves = gloves.itemid;
                     dStats.glovesicon = item.emoji;
                     dStats.glovesinfo = { ...gloves };
 
@@ -425,18 +427,19 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.boots) {
             clearTimeout(retainItemStats.get(inv.equipment.boots)?.timeout);
-            boots = retainItemStats.get(inv.equipment.boots)?.stats ?? await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.boots}'`);
-            retainItemStats.set(inv.equipment.boots, { stats: boots, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.boots), 10 * 1000) });
+            boots = retainItemStats.get(inv.equipment.boots)?.stats ?? await getWeaponSchema(inv.equipment.boots);
 
-            // boots = await query(`SELECT * FROM weapons WHERE uniqueid = '${inv.equipment.boots}'`);
-            if (boots[0]) {
-                dStats.uniqueids.push(boots[0].uniqueid.split(":")[0]);
-                boots = { id: boots[0].itemid, level: getItemLevel(boots[0].level), ascension: boots[0].ascension };
-                const item = items[boots.id];
+            if (boots) {
+                retainItemStats.set(inv.equipment.boots, { stats: boots, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.boots), 10 * 1000) });
+
+                dStats.uniqueids.push(boots.uniqueid.split(":")[0]);
+                boots.level = getItemLevel(boots.level);
+
+                const item = items[boots.itemid];
                 if (item instanceof armorInfo) {
 
                     // Set item to dStats
-                    dStats.boots = boots.id;
+                    dStats.boots = boots.itemid;
                     dStats.bootsicon = item.emoji;
                     dStats.bootsinfo = { ...boots };
 

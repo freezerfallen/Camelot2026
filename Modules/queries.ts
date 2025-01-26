@@ -48,6 +48,16 @@ export const getWeaponSchema = async (uniqueid: string): Promise<WeaponSchema | 
     return weapon;
 };
 
+export const getUserWeaponCount = async (userId: string, item_type?: "weapon" | "armor" | "ring"): Promise<number> => {
+    if (item_type === undefined) {
+        const [count] = await query(`SELECT COUNT(*) AS count FROM weapons WHERE id = $1`, [userId]) as [{ count: number; }];
+        return count.count ?? 0;
+    } else {
+        const [count] = await query(`SELECT COUNT(*) AS count FROM weapons WHERE id = $1 AND item_type = $2`, [userId, item_type]) as [{ count: number; }];
+        return count.count ?? 0;
+    };
+};
+
 export const getWeaponSchemas = async (uniqueids: string[]): Promise<WeaponSchema[]> => {
     const weapons = await query(`SELECT * FROM weapons WHERE uniqueid = ANY($1)`, [uniqueids]) as WeaponSchema[];
     return weapons;
@@ -143,6 +153,11 @@ export const getPartyMembers = async (partyId: string, options: { excludeIds: st
     return members ?? [];
 };
 
+export const getLatestRaid = async (guildId: string): Promise<RaidSchema | undefined> => {
+    const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
+    return raid;
+};
+
 export const getLatestStampede = async (): Promise<StampedeSchema | undefined> => {
     const [stampede] = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT 1`) as [StampedeSchema];
     return stampede;
@@ -191,7 +206,7 @@ export const getWeaponCount = async (itemId: number): Promise<number> => {
 
 export const getUserWeapons = async (userId: string): Promise<WeaponSchema[]> => {
     const weapons = await query(`SELECT * FROM weapons WHERE id = $1`, [userId]) as WeaponSchema[];
-    return weapons;
+    return weapons ?? [];
 };
 
 export const getReferredUsers = async (userId: string): Promise<(Pick<UserSchema, "id" | "name" | "created" | "dungeon_floors" | "xp"> & { age: number; floor: number; level: number; })[]> => {
@@ -326,6 +341,15 @@ export const loadPullResets = async (): Promise<Pick<UserSchema, "id" | "premium
     return users;
 };
 
+export const loadVoteReminders = async (): Promise<Pick<UserSchema, "id" | "lastvote">[]> => {
+    const users = await query(`SELECT id, lastvote FROM users 
+        WHERE votereminder = 1 
+        AND lastvote IS NOT NULL
+        AND (EXTRACT(EPOCH FROM (NOW() - lastvote)) / 3600) < 12
+    `, []) as Pick<UserSchema, "id" | "lastvote">[];
+    return users;
+};
+
 export const loadRanking = async (pass: number, batchSize: number): Promise<UserSchemaForStats[]> => {
     const users = await query(`SELECT id, name, premium, battlechar, level, bank, char_ref, equipment, shield_slot, class, dungeon_classlevels FROM users WHERE battlechar IS NOT NULL ORDER BY rowid LIMIT $1 OFFSET $2`, [batchSize, pass * batchSize]) as UserSchemaForStats[];
     return users;
@@ -416,6 +440,10 @@ export const deleteFAQ = async (name: string): Promise<void> => {
 export const deleteWeapon = async (uniqueId: string): Promise<WeaponSchema | undefined> => {
     const { rows: [weapon] } = await query(`DELETE FROM weapons WHERE uniqueid = $1 RETURNING *`, [uniqueId]) as { rows: WeaponSchema[]; };
     return weapon;
+};
+
+export const deleteWeapons = async (uniqueIds: string[]): Promise<void> => {
+    await query(`DELETE FROM weapons WHERE uniqueid = ANY($1)`, [uniqueIds]);
 };
 
 //---------------------------------------------//
@@ -538,6 +566,36 @@ export const updateStampedeParticipation = async (stampedeRowId: number, partyId
         )
         WHERE rowid = $1
     `, [stampedeRowId, participation]);
+};
+
+export const updateRaidParticipation = async (raidRowId: number, userId: string, damage: number): Promise<void> => {
+
+    const participation = {
+        [userId]: [damage, 1]
+    };
+
+    await query(`
+        UPDATE raids 
+        SET enemy_hp = enemy_hp - $3,
+            participation = (
+                SELECT jsonb_object_agg(
+                    key,
+                    CASE
+                        WHEN participation->key IS NOT NULL AND $2::jsonb->key IS NOT NULL THEN
+                            jsonb_build_array(
+                                (COALESCE((participation->key->>0)::numeric, 0) + COALESCE(($2::jsonb->key->>0)::numeric, 0)),
+                                (COALESCE((participation->key->>1)::numeric, 0) + COALESCE(($2::jsonb->key->>1)::numeric, 0))
+                            )
+                        WHEN $2::jsonb->key IS NOT NULL THEN
+                            $2::jsonb->key
+                        ELSE
+                            participation->key
+                    END
+                )
+                FROM jsonb_each(COALESCE(participation, '{}'::jsonb) || $2::jsonb)
+            )
+        WHERE rowid = $1
+    `, [raidRowId, participation, damage]);
 };
 
 

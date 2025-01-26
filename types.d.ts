@@ -512,7 +512,7 @@ export interface RaidSchema {
     raidid: number;
     enemy_hp: number;
     enemy_hpmax: number;
-    participation: Record<string, any>;
+    participation: Record<string, [number, number]>;
     start_date: Date;
 }
 
@@ -803,7 +803,6 @@ declare global {
 
 declare module "discord.js" {
     export interface Client {
-        commands: Collection<string, any>;
         slashCommands: Collection<string, SlashCommand>;
     }
 }

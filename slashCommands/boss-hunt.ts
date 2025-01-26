@@ -140,7 +140,7 @@ function adjustDEF(myStatsC: DetailedStats) { // {274: x2 atk -> x1.5 dmg, 340: 
 const isEventActive = false;
 
 const exportCommand: SlashCommand = {
-    name: 'bosshunt',
+    name: 'boss-hunt',
     async execute({ interaction, author }) {
 
         if (!isEventActive) {

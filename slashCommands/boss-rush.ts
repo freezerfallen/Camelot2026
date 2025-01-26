@@ -29,7 +29,7 @@ function toOrdinal(num: number) {
 const isEventActive = false;
 
 const exportCommand: SlashCommand = {
-    name: 'boss',
+    name: 'boss-rush',
     async execute({ interaction, author }) {
 
         if (!isEventActive) {
