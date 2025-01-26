@@ -383,6 +383,8 @@ export interface UserSchema {
     rankscore: number;
     raidxp: number;
     guild_marks: number;
+    image_credits: number;
+    image_credits_claimed: number;
     created: Date;
 
     chars: number[];
@@ -577,7 +579,7 @@ export interface ITrigger {
     set used(used: number);
 };
 
-export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "defend" | "cskill" | "minionDeath";
+export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "defend" | "cskill" | "minionDeath" | "minionDeath" | "revival" | "heal";
 
 export type TriggerOptions = {
     event: TriggerEvents;
