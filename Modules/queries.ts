@@ -729,7 +729,7 @@ export const updateUsers = async (
 ): Promise<void> => {
     const setStatements = Object.entries(updates)
         .map(([key, { type, value }], index) => {
-            const paramIndex = index + 2;
+            const paramIndex = index + (userIds === "*" ? 1 : 2);
 
             switch (type) {
                 case 'set':

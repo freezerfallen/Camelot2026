@@ -466,7 +466,7 @@ async function alterTables() {
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits_claimed INT DEFAULT 0 NOT NULL');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits_claimed INT DEFAULT 0 NOT NULL');
 };
 
 async function dropTables() {
