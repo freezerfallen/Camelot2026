@@ -1,4 +1,4 @@
-import { IOutputFormat, ITextToImage } from '@runware/sdk-js';
+import { IOutputFormat } from '@runware/sdk-js';
 import { SlashCommand } from '../types';
 import { EmbedBuilder } from 'discord.js';
 import { characters } from "../Modules/chars";
@@ -7,12 +7,17 @@ import { updateUsers } from "../Modules/queries";
 import { generateImages } from '../Modules/runware';
 import { generateText } from '../Modules/gemini';
 
+type GenType = "weapon" | "armor" | "ring" | "custom" | "character";
+
 const exportCommand: SlashCommand = {
     name: 'generate',
     async execute({ interaction, author }) {
 
         const stats = author.schema;
-        const type = interaction.options.getString('type') as "weapon" | "armor" | "ring" | "custom" | "character" | null;
+        const type = interaction.options.getString('type') as GenType | null;
+        const userprompt = interaction.options.getString('prompt') ?? type ?? "";
+        const enhancePrompt = interaction.options.getBoolean('enhance') ?? true;
+        const outputFormat = (interaction.options.getString('output') as IOutputFormat) ?? "JPG";
 
         if (type === null) {
             let thumbnail = characters[stats.chars[Math.floor(Math.random() * stats.chars.length)]].image || "https://i.imgur.com/Ta2YDBN.png";
@@ -37,34 +42,9 @@ const exportCommand: SlashCommand = {
             return console.log(`ERROR Interaction Failed to reply, command: "${interaction.commandName}"`);
         };
 
-        const userprompt = interaction.options.getString('prompt') ?? "";
-        const enhancePrompt = interaction.options.getBoolean('enhance') ?? true;
-        const outputFormat = (interaction.options.getString('output') as IOutputFormat) ?? "JPG";
+        const prompt = enhancePrompt ? await getPrompt(userprompt, type) : userprompt;
 
-        const prompt = enhancePrompt
-            ? await getPrompt(userprompt, type)
-            : userprompt;
-        let images: ITextToImage[] = [];
-
-        if (type === "weapon" || type === "ring" || type === "custom") {
-            images = await generateImages({ prompt, outputFormat, number: 3 });
-        } else if (type === "armor") {
-            const armorPrompts = parseArmorPrompts(prompt);
-            if (armorPrompts === undefined) return interaction.editReply({ content: "An error occurred while parsing the prompt. Please try again later.\n\nIf the issue persists, please contact us on our `/support` server!" });
-
-            const armorImages = await Promise.all([
-                generateImages({ prompt: armorPrompts.helmet, outputFormat }),
-                generateImages({ prompt: armorPrompts.cuirass, outputFormat }),
-                generateImages({ prompt: armorPrompts.gloves, outputFormat }),
-                generateImages({ prompt: armorPrompts.boots, outputFormat })
-            ]);
-
-            images.push(...armorImages.flat());
-        } else if (type === "character") {
-            images = await generateImages({ prompt, outputFormat, model: "Anything V3", number: 2, width: 576, height: 896, CFGScale: 8, negativePrompt: "easynegative, (mutilated:1.21), mutated hands, (poorly drawn hands:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), bad hands, missing fingers, extra digit" });
-        };
-
-        // Return if no images are generated
+        const images = await getImages(prompt, type, outputFormat);
         if (images.length === 0) return interaction.editReply({ content: "An error occurred while generating the images. Please try again later.\n\nIf the issue persists, please contact us on our `/support` server!" });
 
         // Update users table
@@ -83,7 +63,7 @@ export default exportCommand;
 //         Helper Functions         //
 //----------------------------------//
 
-async function getPrompt(userprompt: string, type: string) {
+async function getPrompt(userprompt: string, type: GenType) {
 
     if (type === "weapon") {
         return await generateText({
@@ -139,6 +119,7 @@ async function getPrompt(userprompt: string, type: string) {
             systemInstruction: "Reply only with the result of your task, nothing else",
             chatHistory: [
                 "Create a custom character prompt based on the below user prompt in the following structure: watercolor (medium), (carne griffiths:1.2), yuko shimizu, masterpiece portrait, extreme details, (((${race}))), ${1girl|1boy}, (Waterfall braid ${hairColor} hair:1.2), dynamic pose, (${eyeAccent} ${eyeColor} eyes:1.2), Bold, Delighted, ${emotions}, (illustration), ${large|medium|small} breasts, (${clothing}:1.2), (character focus), ((perfect anatomy)), (((extreme detail))), ((${theme} theme)), masterpiece, best quality, highest quality, (dynamic lighting:1.1), (perfect face:1.1) intricate (high detail:1.1), official art, (chiaroscuro:1.1) ${otherOptionals}",
+                `Weighting Syntax: (text) (text:number) [text]\nUse parentheses () to increase attention, square brackets [] to decrease it. Add a number after the text to specify a custom multiplier.\n\nExamples:\n\nSingle words: (small) dog, pixar style\nMultiple words: small dog, [pixar style]\nHigher emphasis: (small:2.5) dog, pixar style\nCombined emphasis: (small dog:1.5), pixar style` +
                 "Note: Feel free to modify the prompt to fit the style of the user prompt. You may also slightly modify the user prompt to fit the style of the prompt, and to add some slight variety.",
                 "Note: If the user prompt is empty or missing certain vectors, fill in with random keywords to make the prompt more interesting. Vectors you can play with include hair color, hair style, eye color, clothing, setting, grimace, pose, etc.",
                 "User prompt:",
@@ -148,6 +129,36 @@ async function getPrompt(userprompt: string, type: string) {
     };
 
     return userprompt;
+};
+
+async function getImages(prompt: string, type: GenType, outputFormat: IOutputFormat) {
+
+    if (type === "weapon" || type === "ring" || type === "custom") {
+        return await generateImages({ prompt, outputFormat, numberOfImages: 3 });
+    };
+
+    if (type === "armor") {
+        const armorPrompts = parseArmorPrompts(prompt);
+        if (armorPrompts === undefined) return [];
+
+        const armorImages = await Promise.all([
+            generateImages({ prompt: armorPrompts.helmet, outputFormat }),
+            generateImages({ prompt: armorPrompts.cuirass, outputFormat }),
+            generateImages({ prompt: armorPrompts.gloves, outputFormat }),
+            generateImages({ prompt: armorPrompts.boots, outputFormat })
+        ]);
+
+        return armorImages.flat();
+    };
+
+    if (type === "character") {
+        return await generateImages({
+            prompt, outputFormat, model: "PrimeMix", numberOfImages: 2, width: 576, height: 896, CFGScale: 8, steps: 30,
+            negativePrompt: "easynegative, (mutilated:1.21), mutated hands, (poorly drawn hands:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), bad hands, missing fingers, extra digit"
+        });
+    };
+
+    return [];
 };
 
 function parseArmorPrompts(jsonString: string) {

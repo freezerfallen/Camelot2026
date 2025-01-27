@@ -1,17 +1,39 @@
-import { IOutputFormat, Runware } from "@runware/sdk-js";
+import { IOutputFormat, Runware, TPromptWeighting } from "@runware/sdk-js";
 import config from '../config.json';
 
 const runware = new Runware({ apiKey: config.runware.apiKey });
 
-type RunwareModel = "FLUX.1 (Schnell)" | "FLUX.1 (Dev)" | "Anything V3";
+type RunwareModel = "FLUX.1 (Schnell)" | "FLUX.1 (Dev)" | "Anything V3" | "PrimeMix";
 
-const runwareModel: Record<RunwareModel, string> = {
-    "FLUX.1 (Schnell)": "runware:100@1",
-    "FLUX.1 (Dev)": "runware:101@1",
-    "Anything V3": "civitai:66@75",
+type ModelParameters = {
+    model: string,
+    vae?: string,
+    scheduler?: string,
+    promptWeighting?: TPromptWeighting,
 };
 
-export const generateImages = async ({ prompt, negativePrompt, outputFormat = "JPG", model = "FLUX.1 (Dev)", number = 1, width = 512, height = 512, steps = 20, CFGScale = undefined }: {
+const runwareModel: Record<RunwareModel, ModelParameters> = {
+    "FLUX.1 (Schnell)": {
+        model: "runware:100@1",
+    },
+    "FLUX.1 (Dev)": {
+        model: "runware:101@1",
+    },
+    "Anything V3": {
+        model: "civitai:66@75",
+        // vae: "civitai:276082@311162",
+        scheduler: "DPM++ 2M Karras",
+        promptWeighting: "sdEmbeds",
+    },
+    "PrimeMix": {
+        model: "civitai:28779@67388",
+        vae: "civitai:276082@311162",
+        scheduler: "DPM++ 2M Karras",
+        promptWeighting: "sdEmbeds",
+    },
+};
+
+export const generateImages = async ({ prompt, negativePrompt, outputFormat = "JPG", model = "FLUX.1 (Dev)", numberOfImages = 1, width = 512, height = 512, steps = 20, CFGScale = undefined }: {
     prompt: string,
     negativePrompt?: string,
     /**
@@ -27,7 +49,7 @@ export const generateImages = async ({ prompt, negativePrompt, outputFormat = "J
      * Number of images to generate
      * @default 1
      */
-    number?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+    numberOfImages?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
     /**
      * @default 512
      */
@@ -48,14 +70,19 @@ export const generateImages = async ({ prompt, negativePrompt, outputFormat = "J
     try {
         const images = await runware.requestImages({
             positivePrompt: prompt,
-            model: runwareModel[model],
-            numberResults: number,
+            model: runwareModel[model].model,
+            numberResults: numberOfImages,
             negativePrompt,
             height,
             width,
             steps,
             outputFormat,
             CFGScale,
+            scheduler: runwareModel[model].scheduler,
+            promptWeighting: runwareModel[model].promptWeighting,
+
+            //@ts-ignore
+            vae: runwareModel[model].vae,
         });
 
         return images ?? [];
