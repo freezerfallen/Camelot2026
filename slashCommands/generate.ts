@@ -1,5 +1,5 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { Runware } = require('@runware/sdk-js');
+import { GenerateContentResult, GoogleGenerativeAI } from '@google/generative-ai';
+import { ITextToImage, Runware } from '@runware/sdk-js';
 import { SlashCommand } from '../types';
 import config from '../config.json';
 import { EmbedBuilder } from 'discord.js';
@@ -11,45 +11,47 @@ import { updateUsers } from "../Modules/queries";
 // TODO Add credits to shop/ monthly shop/ weekly (premium)
 // TODO Image Credit Icon
 
+type ArmorPrompts = {
+    helmet: string;
+    chestplate: string;
+    vambrace: string;
+    boots: string;
+};
+
 const exportCommand: SlashCommand = {
     name: 'generate',
     async execute({ interaction, author }) {
+
+        try {
+            await interaction.deferReply();
+        } catch (err) {
+            return console.log(`ERROR Interaction Failed 'deferReply()', command: "${interaction.commandName}"`);
+        };
+
         const subcommand = interaction.options.getSubcommand();
-        
-        const userprompt = interaction.options.getString('prompt');
+
+        const userprompt = interaction.options.getString('prompt', true);
         const enhancePrompt = interaction.options.getBoolean('enhanceprompt') ?? true;
-        const output = interaction.options.getString('output') ?? "JPG";
+        const output = (interaction.options.getString('output') as "PNG" | "JPG" | "WEBP") ?? "JPG";
         const type = interaction.options.getString('type') ?? "character";
 
         const stats = author.schema;
-        if (!stats) return interaction.reply("It seems you haven't started playing yet.");
-        
-        // Defer the reply immediately to prevent timeout
-        await interaction.deferReply();
 
         // Give Starting Image Credits
         if (userLevel(stats.xp) >= 25 && !stats.image_credits_claimed) {
-            await updateUsers(interaction.user.id, { 
+            await updateUsers(interaction.user.id, {
                 image_credits: { type: 'increment', value: 20 },
                 image_credits_claimed: { type: 'set', value: 1 }
             });
-            await interaction.editReply(`🎉 Congratulations! You've received 20 starting image credits!`);
-        }
+            return interaction.editReply(`🎉 Congratulations! You've received 20 starting image credits!`);
+        };
 
-        // Armor Prompt Parsing
-        interface ArmorPrompts {
-            helmet: string;
-            chestplate: string;
-            vambrace: string;
-            boots: string;
-        }
-        
         // Armor Prompt Parsing
         function parseArmorPrompts(jsonString: string): ArmorPrompts {
             try {
                 // Parse the JSON string into an object
                 const armorJson = JSON.parse(jsonString);
-                
+
                 // Ensure all required keys exist
                 const requiredKeys = ['helmet', 'chestplate', 'vambrace', 'boots'];
                 for (const key of requiredKeys) {
@@ -57,7 +59,7 @@ const exportCommand: SlashCommand = {
                         throw new Error(`Missing required armor piece: ${key}`);
                     }
                 }
-        
+
                 return {
                     helmet: armorJson.helmet,
                     chestplate: armorJson.chestplate,
@@ -68,18 +70,18 @@ const exportCommand: SlashCommand = {
             } catch (error) {
                 console.error('Error parsing armor JSON:', error);
                 throw error;
-            }
-        }
+            };
+        };
 
         // Prompt Enhancement
         async function getPrompt() {
 
-            let systemInstruction = ""; let result;
-            if (type === "weapon") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for weapon icon illustrations."
-            else if (type === "armor") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for armor icon illustrations."
-            else if (type === "ring") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for ring icon illustrations."
-            else if (type === "custom") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for an item icon illustrations."
-            else if (type === "character") systemInstruction = "You create detailed prompts, suiting the style of the Stable Diffusion 1.5 Model 'Anything V3' for a character portrait." //* Character systemInstruction
+            let systemInstruction = ""; let result: GenerateContentResult;
+            if (type === "weapon") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for weapon icon illustrations.";
+            else if (type === "armor") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for armor icon illustrations.";
+            else if (type === "ring") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for ring icon illustrations.";
+            else if (type === "custom") systemInstruction = "You create detailed prompts, suiting the style of FLUX.1 (Dev) for an item icon illustrations.";
+            else if (type === "character") systemInstruction = "You create detailed prompts, suiting the style of the Stable Diffusion 1.5 Model 'Anything V3' for a character portrait."; //* Character systemInstruction
 
             const genAI = new GoogleGenerativeAI(config.gemini.apiKey);
             const model = genAI.getGenerativeModel({
@@ -108,7 +110,7 @@ const exportCommand: SlashCommand = {
                     generationConfig: {
                         maxOutputTokens: 512
                     }
-                })
+                });
                 return result.response.text();
             } else if (type === "armor") {
                 result = await model.generateContent({
@@ -144,7 +146,7 @@ const exportCommand: SlashCommand = {
                         maxOutputTokens: 2048,
                         temperature: 0.4
                     }
-                })
+                });
                 return result.response.text();
             } else if (type === "ring") {
                 result = await model.generateContent({
@@ -167,7 +169,7 @@ const exportCommand: SlashCommand = {
                     generationConfig: {
                         maxOutputTokens: 512
                     }
-                })
+                });
                 return result.response.text();
             } else if (type === "custom") {
                 result = await model.generateContent({
@@ -190,7 +192,7 @@ const exportCommand: SlashCommand = {
                     generationConfig: {
                         maxOutputTokens: 512
                     }
-                })
+                });
                 return result.response.text();
             } else if (type === "character") { //* Character Prompt
                 result = await model.generateContent({
@@ -207,22 +209,23 @@ const exportCommand: SlashCommand = {
                     generationConfig: {
                         maxOutputTokens: 2048
                     }
-                })
+                });
                 return result.response.text();
             }
         }
 
-        let armorPrompts: ArmorPrompts; let prompt: string = userprompt ?? "";
+        let armorPrompts: ArmorPrompts;
+        let prompt = userprompt;
 
         // Create Images
         async function main() {
 
             const runware = new Runware({ apiKey: config.runware.apiKey });
-            let images: any[] = []; 
+            let images: ITextToImage[] = [];
 
             if (subcommand === "item") {
                 if (stats.image_credits <= 0) return interaction.editReply("You don't have any image credits left.");
-                if (enhancePrompt) prompt = await getPrompt(); 
+                if (enhancePrompt) prompt = await getPrompt() ?? prompt;
 
                 if (type === "weapon" || type === "ring" || type === "custom") {
                     images = await runware.requestImages({
@@ -233,10 +236,9 @@ const exportCommand: SlashCommand = {
                         height: 512,
                         width: 512,
                         outputFormat: output,
-                    });
-
+                    }) ?? [];
                 } else {
-                    if (prompt) armorPrompts = parseArmorPrompts(prompt); // No idea why I have to check this
+                    armorPrompts = parseArmorPrompts(prompt);
 
                     let armorImagesHelmet = await runware.requestImages({
                         positivePrompt: armorPrompts.helmet,
@@ -246,7 +248,7 @@ const exportCommand: SlashCommand = {
                         height: 512,
                         width: 512,
                         outputFormat: output,
-                    });
+                    }) ?? [];
                     let armorImagesChestplate = await runware.requestImages({
                         positivePrompt: armorPrompts.chestplate,
                         model: "runware:101@1",
@@ -255,7 +257,7 @@ const exportCommand: SlashCommand = {
                         height: 512,
                         width: 512,
                         outputFormat: output,
-                    });
+                    }) ?? [];
                     let armorImagesVambrace = await runware.requestImages({
                         positivePrompt: armorPrompts.vambrace,
                         model: "runware:101@1",
@@ -264,7 +266,7 @@ const exportCommand: SlashCommand = {
                         height: 512,
                         width: 512,
                         outputFormat: output,
-                    });
+                    }) ?? [];
                     let armorImagesBoots = await runware.requestImages({
                         positivePrompt: armorPrompts.boots,
                         model: "runware:101@1",
@@ -273,7 +275,7 @@ const exportCommand: SlashCommand = {
                         height: 512,
                         width: 512,
                         outputFormat: output,
-                    });
+                    }) ?? [];
                     images.push(...armorImagesHelmet);
                     images.push(...armorImagesChestplate);
                     images.push(...armorImagesVambrace);
@@ -291,7 +293,7 @@ const exportCommand: SlashCommand = {
                 }
                 await interaction.editReply({
                     content: `**Prompt: ** ${userprompt}`,
-                    files: images.map((img: { imageURL: any; }) => img.imageURL)
+                    files: images.map((img) => img.imageURL ?? "")
                 });
 
                 updateUsers(interaction.user.id, { image_credits: { type: 'increment', value: -1 } });
@@ -299,8 +301,8 @@ const exportCommand: SlashCommand = {
                 return images;
             } else if (subcommand === "character") {
                 if (stats.image_credits <= 0) return interaction.editReply("You don't have any image credits left.");
-                if (enhancePrompt) prompt = await getPrompt(); 
-                
+                if (enhancePrompt) prompt = await getPrompt() ?? "";
+
                 images = await runware.requestImages({
                     positivePrompt: prompt,
                     model: "civitai:66@75", // Anything V3
@@ -309,19 +311,19 @@ const exportCommand: SlashCommand = {
                     width: 576,
                     height: 896,
                     outputFormat: output,
-                });
+                }) ?? [];
 
                 await interaction.editReply({
                     content: `**Prompt: ** ${prompt}`,
-                    files: images.map((img: { imageURL: any; }) => img.imageURL)
+                    files: images.map((img) => img.imageURL ?? "")
                 });
                 updateUsers(interaction.user.id, { image_credits: { type: 'increment', value: -1 } });
-                
+
                 return images;
             } else if (subcommand === "balance") { // Image Credits Balance
                 //let thumbnail = characters[stats.chars[Math.floor(Math.random() * stats.chars.length)]].image || "https://i.imgur.com/Ta2YDBN.png";
                 //if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, "", stats.char_skin[stats.favchar]);
-        
+
                 const Embed = new EmbedBuilder()
                     .setColor(0xbbffff)
                     .setAuthor({ name: `${interaction.user.username}'s Credit Balance`, iconURL: interaction.user.displayAvatarURL({ size: 1024 }) })
@@ -333,6 +335,6 @@ const exportCommand: SlashCommand = {
         }
         main().catch(console.error);
     }
-}
+};
 
 export default exportCommand;
