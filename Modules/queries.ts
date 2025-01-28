@@ -556,7 +556,7 @@ export const addGuildDonation = async (guildId: string, userId: string, type: "c
 };
 
 export const resetDailyResponses = async (): Promise<void> => {
-    await query(`UPDATE dungeon SET dungeon_responsetime = ARRAY[]::timestamp[] WHERE array_length(dungeon_responsetime, 1) < 200`);
+    await query(`UPDATE users SET dungeon_responsetime = ARRAY[]::timestamp[] WHERE array_length(dungeon_responsetime, 1) < 200`);
 };
 
 export const resetDungeonLimit = async (): Promise<void> => {
