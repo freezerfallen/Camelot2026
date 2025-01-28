@@ -1,12 +1,11 @@
 import { IOutputFormat } from '@runware/sdk-js';
 import { SlashCommand } from '../types';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, Message, MessageFlags } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, MessageFlags } from 'discord.js';
 import { characters } from "../Modules/chars";
 import { formatNumberWithQuotes } from "../Modules/functions";
 import { getUserSchema, updateUsers } from "../Modules/queries";
 import { generateText } from '../Modules/gemini';
 import { generateImages, removeBackground } from '../Modules/runwareDirectApi';
-// import { generateImages } from '../Modules/runware';
 
 type GenType = "weapon" | "armor" | "ring" | "item" | "character";
 
