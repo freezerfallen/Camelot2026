@@ -580,7 +580,7 @@ export interface ITrigger {
     set used(used: number);
 };
 
-export type TriggerEvents = "attack" | "crit" | "ability" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "defend" | "cskill" | "minionDeath" | "minionDeath" | "revival" | "heal";
+export type TriggerEvents = "attack" | "crit" | "counter" | "dodge" | "block" | "miss" | "execute" | "shieldBreak" | "ATK" | "DEF" | "ABILITY" | "CSKILL" | "minionDeath" | "revival" | "heal";
 
 export type TriggerCallback = ((args: { trigger: ITrigger, caster: DetailedStats, target: DetailedStats, casterBuff: Buffs, targetBuff: Buffs, matchStats: MatchStats, options: any; }) => any);
 

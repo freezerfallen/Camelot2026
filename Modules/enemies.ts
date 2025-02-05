@@ -920,7 +920,7 @@ export const raidBosses: enemyInfo[] = [
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
                 // Increases damage when player uses special abilities
-                matchStats.on("ability", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                     if (caster === myStats) {
                         eStats.atk += Math.floor(eStats.atk * 0.1);
                         eStats.md += Math.floor(eStats.md * 0.1);
