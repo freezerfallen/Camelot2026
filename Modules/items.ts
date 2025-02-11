@@ -3160,8 +3160,7 @@ export const items = [
         }, 9999));
     }, "Forces the enemy to deal magic damage. Drains the equivalent of **10%** of the wielders max HP from the enemy and adds it to the wielder after each round. For every **100** MR the wielder has, reduces enemy MD by **2%** (up to **24%**) and MR by **2%** (up to **18%**, max **2x** damage).", "The Sacred Life Salamander is a creature of mystery.  Nobody knows of its intentions, but the fact that its stuck to a twig and invigorated it with life-draining energy. According to a half-torn scripture, the sacred life salamander's existence was of arbitrary happenstance.", "genesis", 687),
 
-
-    //! Rings
+    // Rings
     new ringInfo("Hope's End Signet", "ring", "ring", ["chest"], "<:hopes_end_signet:1333956472186343479>", "https://i.ibb.co/F47BRF93/Hope-s-End-Signet.png", 3, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // On Ability: +20/25/30% MD (2 turns)
@@ -3329,7 +3328,7 @@ export const items = [
                     myStats.equilibriumBand++;
                     if (myStats.equilibriumBand % 4 === 0) {
                         myStats.shield += Math.floor(myStats.maxhp * [0.15, 0.175, 0.2, 0.225, 0.25][level - 1]);
-                        
+
                         return true;
                     };
                 };

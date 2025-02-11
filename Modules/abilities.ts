@@ -13,6 +13,7 @@ type Ability = {
     used: number;
     cost: number;
     desc: string;
+    shortdesc: string;
     [key: string]: any;
     ability?: (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, eStatsFixed: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, message: Message, ...list: any[]) => void;
     passive?: (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
@@ -291,10 +292,10 @@ export const abilities: Record<number, Ability> = {
             // Attack Trigger
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (caster === myStats) {
-                 
+
                     if (myStats.yoimiyaFlames < 20) myStats.yoimiyaFlames++;
                     if (myStats.yoimiyaFlames >= 3) myStats.atk += Math.floor(myStats.atk * 0.225);
-                    
+
                     // Deals additional 12.5% HP damage for 2 rounds each timee
                     if (items[myStats.weapon]?.type === "bow") ebuff.hp.push(new buffInfo("+", -Math.floor(options.damage * 0.125), 2));
 
@@ -796,8 +797,8 @@ export const abilities: Record<number, Ability> = {
                     myStats.sm += 4;
                 } else if (matchStats.round === 6) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 1.3, shieldBreak: true, magicDamage: false, dodge: false, block: false });
-                    eStats.atk -= Math.floor(eStats.atk*0.2);
-                    eStats.md -= Math.floor(eStats.md*0.2);
+                    eStats.atk -= Math.floor(eStats.atk * 0.2);
+                    eStats.md -= Math.floor(eStats.md * 0.2);
                     ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
                     ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * 0.2), 9999));
                 } else {
@@ -929,21 +930,22 @@ export const abilities: Record<number, Ability> = {
         party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             let ally = 0, bombchance = 0.34, vulnrate = 0.2;
             // Get party stampede characters
-            let mates = [6030,6028,6031,6033,6034];
+            let mates = [6030, 6028, 6031, 6033, 6034];
             // Check if party stampede characters buff Vlad.
-            matchStats.partyChars.forEach((pChar:any) => mates.includes(pChar.id) ? ally++ : false);
-            
+            matchStats.partyChars.forEach((pChar: any) => mates.includes(pChar.id) ? ally++ : false);
+
             // Final buff confirmation
             bombchance += 0.33 * ally;
             if (bombchance > 1) bombchance = 1;
-            vulnrate += 0.05*ally;
-            notice.push(`\n<:vladconcern:1284691235868770386> Vladilena has offered her support in this fight! Assisting chance: **${bombchance*100}%**, Vulnerability rate: **${vulnrate*100}%**`);
+            vulnrate += 0.05 * ally;
+            notice.push(`\n<:vladconcern:1284691235868770386> Vladilena has offered her support in this fight! Assisting chance: **${bombchance * 100}%**, Vulnerability rate: **${vulnrate * 100}%**`);
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladcommand:1284691781694390386> **Vladilena Milize**`, { atkMultiplier: 2, magicDamage: true, dodge: false });
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (Math.random() < bombchance) { //? Too strong? If entire party full, then 100% chance to bomb every round
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladcommand:1284691781694390386> **Vladilena Milize**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
-                if (!eStats.vulnerability) eStats.vulnerability = vulnrate;
-            }}, 9999));
+                if (Math.random() < bombchance) { //? Too strong? If entire party full, then 100% chance to bomb every round
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladcommand:1284691781694390386> **Vladilena Milize**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
+                    if (!eStats.vulnerability) eStats.vulnerability = vulnrate;
+                }
+            }, 9999));
         },
     },
     "8189": {
@@ -1392,8 +1394,8 @@ export const abilities: Record<number, Ability> = {
                     myStats.cd += 0.25;
                     if (myStats.cr > 1) myStats.cr = 1;
                 };
-            }, 9999))
-            
+            }, 9999));
+
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (myStats.sm > 25) {
                     myStats.sm -= 25;
@@ -1421,7 +1423,8 @@ export const abilities: Record<number, Ability> = {
             if (dmg && Math.random() < 0.5) {
                 ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 2));
                 notice.push(`\n⚜️ ${char.name} caused bleeding for 2 rounds`);
-        }},
+            }
+        },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.xpboost += 0.2;
             ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 9999));
@@ -2456,7 +2459,7 @@ export const abilities: Record<number, Ability> = {
             // Check if day time for the first 3 skill uses
             if (roundTime > 2 && this.used <= 3) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.followUp({ content: `${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`, ephemeral: true});
+                matchStats.interaction.followUp({ content: `${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`, ephemeral: true });
                 myStats.sm += this.cost;
                 this.used--;
                 return;
@@ -2467,7 +2470,7 @@ export const abilities: Record<number, Ability> = {
                 let mana_cost = (this.used === 3) ? 80 : 50;
                 if (this.cost + mana_cost > myStats.sm) {
                     matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                    matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true});
+                    matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                     myStats.sm += this.cost;
                     this.used--;
                     return;
@@ -2480,19 +2483,20 @@ export const abilities: Record<number, Ability> = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 if (myStats.heat < 0) {
                     this.used--;
-                    return matchStats.interaction.followUp({ content: `${char.name} has no heat to summon a miniature sun!`, ephemeral: true})};
+                    return matchStats.interaction.followUp({ content: `${char.name} has no heat to summon a miniature sun!`, ephemeral: true });
+                };
                 let buffpercent = myStats.heat * 0.01;
                 myStats.cr += buffpercent;
-                if(myStats.cr <= 0.9) {
+                if (myStats.cr <= 0.9) {
                     notice.push(`\n☀️**${char.name}** used Cruel Sun! Increased his critical rate by **${buffpercent * 100}%**`);
-                    mybuff.cr.push(new buffInfo("+", buffpercent, 9999));               
+                    mybuff.cr.push(new buffInfo("+", buffpercent, 9999));
                 } else {
                     const overflowingpercent = Math.floor((myStats.cr - 0.9) * 100) / 100;
                     //Overflowing critical rate -> 1% DEF shred & Crit DMG up to 30%
                     myStats.cr = 0.9;
-                    eStats.def -= Math.min(eStats.def * 0.3, Math.floor(eStats.def * overflowingpercent))
+                    eStats.def -= Math.min(eStats.def * 0.3, Math.floor(eStats.def * overflowingpercent));
                     myStats.cd += Math.min(overflowingpercent, 0.3);
-                    notice.push(`\n☀️**${char.name}** used Cruel Sun! Increased his critical rate by **${Math.floor((buffpercent-overflowingpercent)*100)}%**. Overflowing heat additionally decreased the enemy's DEF and increased his critical damage by **${Math.min(overflowingpercent,0.3)*100}%**!`);
+                    notice.push(`\n☀️**${char.name}** used Cruel Sun! Increased his critical rate by **${Math.floor((buffpercent - overflowingpercent) * 100)}%**. Overflowing heat additionally decreased the enemy's DEF and increased his critical damage by **${Math.min(overflowingpercent, 0.3) * 100}%**!`);
                     ebuff.def.push(new buffInfo("+", -Math.min(eStats.def * 0.3, Math.floor(eStats.def * overflowingpercent)), 9999));
                     mybuff.cd.push(new buffInfo("+", Math.min(overflowingpercent, 0.3), 9999));
                 };
@@ -2518,7 +2522,7 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Scorch Effect
                 matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                    if (caster === eStats) ebuff.hp.push(new buffInfo("+", -Math.floor(eStats.hp * Math.min(0.01 * Math.floor(myStats.heat/10), 0.04)), 2));
+                    if (caster === eStats) ebuff.hp.push(new buffInfo("+", -Math.floor(eStats.hp * Math.min(0.01 * Math.floor(myStats.heat / 10), 0.04)), 2));
                 });
 
                 let roundTime = (matchStats.round - 1) % 6; // day: [0, 1], noon: [2], night: [3, 4, 5];
@@ -2531,17 +2535,18 @@ export const abilities: Record<number, Ability> = {
                     myStats.hp -= Math.floor(myStats.maxhp * 0.04);
                     if (myStats.hp < 0) myStats.hp = 0;
                     myStats.replaceButton.def = { // Divine Attack
-                    "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                        eStats.counter ??= 0;
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}** released his Divine Attack! He`, { atkMultiplier: 1.5, dodge: false, block: false});
-                        myStats.heat += 10;
-                    },
-                };
+                        "run": (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                            eStats.counter ??= 0;
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}** released his Divine Attack! He`, { atkMultiplier: 1.5, dodge: false, block: false });
+                            myStats.heat += 10;
+                        },
+                    };
                     myStats.heat += 1;
                     // Remove altered DEF next turn
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round+1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    delete myStats.replaceButton.def;
-                },1))}
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        delete myStats.replaceButton.def;
+                    }, 1));
+                }
                 else if (roundTime < 3) { // day
                     if (roundTime == 0) notice.push(`\n⛅ It's Daytime!`);
                     myStats.atk += Math.floor(myStats.atk * 0.2);
@@ -4319,8 +4324,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 0,
         burst: true,
-        ddesc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** turns.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know` : Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** turns. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart` : Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** turns with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 turns)\n> - The marking effects will have **+50%** effectiveness.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** turns, with the marking lasting for that turn only.",
-        desc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** turns, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** turns\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 turns)\nIf temple is active, always prioritizes using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** turn every **3** turns",
+        desc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** turns.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know` : Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** turns. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart` : Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** turns with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 turns)\n> - The marking effects will have **+50%** effectiveness.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** turns, with the marking lasting for that turn only.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** turns, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** turns\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 turns)\nIf temple is active, always prioritizes using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** turn every **3** turns",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Nahida
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -4340,7 +4345,7 @@ export const abilities: Record<number, Ability> = {
                 eStats.marked += 2;
                 notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
             }
-            
+
             // Condition: Not in temple state but can summon temple
             else if (myStats.sm >= 110) {
                 // Summons temple for 4 turns
@@ -4348,12 +4353,12 @@ export const abilities: Record<number, Ability> = {
                 myStats.temple = 4;
                 notice.push(`\n✨ Summoned the temple of wisdom for **4** turns!`);
 
-            } else {matchStats.interaction.followUp({ content: `${char.name} does not have sufficient mana to use any of her active abilities`, ephemeral: true })};
+            } else { matchStats.interaction.followUp({ content: `${char.name} does not have sufficient mana to use any of her active abilities`, ephemeral: true }); };
         },
         passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.temple = 0;
             eStats.marked = 0;
-            
+
             // Gains shield equal to DMG taken (Up to 100% of own max HP) + Stun for 2 turn when below 35% HP at the start of the turn
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if ((myStats.hp / myStats.maxhp <= 0.33) && this.burst) {
@@ -4385,17 +4390,17 @@ export const abilities: Record<number, Ability> = {
                 else notice.push(`\n💡 The temple of wisdom withered... ⋆.ೃ࿔*:･`);
 
             }, 9999));
-            
+
             // Gain +6 mana when critting a marked enemy
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (eStats.marked > 0 && caster === myStats) {
                     myStats.sm += 6;
                     if (myStats.temple > 0) myStats.sm += 3;
-                    if (myStats.sm > myStats.mana) myStats.sm = myStats.mana
+                    if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
                 };
             });
         },
-        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {           
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // Marks enemy every 3 turns
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 3 === 0) {
@@ -4411,7 +4416,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (eStats.marked > 0) {
                     myStats.sm += 10;
-                    };
+                };
             });
         },
     },
@@ -4419,8 +4424,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 100,
-        ddesc: "**Total Uses:** `4 (CD: 10 turns)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** DMG with **+25%** critical rate\n> Every hit inflicts **1x** `Frost`\n\nAt the start of her turn, when the enemy has **5** or more `Frost`, consumes **5x** to freeze the enemy for **1** turn. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** turns, lowers body temperature to absolute zero, inflicting **4x** `Frost` every turn, in return losing **10%** current HP every turn, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** turns, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing fixed DMG equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`. This attack cannot be dodged, blocked or countered, and penetrates shields, but will not trigger a critical hit.\n\nWhen in a party, she intervenes every **5** turns, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** turn, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
-        desc: "**Uses**: `4`\n**Cooldown:** `10 turns`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\n- ATTACK is altered to deal **90%** DMG with **+25%** critical rate\n- A successful hit inflicts `Frost`\n\nAt the start of the turn:\n- When the enemy has **5x** `Frost` or more: Consumes **5x** and freezes the enemy for **1** turn\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** turns:\n- Loses **10%** current HP every turn\n- Inflicts **4x** `Frost` every turn\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** turns:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** turns and freezes the enemy for **1** turn\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
+        desc: "**Total Uses:** `4 (CD: 10 turns)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** DMG with **+25%** critical rate\n> Every hit inflicts **1x** `Frost`\n\nAt the start of her turn, when the enemy has **5** or more `Frost`, consumes **5x** to freeze the enemy for **1** turn. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** turns, lowers body temperature to absolute zero, inflicting **4x** `Frost` every turn, in return losing **10%** current HP every turn, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** turns, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing fixed DMG equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`. This attack cannot be dodged, blocked or countered, and penetrates shields, but will not trigger a critical hit.\n\nWhen in a party, she intervenes every **5** turns, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** turn, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
+        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 turns`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\n- ATTACK is altered to deal **90%** DMG with **+25%** critical rate\n- A successful hit inflicts `Frost`\n\nAt the start of the turn:\n- When the enemy has **5x** `Frost` or more: Consumes **5x** and freezes the enemy for **1** turn\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** turns:\n- Loses **10%** current HP every turn\n- Inflicts **4x** `Frost` every turn\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** turns:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** turns and freezes the enemy for **1** turn\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rukia Kuchiki
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -4443,20 +4448,20 @@ export const abilities: Record<number, Ability> = {
 
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 eStats.frost += 4;
-                myStats.hp -= Math.floor(myStats.hp*0.1);
+                myStats.hp -= Math.floor(myStats.hp * 0.1);
                 myStats.mg = 0;
             }, domainLast - 1));
 
             // Fun text before domain ends
             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast - 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                notice.push(`\n✨ *Bankai...*`)
+                notice.push(`\n✨ *Bankai...*`);
             }));
 
             // When Domain Ends
             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.rukiaUsedActive = false;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Hakka no Togame! **${char.name}**`, { atkMultiplier: 2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                
+
                 const shatterdmg = eStats.frozenwounds * 1.5;
                 eStats.hp -= shatterdmg;
                 notice.push(`\n❄️ Frozen wounds shattered and dealt **${shatterdmg}** damage!`);
@@ -4472,12 +4477,12 @@ export const abilities: Record<number, Ability> = {
             eStats.frost = 0;
             eStats.frozenwounds = 0;
             eStats.vulnerability ??= 1;
-            
+
             // Alters ATTACK
             myStats.replaceButton.atk = {
                 emoji: "❄️",
                 run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25});
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25 });
                 },
             };
 
@@ -4487,7 +4492,7 @@ export const abilities: Record<number, Ability> = {
             });
 
             // 5x Frost => Freeze enemy for 1 turn
-            myStats.delayedBuffs.push(new delayedBuffs(0,  (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (eStats.frost >= 5) {
                     eStats.frost -= 5;
                     eStats.vulnerability += 0.2;
@@ -4503,16 +4508,16 @@ export const abilities: Record<number, Ability> = {
                 };
             }, 9999));
         },
-        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {           
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             eStats.vulnerability ??= 0;
-            
+
             // Freezes enemy and boosts cd every 5 turns
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 5 === 0) {
                     eStats.timeFrozen = true;
                     eStats.frozenMessage = "was frozen ❄️";
                     eStats.vulnerability += 0.2;
-                    
+
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         eStats.timeFrozen = false;
                         eStats.vulnerability -= 0.2;

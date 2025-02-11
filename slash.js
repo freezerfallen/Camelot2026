@@ -1,4 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { token, clientId } = require('./config.json');
@@ -10,6 +9,7 @@ const commands = [
 			.setName('ability')
 			.setDescription('Look up characters with abilities')
 			.addStringOption(option => option.setName('character').setDescription('Get more information about a characters ability').setRequired(false))
+			.addBooleanOption(option => option.setName('compact').setDescription('Display in compact view').setRequired(false))
 			.addStringOption(option =>
 				option.setName('filter')
 					.setDescription('Select a filter')
