@@ -23,7 +23,7 @@ const handler: BotHandler = {
         app.use(express.json());
         app.listen(3010);
         // Rank.top Webhook
-        app.post('/rankshop', async (req, res ): Promise<any> => {
+        app.post('/rankshop', async (req, res): Promise<any> => {
             const donation = req.body as RankShopTransaction;
 
             // Check if authorization is valid
