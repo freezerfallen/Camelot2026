@@ -4525,9 +4525,9 @@ export const items = [
         });
 
     }, (level) => `On every 3rd class skill usage, the wearer heals **${[4, 5, 6, 7, 7.5][level - 1]}%** of their max HP and steals **${[3, 3, 4, 4, 5][level - 1]}**💧 from the enemy.`, "The Eclipse Gem radiates an air of mystery and allure, crafted from darkened metals that capture the very essence of the night sky. At its heart lies a mesmerizing azure gemstone that seems to change hues, evoking the feeling of a shimmering moonlit night. Intricate silver swirls wrap around the band, mimicking celestial events, while small gems of varying colors represent the stars. This ring enhances the wearer's stealth and cunning, allowing them to merge with shadows and gain the upper hand in intricate situations. The Eclipse Gem is a coveted artifact for rogues and nocturnal warriors.", "unique", 772),
-    new ringInfo("Radiant Heart", "ring", "ring", ["chest"], "<:radiant_heart:1338658015951327254>", "https://i.ibb.co/kVZ4NPxt/Radiant-Heart.png", 3, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Radiant Heart", "ring", "ring", ["chest"], "<:radiant_heart:1338658015951327254>", "https://i.ibb.co/kVZ4NPxt/Radiant-Heart.png", 5, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        // On Revival: -20/25/30% ATK/MD for enemy (10 turns)
+        // On Revival: ATK/MD debuff for enemy (10 turns)
         matchStats.on("revival", {
             maxUsage: 1,
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
