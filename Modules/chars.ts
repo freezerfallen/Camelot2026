@@ -22715,8 +22715,6 @@ export const characters: charInfo[] = [
     new charInfo("Mari EX", [], anime[242], "F", "https://i.ibb.co/LJYhqbW/Mari-EX.gif", 22610, "EX"),
     new charInfo("Frieren EX", [], anime[457], "F", "https://i.ibb.co/jfKBhHr/Frieren-EX.gif", 22611, "EX"),
     new charInfo("Itachi Uchiha EX", ["Itachi EX"], anime[252], "M", "https://i.ibb.co/vkQ2td9/Itachi-EX.gif", 22612, "EX"),
-
-
     new charInfo("Tsumiki Miniwa", [], anime[579], "F", "https://i.ibb.co/CQy9PPF/c.png", 22613, "S"),
     new charInfo("Io Otonashi", [], anime[579], "M", "https://i.ibb.co/cvc2s6Z/c.png", 22614, "A"),
     new charInfo("Mayoi Katase", [], anime[579], "F", "https://i.ibb.co/C5k0v5r/c.png", 22615, "A"),
@@ -22747,7 +22745,7 @@ export const characters: charInfo[] = [
     new charInfo("Gabu Samejima", [], anime[581], "M", "https://i.ibb.co/Ks6t29R/c.png", 22640, "B"),
     new charInfo("Kakeru Sakamaki", [], anime[581], "M", "https://i.ibb.co/sWp3MJg/c.png", 22641, "C"),
     new charInfo("Hosuke", [], anime[581], "M", "https://i.ibb.co/kShmYGP/c.png", 22642, "C"),
-    new charInfo("Yuki (IJ)" , [], anime[581], "F", "https://i.ibb.co/Y8dzk6C/c.png", 22643, "C"),
+    new charInfo("Yuki (IJ)", [], anime[581], "F", "https://i.ibb.co/Y8dzk6C/c.png", 22643, "C"),
     new charInfo("Arthur (IJ)", ["The Painter"], anime[581], "M", "https://i.ibb.co/tDB2zHs/c.png", 22644, "D"),
     new charInfo("Koei", [], anime[581], "M", "https://i.ibb.co/0ZQJD23/c.png", 22645, "D"),
     new charInfo("Ginko Sora", [], anime[582], "F", "https://i.ibb.co/J5W4PWT/c.png", 22646, "SS"),
@@ -23224,3 +23222,15 @@ characters.forEach((e, i) => {
     while (len--) if (links[len - 1] === links[len]) res += links[len--] + "\n";
     if (res) throw new Error("WARNING! Duplicate links: " + res);
 }
+
+// Print
+// {
+//     let totalChars = 0, totalAnime = 0;
+//     for (let i = 579; i < anime.length; i++) {
+//         const numberOfChars = characters.filter(char => char.animeInfo.id === anime[i].id).length;
+//         console.log(`  - **${anime[i].name}** (${numberOfChars} chars)`);
+//         totalChars += numberOfChars;
+//         totalAnime++;
+//     };
+//     console.log(`\n\nTotal anime: ${totalAnime}\nTotal characters: ${totalChars}`);
+// }
