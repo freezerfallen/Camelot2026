@@ -577,7 +577,7 @@ const exportCommand: SlashCommand = {
 
                     continue;
                 };
-                
+
                 /* //! 2B Something
                 // Nier Pod Programmes
                 if (itemChoice.toLowerCase().startsWith(`prog`)) {

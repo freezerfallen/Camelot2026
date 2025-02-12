@@ -771,10 +771,10 @@ export const abilities: Record<number, Ability> = {
 
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used Gungnir! He`, { atkMultiplier: damageMultiplier, shieldBreak: true, magicDamage: false, dodge: false, block: false });
 
-                eStats.atk -= Math.floor(eStats.atk * 0.2);
-                eStats.md -= Math.floor(eStats.md * 0.2);
                 ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
                 ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * 0.2), 9999));
+                eStats.atk -= Math.floor(eStats.atk * 0.2);
+                eStats.md -= Math.floor(eStats.md * 0.2);
             };
         },
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -797,10 +797,10 @@ export const abilities: Record<number, Ability> = {
                     myStats.sm += 4;
                 } else if (matchStats.round === 6) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 1.3, shieldBreak: true, magicDamage: false, dodge: false, block: false });
-                    eStats.atk -= Math.floor(eStats.atk * 0.2);
-                    eStats.md -= Math.floor(eStats.md * 0.2);
                     ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
                     ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * 0.2), 9999));
+                    eStats.atk -= Math.floor(eStats.atk * 0.2);
+                    eStats.md -= Math.floor(eStats.md * 0.2);
                 } else {
                     myStats.cr += 0.15;
                     if (myStats.cr > 1) myStats.cr = 1;
@@ -922,29 +922,27 @@ export const abilities: Record<number, Ability> = {
         usage: 0,
         used: 0,
         cost: 100,
-        desc: "**Total Usage**: `0`\n**Role**: `Support`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **34%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy is marked with a **20%** vulnerability debuff (does not stack with other vulnerability sources), taking more damage from attacks.\n\nMoreover, for every ally that is a **S** or **SS** character (excluding herself) in her anime series (86 -Eighty Six-), her chance of intervention in that fight is increased by **33%** (up to **100%**), her vulnerability debuff is also increased by **5%**.",
-        shortdesc: "**Uses**: `0`\n**Role**: `Sub-DPS (Additional Attack, Vulnerability)`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG upon entering battle\n\n__**Party**__ (👥)\n- Deals **150%** undodgeable DMG to the enemy once upon entering battle\n- **34%** chance to intervene every turn to deal **120%** DMG\n- Enemy inflicted with a **20%** vulnerability debuff\n\nFor every S or SS character excluding herself in her anime (86 - Eighty Six -):\n- **+33%** intervention chance\n- **+5%** vulnerability debuff",
+        desc: "**Total Usage**: `0`\n**Role**: `Support/Sub-DPS`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **25%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy is marked with a **20%** vulnerability debuff (does not stack with other vulnerability sources), taking more damage from attacks.\n\nMoreover, for each **S** or **SS** character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself), Vladilena's chance of intervention is increased by an additional **+25%** (up to **100%**).",
+        shortdesc: "**Uses**: `0`\n**Role**: `Support/Sub-DPS`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n\n__**Party**__ (👥)\n- Applies a **20%** vulnerability debuff to the enemy\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n- **25%** chance to intervene every round and deal **120%** DMG\n  - The chance to intervene is increased by an additional **+25%** for each S or SS character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself)",
         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladconcern:1284691235868770386> Don't leave me behind... **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Don't leave me behind... **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
         },
         party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            let ally = 0, bombchance = 0.34, vulnrate = 0.2;
-            // Get party stampede characters
-            let mates = [6030, 6028, 6031, 6033, 6034];
-            // Check if party stampede characters buff Vlad.
-            matchStats.partyChars.forEach((pChar: any) => mates.includes(pChar.id) ? ally++ : false);
+            const name = pStats.name;
 
-            // Final buff confirmation
-            bombchance += 0.33 * ally;
-            if (bombchance > 1) bombchance = 1;
-            vulnrate += 0.05 * ally;
-            notice.push(`\n<:vladconcern:1284691235868770386> Vladilena has offered her support in this fight! Assisting chance: **${bombchance * 100}%**, Vulnerability rate: **${vulnrate * 100}%**`);
-            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladcommand:1284691781694390386> **Vladilena Milize**`, { atkMultiplier: 2, magicDamage: true, dodge: false });
+            const mates = [6030, 6028, 6031, 6033, 6034];
+            const allyCount = matchStats.partyChars.reduce((count: number, pChar: charInfo) => mates.includes(pChar.id) ? count + 1 : count, 0);
+            const bombChance = 0.25 * (allyCount + 1);
+
+            // Apply vulnerability
+            eStats.vulnerability = Math.max(eStats.vulnerability, 0.2);
+
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
+
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (Math.random() < bombchance) { //? Too strong? If entire party full, then 100% chance to bomb every round
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vladcommand:1284691781694390386> **Vladilena Milize**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
-                    if (!eStats.vulnerability) eStats.vulnerability = vulnrate;
-                }
+                if (Math.random() < bombChance) {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 1.2, magicDamage: true, dodge: false });
+                };
             }, 9999));
         },
     },
@@ -1175,6 +1173,121 @@ export const abilities: Record<number, Ability> = {
                 myStats.md = Math.floor(myStats.md * boost);
                 myStats.sm -= Math.min(myStats.sm - 25, 125);
                 notice.push(`\n✨ **${char.name}** used his Final Getsuga Tensho! Increased ATK and MD by **${Math.floor(boost * 100)}%** and reduced enemy block rate to **0%** for 4 rounds.`);
+            };
+        },
+    },
+    "9004": {
+        usage: 4,
+        used: 0,
+        cost: 100,
+        desc: "**Total Uses:** `4 (CD: 10 turns)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** DMG with **+25%** critical rate\n> Every hit inflicts **1x** `Frost`\n\nAt the start of her turn, when the enemy has **5** or more `Frost`, consumes **5x** to freeze the enemy for **1** turn. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** turns, lowers body temperature to absolute zero, inflicting **4x** `Frost` every turn, in return losing **10%** current HP every turn, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** turns, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing fixed DMG equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`. This attack cannot be dodged, blocked or countered, and penetrates shields, but will not trigger a critical hit.\n\nWhen in a party, she intervenes every **5** turns, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** turn, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
+        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 turns`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\n- ATTACK is altered to deal **90%** DMG with **+25%** critical rate\n- A successful hit inflicts `Frost`\n\nAt the start of the turn:\n- When the enemy has **5x** `Frost` or more: Consumes **5x** and freezes the enemy for **1** turn\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** turns:\n- Loses **10%** current HP every turn\n- Inflicts **4x** `Frost` every turn\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** turns:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** turns and freezes the enemy for **1** turn\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Rukia Kuchiki
+            matchStats.turn = matchStats.turnSkill ? 0 : 1;
+
+            if (this.pause > matchStats.round) {
+                matchStats.interaction.followUp({ content: `Rukia needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                this.used--;
+                myStats.sm += this.cost;
+                return;
+            };
+
+            const domainLast = 4;
+            this.pause = matchStats.round + 10;
+            myStats.rukiaUsedActive = true;
+
+            // During Domain
+            eStats.frost += 4;
+            myStats.hp -= Math.floor(myStats.hp * 0.1);
+            myStats.mg = 0;
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                eStats.frost += 4;
+                myStats.hp -= Math.floor(myStats.hp * 0.1);
+                myStats.mg = 0;
+            }, domainLast - 1));
+
+            // Fun text before domain ends
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast - 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                notice.push(`\n✨ *Bankai...*`);
+            }));
+
+            // When Domain Ends
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                myStats.rukiaUsedActive = false;
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Hakka no Togame! **${char.name}**`, { atkMultiplier: 2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+
+                const shatterdmg = eStats.frozenwounds * 1.5;
+                eStats.hp -= shatterdmg;
+                notice.push(`\n❄️ Frozen wounds shattered and dealt **${shatterdmg}** damage!`);
+                if (eStats.hp < 0) eStats.hp = 0;
+                eStats.frozenwounds = 0;
+            }));
+
+            notice.push(`\n✨ **${char.name}** lowered her temperature to absolute zero for ${domainLast} rounds.`);
+        },
+        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+
+            myStats.rukiaUsedActive = false;
+            eStats.frost = 0;
+            eStats.frozenwounds = 0;
+            eStats.vulnerability ??= 1;
+
+            // Alters ATTACK
+            myStats.replaceButton.atk = {
+                emoji: "❄️",
+                run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25 });
+                },
+            };
+
+            // Inflict Frost On Attack
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) myStats.frost += 1;
+            });
+
+            // 5x Frost => Freeze enemy for 1 turn
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (eStats.frost >= 5) {
+                    eStats.frost -= 5;
+                    eStats.vulnerability += 0.2;
+                    notice.push(`\n🧊 Consumed **5x** Frost to freeze the enemy!`);
+                    eStats.timeFrozen = true;
+                    eStats.frozenMessage = "was frozen";
+
+                    // When freeze is over
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 2, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        eStats.timeFrozen = false;
+                        eStats.vulnerability -= 0.2;
+                    }));
+                };
+            }, 9999));
+        },
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.vulnerability ??= 0;
+
+            // Freezes enemy and boosts cd every 5 turns
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 5 === 0) {
+                    eStats.timeFrozen = true;
+                    eStats.frozenMessage = "was frozen ❄️";
+                    eStats.vulnerability += 0.2;
+
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        eStats.timeFrozen = false;
+                        eStats.vulnerability -= 0.2;
+                    }));
+                };
+            }, 9999));
+
+            // If Ichigo Kurosaki/Byakuya Kuchiki in party: Evades first 3 lethal hits
+            if (["Ichigo Kurosaki", "Byakuya Kuchiki"].includes(myStats.name)) {
+                // SETUP VAR
+                myStats.evadeDeathStrike ??= 0;
+                myStats.evadeDeathChance = 1;
+
+                myStats.evadeDeathStrike += 3;
             };
         },
     },
@@ -2100,7 +2213,7 @@ export const abilities: Record<number, Ability> = {
             if (this.pause > matchStats.round) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
-                myStats.sm += 50;
+                myStats.sm += this.cost;
                 return matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
             };
             this.pause = matchStats.round + 5;
@@ -2260,6 +2373,106 @@ export const abilities: Record<number, Ability> = {
                     }, 3));
                 };
             }, 9999, 1));
+        },
+    },
+    "16199": {
+        usage: 9999,
+        used: 0,
+        cost: 0,
+        burst: true,
+        desc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** turns.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know`: Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** turns. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart`: Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** turns with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 turns)\n> - The marking effects will have **+50%** effectiveness.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** turns, with the marking lasting for that turn only.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** turns, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** turns\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 turns)\nIf temple is active, always prioritizes using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** turn every **3** turns",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Nahida
+            matchStats.turn = matchStats.turnSkill ? 0 : 1;
+
+            // Condition: When in temple state and can mark enemy
+            if (myStats.sm >= 40 && myStats.temple > 0) {
+                // Mark enemy (cheaper)
+                myStats.sm -= 40;
+                eStats.marked += 4;
+                notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
+            }
+            // || myStats.sm >= 60 && myStats.sm < 100 && myStats.temple == 0
+            // Condition: When not in temple state but still can mark enemy
+            else if (myStats.sm >= 80 && myStats.sm < 110) {
+                // Mark enemy
+                myStats.sm -= 80;
+                eStats.marked += 2;
+                notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
+            }
+
+            // Condition: Not in temple state but can summon temple
+            else if (myStats.sm >= 110) {
+                // Summons temple for 4 turns
+                myStats.sm -= 110;
+                myStats.temple = 4;
+                notice.push(`\n✨ Summoned the temple of wisdom for **4** turns!`);
+
+            } else { matchStats.interaction.followUp({ content: `${char.name} does not have sufficient mana to use any of her active abilities`, ephemeral: true }); };
+        },
+        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            myStats.temple = 0;
+            eStats.marked = 0;
+
+            // Gains shield equal to DMG taken (Up to 100% of own max HP) + Stun for 2 turn when below 35% HP at the start of the turn
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if ((myStats.hp / myStats.maxhp <= 0.33) && this.burst) {
+                    const shgain = Math.min(myStats.damageTaken, myStats.maxhp);
+                    notice.push(`\n✧ Data collection is complete! ${char.name} gained **${shgain}** shield ✧`);
+                    myStats.shield += shgain;
+                    eStats.timeFrozen = true;
+                    eStats.frozenMessage = "was overwhelmed ⋆.ೃ࿔";
+                    this.burst = false;
+
+                    // When stun is over
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 2, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        eStats.timeFrozen = false;
+                    }));
+                };
+
+                // Marked enemies (Nahida)
+                if (eStats.marked > 0) {
+                    eStats.marked--;
+                    let multiplier = 1;
+                    if (myStats.temple > 0) multiplier = 1.5;
+                    myStats.cr += 0.3 * multiplier;
+                    if (myStats.cr > 1) myStats.cr = 1;
+                    eStats.def -= Math.floor(eStats.def * 0.15 * multiplier);
+                    eStats.mr -= Math.floor(eStats.mr * 0.15 * multiplier);
+                } else notice.push(`\n𓇬 The enemy lost the mark of Skandha...`);
+
+                if (myStats.temple > 0) myStats.temple--;
+                else notice.push(`\n💡 The temple of wisdom withered... ⋆.ೃ࿔*:･`);
+            }, 9999));
+
+            // Gain +6 mana when critting a marked enemy
+            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (eStats.marked > 0 && caster === myStats) {
+                    myStats.sm += 6;
+                    if (myStats.temple > 0) myStats.sm += 3;
+                    if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                };
+            });
+        },
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // Marks enemy every 3 turns
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 3 === 0) {
+                    // Marked enemy
+                    myStats.cr += 0.3;
+                    if (myStats.cr > 1) myStats.cr = 1;
+                    eStats.def -= Math.floor(eStats.def * 0.15);
+                    eStats.mr -= Math.floor(eStats.mr * 0.15);
+                };
+            }, 9999));
+
+            // Gain +10 mana when critting a marked enemy
+            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (eStats.marked > 0) {
+                    myStats.sm += 10;
+                };
+            });
         },
     },
     "17115": {
@@ -2816,9 +3029,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.xpboost += 0.2;
 
             // Heals 5% of max HP per round
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05), {});
-            }, 9999));
+            mybuff.hp.push(new buffInfo("+", Math.floor(myStats.maxhp * 0.05), 9999));
 
             // Revives once with 40% HP
             myStats.maxRevivals = 1;
@@ -2881,12 +3092,10 @@ export const abilities: Record<number, Ability> = {
         cost: 60,
         stacks: 1,
         pause: -5,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `60`\\💧\n**Timeout**: `No`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? Every turn, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to an endurance mode for **4 rounds**. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **10 rounds**.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **5 rounds**, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 turns`\n**Cost**: `60 💧`\n**Timeout**: `No`\n**Role**: `DPS/Tank (DMG-boost, Mitigation, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **4** turns\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **10** turns\n\n__**Party**__ (👥)\nEvery **5** turns:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? Every turn, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to an endurance mode for **4 rounds**. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **10 rounds**.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **5 rounds**, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 turns`\n**Cost**: `60 💧`\n**Timeout**: `yes`\n**Role**: `DPS/Tank (DMG-boost, Mitigation, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **4** turns\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **10** turns\n\n__**Party**__ (👥)\nEvery **5** turns:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Gintoki EX
-
-            matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (this.pause > matchStats.round) {
                 myStats.sm += this.cost;
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -4202,7 +4411,6 @@ export const abilities: Record<number, Ability> = {
         shortdesc: "**Uses**: `1`\n**Cost**: `all` 💧 + `40%` Max HP\n**Timeout**: `Yes`\n**Role**: `Self-Sacrifice`\n\n__**Passive**__\n- Begins with **70%** of Max HP\n- **+20%** Dodge rate\n\n__**Active**__ (✨) : Tsukuyomi\n- Loses **40%** (own) HP\n- Stuns enemy for **3** turns.\n\nAfter dying once, revives with the following characteristics, and abilities get replaced.\n\n**Uses**: `1`\n**Cost**: `50%` 💧 (own) + `50%` 💧 (enemy)\n**Timeout**: `No`\n**Role**: `DPS`\n\n__**Passive**__\n- Revives with **100%** max HP\n- **+20%** ATK/MD\n- ATTACK is altered to dealing **66%** DMG + **10%** of enemy Max HP as DMG (Max: DMG dealt with the first 66%)\n\n- DEFEND is altered to: **+30%** DMG mitigation for **2** turns (can still block).\n\n __**Active**__ (✨) : Kotoamatsukami\n- Stuns the enemy **1** turn (max. **5**) for every **30** Mana consumed.\n- For each turn stunned, **-3%** enemy DEF/MR (permanently)",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Itachi EX
-
             if (myStats.revivedTotal < 1) {
                 // Tsukuyomi
                 if (this.used > 1) {
@@ -4317,222 +4525,6 @@ export const abilities: Record<number, Ability> = {
 
                 };
             }, 9999, 1));
-        },
-    },
-    "16199": {
-        usage: 9999,
-        used: 0,
-        cost: 0,
-        burst: true,
-        desc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** turns.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know` : Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** turns. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart` : Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** turns with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 turns)\n> - The marking effects will have **+50%** effectiveness.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** turns, with the marking lasting for that turn only.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** turns, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** turns\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 turns)\nIf temple is active, always prioritizes using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** turn every **3** turns",
-        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Nahida
-            matchStats.turn = matchStats.turnSkill ? 0 : 1;
-
-            // Condition: When in temple state and can mark enemy
-            if (myStats.sm >= 40 && myStats.temple > 0) {
-                // Mark enemy (cheaper)
-                myStats.sm -= 40;
-                eStats.marked += 4;
-                notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
-            }
-            // || myStats.sm >= 60 && myStats.sm < 100 && myStats.temple == 0
-            // Condition: When not in temple state but still can mark enemy
-            else if (myStats.sm >= 80 && myStats.sm < 110) {
-                // Mark enemy
-                myStats.sm -= 80;
-                eStats.marked += 2;
-                notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
-            }
-
-            // Condition: Not in temple state but can summon temple
-            else if (myStats.sm >= 110) {
-                // Summons temple for 4 turns
-                myStats.sm -= 110;
-                myStats.temple = 4;
-                notice.push(`\n✨ Summoned the temple of wisdom for **4** turns!`);
-
-            } else { matchStats.interaction.followUp({ content: `${char.name} does not have sufficient mana to use any of her active abilities`, ephemeral: true }); };
-        },
-        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            myStats.temple = 0;
-            eStats.marked = 0;
-
-            // Gains shield equal to DMG taken (Up to 100% of own max HP) + Stun for 2 turn when below 35% HP at the start of the turn
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if ((myStats.hp / myStats.maxhp <= 0.33) && this.burst) {
-                    const shgain = Math.min(myStats.damageTaken, myStats.maxhp);
-                    notice.push(`\n✧ Data collection is complete! ${char.name} gained **${shgain}** shield ✧`);
-                    myStats.shield += shgain;
-                    eStats.timeFrozen = true;
-                    eStats.frozenMessage = "was overwhelmed ⋆.ೃ࿔";
-                    this.burst = false;
-
-                    // When stun is over
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 2, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                        eStats.timeFrozen = false;
-                    }));
-                };
-
-                // Marked enemies (Nahida)
-                if (eStats.marked > 0) {
-                    eStats.marked--;
-                    let multiplier = 1;
-                    if (myStats.temple > 0) multiplier = 1.5;
-                    myStats.cr += 0.3 * multiplier;
-                    if (myStats.cr > 1) myStats.cr = 1;
-                    eStats.def -= Math.floor(eStats.def * 0.15 * multiplier);
-                    eStats.mr -= Math.floor(eStats.mr * 0.15 * multiplier);
-                } else notice.push(`\n𓇬 The enemy lost the mark of Skandha...`);
-
-                if (myStats.temple > 0) myStats.temple--;
-                else notice.push(`\n💡 The temple of wisdom withered... ⋆.ೃ࿔*:･`);
-
-            }, 9999));
-
-            // Gain +6 mana when critting a marked enemy
-            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (eStats.marked > 0 && caster === myStats) {
-                    myStats.sm += 6;
-                    if (myStats.temple > 0) myStats.sm += 3;
-                    if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                };
-            });
-        },
-        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            // Marks enemy every 3 turns
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (matchStats.round % 3 === 0) {
-                    // Marked enemy
-                    myStats.cr += 0.3;
-                    if (myStats.cr > 1) myStats.cr = 1;
-                    eStats.def -= Math.floor(eStats.def * 0.15);
-                    eStats.mr -= Math.floor(eStats.mr * 0.15);
-                };
-            }, 9999));
-
-            // Gain +10 mana when critting a marked enemy
-            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (eStats.marked > 0) {
-                    myStats.sm += 10;
-                };
-            });
-        },
-    },
-    "9004": {
-        usage: 4,
-        used: 0,
-        cost: 100,
-        desc: "**Total Uses:** `4 (CD: 10 turns)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** DMG with **+25%** critical rate\n> Every hit inflicts **1x** `Frost`\n\nAt the start of her turn, when the enemy has **5** or more `Frost`, consumes **5x** to freeze the enemy for **1** turn. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** turns, lowers body temperature to absolute zero, inflicting **4x** `Frost` every turn, in return losing **10%** current HP every turn, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** turns, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing fixed DMG equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`. This attack cannot be dodged, blocked or countered, and penetrates shields, but will not trigger a critical hit.\n\nWhen in a party, she intervenes every **5** turns, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** turn, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
-        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 turns`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\n- ATTACK is altered to deal **90%** DMG with **+25%** critical rate\n- A successful hit inflicts `Frost`\n\nAt the start of the turn:\n- When the enemy has **5x** `Frost` or more: Consumes **5x** and freezes the enemy for **1** turn\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** turns:\n- Loses **10%** current HP every turn\n- Inflicts **4x** `Frost` every turn\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** turns:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** turns and freezes the enemy for **1** turn\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
-        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Rukia Kuchiki
-            matchStats.turn = matchStats.turnSkill ? 0 : 1;
-
-            if (this.pause > matchStats.round) {
-                matchStats.interaction.followUp({ content: `Rukia needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-                this.used--;
-                myStats.sm += this.cost;
-                return;
-            };
-
-            const domainLast = 4;
-            this.pause = matchStats.round + 10;
-            myStats.rukiaUsedActive = true;
-
-            // During Domain
-            eStats.frost += 4;
-            myStats.hp -= Math.floor(myStats.hp * 0.1);
-            myStats.mg = 0;
-
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                eStats.frost += 4;
-                myStats.hp -= Math.floor(myStats.hp * 0.1);
-                myStats.mg = 0;
-            }, domainLast - 1));
-
-            // Fun text before domain ends
-            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast - 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                notice.push(`\n✨ *Bankai...*`);
-            }));
-
-            // When Domain Ends
-            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.rukiaUsedActive = false;
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Hakka no Togame! **${char.name}**`, { atkMultiplier: 2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-
-                const shatterdmg = eStats.frozenwounds * 1.5;
-                eStats.hp -= shatterdmg;
-                notice.push(`\n❄️ Frozen wounds shattered and dealt **${shatterdmg}** damage!`);
-                if (eStats.hp < 0) eStats.hp = 0;
-                eStats.frozenwounds = 0;
-            }));
-
-            notice.push(`\n✨ **${char.name}** lowered her temperature to absolute zero for ${domainLast} rounds.`);
-        },
-        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-
-            myStats.rukiaUsedActive = false;
-            eStats.frost = 0;
-            eStats.frozenwounds = 0;
-            eStats.vulnerability ??= 1;
-
-            // Alters ATTACK
-            myStats.replaceButton.atk = {
-                emoji: "❄️",
-                run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25 });
-                },
-            };
-
-            // Inflict Frost On Attack
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (caster === myStats) myStats.frost += 1;
-            });
-
-            // 5x Frost => Freeze enemy for 1 turn
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (eStats.frost >= 5) {
-                    eStats.frost -= 5;
-                    eStats.vulnerability += 0.2;
-                    notice.push(`\n🧊 Consumed **5x** Frost to freeze the enemy!`);
-                    eStats.timeFrozen = true;
-                    eStats.frozenMessage = "was frozen";
-
-                    // When freeze is over
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 2, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                        eStats.timeFrozen = false;
-                        eStats.vulnerability -= 0.2;
-                    }));
-                };
-            }, 9999));
-        },
-        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.vulnerability ??= 0;
-
-            // Freezes enemy and boosts cd every 5 turns
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (matchStats.round % 5 === 0) {
-                    eStats.timeFrozen = true;
-                    eStats.frozenMessage = "was frozen ❄️";
-                    eStats.vulnerability += 0.2;
-
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                        eStats.timeFrozen = false;
-                        eStats.vulnerability -= 0.2;
-                    }));
-                };
-            }, 9999));
-
-            // If Ichigo Kurosaki/Byakuya Kuchiki in party: Evades first 3 lethal hits
-            if (["Ichigo Kurosaki", "Byakuya Kuchiki"].includes(myStats.name)) {
-                // SETUP VAR
-                myStats.evadeDeathStrike ??= 0;
-                myStats.evadeDeathChance = 1;
-
-                myStats.evadeDeathStrike += 3;
-            };
         },
     },
 };

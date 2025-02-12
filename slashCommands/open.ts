@@ -156,8 +156,13 @@ const exportCommand: SlashCommand = {
                 let grade = weightedRandom(chest.dropratesFull);
                 if (chest.id === 458 && j % 6 === 0 && ++stats.genesispity >= 24) grade = "genesis";
                 if (chest.id === 458 && grade === "genesis") stats.genesispity = 0;
+
                 const fItems = items.filter((e) => e.obtain.includes("chest") && e.grade === grade);
-                drops.push(fItems[Math.floor(Math.random() * fItems.length)]);
+                const fIds = fItems.reduce((acc, e) => {
+                    if (stats.itemwishlist.includes(e.id)) return [...acc, e.id, e.id];
+                    return [...acc, e.id];
+                }, [] as number[]);
+                drops.push(fItems[fIds[Math.floor(Math.random() * fIds.length)]]);
 
                 // Insert new weapon
                 const drop = await insertNewWeapon(interaction.user.id, drops[j].id, drops[j].category);
