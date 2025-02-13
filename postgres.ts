@@ -460,7 +460,6 @@ async function createTriggers() {
 };
 
 async function alterTables() {
-    // This function can be used for migrations
     // Example:
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
@@ -482,6 +481,15 @@ async function dropTables() {
     // await query('DROP TABLE IF EXISTS raids CASCADE');
 };
 
+async function resetDatabase(migrate: boolean = false) {
+    // await dropTables();
+    // await createTables();
+    // await createIndexes();
+    // await alterTables();
+    // await createTriggers();
+    // // if (migrate) await migrateData();
+};
+
 // Self-executing async function to initialize database
 (async () => {
     try {
@@ -497,3 +505,8 @@ async function dropTables() {
         console.error('Database initialization failed:', error);
     };
 })();
+
+
+//* Start migration
+// import { migrateData } from './migration';
+// migrateData().catch(console.error);

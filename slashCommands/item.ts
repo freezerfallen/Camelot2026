@@ -742,7 +742,7 @@ const exportCommand: SlashCommand = {
 
             const fItem = searchItem(choice, interaction);
             if (!fItem) return;
-            if (!(fItem.category === "armor" || fItem.category === "weapon")) return interaction.reply(`You can only wish for weapons or armor pieces`);
+            if (!(fItem.category === "armor" || fItem.category === "weapon" || fItem.category === "ring")) return interaction.reply(`You can only wish for weapons, armor pieces or rings`);
 
             const newWishList = [fItem.id, ...wished.filter((item) => (item.grade !== fItem.grade) && (item.id !== fItem.id)).map((item) => item.id)];
 

@@ -835,6 +835,17 @@ const commands = [
 							{ name: 'detailed', value: 'detailed' },
 						)
 				))
+			.addSubcommand((subcommand) => subcommand.setName('ring').setDescription('See your ring inventory')
+				.addUserOption(option => option.setName('user').setDescription('Select a user').setRequired(false))
+				.addIntegerOption(option => option.setName('page').setDescription('Select a page to jump to').setRequired(false))
+				.addStringOption(option =>
+					option.setName('flag')
+						.setDescription('Choose how to display the items')
+						.setRequired(false)
+						.addChoices(
+							{ name: 'detailed', value: 'detailed' },
+						)
+				))
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
