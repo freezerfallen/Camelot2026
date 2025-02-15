@@ -4220,10 +4220,8 @@ export const items = [
                 if (caster === myStats) {
                     // Remove old debuff
                     casterBuff.hp = casterBuff.hp.filter((buff) => buff.id !== hpDebuff.id);
-
                     // Push new buff
                     casterBuff.hp.push(new buffInfo("+", amount, 9999));
-
                     return true;
                 };
             },
