@@ -3500,7 +3500,7 @@ export const items = [
         //     myStats.ringOfRebound = myStats.shield;
         // }, 9999));
 
-    }, (level) => `Upon gaining a shield, enters the state of "Rebounce" for 1 turn, countering any damage taken.`, "The Arcane Rebound is a masterpiece of magical craftsmanship, adorned with intricate blue filigree that glimmers like stars against a dark backdrop. The ring is smooth and slightly curved, resembling a spellcaster's focus tool, with an ethereal light emanating from the core. Tiny arcs of electricity flicker around the band, forming patterns reminiscent of a magical glyph, enhancing the wielder's spell defense. When activated, it can absorb hostile magic and redirect it, turning an enemy's strength against them. The ring's unique design highlights its functionality, making it the ideal choice for scholars and sorcerers alike, ensuring that their arcane power never wavers.", "unique", 710),
+    }, (level) => `"Upon gaining a shield, enters the state of "Rebounce" for 1 turn, countering any damage taken".`, "The Arcane Rebound is a masterpiece of magical craftsmanship, adorned with intricate blue filigree that glimmers like stars against a dark backdrop. The ring is smooth and slightly curved, resembling a spellcaster's focus tool, with an ethereal light emanating from the core. Tiny arcs of electricity flicker around the band, forming patterns reminiscent of a magical glyph, enhancing the wielder's spell defense. When activated, it can absorb hostile magic and redirect it, turning an enemy's strength against them. The ring's unique design highlights its functionality, making it the ideal choice for scholars and sorcerers alike, ensuring that their arcane power never wavers.", "unique", 710),
     new ringInfo("Lucky Star Band", "ring", "ring", ["raid"], "<:lucky_star_band:1334250598849052744>", "https://i.ibb.co/fz6N3qv9/Lucky-Star-Band.png", 5, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Duo
 
         // On enemy dodge: 30/35/40/45/50% chance to attack twice
@@ -3727,14 +3727,14 @@ export const items = [
     new ringInfo("Deathbloom Ring", "ring", "ring", ["raid"], "<:deathbloom_ring:1336031521181532280>", "https://i.ibb.co/Nn74bhyg/Deathbloom-Ring.png", 1, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         // // On own heal: negate enemy heal for 1 turn
-        // matchStats.on("heal", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-        //     if (caster === myStats && options.caster === myStats) {
-        //         myStats.negateHeal = 1;
-        //         matchStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        //             myStats.negateHeal = 0;
-        //         }));
-        //     };
-        // });
+        matchStats.on("heal", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats && options.caster === myStats) {
+                myStats.negateHeal = 1;
+                matchStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    myStats.negateHeal = 0;
+                }));
+            };
+        });
 
     }, (level) => `If you recover HP, negates the healing of the enemy that turn.`, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 729),
     new ringInfo("Crimson Pulse", "ring", "ring", ["raid"], "<:crimson_pulse:1336032778680143942>", "https://i.ibb.co/ksrQz96V/Crimson-Pulse.png", 7, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
@@ -3818,7 +3818,7 @@ export const items = [
             myStats.md += Math.floor(myStats.md * mgScale);
         }, 9999));
 
-    }, (level) => `Increases your attack and magic damage by **${[0.25, 0.5, 0.1, 0.125][level - 1]}%** for every **1** mana generation stat (up to **${[10, 10, 15, 20][level - 1]}%**).`, "The Mystic Wave ring is a masterwork of blue and silver, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A deep sapphire rests at its zenith, glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control water and manipulate tides, providing protection against fiery adversaries. When in water, the sapphire glows brightly, summoning a protective wave that can shield the wearer from harm. It is a favored ring among ocean mages and water elementals.", "legendary", 734),
+    }, (level) => `Increases your attack and magic damage by **${[0.25, 0.5, 1, 1.25][level - 1]}%** for every **1** mana generation stat (up to **${[10, 10, 15, 20][level - 1]}%**).`, "The Mystic Wave ring is a masterwork of blue and silver, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A deep sapphire rests at its zenith, glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control water and manipulate tides, providing protection against fiery adversaries. When in water, the sapphire glows brightly, summoning a protective wave that can shield the wearer from harm. It is a favored ring among ocean mages and water elementals.", "legendary", 734),
     new ringInfo("Yuletide Band", "ring", "ring", ["raid"], "<:yuletide_band:1336068419509944320>", "https://i.ibb.co/mrWDF4Hj/Yuletide-Band.png", 1, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mail
 
         // const ATK_EMOJI = myStats.replaceButton?.atk?.emoji || '⚔️',
@@ -4222,7 +4222,7 @@ export const items = [
                     casterBuff.hp = casterBuff.hp.filter((buff) => buff.id !== hpDebuff.id);
 
                     // Push new buff
-                    casterBuff.hp.push(new buffInfo("+", amount, 5));
+                    casterBuff.hp.push(new buffInfo("+", amount, 9999));
 
                     return true;
                 };
