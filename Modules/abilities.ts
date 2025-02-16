@@ -2674,7 +2674,7 @@ export const abilities: Record<number, Ability> = {
             // Check if day time for the first 3 skill uses
             if (roundTime > 2 && this.used <= 3) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.followUp({ content: `${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`, ephemeral: true});
+                matchStats.interaction.followUp({ content: `${this.used === 3 ? "Final Prominence" : "Crazy Prominence"} can only be used during day time (in ${6 - roundTime} rounds)`, ephemeral: true });
                 myStats.sm += this.cost;
                 this.used--;
                 return;
@@ -3031,9 +3031,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.xpboost += 0.2;
 
             // Heals 5% of max HP per round
-            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05), {});
-            }, 9999));
+            mybuff.hp.push(new buffInfo("+", Math.floor(myStats.maxhp * 0.05), 9999));
 
             // Revives once with 40% HP
             myStats.maxRevivals = 1;
@@ -3100,8 +3098,6 @@ export const abilities: Record<number, Ability> = {
         shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds`\n**Cost**: `60 💧`\n**Timeout**: `yes`\n**Role**: `DPS/Tank (DMG-boost, Mitigation, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **4** rounds\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **10** rounds\n\n__**Party**__ (👥)\nEvery **5** rounds:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Gintoki EX
-
-            matchStats.turn = matchStats.turnSkill ? 0 : 1;
             if (this.pause > matchStats.round) {
                 myStats.sm += this.cost;
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;

@@ -455,11 +455,11 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
             dStats.maskinfo = inv.equipment.mask;
         };
 
-        /* //! 2B Something
-        if ((id === 13780 || id === 13781 || id === 13782) && inv.equipment.prog) {
-            dStats.proginfo = inv.equipment.prog;
-        };
-        */
+        //! 2B Something
+        // if ((id === 13780 || id === 13781 || id === 13782) && inv.equipment.prog) {
+        //     dStats.proginfo = inv.equipment.prog;
+        // };
+
     };
 
     dStats.maxhp = dStats.hp;
