@@ -4083,7 +4083,7 @@ export const items = [
         });
 
     }, (level) => `After the wearer misses an attack, decreases the enemy's MD by **${[20, 22, 24, 26, 28, 30][level - 1]}%** for 2 rounds.`, "The Aqua Serpent ring features a stunning wrap-around design, mirroring the sinuous form of a serpent made of shimmering ocean-blue materials. Its band glistens as if it were polished by the waves, while an azure gemstone–shaped like a serpent's heart–rests as its centerpiece. The ring radiates a calming aura, allowing the wearer to commune with water elementals and control water's flow. Embellished with silver scales etched with intricate oceanic patterns, it is a prized possession for those who traverse the waters or seek harmony with the aquatic realms, enhancing their affinity for the sea.", "legendary", 745),
-    new ringInfo("Starlit Whirl", "ring", "ring", ["guild"], "<:starlit_whirl:1336655984659271700>", "https://i.ibb.co/0VFf8r7V/Starlit-Whirl.png", 6, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Starlit Whirl", "ring", "ring", ["guild"], "<:starlit_whirl:1341442725072998441>", "https://i.ibb.co/p6hgZWqb/Starlit-Whirl.png", 6, (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // On eCrit: Steal 5% CR
         matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
