@@ -658,7 +658,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         (Math.floor(target.hp - damage) < 1) // Would kill
     ) {
         target.evadeDeathStrike--;
-        notice.push(`\n✨ **${target.name}** has evaded a deadly attack!`);
+        notice.push(`\n💨 **${target.name}** has evaded a deadly attack!`);
 
         // Event Triggers
         matchStats.trigger("miss", attacker, target, attackerBuff, targetBuff);
@@ -702,11 +702,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             };
         };
 
-        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${attacker.isLightning ? " lightning" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage${target.shield === 0 ? `. **${target.name}**'s shield broke down!` : ""}`);
+        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical " + ((options.magicDamage && options.mdChance < attacker.mdChance && !attacker.isLightning) ? "magic" : "") + ((!(options.magicDamage && options.mdChance < attacker.mdChance) && attacker.isLightning) ? "lightning" : "") + " hit!" : ""} **${damage}**${attacker.isLightning ? " lightning" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage${target.shield === 0 ? `. **${target.name}**'s shield broke down!` : ""}`);
     } else {
         target.hp = Math.floor(target.hp - damage);
         if (target.hp < 1) target.hp = 0;
-        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${attacker.isLightning ? " lightning" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage`);
+        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical " + ((options.magicDamage && options.mdChance < attacker.mdChance && !attacker.isLightning) ? "magic" : "") + ((!(options.magicDamage && options.mdChance < attacker.mdChance) && attacker.isLightning) ? "lightning" : "") + " hit!" : ""} **${damage}**${attacker.isLightning ? " lightning" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage`);
     };
 
     // Reflect damage
@@ -777,7 +777,7 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
-    if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) notice.push(`\n💖 **${attacker.name}** has negated the heal!`);
+    if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
     else {
         target.hp += amount;
         if (target.hp > target.maxhp) target.hp = target.maxhp;
