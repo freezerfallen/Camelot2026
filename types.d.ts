@@ -394,6 +394,7 @@ export interface UserSchema {
     raidxp: number;
     guild_marks: number;
     image_credits: number;
+    skill_tree: Record<string, number>;
     created: Date;
 
     chars: number[];

@@ -506,6 +506,30 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('generate')
+			.setDescription('Generate images')
+			.addStringOption(option => option.setName('type')
+				.setDescription('Choose what you want to generate')
+				.setRequired(false)
+				.addChoices(
+					{ name: 'weapon', value: 'weapon' },
+					{ name: 'armor', value: 'armor' },
+					{ name: 'ring', value: 'ring' },
+					{ name: 'item', value: 'item' },
+					{ name: 'character', value: 'character' },
+				)
+			)
+			.addStringOption(option => option.setName('prompt').setDescription('Enter your prompt').setRequired(false))
+			.addIntegerOption(option => option.setName('count').setDescription('Number of images to generate').setRequired(false))
+			.addBooleanOption(option => option.setName('enhance').setDescription('Enhance your prompt using an LLM | Default: true').setRequired(false))
+			.addStringOption(option => option.setName('output').setDescription('Select your output file format | Default: JPG').setRequired(false).addChoices(
+				{ name: 'JPG', value: "JPG" },
+				{ name: 'PNG', value: "PNG" },
+				{ name: 'WEBP', value: "WEBP" },
+			))
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('give')
 			.setDescription('Give coins or characters to other players')
 			.addSubcommand((subcommand) => subcommand.setName('coins').setDescription('Give someone coins').addUserOption(option => option.setName('user').setDescription('Select a user').setRequired(true)).addIntegerOption(option => option.setName('amount').setDescription('How much coins should be sent?').setRequired(true)))
@@ -1194,30 +1218,6 @@ const commands = [
 					)
 			)
 	}.data.toJSON(),
-	{
-		data: new SlashCommandBuilder()
-			.setName('generate')
-			.setDescription('Generate images')
-			.addStringOption(option => option.setName('type')
-				.setDescription('Choose what you want to generate')
-				.setRequired(false)
-				.addChoices(
-					{ name: 'weapon', value: 'weapon' },
-					{ name: 'armor', value: 'armor' },
-					{ name: 'ring', value: 'ring' },
-					{ name: 'item', value: 'item' },
-					{ name: 'character', value: 'character' },
-				)
-			)
-			.addStringOption(option => option.setName('prompt').setDescription('Enter your prompt').setRequired(false))
-			.addIntegerOption(option => option.setName('count').setDescription('Number of images to generate').setRequired(false))
-			.addBooleanOption(option => option.setName('enhance').setDescription('Enhance your prompt using an LLM | Default: true').setRequired(false))
-			.addStringOption(option => option.setName('output').setDescription('Select your output file format | Default: JPG').setRequired(false).addChoices(
-				{ name: 'JPG', value: "JPG" },
-				{ name: 'PNG', value: "PNG" },
-				{ name: 'WEBP', value: "WEBP" },
-			))
-	}.data.toJSON(),
 	// {
 	// 	data: new SlashCommandBuilder()
 	// 			.setName('reset')
@@ -1386,6 +1386,13 @@ const commands = [
 						{ name: 'premium', value: "3" },
 					)
 			),
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
+			.setName('skill')
+			.setDescription('Raid Skill Tree')
+			.addSubcommand((subcommand) => subcommand.setName('tree').setDescription('View your skill tree')
+				.addUserOption(option => option.setName('user').setDescription('View someone else\'s skill tree').setRequired(false))),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

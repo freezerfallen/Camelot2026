@@ -133,6 +133,7 @@ async function createTables() {
         guild_marks BIGINT DEFAULT 0 NOT NULL,
         created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         image_credits INT DEFAULT 0 NOT NULL,
+        skill_tree JSONB DEFAULT '{}' NOT NULL,
 
         -- Characters table columns
         chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
@@ -464,6 +465,7 @@ async function alterTables() {
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
+    // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");
 };
 
 async function dropTables() {

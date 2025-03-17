@@ -15,6 +15,7 @@ import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { getUserSchema, getWeaponSchemas, updateUsers } from '../Modules/queries';
+import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
 
@@ -191,6 +192,11 @@ const exportCommand: SlashCommand = {
 
         let matchStats = Avalon.getMatchStats(interaction);
         let notice = ["", "", "", ""];
+
+        // Apply skill tree
+        Object.entries(stats.skill_tree).forEach(([skill, level]) => {
+            skillTree[parseInt(skill)].passive(level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+        });
 
         // Apply passives
         if (skill && myChar.id !== 4767) skill.passive(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user, interaction.commandName);
