@@ -14,7 +14,7 @@ import classInfo, { classes } from "./classes";
 import { donationWeekStart, rankLowerRanges } from "./components";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
-import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "./items";
+import { armorInfo, itemInfo, items, lootInfo, ringInfo, weaponInfo } from "./items";
 import _ from 'lodash';
 import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
 import { curses } from './curses';
@@ -202,10 +202,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         "class": -1,
         "clvl": 1,
         "expertise": baseExpertise(id) as Expertise,
+        "ringSlots": getRingSlotsTotal(inv),
         "weapon": -1,
         "weaponinfo": {},
         "weaponicon": "<:sword_empty:1034502134474997790>",
         "uniqueids": [] as string[],
+        "ring1icon": "<:locked:1034511902417621002>",
+        "ring2icon": "<:locked:1034511902417621002>",
+        "ring3icon": "<:locked:1034511902417621002>",
     };
 
     // Expertise change
@@ -446,6 +450,79 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
                     dStats.bootsinfo = { ...boots };
 
                     dStats[item.primaryStat] += Math.floor(item.psmin + ((item.psmax - item.psmin) / 150) * ((boots.level - 1) + (boots.ascension * 3)));
+                };
+            };
+        };
+
+        // Add ring 1 if available
+        if (dStats.ringSlots > 0) {
+            dStats.ring1icon = "<:ring_empty:1034509903886299136>";
+
+            if (inv.equipment.ring1) {
+                clearTimeout(retainItemStats.get(inv.equipment.ring1)?.timeout);
+                const ring = retainItemStats.get(inv.equipment.ring1)?.stats ?? await getWeaponSchema(inv.equipment.ring1);
+
+                if (ring) {
+                    retainItemStats.set(inv.equipment.ring1, { stats: ring, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.ring1), 10 * 1000) });
+
+                    dStats.uniqueids.push(ring.uniqueid.split(":")[0]);
+
+                    const item = items[ring.itemid];
+
+                    if (item instanceof ringInfo) {
+                        // Set item to dStats
+                        dStats.ring1 = ring.itemid;
+                        dStats.ring1icon = item.emoji;
+                        dStats.ring1info = { ...ring };
+                    };
+                };
+            };
+        };
+
+        // Add ring 2 if available
+        if (dStats.ringSlots > 1) {
+            dStats.ring2icon = "<:ring_empty:1034509903886299136>";
+
+            if (inv.equipment.ring2) {
+                clearTimeout(retainItemStats.get(inv.equipment.ring2)?.timeout);
+                const ring = retainItemStats.get(inv.equipment.ring2)?.stats ?? await getWeaponSchema(inv.equipment.ring2);
+
+                if (ring) {
+                    retainItemStats.set(inv.equipment.ring2, { stats: ring, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.ring2), 10 * 1000) });
+
+                    dStats.uniqueids.push(ring.uniqueid.split(":")[0]);
+
+                    const item = items[ring.itemid];
+                    if (item instanceof ringInfo) {
+                        // Set item to dStats
+                        dStats.ring2 = ring.itemid;
+                        dStats.ring2icon = item.emoji;
+                        dStats.ring2info = { ...ring };
+                    };
+                };
+            };
+        };
+
+        // Add ring 3 if available
+        if (dStats.ringSlots > 2) {
+            dStats.ring3icon = "<:ring_empty:1034509903886299136>";
+
+            if (inv.equipment.ring3) {
+                clearTimeout(retainItemStats.get(inv.equipment.ring3)?.timeout);
+                const ring = retainItemStats.get(inv.equipment.ring3)?.stats ?? await getWeaponSchema(inv.equipment.ring3);
+
+                if (ring) {
+                    retainItemStats.set(inv.equipment.ring3, { stats: ring, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.ring3), 10 * 1000) });
+
+                    dStats.uniqueids.push(ring.uniqueid.split(":")[0]);
+
+                    const item = items[ring.itemid];
+                    if (item instanceof ringInfo) {
+                        // Set item to dStats
+                        dStats.ring3 = ring.itemid;
+                        dStats.ring3icon = item.emoji;
+                        dStats.ring3info = { ...ring };
+                    };
                 };
             };
         };
@@ -1048,6 +1125,23 @@ export const getItemLevel = (xp: number) => {
         level++;
     };
     return level - 1;
+};
+
+export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon_classlevels" | "dungeon_floors">) => {
+    let total = 0;
+
+    // Reach clvl 1000
+    const classLevelTotal = getClassLvl(41, { 41: Object.values(stats.dungeon_classlevels).reduce((acc, e) => acc + e, 0) });
+    if (classLevelTotal >= 1000) total++;
+
+    // Reach account level 100
+    const accLevel = userLevel(stats.xp);
+    if (accLevel >= 100) total++;
+
+    // Beat floor 300
+    if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
+
+    return total;
 };
 
 export const formatNumberWithQuotes = (num: number) => {

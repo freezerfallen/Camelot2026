@@ -387,10 +387,19 @@ const exportCommand: SlashCommand = {
 
         // Query DB
         if (cmd === "query") {
-            if (args[0].toUpperCase() === "DROP") return interaction.reply({ content: "not allowed", ephemeral });
-            const res = await query(args.join(" ") + (user ? ` WHERE id = ${user.id}` : ""));
+            const flags = args.filter(arg => arg.startsWith("--")).map(flag => flag.slice(2));
+            args = args.filter(arg => !arg.startsWith("--"));
 
-            if (Array.isArray(res)) return interaction.reply({ content: JSON.stringify(res).slice(0, 2000), ephemeral });
+            if (args[0].toUpperCase() === "DROP") return interaction.reply({ content: "not allowed", ephemeral });
+            const res = await query(args.join(" ") + (user ? ` WHERE id = '${user.id}'` : ""));
+
+            if (Array.isArray(res)) {
+                if (flags.includes("txt")) {
+                    const attachment = new AttachmentBuilder(Buffer.from(JSON.stringify(res, null, 2) ?? "", 'utf-8'), { name: 'data.txt' });
+                    return interaction.reply({ files: [attachment], content: JSON.stringify(res).slice(0, 2000), ephemeral });
+                };
+                return interaction.reply({ content: JSON.stringify(res).slice(0, 2000), ephemeral });
+            };
             return interaction.reply({ content: "Action Successful", ephemeral });
         };
 

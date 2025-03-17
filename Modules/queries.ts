@@ -366,7 +366,7 @@ export const loadVoteReminders = async (): Promise<Pick<UserSchema, "id" | "last
 };
 
 export const loadRanking = async (pass: number, batchSize: number): Promise<UserSchemaForStats[]> => {
-    const users = await query(`SELECT id, name, premium, battlechar, level, bank, char_ref, equipment, shield_slot, class, dungeon_classlevels FROM users WHERE battlechar IS NOT NULL ORDER BY rowid LIMIT $1 OFFSET $2`, [batchSize, pass * batchSize]) as UserSchemaForStats[];
+    const users = await query(`SELECT id, name, xp, premium, battlechar, level, bank, char_ref, equipment, shield_slot, class, dungeon_classlevels, dungeon_floors FROM users WHERE battlechar IS NOT NULL ORDER BY rowid LIMIT $1 OFFSET $2`, [batchSize, pass * batchSize]) as UserSchemaForStats[];
     return users;
 };
 

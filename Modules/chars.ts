@@ -21458,7 +21458,7 @@ export const characters: charInfo[] = [
     new charInfo("Jurai Asuka Misurugi", [], anime[311], "M", "https://i.ibb.co/zVGZfnL/c.png", 21353, "D"),
     new charInfo("Maeno", [], anime[525], "M", "https://i.ibb.co/hx5bx3m/c.png", 21354, "A"),
     new charInfo("Kyouko Iwashita", [], anime[525], "F", "https://i.ibb.co/7VXryff/c.png", 21355, "A"),
-    new charInfo("Takeda ", [], anime[525], "M", "https://i.ibb.co/g63wWFm/c.png", 21356, "B"),
+    new charInfo("Takeda", [], anime[525], "M", "https://i.ibb.co/g63wWFm/c.png", 21356, "B"),
     new charInfo("Hiromi Izawa", [], anime[525], "M", "https://i.ibb.co/N1D77XR/c.png", 21357, "C"),
     new charInfo("Tanaka (PPC)", [], anime[525], "M", "https://i.ibb.co/Bj3hp76/c.png", 21358, "C"),
     new charInfo("Chiyoko Kamiya", [], anime[525], "F", "https://i.ibb.co/HNnD5c0/c.png", 21359, "B"),

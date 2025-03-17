@@ -228,10 +228,14 @@ export type DetailedStats = {
     class: number;
     clvl: number;
     expertise: Expertise;
+    ringSlots: number;
     weapon: number;
     weaponinfo: Record<string, any>;
     weaponicon: string;
     uniqueids: Array<string>;
+    ring1icon: string;
+    ring2icon: string;
+    ring3icon: string;
     [key: string]: any;
 };
 
@@ -360,7 +364,7 @@ export interface UserSchema {
     passpurchaselimit: number;
     expity: number;
     craze_equipment: Record<string, any>;
-    equipment: Record<string, any>;
+    equipment: Record<string, string>;
     trial_equipment: Record<string, any>;
     craze_levels: Record<string, any>;
     shield_slot: number;
@@ -396,14 +400,14 @@ export interface UserSchema {
     dungeon_floors: Record<string, number>;
     dungeon_limit: number;
     dungeon_classes: number[];
-    dungeon_classlevels: Record<string, any>;
+    dungeon_classlevels: Record<string, number>;
     dungeon_responsetime: Date[];
     stampede_responsetime: Date[];
 }
 
 export type CompactUserSchema = Omit<UserSchema, "transactions" | "char_level" | "char_class" | "char_equipment" | "dungeon_responsetime" | "stampede_responsetime">;
 
-export type UserSchemaForStats = Pick<CompactUserSchema, "id" | "name" | "premium" | "battlechar" | "level" | "bank" | "char_ref" | "equipment" | "shield_slot" | "class" | "dungeon_classlevels">;
+export type UserSchemaForStats = Pick<CompactUserSchema, "id" | "name" | "xp" | "premium" | "battlechar" | "level" | "bank" | "char_ref" | "equipment" | "shield_slot" | "class" | "dungeon_classlevels" | "dungeon_floors">;
 
 export interface ServerSchema {
     rowid: number;

@@ -741,10 +741,15 @@ const commands = [
 							{ name: 'All', value: 'all' },
 							{ name: 'Weapon', value: 'weapon' },
 							{ name: 'Shield', value: 'shield' },
+							{ name: 'Armor', value: 'armor' },
 							{ name: 'Helmet', value: 'helmet' },
 							{ name: 'Cuirass', value: 'cuirass' },
 							{ name: 'Gloves', value: 'gloves' },
 							{ name: 'Boots', value: 'boots' },
+							{ name: 'Rings', value: 'rings' },
+							{ name: 'Ring 1', value: 'ring1' },
+							{ name: 'Ring 2', value: 'ring2' },
+							{ name: 'Ring 3', value: 'ring3' },
 						)
 				))
 			.addSubcommand((subcommand) => subcommand.setName('levelup').setDescription('Levelup an item')
@@ -1128,7 +1133,11 @@ const commands = [
 			.setDescription('Random stuff generator')
 			.addSubcommand((subcommand) => subcommand.setName('coin').setDescription('Flip a coin'))
 			.addSubcommand((subcommand) => subcommand.setName('name').setDescription('Get a random name suggestion'))
-			.addSubcommand((subcommand) => subcommand.setName('number').setDescription('Get a random number between 1-100'))
+			.addSubcommand((subcommand) => subcommand.setName('numbers').setDescription('Get a random number between 1-100')
+				.addIntegerOption(option => option.setName('min').setDescription(`Minimum number | Default: 1 | Min: -1'000'000'000`).setRequired(false))
+				.addIntegerOption(option => option.setName('max').setDescription(`Maximum number | Default: 100 | Max: 1'000'000'000`).setRequired(false))
+				.addIntegerOption(option => option.setName('amount').setDescription(`Amount of numbers to generate | Default: 1 | Min: 1 | Max: 100`).setRequired(false))
+			)
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

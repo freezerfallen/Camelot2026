@@ -2440,12 +2440,14 @@ export const abilities: Record<number, Ability> = {
                     if (myStats.cr > 1) myStats.cr = 1;
                     eStats.def -= Math.floor(eStats.def * 0.15 * multiplier);
                     eStats.mr -= Math.floor(eStats.mr * 0.15 * multiplier);
-                    
-                    if (eStats.marked === 0) notice.push(`\n𓇬 The enemy lost the mark of Skandha...`);}
+
+                    if (eStats.marked === 0) notice.push(`\n𓇬 The enemy lost the mark of Skandha...`);
+                }
 
                 if (myStats.temple > 0) {
                     myStats.temple--;
-                    if (myStats.temple === 0) notice.push(`\n💡 The temple of wisdom withered... ⋆.ೃ࿔*:･`);}
+                    if (myStats.temple === 0) notice.push(`\n💡 The temple of wisdom withered... ⋆.ೃ࿔*:･`);
+                }
             }, 9999));
 
             // Gain +6 mana when critting a marked enemy
@@ -2639,7 +2641,7 @@ export const abilities: Record<number, Ability> = {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:stonecannon:1340376201058844733> **${name}**`, { atkMultiplier: 0.6, ignoreShield: true, magicDamage: true, mdChance: -1 });
                     ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.1), 2));
                     ebuff.mr.push(new buffInfo("+", -Math.floor(eStats.mr * 0.1), 2));
-                    eStats.def -= Math.floor(eStats.def * 0.1);                    
+                    eStats.def -= Math.floor(eStats.def * 0.1);
                     eStats.mr -= Math.floor(eStats.mr * 0.1);
                 };
             }, 9999));

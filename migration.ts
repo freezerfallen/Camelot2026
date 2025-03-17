@@ -140,8 +140,8 @@ export const migrateData = async () => {
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
                     $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)`,
                 [guild.rowid, guild.id, guild.name, guild.description, guild.color, guild.level, guild.icon,
-                guild.banner, guild.treasury, guild.treasury_gems, guild.tax, guild.canjoin, guild.tokens,
-                guild.membercap, guild.xpbuff, guild.lootbuff, guild.cdreduction, guild.master,
+                guild.banner, guild.treasury, guild.treasury_gems, guild.tax, guild.canjoin, guild.xpbuff + guild.lootbuff + guild.cdreduction,
+                guild.membercap, 0, 0, 0, guild.master,
                 guild.elders.split(',').filter(Boolean), guild.members.split(',').filter(Boolean), guild.banned.split(',').filter(Boolean), guild.eventpoints,
                 guild.bosshuntstage, guild.boss1, guild.boss2, guild.boss3, guild.boss4,
                 guild.lastlevelup ? new Date(guild.lastlevelup) : null, guild.raidid]

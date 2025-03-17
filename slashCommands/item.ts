@@ -1,10 +1,10 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle } from "discord.js";
 import { armorInfo, chestInfo, fishInfo, itemInfo, items, lootInfo, ringInfo, weaponInfo } from "../Modules/items";
-import { searchItem, showPage, customEmojis, getAscensionMaterial, getItemLevel } from "../Modules/functions";
+import { searchItem, showPage, customEmojis, getAscensionMaterial, getItemLevel, getRingSlotsTotal } from "../Modules/functions";
 import { PageRow, OfferRow } from "../Modules/components";
 import { characters } from "../Modules/chars";
 import { ItemCategory, ItemRarity, ItemType, SlashCommand } from "../types";
-import { deleteWeapon, getUserSchema, getWeaponCount, getWeaponDupeSchemas, getWeaponSchema, updateUsers, updateWeapons } from "../Modules/queries";
+import { deleteWeapon, getUserSchema, getWeaponCount, getWeaponDupeSchemas, getWeaponSchema, getWeaponSchemas, updateUsers, updateWeapons } from "../Modules/queries";
 
 function getAscension(lvl: number) {
     let asc = "";
@@ -592,57 +592,13 @@ const exportCommand: SlashCommand = {
         };
 
         // Item Equip
-        // if (subcommand === "equip") {
-        //     const itemChoice = interaction.options.getString('item', true);
-
-        //     const stats = author.schema;
-        //     if (!stats.battlechar) return interaction.reply(`You don't have a battle character selected, please use \`/select\` to do so`);
-
-        //     const item = await getWeaponSchema(`${itemChoice}:${interaction.user.id}`);
-
-        //     // Lria's Masks
-        //     if (["remove mask", "verdant mask", "phantasmal mask", "valkyrie mask"].includes(itemChoice.toLowerCase())) {
-        //         if (itemChoice.toLowerCase() === "remove mask") delete stats.equipment["mask"];
-        //         else stats.equipment["mask"] = itemChoice.toLowerCase().split(" ")[0];
-
-        //         // Update users table
-        //         await updateUsers(interaction.user.id, {
-        //             equipment: { type: "set", value: stats.equipment },
-        //         });
-
-        //         return interaction.reply(itemChoice.toLowerCase() === "remove mask" ? "Unequipped **Lria**'s mask" : `Equipped **Lria** <a:EXTRA:1138530846144462968> with the **__${itemChoice.toLowerCase()}__**`);
-        //     };
-
-        //     if (item) {
-        //         const fItem = items[item.itemid];
-
-        //         let type: ItemCategory | ItemType = fItem.category;
-        //         if (type === "armor" || fItem.type === "shield") type = fItem.type;
-        //         if (type === "shield" && (stats.premium < 4 && stats.shield_slot === 0)) type = "weapon";
-
-        //         // Assign weapon
-        //         stats.equipment[type] = `${itemChoice}:${interaction.user.id}`;
-
-        //         // Update users table
-        //         await updateUsers(interaction.user.id, {
-        //             equipment: { type: "set", value: stats.equipment },
-        //         });
-
-        //         return interaction.reply(`Equipped **${characters[stats.battlechar].name}** with ${fItem.emoji} **__${fItem.name}__**`);
-        //     };
-
-        //     const fItem = searchItem(itemChoice, interaction);
-        //     if (!fItem?.name) return;
-
-        //     return interaction.reply(`Please use the weapons id instead of name. You can find the id with \`/items\``);
-        // };
-
-        // Item Equip
         if (subcommand === "equip") {
             const itemChoices = [...new Set(interaction.options.getString('items', true).split(",").map((e) => e.trim()))].filter(Boolean);
 
             const stats = author.schema;
             if (!stats.battlechar) return interaction.reply(`You don't have a battle character selected, please use \`/select\` to do so`);
+
+            const ringSlotsTotal = getRingSlotsTotal(stats);
 
             const equipped: string[] = [];
 
@@ -658,38 +614,36 @@ const exportCommand: SlashCommand = {
                     continue;
                 };
 
-                /* //! 2B Something
-                // Nier Pod Programmes
-                if (itemChoice.toLowerCase().startsWith(`prog`)) {
-                    let action = itemChoice.toLowerCase().split(" ")[1] ?? "info";
-                    if (action === "remove") {
-                        delete stats.equipment["prog"];
-                        equipped.push(`Unequipped Pod's programme`);
-                    }
-                    else if (action === "info") {
-                        // Show list of programmes
-                        let progmsg = "`Gravity` : Gathers foes every **3** turns, reducing their ATK, MD, DEF, MR, Block rate and Dodge rate by **25%** for **1** turn.\n`Mirage` : Analyzes foes every **3** turns, increasing own critical rate by **20%** before guaranteeing **2** hits of **20%** DMG on the enemy.\n`Repair` : Initiates restoration every **3** turns, applying a **10%** max HP heal over **2** turns.\n`Scanner` : Sharply locates loot, increasing coins obtained from dungeons by **15%**.\n`Remove` : Removes any existing programme from the pod.";
-                        return interaction.reply(`⚙️ Correct usage: /item equip item:prog <action>. Valid programmes actions:\n\n${progmsg}`)
-                    }
-                    else if (action === "gravity"||action === "mirage"||action === "repair"||action === "scanner") {
-                        // Dictionary of pod and relevant effects
-                        const proglist = {
-                            "gravity" : "Gathers foes every **3** turns, reducing their ATK, MD, DEF, MR, Block rate and Dodge rate by **25%** for **1** turn.",
-                            "mirage" : "Analyzes foes every **3** turns, increasing own critical rate by **20%** before guaranteeing **2** hits of **20%** DMG on the enemy.",
-                            "repair" : "Initiates restoration every **3** turns, applying a **10%** max HP heal over **2** turns.",
-                            "scanner" : "Sharply locates loot, increasing coins obtained from dungeons by **15%**.",
-                            "remove" : "Removes any existing programme from the pod."
-                        };
-                        
-                        // Equips programme + shows relevant effect
-                        stats.equipment["prog"] = action;
-                        equipped.push(`**__Programme: ${action}__**`);
-                        return interaction.reply(proglist[action])
-                    }
-                    else return interaction.reply(`Unrecognized programme! Equip "prog info" to learn the list of available programmes!`);
-                    continue;
-                };
-                */
+                //! 2B Nier Pod Programmes
+                // if (itemChoice.toLowerCase().startsWith(`prog`)) {
+                //     let action = itemChoice.toLowerCase().split(" ")[1] ?? "info";
+                //     if (action === "remove") {
+                //         delete stats.equipment["prog"];
+                //         equipped.push(`Unequipped Pod's programme`);
+                //     }
+                //     else if (action === "info") {
+                //         // Show list of programmes
+                //         let progmsg = "`Gravity` : Gathers foes every **3** turns, reducing their ATK, MD, DEF, MR, Block rate and Dodge rate by **25%** for **1** turn.\n`Mirage` : Analyzes foes every **3** turns, increasing own critical rate by **20%** before guaranteeing **2** hits of **20%** DMG on the enemy.\n`Repair` : Initiates restoration every **3** turns, applying a **10%** max HP heal over **2** turns.\n`Scanner` : Sharply locates loot, increasing coins obtained from dungeons by **15%**.\n`Remove` : Removes any existing programme from the pod.";
+                //         return interaction.reply(`⚙️ Correct usage: /item equip item:prog <action>. Valid programmes actions:\n\n${progmsg}`)
+                //     }
+                //     else if (action === "gravity"||action === "mirage"||action === "repair"||action === "scanner") {
+                //         // Dictionary of pod and relevant effects
+                //         const proglist = {
+                //             "gravity" : "Gathers foes every **3** turns, reducing their ATK, MD, DEF, MR, Block rate and Dodge rate by **25%** for **1** turn.",
+                //             "mirage" : "Analyzes foes every **3** turns, increasing own critical rate by **20%** before guaranteeing **2** hits of **20%** DMG on the enemy.",
+                //             "repair" : "Initiates restoration every **3** turns, applying a **10%** max HP heal over **2** turns.",
+                //             "scanner" : "Sharply locates loot, increasing coins obtained from dungeons by **15%**.",
+                //             "remove" : "Removes any existing programme from the pod."
+                //         };
+
+                //         // Equips programme + shows relevant effect
+                //         stats.equipment["prog"] = action;
+                //         equipped.push(`**__Programme: ${action}__**`);
+                //         return interaction.reply(proglist[action])
+                //     }
+                //     else return interaction.reply(`Unrecognized programme! Equip "prog info" to learn the list of available programmes!`);
+                //     continue;
+                // };
 
                 const item = await getWeaponSchema(`${itemChoice}:${interaction.user.id}`);
                 if (!item) {
@@ -703,10 +657,30 @@ const exportCommand: SlashCommand = {
                 let type: ItemCategory | ItemType = fItem.category;
                 if (type === "armor" || fItem.type === "shield") type = fItem.type;
                 if (type === "shield" && (stats.premium < 4 && stats.shield_slot === 0)) type = "weapon";
+                if (type === "ring") {
+                    if (ringSlotsTotal === 0) return interaction.reply(`You don't have any ring slots available!\n\nYou can unlock them by:\n- Reaching class level 1000 (cumulative)\n- Defeating Floor 300 in the \`/dungeon\`\n- Reaching account level 100`);
+
+                    let slot = 1;
+                    if ("ring1" in stats.equipment) {
+                        slot++;
+                        if ("ring2" in stats.equipment) slot++;
+                    };
+                    if (slot > ringSlotsTotal) slot = ringSlotsTotal;
+                    type += slot;
+                };
 
                 // Assign weapon
                 stats.equipment[type] = `${itemChoice}:${interaction.user.id}`;
                 equipped.push(`${fItem.emoji} **__${fItem.name}__**`);
+            };
+
+            // Check if rings are unique
+            const ringUIDs = Object.entries(stats.equipment).filter(([key, value]) => key.startsWith("ring")).map(([key, value]) => value).filter(Boolean);
+            if (ringUIDs.length > 1) {
+                const rings = await getWeaponSchemas(ringUIDs);
+                const ringIDs = [...new Set(rings.map((ring) => ring.itemid))];
+
+                if (ringUIDs.length !== ringIDs.length) return interaction.reply(`You can't equip the same ring twice!`);
             };
 
             // Update users table
@@ -725,7 +699,16 @@ const exportCommand: SlashCommand = {
             if (!stats.battlechar) return interaction.reply(`You don't have a battle character selected, please use \`/select\` to do so`);
 
             if (typeChoice === "all") stats.equipment = {};
-            else delete stats.equipment[typeChoice];
+            else if (typeChoice === "armor") {
+                delete stats.equipment["helmet"];
+                delete stats.equipment["cuirass"];
+                delete stats.equipment["gloves"];
+                delete stats.equipment["boots"];
+            } else if (typeChoice === "rings") {
+                delete stats.equipment["ring1"];
+                delete stats.equipment["ring2"];
+                delete stats.equipment["ring3"];
+            } else delete stats.equipment[typeChoice];
 
             // Update users table
             await updateUsers(interaction.user.id, {
