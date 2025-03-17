@@ -272,11 +272,11 @@ export class ringInfo extends itemInfo {
         return this._buffdescs;
     };
 
-    getBuff(level: number) {
+    getBuff(level: number = 1) {
         level = Math.min(Math.max(level, 1), this.maxlevel) || 1;
         return this.buffs(level);
     };
-    getBuffDesc(level: number) {
+    getBuffDesc(level: number = 1) {
         level = Math.min(Math.max(level, 1), this.maxlevel) || 1;
         return this.buffdescs(level);
     };

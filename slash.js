@@ -636,7 +636,7 @@ const commands = [
 						.addChoices(
 							{ name: 'XP Buffs', value: 'xpbuff' },
 							{ name: 'Loot Buffs', value: 'lootbuff' },
-							{ name: 'Timers', value: 'cdreduction' },
+							// { name: 'Timers', value: 'cdreduction' },
 						)
 				))
 		// .addSubcommand((subcommand) => subcommand.setName('convert').setDescription('Convert gems in your treasury into coins')

@@ -10,18 +10,18 @@ function lastActiveInDays(timestamp: Date | number) {
     return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 };
 
-function upgradePrice(level: number) {
+function upgradePrice(level: number): number {
     switch (level) {
-        case 1: return 100000;
-        case 2: return 300000;
-        case 3: return 500000;
-        case 4: return 1000000;
-        case 5: return 2000000;
-        case 6: return 5000000;
-        case 7: return 8000000;
-        case 8: return 12000000;
-        case 9: return 20000000;
-        default: return 30000000;
+        case 1: return 100_000;
+        case 2: return 300_000;
+        case 3: return 500_000;
+        case 4: return 1_000_000;
+        case 5: return 2_000_000;
+        case 6: return 5_000_000;
+        case 7: return 8_000_000;
+        case 8: return 12_000_000;
+        case 9: return 20_000_000;
+        default: return 30_000_000;
     };
 };
 
@@ -106,7 +106,7 @@ const exportCommand: SlashCommand = {
                 .setThumbnail(guild.icon || 'https://i.imgur.com/JEvfGSR.png')
                 .setDescription((guild.description?.replace(/\\n/g, "\n") || "_Missing description. Use `/guild edit` to add one._")
                     + `\n\n**Guild Level**: \`${guild.level}\`\n**Capacity**: \`${members.length}/${10 + Math.min(guild.level - 1, 10)}\`\n**Tax Rate**: \`${guild.tax}%\`\n**Treasury**: \`${formatNumberWithQuotes(guild.treasury)}\`<:coins:872926669055356939>, \`${formatNumberWithQuotes(guild.treasury_gems)}\`<:genesis_gems:1034179687720681492>`
-                    + `\n\n<:ATK:1063214925528440832> **XP Buffs**: level ${guild.xpbuff}${guild.xpbuff ? `<:blank:917804200363171860>ㅤ(__+${20 * guild.xpbuff}__%)` : ""}\n<:coins:872926669055356939> **Loot Buffs**: level ${guild.lootbuff}${guild.lootbuff ? `<:blank:917804200363171860>(__+${20 * guild.lootbuff}__%)` : ""}\n⏱️ **Timers**: level ${guild.cdreduction}${guild.cdreduction ? `<:blank:917804200363171860> <:blank:917804200363171860>(__-${guild.cdreduction}__ min)` : ""}`
+                    + `\n\n<:ATK:1063214925528440832> **XP Buffs**: level ${guild.xpbuff}${guild.xpbuff ? `<:blank:917804200363171860>ㅤ(__+${20 * guild.xpbuff}__%)` : ""}\n<:coins:872926669055356939> **Loot Buffs**: level ${guild.lootbuff}${guild.lootbuff ? `<:blank:917804200363171860>(__+${20 * guild.lootbuff}__%)` : ""}`
                 )//+ `\n\n**Members**\n${members.sort((a, b) => b.value-a.value).map((e) => `${e.name}${e.status} ➜ last online __${lastActive(e.lastdaily)}__`).join("\n")}`)
                 .addFields(
                     { name: "Members", value: `${members.map((e) => `${e.name}${e.status}`).join("\n")}`, inline: true },

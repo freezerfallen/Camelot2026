@@ -233,9 +233,15 @@ export type DetailedStats = {
     weaponinfo: Record<string, any>;
     weaponicon: string;
     uniqueids: Array<string>;
+    ring1?: number;
+    ring2?: number;
+    ring3?: number;
     ring1icon: string;
     ring2icon: string;
     ring3icon: string;
+    ring1info?: WeaponSchema;
+    ring2info?: WeaponSchema;
+    ring3info?: WeaponSchema;
     [key: string]: any;
 };
 
