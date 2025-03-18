@@ -195,6 +195,9 @@ async function createTables() {
         xpbuff INT DEFAULT 0 NOT NULL,
         lootbuff INT DEFAULT 0 NOT NULL,
         cdreduction INT DEFAULT 0 NOT NULL,
+        atkbuff INT DEFAULT 0 NOT NULL,
+        hpbuff INT DEFAULT 0 NOT NULL,
+        defbuff INT DEFAULT 0 NOT NULL,
         master TEXT NOT NULL,
         elders TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         members TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
@@ -468,6 +471,9 @@ async function alterTables() {
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_points INT DEFAULT 0 NOT NULL");
+    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS atkbuff INT DEFAULT 0 NOT NULL");
+    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS hpbuff INT DEFAULT 0 NOT NULL");
+    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS defbuff INT DEFAULT 0 NOT NULL");
 };
 
 async function dropTables() {

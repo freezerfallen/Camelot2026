@@ -222,8 +222,17 @@ const exportCommand: SlashCommand = {
         let myChar = characters[stats.battlechar];
         let myStats = await getDetailedStats(myChar.id, stats, stats.dungeon_classlevels);
         myStats.damageFormula = "log_scale_1.4";
-
         myStats.thumbnail = myChar.getImage(stats.premium, customSettings[interaction.user.id]?.cimg[myChar.id], stats.char_skin[myChar.id]);
+
+        // Add Guild Perks
+        myStats.atk += Math.floor(myStats.atk * (guild.atkbuff * 0.2));
+        myStats.md += Math.floor(myStats.md * (guild.atkbuff * 0.2));
+        myStats.hp += Math.floor(myStats.hp * (guild.hpbuff * 0.2));
+        const defBuff = guild.defbuff * 100;
+        myStats.def += defBuff;
+        myStats.mr += defBuff;
+        myStats.increase_defcap += defBuff;
+        myStats.increase_mrcap += defBuff;
 
         // myStats.removeDefCap = true;
         let myStatsC = { ...myStats };

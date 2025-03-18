@@ -660,6 +660,9 @@ const commands = [
 						.addChoices(
 							{ name: 'XP Buffs', value: 'xpbuff' },
 							{ name: 'Loot Buffs', value: 'lootbuff' },
+							{ name: 'ATK/MD Buff', value: 'atkbuff' },
+							{ name: 'HP Buff', value: 'hpbuff' },
+							{ name: 'DEF/MR Buff', value: 'defbuff' },
 							// { name: 'Timers', value: 'cdreduction' },
 						)
 				))

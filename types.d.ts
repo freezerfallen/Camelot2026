@@ -455,6 +455,9 @@ export interface GuildSchema {
     xpbuff: number;
     lootbuff: number;
     cdreduction: number;
+    atkbuff: number;
+    hpbuff: number;
+    defbuff: number;
     master: string;
     elders: string[];
     members: string[];
