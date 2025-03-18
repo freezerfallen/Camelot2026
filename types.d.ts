@@ -182,11 +182,13 @@ export type DetailedStats = {
     batk: number;
     def: number;
     bdef: number;
+    increase_defcap: number;
     ep: number;
     md: number;
     bmd: number;
     mr: number;
     bmr: number;
+    increase_mrcap: number;
     cr: number;
     cd: number;
     td: number;
@@ -395,6 +397,7 @@ export interface UserSchema {
     guild_marks: number;
     image_credits: number;
     skill_tree: Record<string, number>;
+    skill_points: number;
     created: Date;
 
     chars: number[];

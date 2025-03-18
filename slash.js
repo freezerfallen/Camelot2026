@@ -1391,8 +1391,10 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('skill')
 			.setDescription('Raid Skill Tree')
-			.addSubcommand((subcommand) => subcommand.setName('tree').setDescription('View your skill tree')
-				.addUserOption(option => option.setName('user').setDescription('View someone else\'s skill tree').setRequired(false))),
+			.addSubcommand((subcommand) => subcommand.setName('view').setDescription('View your skill tree')
+				.addUserOption(option => option.setName('user').setDescription('View someone else\'s skill tree').setRequired(false))
+				.addIntegerOption(option => option.setName('page').setDescription('Choose a page to jump to').setRequired(false)))
+			.addSubcommand((subcommand) => subcommand.setName('upgrade').setDescription('Upgrade a skill')),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

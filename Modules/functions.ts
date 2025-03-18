@@ -156,11 +156,13 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         "batk": 1,
         "def": baseDEF(id),
         "bdef": 1,
+        "increase_defcap": 0,
         "ep": 0,
         "md": baseATK(id),
         "bmd": 1,
         "mr": baseDEF(id),
         "bmr": 0,
+        "increase_mrcap": 0,
         "cr": 0.18,
         "cd": 1.25,
         "td": 0,
@@ -670,8 +672,8 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     const multipliers = {
         atk: options.atkMultiplier * attacker.atk,
         md: options.atkMultiplier * attacker.md,
-        def: Math.max(Math.pow(0.99895, options.defMultiplier * target.def), (target.removeDefCap ? 0 : 0.1)),
-        mr: Math.max(Math.pow(0.99895, options.defMultiplier * target.mr), (target.removeDefCap ? 0 : 0.1)),
+        def: Math.max(Math.pow(0.99895, options.defMultiplier * target.def), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_defcap ?? 0) > 0) && ((options.defMultiplier * target.def) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * target.def) - 2192, options.defMultiplier * target.increase_defcap)) : 1),
+        mr: Math.max(Math.pow(0.99895, options.defMultiplier * target.mr), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * target.mr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * target.mr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
         crit: (isCrit ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
         lightning: 1 + (options.isLightning ? (attacker.lightningMultiplier ?? 0) : 0),
@@ -1447,6 +1449,41 @@ export const lastActive = (timestamp: Date | number) => {
     // Calculate the number of days between the date and today
     const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
     return `${diff === 1 ? diff + " day" : diff + " days"} ago`;
+};
+
+/**
+ * Converts a number to its Roman numeral representation
+ * @param n The number to convert (1-3999)
+ * @returns The Roman numeral string
+ */
+export const numberToRoman = (n: number): string => {
+    if (n < 1 || n > 3999) return String(n);
+
+    const romanNumerals = [
+        { value: 1000, symbol: 'M' },
+        { value: 900, symbol: 'CM' },
+        { value: 500, symbol: 'D' },
+        { value: 400, symbol: 'CD' },
+        { value: 100, symbol: 'C' },
+        { value: 90, symbol: 'XC' },
+        { value: 50, symbol: 'L' },
+        { value: 40, symbol: 'XL' },
+        { value: 10, symbol: 'X' },
+        { value: 9, symbol: 'IX' },
+        { value: 5, symbol: 'V' },
+        { value: 4, symbol: 'IV' },
+        { value: 1, symbol: 'I' }
+    ];
+
+    let result = '';
+    for (const { value, symbol } of romanNumerals) {
+        while (n >= value) {
+            result += symbol;
+            n -= value;
+        };
+    };
+
+    return result;
 };
 
 export const customEmojis: Record<PrimaryStat, string> = {
