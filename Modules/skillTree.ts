@@ -63,9 +63,9 @@ class SkillPath {
         };
     };
 
-    fullName(level: number = 1) {
+    fullName(level: number = 1, includeEmoji: boolean = false) {
         level ||= 1;
-        return `${this._name} ${numberToRoman(level)}`;
+        return `${includeEmoji ? `${this.emojiLabel} ` : ""}${this._name} ${numberToRoman(level)}`;
     };
     desc(level: number = 1) {
         level ||= 1;
@@ -76,12 +76,12 @@ class SkillPath {
 export const skillTree: SkillPath[] = [
     // Attack
     new SkillPath("Blade Mastery", "Increases ATK by **+3%**.", 2, 10, "attack", (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const buff = myStatsFixed.atk * 0.03 * level;
+        const buff = Math.floor(myStatsFixed.atk * 0.03 * level);
         myStatsFixed.atk += buff;
         myStats.atk += buff;
     }, 0),
     new SkillPath("Arcane Mastery", "Increases MD by **+3%**.", 2, 10, "attack", (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const buff = myStatsFixed.md * 0.03 * level;
+        const buff = Math.floor(myStatsFixed.md * 0.03 * level);
         myStatsFixed.md += buff;
         myStats.md += buff;
     }, 1),
@@ -102,7 +102,7 @@ export const skillTree: SkillPath[] = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats && trigger.used < trigger.maxUsage) {
                     trigger.used++;
-                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: Math.floor(options.damage * extraDamage), magicDamage: true });
+                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: Math.floor(options.damage * extraDamage), magicDamage: true });
                 };
             },
         });
@@ -126,7 +126,7 @@ export const skillTree: SkillPath[] = [
 
     // Health
     new SkillPath("Vital Surge", "Increases max HP by **+4%**.", 2, 10, "health", (level) => (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const buff = myStatsFixed.maxhp * 0.03 * level;
+        const buff = Math.floor(myStatsFixed.maxhp * 0.03 * level);
         myStatsFixed.maxhp += buff;
         myStatsFixed.hp += buff;
         myStats.maxhp += buff;

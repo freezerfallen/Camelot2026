@@ -18,7 +18,7 @@ const exportCommand: SlashCommand = {
             const stats = user.id === interaction.user.id ? author.schema : await getUserSchema(user.id);
             if (!stats) return interaction.reply(`User not found`);
 
-            const skillList = skillTree.filter(skill => stats.skill_tree[skill.id]).sort((a, b) => stats.skill_tree[b.id] - stats.skill_tree[a.id]);
+            const skillList = Object.keys(stats.skill_tree).map((skill) => skillTree[parseInt(skill)]).sort((a, b) => stats.skill_tree[b.id] - stats.skill_tree[a.id]);
 
             if (skillList.length === 0) {
                 if (user.id === interaction.user.id) return interaction.reply(`You don't have any skills yet, use \`/skill upgrade\` to unlock your first skill!`);
@@ -39,7 +39,7 @@ const exportCommand: SlashCommand = {
                 .setAuthor({ name: `${user.username}'s Skill Tree`, iconURL: user.displayAvatarURL({ size: 1024 }) })
                 .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
                 .setColor(0xbbffff)
-                .setDescription(`${showSkills.map(skill => `**${skill.fullName(stats.skill_tree[skill.id])}**\n> - ${skill.desc(stats.skill_tree[skill.id])}`).join("\n\n")}\n\n`)
+                .setDescription(`${showSkills.map(skill => `**${skill.fullName(stats.skill_tree[skill.id], true)}**\n> - ${skill.desc(stats.skill_tree[skill.id])}`).join("\n\n")}\n\n`)
                 .setFooter({ text: `Page ${currPage}/${pagesTotal}` });
             if (pagesTotal === 1) return interaction.reply({ embeds: [Embed] });
             else return interaction.reply({ embeds: [Embed], components: [PageRow] }).then((msg) => {
@@ -56,7 +56,7 @@ const exportCommand: SlashCommand = {
 
                     showSkills = showPage(currPage, skillList, elementsPerPage);
 
-                    Embed.setFooter({ text: `Page ${currPage}/${pagesTotal}` }).setDescription(`${showSkills.map(skill => `**${skill.fullName(stats.skill_tree[skill.id])}**\n> - ${skill.desc(stats.skill_tree[skill.id])}`).join("\n\n")}\n\n`);
+                    Embed.setFooter({ text: `Page ${currPage}/${pagesTotal}` }).setDescription(`${showSkills.map(skill => `**${skill.fullName(stats.skill_tree[skill.id], true)}**\n> - ${skill.desc(stats.skill_tree[skill.id])}`).join("\n\n")}\n\n`);
                     interaction.editReply({ embeds: [Embed] });
                 });
             });

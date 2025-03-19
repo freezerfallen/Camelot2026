@@ -201,6 +201,11 @@ const exportCommand: SlashCommand = {
         if (!raid) return interaction.reply("There is no active raid at the moment. Please ask your guild master or an elder to start one!");
 
 
+        //! REMOVE THIS
+        const test = interaction.options.getString("test");
+        if (test && raids[parseInt(test)]) raid.raidid = parseInt(test);
+
+
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots]);
         const userItems = myWeapons.map((e) => items[e.itemid]);
 

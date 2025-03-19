@@ -856,8 +856,9 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
-    if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
-    else {
+    if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) {
+        // notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
+    } else {
         target.hp += amount;
         if (target.hp > target.maxhp) target.hp = target.maxhp;
     };
