@@ -618,82 +618,77 @@ export const raidBosses: enemyInfo[] = [
     ),
 
     new enemyInfo("Sledgefist", "Golem", "the Stonebreaker", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/B5n382Vc/sledgefist.png"], [], 14,
-        new skillInfo(15, 85, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        new skillInfo(15, 120, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             myStats.shield = 0;
-            notice.push(`\n<:steal_shield:1340630053695918100> HAHAHAHA, Your shield is MINE!`);
+            notice.push(`\n<:steal_shield:1340630053695918100> ${enemy.name} has broken your shield!`);
 
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             eStats.ignoreShield = true;
-            const buffMax = 2.5, buffScale = 0.00025;
 
             // +0.025% of shield as atk and md (max 250%) //* 10k shield = 250% atk
+            const buffMax = 2.5, buffScale = 0.00025;
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.atk += Math.floor(myStats.atk * Math.min(myStats.shield * buffScale, buffMax));
                 myStats.md += Math.floor(myStats.md * Math.min(myStats.shield * buffScale, buffMax));
             }, 9999));
 
-        }, [["Only deals true damage", "Character gets 0.025% of their shield as atk and md, up to 250%", "**Active**: Takes all of your shield (**85** <:mana:1047269152957661255>)"]])
+        }, [["Only deals true damage (ignores shield)", "The player receives ATK & MD equal to **0.025%** of their shield, up to **250%**", "**Active**: Breaks the player's shield (**120** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Kraghammer", "Golem", "the Warbreaker", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/5gknttwn/kraghammer.png"], [], 16,
-        new skillInfo(16, 105, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        new skillInfo(16, 150, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            //? How much damage is that?
-            dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:steal_shield:1340630053695918100> **${enemy.name}** took your shield and threw it back at you! **${enemy.name}**`, { overwriteDamage: Math.floor(myStats.shield * 0.7), ignoreShield: true, dodge: false, block: false });
-            notice.push(`\n<:steal_shield:1340630053695918100> YOUR SHIELD IS MINE!`);
+            const steal = Math.floor(myStats.shield * 0.5);
+            eStats.shield += steal;
+            myStats.shield = steal;
 
-            eStats.shield += Math.floor(myStats.shield * 0.5);
-            myStats.shield = Math.floor(myStats.shield * 0.3);
+            dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:steal_shield:1340630053695918100> **${enemy.name}**`, { overwriteDamage: eStats.shield, ignoreShield: true, dodge: false, block: false });
 
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             eStats.ignoreShield = true;
-            const buffMax = 2.5, buffScale = 0.00025;
 
             // +0.025% of shield as atk and md (max 250%) //* 10k shield = 250% atk
+            const buffMax = 2.5, buffScale = 0.00025;
             myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.atk += Math.floor(myStats.atk * Math.min(myStats.shield * buffScale, buffMax));
                 myStats.md += Math.floor(myStats.md * Math.min(myStats.shield * buffScale, buffMax));
             }, 9999));
 
-        }, [["Only deals true damage", "Character gets 0.025% of their shield as atk and md, up to 250%", "**Active**: Takes 50% of your shield and deals 70% of your shield as damage (**105** <:mana:1047269152957661255>)"]])
+        }, [["Only deals true damage (ignores shield)", "The player receives ATK & MD equal to **0.025%** of their shield, up to **250%**", "**Active**: Steals **50%** of the player's shield, then deals damage equal to his available shield (**150** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Cake Witch", "Witch", "the Baking Bad", "F", true, { mdChance: 1 }, {}, { mana: 120 }, [], ["https://i.ibb.co/ccCZfzfk/cake-witch.png"], [], 17,
         new skillInfo(17, 55, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            const atkScale = 0.05, mrScale = 0.03;
+            const steal = Math.floor(myStats.md * 0.05);
+            mybuff.md.push(new buffInfo("+", -steal, 9999));
+            ebuff.md.push(new buffInfo("+", steal, 9999));
+            myStats.md += -steal;
+            eStats.md += steal;
 
-            ebuff.md.push(new buffInfo("+", Math.floor(myStats.md * atkScale), 9999));
-            mybuff.md.push(new buffInfo("+", -Math.floor(myStats.md * atkScale), 9999));
-            eStats.md += Math.floor(myStats.md * atkScale);
-            myStats.md += -Math.floor(myStats.md * atkScale);
+            ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * 0.03), 9999));
+            eStats.mr += Math.floor(eStats.mr * 0.03);
 
-            ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * mrScale), 9999));
-            eStats.mr += Math.floor(eStats.mr * mrScale);
-
-            //? More Fun Message: @freezerfallen
-            notice.push(`\n<:cakey:1340671224430329928> **${enemy.name}** took 5% of your magic damage and added it to her own`);
+            notice.push(`\n<:cakey:1340671224430329928> **${enemy.name}** stole **${steal}** MD and increased her MR by **3%**`);
 
         }, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (caster === myStats && !options.isMagicDamage) {
-                    myStats.maxhp -= Math.floor(myStats.maxhp * 0.03);
-                    myStats.hp -= Math.floor(myStats.hp * 0.03);
+                if (caster === myStats && !options.magicDamage) {
+                    myStats.maxhp -= Math.floor(myStats.maxhp * 0.05);
                     if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
 
-                    //? More Fun Message: @freezerfallen
-                    notice.push(`\n<:cakey:1340671224430329928> **${enemy.name}** took **3%** of your max HP`);
-                }
+                    notice.push(`\n<:cakey:1340671224430329928> **${enemy.name}** ate **5%** of your max HP`);
+                };
             });
 
-        }, [["After being dealt physical damage, reduces the user's max HP by **3%**", "**Active**: Steals **5%** MD and increases MR by **3%** (**55** <:mana:1047269152957661255>)"]])
+        }, [["After being dealt physical damage, reduces the player's max HP by **5%**", "**Active**: Steals **5%** MD and increases MR by **3%** (**55** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Velkris/Kyntheris", "Void Knight", "the Void Knights", "F", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/NnKqLhHH/velkris.png"], [], 18,
-        new skillInfo(18, 85, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        new skillInfo(18, 110, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             //* 0: Velkris is Main Character
             //* 1: Kyntheris is Summoned Boss (Minion)
 
@@ -782,7 +777,7 @@ export const raidBosses: enemyInfo[] = [
                     ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * mrScale), 9999));
                     eStats.mr += Math.floor(eStats.mr * mrScale);
 
-                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:quick_strike:1340696280636067922> **Velkris** dealt a quick strike`, { atkMultiplier: 0.4, mdChance: 0 });
+                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:quick_strike:1340696280636067922> **Velkris** dealt a quick strike`, { atkMultiplier: 0.4, mdChance: 0, block: false });
                 };
             });
 
@@ -805,7 +800,7 @@ export const raidBosses: enemyInfo[] = [
                     }
                 }
             }, 9999));
-        }, [["Duo Boss, Velkris gets stronger when Character dodges, Kyntheris gets stronger when Character blocks", "Support Ability Velkris: Velkris deals Damage, when Character blocks", "Support Ability Kyntheris: Kyntheris steals every 3 rounds 5% of a random stat and Velkris gets it for 3 rounds", "**Active**: Velkris switches into Kyntheris, Kyntheris switches into Velkris (**105** <:mana:1047269152957661255>)"]])
+        }, [["Duo: Velkris, who gets stronger when the player dodges, and Kyntheris, who gets stronger when the player blocks an attack", "While Velkris is fighting, Kyntheris deals **40%** unblockable physical damage whenever the player blocks an attack", "While Kyntheris is fighting, every **3** rounds Velkris steals **5%** of a random stat for **3** rounds", "**Active**: Velkris switches with Kyntheris, Kyntheris switches with Velkris (**110** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Hooded Hopper", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/wFXPyyBx/hooded-hopper.png"], [], 19,
