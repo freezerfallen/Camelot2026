@@ -12,7 +12,7 @@ import { getDetailedStats, customEmojis, dealDamage, search, searchClass, search
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { enemyInfo } from '../Modules/enemies';
 import { updateUsers } from '../Modules/queries';
 
@@ -338,14 +338,16 @@ const exportCommand: SlashCommand = {
         const enemy = new enemyInfo("Luminous", "Human", "the Luminous", "F", true, {}, {}, {}, [], luminousImages, [], 0);
         const curseRar = curses.filter((e) => e.tier);
         const curse = curseRar[Math.floor(Math.random() * curseRar.length)];
-        let eAbility = new skillInfo(0, 50, (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        let eAbility = new skillInfo(0, 50, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             let dmg = Math.floor(((2 * eStats.atk) * Math.pow(0.99895, myStats.def)) * (1 - (0.2 * Math.random())));
             myStats.hp -= dmg;
             if (myStats.hp < 0) myStats.hp = 0;
             eStats.sm -= 50;
             matchStats.turn = 0;
             notice.push(`\n✨ **${enemy.name}** dealt **${dmg}** damage!`);
-        }, () => { }, [5, "Luminous deals 200% damage"]);
+
+            return AbilityResponse.SUCCESS;
+        }, async () => AbilityResponse.SUCCESS, [5, "Luminous deals 200% damage"]);
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
         let eStats: any = {
@@ -705,10 +707,12 @@ const exportCommand: SlashCommand = {
                         if (myStatsC.replaceButton.ability?.run && matchStats.turn === 1) {
                             matchStats.turn = 0;
                             myStatsC.attackStreak = 0;
-                            myStatsC.replaceButton.ability.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
+                            const response = await myStatsC.replaceButton.ability.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
 
                             // Event Triggers
-                            matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                            if (response === AbilityResponse.SUCCESS) {
+                                matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                            };
 
                             editEmbed();
                             Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
@@ -724,11 +728,13 @@ const exportCommand: SlashCommand = {
                                         matchStats.turn = 0;
                                         myStatsC.attackStreak = 0;
                                         myAbility.used++;
-                                        await myAbility.ability(myStatsC, myStats, eStatsC, eStats, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, msg);
+                                        const response = await myAbility.ability(myStatsC, myStats, eStatsC, eStats, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, msg);
                                         myStatsC.sm -= myAbility.cost;
 
                                         // Event Triggers
-                                        matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                                        if (response === AbilityResponse.SUCCESS) {
+                                            matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                                        };
 
                                         editEmbed();
                                         Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
@@ -739,16 +745,18 @@ const exportCommand: SlashCommand = {
                         };
                     });
 
-                    cskill.on('collect', () => {
+                    cskill.on('collect', async () => {
 
                         // If class active was replaced
                         if (myStatsC.replaceButton.cskill?.run && matchStats.turn === 1) {
                             matchStats.turn = 0;
                             myStatsC.attackStreak = 0;
-                            myStatsC.replaceButton.cskill.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
+                            const response = await myStatsC.replaceButton.cskill.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
 
                             // Event Triggers
-                            matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                            if (response === AbilityResponse.SUCCESS) {
+                                matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                            };
 
                             editEmbed();
                             Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
@@ -764,10 +772,12 @@ const exportCommand: SlashCommand = {
                                 if (matchStats.turn === 1) {
                                     myStatsC.sm -= skill.cost;
                                     myStatsC.attackStreak = 0;
-                                    skill.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user, stats.chars);
+                                    const response = await skill.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user, stats.chars);
 
                                     // Event Triggers
-                                    matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                                    if (response === AbilityResponse.SUCCESS) {
+                                        matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                                    };
 
                                     editEmbed();
                                     Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);

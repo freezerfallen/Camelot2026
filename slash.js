@@ -732,6 +732,7 @@ const commands = [
 						.addChoices(
 							{ name: 'weapons', value: 'weapons' },
 							{ name: 'armor', value: 'armor' },
+							{ name: 'rings', value: 'ring' },
 							{ name: 'fish', value: 'fish' },
 							{ name: 'loot', value: 'loot' },
 							{ name: 'sword', value: 'sword' },

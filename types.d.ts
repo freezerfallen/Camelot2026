@@ -155,9 +155,14 @@ export interface IdelayedBuff {
     decrement(): void;
 };
 
-export type ClassAbility = (myStats: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+export enum AbilityResponse {
+    SUCCESS = 1,
+    FAILURE = 0,
+};
 
-export type ItemAbility = (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => void;
+export type ClassAbility = (myStats: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => Promise<AbilityResponse>;
+
+export type ItemAbility = (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: IcharInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => Promise<AbilityResponse>;
 
 type ReplaceButtonAction = {
     emoji?: string;

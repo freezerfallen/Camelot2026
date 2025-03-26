@@ -16,7 +16,7 @@ import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, ringInfo, weaponInfo } from "./items";
 import _ from 'lodash';
-import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
+import { AbilityResponse, Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
 import { curses } from './curses';
 import { getWeaponSchema } from './queries';
 
@@ -771,8 +771,9 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             if (target.shieldBreakDamageBuff) {
                 attacker.timeFrozen = true;
                 attacker.frozenMessage = "was frozen";
-                (target.delayedBuffs ?? attacker.delayedBuffs).push(new delayedBuffs(matchStats.round + 2, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                (target.delayedBuffs ?? attacker.delayedBuffs).push(new delayedBuffs(matchStats.round + 2, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     eStats.timeFrozen = false;
+                    return AbilityResponse.SUCCESS;
                 }));
                 if (target.shieldBreakDamageBuff) {
                     targetBuff.atk.push(new buffInfo("+", Math.floor(target.atk * target.shieldBreakDamageBuff), 1));

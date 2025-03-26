@@ -775,7 +775,7 @@ const exportCommand: SlashCommand = {
             if (subcommand === "lock") stats.itemlock = [...new Set([...stats.itemlock, ...choice])];
             else stats.itemlock = stats.itemlock.filter((e) => !choice.includes(e));
 
-            if (stats.itemlock.length > 200) return interaction.reply(`You can't lock more than 200 items at once.`);
+            if (stats.itemlock.length > 500) return interaction.reply(`You can't lock more than 500 items at once.`);
 
             // Update users table
             await updateUsers(interaction.user.id, {

@@ -4,7 +4,7 @@ import { characters } from "../Modules/chars";
 import { classLevelToXP, search, searchItem, showPage } from "../Modules/functions";
 import { OfferRow, PageRow, cowSettings } from "../Modules/components";
 import { requestVerification, dungeonTempBan } from "../Modules/components";
-import { items } from "../Modules/items";
+import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
 import * as math from 'mathjs';
 import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers } from '../Modules/queries';
@@ -243,6 +243,46 @@ const exportCommand: SlashCommand = {
                 if (customId) return interaction.reply({ content: `Error: Item with ID \`${customId}\` possibly exists for this user`, ephemeral });
                 return interaction.reply({ content: `Error while adding item to ${user.toString()}`, ephemeral });
             };
+        };
+
+        // Add all weapons
+        if (action.startsWith("add all weapons")) {
+            if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/admin add all weapons user:@user\`\n\n**Options**\n\`user\`: User to add the weapons to`, ephemeral });
+
+            const flags = args.filter(arg => arg.startsWith("--")).map(flag => flag.slice(2));
+
+            const weapons = items.filter(item => item.category === "weapon" || item.category === "armor") as (weaponInfo | armorInfo)[];
+
+            let level = 120, xp = 0, ascension = 0;
+            if (level && level > 1) {
+                ascension = level <= 30 ? 0 : Math.ceil((level - 30) / 10) + 1;
+
+                // Calculate total XP needed
+                for (let i = 1; i < level; i++) {
+                    xp += Math.floor(20 * Math.pow(i, 1.290349));
+                };
+            };
+
+            for (const weapon of weapons) {
+                await insertNewWeapon(user.id, weapon.id, weapon.category, undefined, flags.includes("max") ? xp : undefined, flags.includes("max") ? ascension : undefined);
+            };
+
+            return interaction.reply({ content: `Action Successful: Added all weapons to ${user.toString()}`, ephemeral });
+        };
+
+        // Add all rings
+        if (action.startsWith("add all rings")) {
+            if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/admin add all rings user:@user\`\n\n**Options**\n\`user\`: User to add the rings to`, ephemeral });
+
+            const flags = args.filter(arg => arg.startsWith("--")).map(flag => flag.slice(2));
+
+            const rings = items.filter(item => item.category === "ring") as ringInfo[];
+
+            for (const ring of rings) {
+                await insertNewWeapon(user.id, ring.id, ring.category, undefined, flags.includes("max") ? (ring.maxlevel - 1) : undefined);
+            };
+
+            return interaction.reply({ content: `Action Successful: Added all rings to ${user.toString()}`, ephemeral });
         };
 
         // Remove weapon
