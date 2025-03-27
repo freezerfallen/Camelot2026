@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ChatInputCommandInteraction, ButtonStyle } from "discord.js";
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { abilities } from "../Modules/abilities";
 import { achievements } from "../Modules/achievements";
 import { classes } from "../Modules/classes";
@@ -11,7 +11,7 @@ import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
 import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, formatNumberWithQuotes } from "../Modules/functions";
-import { requestVerification, dungeonTempBan } from "../Modules/components";
+import { requestVerification, dungeonTempBan, AbilityResponse } from "../Modules/components";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';

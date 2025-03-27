@@ -1,5 +1,6 @@
-import { AbilityResponse, ClassAbility } from "../types";
+import { ClassAbility } from "../types";
 import buffInfo from "./buffs";
+import { AbilityResponse } from "./components";
 import { addHeal } from "./functions";
 
 export default class curseInfo {

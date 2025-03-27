@@ -11,8 +11,9 @@ import { getDetailedStats, customEmojis, dealDamage } from "../Modules/functions
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, DetailedStats, SlashCommand, UpdateUserOptions } from '../types';
+import { DetailedStats, SlashCommand, UpdateUserOptions } from '../types';
 import { getUserSchema, updateUsers } from '../Modules/queries';
+import { AbilityResponse } from '../Modules/components';
 
 const dungeonInProgress = new Map();
 

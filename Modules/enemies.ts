@@ -1,9 +1,10 @@
 import { ActionRowBuilder, ButtonStyle, ButtonBuilder } from "discord.js";
-import { AbilityResponse, Buffs, CharacterRarity, Gender, IenemyInfo, IskillInfo } from "../types";
+import { Buffs, CharacterRarity, DetailedStats, Gender, IenemyInfo, IentityInfo, IskillInfo } from "../types";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal, customEmojis } from "./functions";
 import skillInfo from "./skills";
+import { AbilityResponse } from "./components";
 
 export class enemyInfo implements IenemyInfo {
     private _name: string;
@@ -886,34 +887,35 @@ export const raidBosses: enemyInfo[] = [
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.buffIds = []; eStats.buffScale = 1;
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.buffIds = [];
+            eStats.buffScale = 1;
 
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Reflects DoT, +50% DoT to Boss
                 Object.keys(ebuff).forEach((stat) => {
-                    ebuff[stat as keyof Buffs].forEach((buff: any) => {
+                    ebuff[stat as keyof Buffs].forEach((buff) => {
                         if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
                             eStats.buffIds.push(buff.id);
                             mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
                             buff.val = buff.val * (eStats.buffScale + 0.5);
-                        }
+                        };
                     });
                 });
 
                 // +25% DoT, removes boss debuffs
                 if (matchStats.round % 10 === 0) {
                     Object.keys(ebuff).forEach((stat) => {
-                        ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff: any) => !buff.isDebuff);
+                        ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff) => !buff.isDebuff);
                     });
                     eStats.buffScale += 0.25;
-                    notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** enrages and lost his debuffs and increased your bleeding damage.`);
+                    notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** sheds its debuffs!`);
                 };
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Reflects any damage over time", "Gets 50% more damage over time", "After every 10 rounds, removes his debuffs and increases the damage over time by 25%", "**Active**: Afflicts unstoppable bleeding with 4% of your HP (**40** <:mana:1047269152957661255>)"]])
+        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "Gets 50% more damage over time", "After every 10 rounds, removes his debuffs and increases the damage over time by 25%", "**Active**: Afflicts unstoppable bleeding with 4% of your HP (**40** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Hooded Striker", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/v6w1Z8g4/hooded-striker.png"], [], 20,
         new skillInfo(20, 55, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -949,7 +951,7 @@ export const raidBosses: enemyInfo[] = [
             // Reflects DoT, +75% DoT to Boss
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 Object.keys(ebuff).forEach((stat) => {
-                    ebuff[stat as keyof Buffs].forEach((buff: any) => {
+                    ebuff[stat as keyof Buffs].forEach((buff) => {
                         if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
                             eStats.buffIds.push(buff.id);
                             mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
@@ -961,7 +963,7 @@ export const raidBosses: enemyInfo[] = [
                 // Removes boss debuffs, +40% DoT
                 if (matchStats.round % 8 === 0) {
                     Object.keys(ebuff).forEach((stat) => {
-                        ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff: any) => !buff.isDebuff);
+                        ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff) => !buff.isDebuff);
                     });
                     eStats.buffScale += 0.4;
                     notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** enrages and lost his debuffs and increased your bleeding damage.`);
@@ -1010,7 +1012,7 @@ export const raidBosses: enemyInfo[] = [
             ];
             let availableButtons = [0, 1, 2, 3];
 
-            function updateButtons(buttons: ButtonBuilder[], availableButtons: number[], myStats: any, enemy: any, eStats: any) {
+            function updateButtons(buttons: ButtonBuilder[], availableButtons: number[], myStats: DetailedStats, enemy: IentityInfo, eStats: DetailedStats) {
                 const successIndex = availableButtons.splice(Math.floor(Math.random() * availableButtons.length), 1)[0];
                 const dangerIndex = availableButtons.splice(Math.floor(Math.random() * availableButtons.length), 1)[0];
                 const fakeDanger1 = availableButtons[0];

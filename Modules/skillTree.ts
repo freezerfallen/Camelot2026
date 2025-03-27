@@ -1,5 +1,6 @@
-import { AbilityResponse, ItemAbility } from "../types";
+import { ItemAbility } from "../types";
 import buffInfo from "./buffs";
+import { AbilityResponse } from "./components";
 import delayedBuffs from "./delayedBuffs";
 import { addHeal, customEmojis, dealDamage, numberToRoman } from "./functions";
 

@@ -8,11 +8,11 @@ import { stampedes } from "../Modules/stampedes.js";
 import { skills, eventBossAbilities } from "../Modules/skills.js";
 import charInfo, { characters } from "../Modules/chars.js";
 import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, isStampedeMonth } from "../Modules/functions.js";
-import { requestVerification, dungeonTempBan } from "../Modules/components.js";
+import { requestVerification, dungeonTempBan, AbilityResponse } from "../Modules/components.js";
 import Avalon from "../Modules/avalon.js";
 import buffInfo from "../Modules/buffs.js";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand, StampedeSchema, UpdateUserOptions } from '../types.js';
+import { CompactUserSchema, DetailedStats, SlashCommand, StampedeSchema, UpdateUserOptions } from '../types.js';
 import { getGuildSchema, getLatestStampede, getPartyMembers, getPartySchema, getUserSchema, getUserSchemas, updateStampedeParticipation, updateStampedes, updateUsers } from '../Modules/queries.js';
 
 const dungeonInProgress = new Map();

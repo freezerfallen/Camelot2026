@@ -8,12 +8,12 @@ import { armorInfo, itemInfo, items, ringInfo, weaponInfo } from "../Modules/ite
 import { skills } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { getDetailedStats, customEmojis, dealDamage, getClassLvl, formatNumberWithQuotes, getLetterRank } from "../Modules/functions";
-import { dungeonTempBan } from "../Modules/components";
+import { AbilityResponse, dungeonTempBan } from "../Modules/components";
 import delayedBuffs from "../Modules/delayedBuffs";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { getUserSchema, getWeaponSchemas, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 

@@ -1,8 +1,9 @@
-import { AbilityResponse, Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
+import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
 import { ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
+import { AbilityResponse } from "./components";
 
 export class itemInfo {
     private _name: string;
@@ -4404,8 +4405,8 @@ export const items = [
 
         myStats.nimbleGuardian = myStats.dodge;
         // On turn 10/7: damageReduction += dodge rate difference
-        myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + [10, 7][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.damageReduction += Math.abs(myStats.dodge - myStats.nimbleGuardian);
+        myStats.delayedBuffs.push(new delayedBuffs([10, 7][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.damageReduction = (myStats.damageReduction ?? 0) + Math.abs(myStats.dodge - myStats.nimbleGuardian);
 
             return AbilityResponse.SUCCESS;
         }));
@@ -4533,6 +4534,13 @@ export const items = [
     }, (level) => `Normal attacks deal 2 hits of 40% lightning damage, each with a 40% chance to inflict Shock on the enemy, dealing **50%** of the previous damage for **2** rounds.`, "Crafted from darkened steel, the Lightning Seal ring is adorned with jagged edges that mimic the ferocity of a thunderstorm. Its deep indigo hue shifts to vibrant electric blue, sparking with arcs of energy that dance across its surface. Blinding light leaks from the cracks, embodying the essence of storm clouds. This ring grants the wearer mastery over lightning magic, channeling raw energy into powerful spells while enhancing reflexes and agility during combat. Whispers of ancient storms resonate from the ring, bestowing the courage to challenge the fiercest of foes.", "genesis", 708),
     new ringInfo("Fractured Whisper", "ring", "ring", ["raid"], "<:fractured_whisper:1340497296802054215>", "https://i.ibb.co/yBfWSyFM/Fractured-Whisper.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Hammer
 
+        // On (own) shield break: deal 10/12.5/15% damage
+        matchStats.on("shieldBreak", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (target === myStats) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:fractured_whisper:1340497296802054215> **${char.name}**`, { atkMultiplier: [0.1, 0.125, 0.15][level - 1], });
+            };
+        });
+
         // Create and break shield
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             if (myStats.round % [2, 2, 1][level - 1] === 0) {
@@ -4543,12 +4551,9 @@ export const items = [
             return AbilityResponse.SUCCESS;
         }, 9999));
 
-        // On (own) shield break: deal 10/12.5/15% damage
-        matchStats.on("shieldBreak", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (target === myStats) {
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:fractured_whisper:1340497296802054215> **${char.name}**`, { atkMultiplier: [0.1, 0.125, 0.15][level - 1], });
-            };
-        });
+        // Round 0 trigger
+        myStats.shield = 0;
+        matchStats.trigger("shieldBreak", eStats, myStats, ebuff, mybuff);
 
         return AbilityResponse.SUCCESS;
     }, (level) => `The wearer creates and immediately breaks a shield ${["every **2** rounds", "every **2** rounds", "every round"][level - 1]}. Deals **${[10, 12.5, 15][level - 1]}%** damage to the enemy on every shield break.`, "Forged from the remnants of an ancient frost titan’s crown, the Fractured Whisper hums with the echoes of a winter long lost. Its crystalline shards shimmer with spectral whispers, promising power to those who dare to listen.", "genesis", 709),
@@ -4750,7 +4755,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `Increases the wearer's max HP by **${[8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1]}%** but reduces dodge rate to **0%**.`, "The Amber's Dawn ring radiates warmth and a sense of inner light. Its intricately designed golden band is embellished with delicate, flower-like motifs that cradle a radiant amber gem, sparkling with a gentle glow reminiscent of a rising sun. When worn, this ring provides its bearer with the blessings of vitality, alike the lively blossoming. Life may be fleeting, but the soft petals will always infuse light into the bearer’s surroundings, banishing shadows and inspiring hope.", "rare", 724),
-    new ringInfo("Barbed Glory", "ring", "ring", ["raid"], "<:barbed_glory:1334561550379515955>", "https://i.ibb.co/jvT4P74T/Barbed-Glory.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Dusty
+    new ringInfo("Barbed Glory", "ring", "ring", ["raid"], "<:barbed_glory:1334561550379515955>", "https://i.ibb.co/jvT4P74T/Barbed-Glory.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Dusty
 
         // Reflects 5/7.5/10/12.5/15% damage taken back to the enemy
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -5059,13 +5064,13 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs([9, 10, 11, 12, 13][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             const atkScale = [20, 22.5, 25, 27.5, 30][level - 1] / 100;
-            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * atkScale), 9999));
-            mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * atkScale), 9999));
+            // mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * atkScale), 9999));
+            // mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * atkScale), 9999));
             myStats.atk += Math.floor(myStats.atk * atkScale);
             myStats.md += Math.floor(myStats.md * atkScale);
 
-            mybuff.def.push(new buffInfo("+", -Math.floor(myStats.def * 0.3), 9999));
-            mybuff.mr.push(new buffInfo("+", -Math.floor(myStats.mr * 0.3), 9999));
+            // mybuff.def.push(new buffInfo("+", -Math.floor(myStats.def * 0.3), 9999));
+            // mybuff.mr.push(new buffInfo("+", -Math.floor(myStats.mr * 0.3), 9999));
             myStats.def -= Math.floor(myStats.def * 0.3);
             myStats.mr -= Math.floor(myStats.mr * 0.3);
 

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle } from "discord.js";
-import { AbilityResponse, DetailedStats, SlashCommand } from '../types';
+import { DetailedStats, SlashCommand } from '../types';
 import { abilities } from "../Modules/abilities";
 import { achievements } from "../Modules/achievements";
 import { classes } from "../Modules/classes";
@@ -13,6 +13,7 @@ import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { getUserSchema, updateUsers } from '../Modules/queries';
+import { AbilityResponse } from '../Modules/components';
 
 const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()

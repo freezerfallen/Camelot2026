@@ -5,14 +5,14 @@ import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
 import { floors, rollingCowMobs } from "../Modules/enemies";
 import { armorInfo, itemInfo, items, ringInfo, weaponInfo } from "../Modules/items";
-import { cowSettings } from "../Modules/components";
+import { AbilityResponse, cowSettings } from "../Modules/components";
 import { skills, rollingCowAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { getDetailedStats, customEmojis, dealDamage, classLevelToXP } from "../Modules/functions";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { getPartyMembers, getUserSchemas, getWeaponSchemas, loadCowParticipants, updateUsers } from '../Modules/queries';
 
 type RcUserSchema = CompactUserSchema & {

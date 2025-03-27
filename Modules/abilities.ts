@@ -5,8 +5,9 @@ import charInfo, { characters } from "./chars";
 import { items } from "./items";
 import delayedBuffs from "./delayedBuffs";
 import buffInfo from "./buffs";
-import { AbilityResponse, Buffs, DetailedStats, IbuffInfo, IcharInfo, IentityInfo, MatchStats } from "../types";
+import { Buffs, DetailedStats, IbuffInfo, IcharInfo, IentityInfo, MatchStats } from "../types";
 import { getLatestStampede, getUserSchema, getUserWeaponCount, updateUsers, getPartyMembers, getUserSchemas } from "./queries";
+import { AbilityResponse } from "./components";
 
 type Ability = {
     usage: number;
@@ -639,7 +640,7 @@ export const abilities: Record<number, Ability> = {
             if (myStats.hp / myStats.maxhp > 0.25) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.used--;
-                matchStats.interaction.followUp({ content: `Self destruct can only be used once your hp is below 15% of your max HP (${Math.floor(myStats.maxhp * 0.15)})`, ephemeral: true });
+                matchStats.interaction.followUp({ content: `Self destruct can only be used once your hp is below **25%** of your max HP (${Math.floor(myStats.maxhp * 0.15)})`, ephemeral: true });
                 return AbilityResponse.FAILURE;
             };
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used self destruct! She`, { atkMultiplier: 3, magicDamage: true, dodge: false });

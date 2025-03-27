@@ -11,8 +11,9 @@ import { getDetailedStats, customEmojis, deleteReplyIn, dealDamage, baseEP } fro
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, GuildSchema, SlashCommand, UpdateUserOptions } from '../types';
+import { CompactUserSchema, DetailedStats, GuildSchema, SlashCommand, UpdateUserOptions } from '../types';
 import { getGuildSchema, getUserSchema, updateGuilds, updateUsers } from '../Modules/queries';
+import { AbilityResponse } from '../Modules/components';
 
 const dungeonInProgress = new Set();
 

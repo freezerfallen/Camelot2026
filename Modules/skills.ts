@@ -4,8 +4,9 @@ import { dealDamage, addHeal } from "./functions";
 import { items } from "./items";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
-import { AbilityResponse, CharacterRarity, ClassAbility, IskillInfo } from "../types";
+import { CharacterRarity, ClassAbility, IskillInfo } from "../types";
 import { getUserSchema } from "./queries";
+import { AbilityResponse } from "./components";
 
 export default class skillInfo implements IskillInfo {
     private _id: number;

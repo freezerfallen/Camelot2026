@@ -12,9 +12,10 @@ import { getDetailedStats, customEmojis, dealDamage, search, searchClass, search
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { enemyInfo } from '../Modules/enemies';
 import { updateUsers } from '../Modules/queries';
+import { AbilityResponse } from '../Modules/components';
 
 const dungeonInProgress = new Set();
 const crazeLevelSelected = new Map();

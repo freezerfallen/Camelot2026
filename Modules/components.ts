@@ -87,6 +87,11 @@ export const profileColors = {
     pink: ['#FFAFD7', '#FF7BBD'],
 } as const;
 
+export enum AbilityResponse {
+    SUCCESS = 1,
+    FAILURE = 0,
+};
+
 // export const newProfileColors = {
 //     creme: { text: '#FDE8FF', floor: '#a89aa8', gradStart: '#FDE8FF', gradEnd: '#000000' },
 //     red: { text: '#FF2626', floor: '#761113', gradStart: '#FF2626', gradEnd: '#000000' },

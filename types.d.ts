@@ -155,7 +155,7 @@ export interface IdelayedBuff {
     decrement(): void;
 };
 
-export enum AbilityResponse {
+enum AbilityResponse {
     SUCCESS = 1,
     FAILURE = 0,
 };

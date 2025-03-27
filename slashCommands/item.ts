@@ -142,9 +142,8 @@ const exportCommand: SlashCommand = {
                             `**Grade**: ${fItem.gradeEmote}\n` +
                             `**Type**: ${fItem.type[0].toUpperCase() + fItem.type.slice(1)}\n` +
                             `**Unique ID**: \`${item.uniqueid.split(":")[0]}\`\n` +
-                            `**Level**: **${item.level + 1}**/${fItem.maxlevel}\n\n` +
-                            `**Passive${fItem.maxlevel > 1 ? " (Asc. 1)" : ""}**: ${fItem.getBuffDesc(1)}\n\n` +
-                            `${fItem.maxlevel > 1 ? `**Passive (Asc. ${fItem.maxlevel})**: ${fItem.getBuffDesc(fItem.maxlevel)}\n\n` : ""}` +
+                            `**Ascension**: **${item.level + 1}**/${fItem.maxlevel}\n\n` +
+                            `**Passive${fItem.maxlevel > 1 ? ` (Asc. ${item.level + 1})` : ""}**: ${fItem.getBuffDesc(item.level + 1)}\n\n` +
                             `>>> ${fItem.flair}`
                         );
 

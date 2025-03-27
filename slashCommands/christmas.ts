@@ -11,8 +11,9 @@ import { getDetailedStats, customEmojis, dealDamage, search, searchClass, search
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { AbilityResponse, CompactUserSchema, DetailedStats, SlashCommand, UpdateUserOptions } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand, UpdateUserOptions } from '../types';
 import { getPartyMembers, updateUsers } from '../Modules/queries';
+import { AbilityResponse } from '../Modules/components';
 
 const dungeonInProgress = new Map();
 const crazeLevelSelected = new Map();
