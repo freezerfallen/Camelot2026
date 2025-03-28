@@ -21,7 +21,7 @@ export default class Avalon {
             if (!eStatsC.blockRevival && myStatsC.revivedTotal < myStatsC.maxRevivals && myStatsC.rev > Math.random()) {
                 myStatsC.revivedTotal++;
                 myStatsC.hp = Math.floor(myStatsC.maxhp * myStatsC.revhp);
-                notice.push(`\n<:revival:1341347208590790759> ${myStatsC.name} survived! Restored **${myStatsC.hp}** HP`);
+                notice.push(`\n🪽 ${myStatsC.name} survived! Restored **${myStatsC.hp}** HP`);
                 matchStats.trigger("revival", myStatsC, eStatsC, myStatsC.buffs, eStatsC.buffs, {});
                 matchStats.turn === 1;
                 editEmbed();

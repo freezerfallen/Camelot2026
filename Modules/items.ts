@@ -4190,25 +4190,35 @@ export const items = [
 
     // Rings
     new ringInfo("Hope's End Signet", "ring", "ring", ["chest"], "<:hopes_end_signet:1333956472186343479>", "https://i.ibb.co/F47BRF93/Hope-s-End-Signet.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.HSusedAbilityOnRound = 0;
+        myStats.HSusedSkillOnRound = 0;
 
-        // On Ability: +20/25/30% MD (2 turns)
+        // On Ability: +20/25/30% MD (3 turns)
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
-                mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * (0.2 + 0.05 * (level - 1))), 2));
-                myStats.md += Math.floor(myStats.md * (0.2 + 0.05 * (level - 1)));
+            if (caster === myStats && myStats.HSusedAbilityOnRound !== matchStats.round) {
+                myStats.HSusedAbilityOnRound = matchStats.round;
+                const amount = Math.floor(myStats.md * (0.2 + 0.05 * (level - 1)));
+                const buff = new buffInfo("+", amount, 3);
+                buff.label = `HES MD: +${amount}`;
+                mybuff.md.push(buff);
+                myStats.md += amount;
             };
         });
 
-        // On Skill: +20/25/30% ATK (2 turns)
+        // On Skill: +20/25/30% ATK (3 turns)
         matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
-                mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * (0.2 + 0.05 * (level - 1))), 2));
-                myStats.atk += Math.floor(myStats.atk * (0.2 + 0.05 * (level - 1)));
+            if (caster === myStats && myStats.HSusedSkillOnRound !== matchStats.round) {
+                myStats.HSusedSkillOnRound = matchStats.round;
+                const amount = Math.floor(myStats.atk * (0.2 + 0.05 * (level - 1)));
+                const buff = new buffInfo("+", amount, 3);
+                buff.label = `HES ATK: +${amount}`;
+                mybuff.atk.push(buff);
+                myStats.atk += amount;
             };
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After using an ability, increases your magic damage by **${[20, 25, 30][level - 1]}%** for 2 turns. After using a skill, increases your attack by **${[20, 25, 30][level - 1]}%** for 2 turns.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
+    }, (level) => `After using an ability, increases the wearer's magic damage by **${[20, 25, 30][level - 1]}%** for **3** turns. And after using a skill, increases attack by **${[20, 25, 30][level - 1]}%** for **3** turns. These can only be triggered once per round each.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
     new ringInfo("Eclipse", "ring", "ring", ["raid"], "<:eclipse:1333953559988928606>", "https://i.ibb.co/MD73rWtJ/Eclipse.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Magma
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -4531,7 +4541,7 @@ export const items = [
         };
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Normal attacks deal 2 hits of 40% lightning damage, each with a 40% chance to inflict Shock on the enemy, dealing **50%** of the previous damage for **2** rounds.`, "Crafted from darkened steel, the Lightning Seal ring is adorned with jagged edges that mimic the ferocity of a thunderstorm. Its deep indigo hue shifts to vibrant electric blue, sparking with arcs of energy that dance across its surface. Blinding light leaks from the cracks, embodying the essence of storm clouds. This ring grants the wearer mastery over lightning magic, channeling raw energy into powerful spells while enhancing reflexes and agility during combat. Whispers of ancient storms resonate from the ring, bestowing the courage to challenge the fiercest of foes.", "genesis", 708),
+    }, (level) => `Normal attacks deal **2** hits of **40%** lightning damage, each with a **40%** chance to inflict Shock on the enemy, dealing **50%** of the previous damage for **2** rounds.`, "Crafted from darkened steel, the Lightning Seal ring is adorned with jagged edges that mimic the ferocity of a thunderstorm. Its deep indigo hue shifts to vibrant electric blue, sparking with arcs of energy that dance across its surface. Blinding light leaks from the cracks, embodying the essence of storm clouds. This ring grants the wearer mastery over lightning magic, channeling raw energy into powerful spells while enhancing reflexes and agility during combat. Whispers of ancient storms resonate from the ring, bestowing the courage to challenge the fiercest of foes.", "genesis", 708),
     new ringInfo("Fractured Whisper", "ring", "ring", ["raid"], "<:fractured_whisper:1340497296802054215>", "https://i.ibb.co/yBfWSyFM/Fractured-Whisper.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Hammer
 
         // On (own) shield break: deal 10/12.5/15% damage
@@ -4733,7 +4743,7 @@ export const items = [
             mybuff.br.push(new buffInfo("*", 0.99, 9999, -0.01, "+", [0.7, 1]));
 
             return AbilityResponse.SUCCESS;
-        }, 30));
+        }, 1));
 
         return AbilityResponse.SUCCESS;
     }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **30** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
@@ -5528,20 +5538,14 @@ export const items = [
             maxUsage: 1,
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats) {
-                    if (myStats.atk < myStats.md) {
-                        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        if (myStats.atk < myStats.md) {
                             myStats.atk = myStats.md;
-
-                            return AbilityResponse.SUCCESS;
-                        }, 9999));
-                    } else {
-                        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        } else {
                             myStats.md = myStats.atk;
-
-                            return AbilityResponse.SUCCESS;
-                        }, 9999));
-                    };
-
+                        };
+                        return AbilityResponse.SUCCESS;
+                    }, 9999));
                     return true;
                 };
             },

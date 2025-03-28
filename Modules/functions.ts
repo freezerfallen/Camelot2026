@@ -644,7 +644,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             target.hp += Math.floor(target.maxhp * target.dodgeHeal);
             if (target.hp > target.maxhp) target.hp = target.maxhp;
         };
-        if (matchStats.dodgebuff) targetBuff.atk.push(new buffInfo("*", 1 + matchStats.dodgebuff, 5));
+        if (matchStats.dodgebuff) {
+            const buff = new buffInfo("*", 1 + matchStats.dodgebuff, 5);
+            buff.label = `dodgebuff: ${matchStats.dodgebuff * 100}%, ${5} rounds`;
+            targetBuff.atk.push(buff);
+        };
         if (target.sjwUsedActive) {
             const drain = Math.floor(attacker.sm * 0.12);
             attacker.sm -= drain;

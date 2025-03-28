@@ -5140,8 +5140,8 @@ export const abilities: Record<number, Ability> = {
                     notice.push(`\n✨ **${char.name}** enters his Susanoo Form!`);
 
                     // 20% ATK & MD buff 
-                    mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
-                    mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.2), 9999));
+                    mybuff.atk.push(new buffInfo("*", 1.2, 9999));
+                    mybuff.md.push(new buffInfo("*", 1.2, 9999));
                     myStats.atk += Math.floor(myStats.atk * 0.2);
                     myStats.md += Math.floor(myStats.md * 0.2);
 

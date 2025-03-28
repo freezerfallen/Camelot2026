@@ -882,32 +882,35 @@ export const raidBosses: enemyInfo[] = [
     new enemyInfo("Hooded Hopper", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/wFXPyyBx/hooded-hopper.png"], [], 19,
         new skillInfo(19, 40, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**'s unstoppable bleeding attack`, { atkMultiplier: 1.25 });
-            mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * (0.04 + eStats.buffScale * 0.08)), 9999)); // gets increased by 2% every 10 rounds
+            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 0.8 });
+
+            if (damage > 0) {
+                mybuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.1), 9999));
+            };
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.buffIds = [];
             eStats.buffScale = 1;
+            // eStats.buffIds = [];
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Reflects DoT, +50% DoT to Boss
-                Object.keys(ebuff).forEach((stat) => {
-                    ebuff[stat as keyof Buffs].forEach((buff) => {
-                        if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
-                            eStats.buffIds.push(buff.id);
-                            mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
-                            buff.val = buff.val * (eStats.buffScale + 0.5);
-                        };
-                    });
-                });
+                // Object.keys(ebuff).forEach((stat) => {
+                //     ebuff[stat as keyof Buffs].forEach((buff) => {
+                //         if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
+                //             eStats.buffIds.push(buff.id);
+                //             mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
+                //             buff.val = buff.val * (eStats.buffScale + 0.5);
+                //         };
+                //     });
+                // });
 
                 // +25% DoT, removes boss debuffs
                 if (matchStats.round % 10 === 0) {
                     Object.keys(ebuff).forEach((stat) => {
                         ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff) => !buff.isDebuff);
                     });
-                    eStats.buffScale += 0.25;
+                    // eStats.buffScale += 0.25;
                     notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** sheds its debuffs!`);
                 };
 
@@ -915,65 +918,68 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "Gets 50% more damage over time", "After every 10 rounds, removes his debuffs and increases the damage over time by 25%", "**Active**: Afflicts unstoppable bleeding with 4% of your HP (**40** <:mana:1047269152957661255>)"]])
+        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "After every **10th** round, removes debuffs afflicting itself", "**Active**: Deals **80%** damage and applies bleeding equal to **10%** the damage caused, lasting until the end of the fight (**40** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Hooded Striker", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/v6w1Z8g4/hooded-striker.png"], [], 20,
         new skillInfo(20, 55, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**'s unstoppable bleeding attack`, { atkMultiplier: 1.35 });
-            mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * (0.05 + eStats.buffScale * 0.0625)), 9999)); // gets increased by 2.5% every 8 rounds
+            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 1.5 });
 
-            const randomBuff = Math.floor(Math.random() * 3);
-            const rBuffScale = 0.075, dodgeScale = 0.15;
-
-            //? Add notice for each buff
-            if (randomBuff === 0) { // Burn: 7.5% of your attack stats
-                mybuff.atk.push(new buffInfo("+", -Math.floor(myStats.atk * rBuffScale), 9999));
-                mybuff.md.push(new buffInfo("+", -Math.floor(myStats.md * rBuffScale), 9999));
-                myStats.atk -= Math.floor(myStats.atk * rBuffScale);
-                myStats.md -= Math.floor(myStats.md * rBuffScale);
-            } else if (randomBuff === 1) { // Poison: 7.5% of your defense stats
-                ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * rBuffScale), 9999));
-                ebuff.mr.push(new buffInfo("+", -Math.floor(eStats.mr * rBuffScale), 9999));
-                eStats.def -= Math.floor(eStats.def * rBuffScale);
-                eStats.mr -= Math.floor(eStats.mr * rBuffScale);
-            } else { // Freeze: 15% of your dodge and block stats
-                mybuff.dodge.push(new buffInfo("+", -dodgeScale, 9999));
-                mybuff.br.push(new buffInfo("+", -Math.floor(myStats.br * rBuffScale), 9999));
-                myStats.dodge -= dodgeScale;
-                myStats.br -= Math.floor(myStats.br * rBuffScale);
+            if (damage > 0) {
+                mybuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.1), 9999));
             };
+
+            // const randomBuff = Math.floor(Math.random() * 3);
+            // const rBuffScale = 0.075, dodgeScale = 0.15;
+
+            // if (randomBuff === 0) { // Burn: 7.5% of your attack stats
+            //     mybuff.atk.push(new buffInfo("+", -Math.floor(myStats.atk * rBuffScale), 9999));
+            //     mybuff.md.push(new buffInfo("+", -Math.floor(myStats.md * rBuffScale), 9999));
+            //     myStats.atk -= Math.floor(myStats.atk * rBuffScale);
+            //     myStats.md -= Math.floor(myStats.md * rBuffScale);
+            // } else if (randomBuff === 1) { // Poison: 7.5% of your defense stats
+            //     ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * rBuffScale), 9999));
+            //     ebuff.mr.push(new buffInfo("+", -Math.floor(eStats.mr * rBuffScale), 9999));
+            //     eStats.def -= Math.floor(eStats.def * rBuffScale);
+            //     eStats.mr -= Math.floor(eStats.mr * rBuffScale);
+            // } else { // Freeze: 15% of your dodge and block stats
+            //     mybuff.dodge.push(new buffInfo("+", -dodgeScale, 9999));
+            //     mybuff.br.push(new buffInfo("+", -Math.floor(myStats.br * rBuffScale), 9999));
+            //     myStats.dodge -= dodgeScale;
+            //     myStats.br -= Math.floor(myStats.br * rBuffScale);
+            // };
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.buffIds = []; eStats.buffScale = 1;
+            eStats.buffScale = 1;
+            // eStats.buffIds = [];
 
-            // Reflects DoT, +75% DoT to Boss
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                Object.keys(ebuff).forEach((stat) => {
-                    ebuff[stat as keyof Buffs].forEach((buff) => {
-                        if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
-                            eStats.buffIds.push(buff.id);
-                            mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
-                            buff.val = buff.val * (eStats.buffScale + 0.75);
-                        }
-                    });
-                });
+                // Reflects DoT, +75% DoT to Boss
+                // Object.keys(ebuff).forEach((stat) => {
+                //     ebuff[stat as keyof Buffs].forEach((buff) => {
+                //         if (buff.isDebuff && !(eStats.buffIds.includes(buff.id))) {
+                //             eStats.buffIds.push(buff.id);
+                //             mybuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val, buff.last, buff.change, buff.ctype, buff.cap));
+                //             buff.val = buff.val * (eStats.buffScale + 0.75);
+                //         }
+                //     });
+                // });
 
                 // Removes boss debuffs, +40% DoT
                 if (matchStats.round % 8 === 0) {
                     Object.keys(ebuff).forEach((stat) => {
                         ebuff[stat as keyof Buffs] = ebuff[stat as keyof Buffs].filter((buff) => !buff.isDebuff);
                     });
-                    eStats.buffScale += 0.4;
-                    notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** enrages and lost his debuffs and increased your bleeding damage.`);
+                    // eStats.buffScale += 0.4;
+                    notice.push(`\n<:bleeding_rage:1340697425630986240> **${enemy.name}** sheds its debuffs!`);
                 };
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Reflects any damage over time", "Gets 75% more damage over time", "After every 8 rounds, removes his debuffs and increases the damage over time by 40%", "**Active**: Applies either Burn, Poison, or Freeze that either decreases your attack, defense or miss stats", "**Active**: Afflicts unstoppable bleeding with 5% of your HP and (**55** <:mana:1047269152957661255>)"]])
+        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "After every **8th** round, removes debuffs afflicting itself", "**Active**: Deals **150%** damage and applies bleeding equal to **10%** the damage caused, lasting until the end of the fight (**55** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("POSTMASTER MALEDICT", "M", "the Postmaster", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/DHk8Nfyz/POSTMASTER-MALEDICT.png"], [], 21,
@@ -1107,7 +1113,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Sends a mail every 3 rounds. The green button decreases the damage dealt, the red button incrases it", "Increases its damage every time character ability is used", "**Active**: Decreases your defense and magic resist by 15% for 3 rounds", "**Active**: Adds 2 more red buttons, only one is the real red button (**55** <:mana:1047269152957661255>)"]])
+        }, [["Sends a mail every **3** rounds, then presents an option: The green button decreases the damage dealt, the red button incrases it", "Increases its damage every time the player uses their active ability", "**Active**: Decreases the player's DEF and MR by **15%** for **3** rounds, and adds **2** more red buttons, only one is the real red button (**55** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Valkorath", "Dark Paladin", "the Dark Sentinel", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/nqzkvYBR/valkorath.png"], [], 22,
@@ -1156,7 +1162,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Gains 40% of your max HP as a shield", "Gains 7.5% of its shield every round", "On Shield Break, Reverses your Type of Damage for 3 rounds", "Attacks each round with either physical damage or magical damage", "**Active**: Enters a domain, in which he increases his crit rate by 50% and sets his crit damage to 150%, and deals 40% lightning damage for 5 rounds (**90** <:mana:1047269152957661255>)"]])
+        }, [["Gains **40%** of the player's max HP as a shield", "Increases his shield by **7.5%** every round", "On shield break, reverses the player's damage type for **3** rounds", "Has a **50%** chance to deal magical damage", "**Active**: Enters a domain which lasts **5** rounds, in which he increases his crit rate by **50%**, sets his crit damage to **150%**, and deals **40%** lightning damage (**90** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Vortharion", "Dark Paladin", "the Warden of Shadows", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/TQTQXVy/vortharion.png"], [], 23,
         new skillInfo(23, 90, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1210,7 +1216,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Gains 50% of your max HP as a shield", "Gains 17.5% of its shield every round", "On Shield Break, Reverses your Type of Damage for 4 rounds", "Attacks each rounds with either physical damage or magical damage", "**Active**: Enters a domain, in which he increases his crit rate by 60% and sets his crit damage to 175%, and deals 45% lightning damage for 5 rounds (**90** <:mana:1047269152957661255>)"]])
+        }, [["Gains **65%** of the player's max HP as a shield", "Increases his shield by **17.5%** every round", "On shield break, reverses the player's damage type for **4** rounds", "Has a **50%** chance to deal magical damage", "**Active**: Enters a domain which lasts **5** rounds, in which he increases his crit rate by **60%**, sets his crit damage to **175%**, and deals **45%** lightning damage (**90** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Duskraze", "Dark Paladin", "the Dark Emperor", "M", true, {}, {}, { mana: 120 }, [], ["https://i.ibb.co/hRLBMbvt/duskraze.png"], [], 24,
         new skillInfo(24, 90, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1273,7 +1279,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Gains 75% of your max HP as a shield", "His Void Orb gains 15% of its shield orb every round, his shield decreases by 10% every round", "On Shield Break, Reverses your Type of Damage for 5 rounds", "Attacks each rounds with either physical damage or magical damage", "Every 6 rounds, he activates his Void Orb, dealing his saved amount of Shield as damage", "**Active**: Enters a domain, in which he increases his crit rate by 70% and sets his crit damage to 175%, and deals 50% lightning damage for 5 rounds (**90** <:mana:1047269152957661255>)"]])
+        }, [["Gains **75%** of the player's max HP as a shield", "Stores **15%** of his shield for his Void Orb every round, decreases his shield by **10%** each time", "On shield break, reverses the player's damage type for **5** rounds", "Has a **50%** chance to deal magical damage", "Every **6th** round, he uses Void Orb, dealing the stored amount of shield as damage", "**Active**: Enters a domain which lasts **5** rounds, in which he increases his crit rate by **70%**, sets his crit damage to **175%**, and deals **50%** lightning damage (**90** <:mana:1047269152957661255>)"]])
     ),
 ];
 
