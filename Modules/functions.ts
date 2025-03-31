@@ -16,7 +16,7 @@ import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { armorInfo, itemInfo, items, lootInfo, ringInfo, weaponInfo } from "./items";
 import _ from 'lodash';
-import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, UserSchemaForStats, WeaponSchema } from '../types';
+import { Buffs, CharacterRarity, ClassStats, CompactUserSchema, DetailedStats, Expertise, GuildDonationSchema, GuildSchema, IRoK, MatchStats, PrimaryStat, RaidRank, UserSchemaForStats, WeaponSchema } from '../types';
 import { curses } from './curses';
 import { getWeaponSchema } from './queries';
 
@@ -1569,7 +1569,7 @@ export const generateUniqueGuildId = (existing: string[], len: number = 5) => {
 
 export const getLetterRank = (score: number) => {
     const ranks = Object.keys(rankLowerRanges) as (keyof typeof rankLowerRanges)[];
-    let highestRank = "F-", highestRankScore = 0;
+    let highestRank: RaidRank = "F-", highestRankScore = 0;
     for (const rank of ranks) {
         if (score >= rankLowerRanges[rank] && rankLowerRanges[rank] > highestRankScore) {
             highestRank = rank;

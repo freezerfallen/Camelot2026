@@ -127,7 +127,7 @@ async function createTables() {
         cow_chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
-        rank TEXT DEFAULT 'F-' NOT NULL,
+        rank INT DEFAULT 0 NOT NULL,
         rankscore BIGINT DEFAULT 0 NOT NULL,
         raidxp INT DEFAULT 0 NOT NULL,
         guild_marks BIGINT DEFAULT 0 NOT NULL,

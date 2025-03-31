@@ -396,7 +396,7 @@ export interface UserSchema {
     cow_chars: number[];
     cow_timer: number | null;
     cow_rolled_today: number;
-    rank: string;
+    rank: number;
     rankscore: number;
     raidxp: number;
     guild_marks: number;
