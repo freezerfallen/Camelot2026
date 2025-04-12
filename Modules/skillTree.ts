@@ -71,9 +71,12 @@ class SkillPath {
         };
     };
 
+    uppercaseSkillType() {
+        return this._type[0].toUpperCase() + this._type.slice(1) + " Skill";
+    };
     fullName(level: number = 1, includeEmoji: boolean = false) {
         level ||= 1;
-        return `${includeEmoji ? `${this.emojiLabel} ` : ""}${this._name} ${numberToRoman(level)}`;
+        return `${includeEmoji ? `${this.emojiLabel} ` : ""}${this._name} ${numberToRoman(level)} - \`${this.uppercaseSkillType()}\``;
     };
     desc(level: number = 1) {
         level ||= 1;
@@ -240,9 +243,9 @@ export const skillTree: SkillPath[] = [
 
         return AbilityResponse.SUCCESS;
     }, 16),
-];
+    // // ];
 
-export const extraSkillTree: SkillPath[] = [
+    // // export const extraSkillTree: SkillPath[] = [
     //* Extra Skills
     // Attack
     new SkillPath("Precision Strike", "extra", "Attacks ignore **+1%** of enemy DEF and MR.", 3, 5, "attack", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
