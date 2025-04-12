@@ -403,6 +403,7 @@ export interface UserSchema {
     image_credits: number;
     skill_tree: Record<string, number>;
     skill_points: number;
+    raid_supports: number[];
     created: Date;
 
     chars: number[];

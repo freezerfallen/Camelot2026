@@ -2995,7 +2995,7 @@ export const abilities: Record<number, Ability> = {
             else if (matchStats.round > 5) atkbuff = 1.75, mana_cost = 10;
 
             if (this.cost + mana_cost > myStats.sm) {
-                matchStats.interaction.followUp({ content: "You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)", ephemeral: true });
+                matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${this.cost + mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                 myStats.sm += this.cost;
                 return AbilityResponse.FAILURE;
             };
@@ -3182,7 +3182,9 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Scorch Effect
                 matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                    if (caster === eStats) ebuff.hp.push(new buffInfo("+", -Math.floor(eStats.hp * Math.min(0.01 * Math.floor(myStats.heat / 10), 0.04)), 2));
+                    if (caster === eStats) {
+                        ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * Math.min(0.01 * Math.floor(myStats.heat / 10), 0.04)), 2));
+                    };
                 });
 
                 let roundTime = (matchStats.round - 1) % 6; // day: [0, 1], noon: [2], night: [3, 4, 5];
@@ -4861,14 +4863,17 @@ export const abilities: Record<number, Ability> = {
         usage: 5,
         used: 0,
         cost: 60,
-        desc: "**Total Usage**: `5`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMari's active skill is a sophisticated form of self-purification. By cleansing herself, she removes all debuffs currently affecting her. These are not merely discarded; instead, Mari redirects them to her enemy, **50%** stronger than they were.\n\nAt the onset of combat, Mari exerts her influence over the environment, infusing it with a toxic essence. This passive poison reduces enemy ATK & MD by **10%**, and DEF & MR by **100**.\n\nAs the battle prolongs, every **4** rounds, both Mari and her enemy suffer from this toxic environment, losing an additional **3%** ATK & MD, as well as **20** DEF & MR.\n\nIn a party, Mari boosts the party's offensive and defensive capabilities at the beginning of the battle, increasing their ATK, MD, DEF, MR, as well as their dodge chance, crit rate, and crit damage by **10%**.",
-        shortdesc: "**Uses**: `5`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `Support (DoT, Debuff-transferration)`\n\n__**Passive**__\nUpon entering battle on the enemy:\n- **-10%** ATK & MD\n- **-100%** DEF & MR\n\nEvery **4** rounds for both Mari & the enemy as a form of DoT:\n- **-3%** ATK & MD\n- **-20** DEF & MR\n\n__**Active**__ (✨)\n- Removes all debuffs on herself\n- Transfers those debuffs to the enemy with **+50%** effectiveness\n\n__**Party**__ (👥)\n- **+10%** ATK, MD, DEF, MR, Dodge rate, critical rate, critical DMG",
+        desc: "**Total Usage**: `5`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMari's active skill is a sophisticated form of self-purification. By cleansing herself, she removes all debuffs currently affecting her. These are not merely discarded; instead, Mari redirects them to her enemy, **50%** stronger than they were, lasting up to **5** rounds.\n\nAt the onset of combat, Mari exerts her influence over the environment, infusing it with a toxic essence. This passive poison reduces enemy ATK & MD by **10%**, and DEF & MR by **100**.\n\nAs the battle prolongs, every **4** rounds, both Mari and her enemy suffer from this toxic environment, losing an additional **3%** ATK & MD, as well as **20** DEF & MR.\n\nIn a party, Mari boosts the party's offensive and defensive capabilities at the beginning of the battle, increasing their ATK, MD, DEF, MR, as well as their dodge chance, crit rate, and crit damage by **10%**.",
+        shortdesc: "**Uses**: `5`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `Support (DoT, Debuff-transferration)`\n\n__**Passive**__\nUpon entering battle on the enemy:\n- **-10%** ATK & MD\n- **-100%** DEF & MR\n\nEvery **4** rounds for both Mari & the enemy as a form of DoT:\n- **-3%** ATK & MD\n- **-20** DEF & MR\n\n__**Active**__ (✨)\n- Removes all debuffs on herself\n- Transfers those debuffs to the enemy with **+50%** effectiveness, lasting up to **5** rounds\n\n__**Party**__ (👥)\n- **+10%** ATK, MD, DEF, MR, Dodge rate, critical rate, critical DMG",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Mari EX
             Object.keys(mybuff).forEach((stat) => {
                 mybuff[stat as keyof Buffs].forEach((buff) => {
-                    // Adds own buff x1.5 to enemy
-                    if (buff.isDebuff) ebuff[stat as keyof Buffs].push(new buffInfo(buff.type, buff.val * 1.5, buff.last, buff.change, buff.ctype, buff.cap));
+                    // Adds own debuffs x1.5 to enemy
+                    if (buff.isDebuff) {
+                        const debuff = new buffInfo(buff.type, buff.val * 1.5, Math.min(5, buff.last), buff.change, buff.ctype, buff.cap);
+                        ebuff[stat as keyof Buffs].push(debuff);
+                    };
                 });
 
                 // Remove debuffs
