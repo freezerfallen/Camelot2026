@@ -535,9 +535,9 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         };
 
         // 2B&9S EX's programmes
-         if (id === 2 && inv.equipment.prog) {
-             dStats.proginfo = inv.equipment.prog;
-         };
+        if (id === 2 && inv.equipment.prog) {
+            dStats.proginfo = inv.equipment?.prog?.split(",") ?? [];
+        };
 
     };
 
@@ -692,7 +692,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     } else {
         damage = options.overwriteDamage || Math.floor(multipliers.atk * multipliers.def * multipliers.crit * multipliers.combo * multipliers.lightning * multipliers.rng);
     };
-    if (attacker.critbonus && (isCrit || attacker.shorekeeperUsedActive)) damage *= 1+attacker.critbonus;
+    if (attacker.critbonus && (isCrit || attacker.shorekeeperUsedActive)) damage *= 1 + attacker.critbonus;
     attacker.crittedTotal ||= 0;
     attacker.crittedTotal++;
 
