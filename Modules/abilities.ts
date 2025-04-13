@@ -851,6 +851,79 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
+    "4334": {
+        usage: 9999,
+        used: 0,
+        cost: 0,
+        pause: 0,
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `40 (Can be substituted with 10% max HP)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, he enters battles with **+25%** critical DMG and **+10%** chance to counter attacks. Upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **20%**, lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **10%** of his max HP to elevate his arms. If his HP is above **1** after the consumption, he slams the shot, dealing **130%** DMG and boosting his ATK by **15%** for the next **2** turns. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **300%** DMG and boosting his ATK by **30%** for the next **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `40 💧 (Can be substituted with 10% max HP)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\n- **+25%** critical DMG\n- **+10%** chance to counter attacks (stackable)\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **20%** permanently\n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **10%** max HP instead as substitute.\n\nIf he is at **1** HP or more:\n- Deals **130%** DMG\n- Increases ATK by **15%** for the next **2** turns\n\nElse:\n- Remains at **1** HP\n- Deals **300%** DMG\n- Increases ATK by **30%** for the next **2** turns\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Taiga Kagami
+
+            // Active cost
+            if (myStats.sm < 40) {myStats.hp -= myStats.maxhp * 0.1} else {myStats.sm -= 40};
+                
+                // Meteor Jam
+                if (myStats.hp <= 0) {
+                    myStats.hp = 1;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🌠 **${char.name}** used Meteor Jam! He`, { atkMultiplier: 3 });
+                    // ATK buffs (Doubled effectiveness)
+                    mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.3), 2));
+                
+                } else {      
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **${char.name}** slammed the shot! He`, { atkMultiplier: 1.3 });           
+                    // ATK buffs
+                    mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.15), 2));
+                    }
+        },
+        passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.zone = false;
+
+            // Crit DMG Buff
+            mybuff.cd.push(new buffInfo("+", 0.25, 9999));
+            myStats.cd += 0.25;
+
+            // Counter Chance
+            myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                if (Math.random() < 0.1) myStats.counter += 1;
+                
+                // Zone (One-time)
+                if ((myStats.hp / myStats.maxhp < 0.4) && !myStats.zone) {
+                    notice.push(`\n💢 We have to win... **${char.name}** entered ZONE.`)
+                    let def_debuff = 0.2;
+                    myStats.zone = true;
+
+                    eStats.dodge -= 0.15;
+                    if (eStats.dodge < 0) eStats.dodge = 0;
+                    myStats.dodge += 0.15;
+                    if (myStats.dodge > 1) myStats.dodge = 1;
+                    eStats.def -= Math.floor(eStats.def * def_debuff);
+                    eStats.mr -= Math.floor(eStats.mr * def_debuff);
+
+                    ebuff.dodge.push(new buffInfo("=", Math.min(eStats.dodge - 0.15, 0), 9999));
+                    mybuff.dodge.push(new buffInfo("=", Math.min(myStats.dodge + 0.15, 1), 9999));
+                    ebuff.def.push(new buffInfo("+", Math.floor(eStats.def * def_debuff), 9999));
+                    ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * def_debuff), 9999));
+        }},9999))},
+        party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            let buff_multiplier = 1;
+            // Kuroko synergy
+            if (myStats.name == "Tetsuya Kuroko") {
+                buff_multiplier = 2;
+                notice.push(`\n✨ I won't let your ray of hope go out this time.`);
+            };
+
+            // General DMG buff
+            myStats.atk += Math.floor(myStats.atk * 0.1 * buff_multiplier);
+            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buff_multiplier), 9999))
+
+            // Upon ally counter, follows up with additional hit
+            matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${char.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
+            });
+        },
+    },
     "4767": {
         usage: 0,
         used: 0,
@@ -989,6 +1062,7 @@ export const abilities: Record<number, Ability> = {
                     if (eStats.shield > 0) {
                         eStats.shield = 0;
                         notice.push(`\n✨ **${enemy.name}**'s shield broke down!`);
+                        matchStats.trigger("shieldBreak", myStats, eStats, mybuff, ebuff);
                     };
                     notice.push(`\n✨ **${char.name}** entered his shadow form!`);
                     embed.setThumbnail("https://i.imgur.com/2VZTpDS.png");
@@ -2302,24 +2376,25 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    // "13314": {
-    //     usage: 9999,
-    //     used: 0,
-    //     cost: 0,
-    //     roundUsed: 0,
-    //     usedThisRound: 0,
-    //     desc: "**Total Usage**: `unlimited`\n**Cost**: `10`\\💧\n**Timeout**: `no`\n**Role**: `DPS/Tank`\n\nSeishirou Nagi",
-    //     ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-    //         // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
-
-    //     },
-    //     passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
-    //     },
-    //     party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
-    //     },
-    // },
+//     "13314": {
+//         usage: 9999,
+//         used: 0,
+//         cost: 0,
+//         roundUsed: 0,
+//         usedThisRound: 0,
+//         shortdesc: "",
+//         desc: "**Total Usage**: `unlimited`\n**Cost**: `10`\\💧\n**Timeout**: `no`\n**Role**: `DPS/Tank`\n\nSeishirou Nagi",
+//         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+//             // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
+//
+//        },
+//         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+//
+//         },
+//         party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+//
+//         },
+//     },
 
 
 
@@ -2677,6 +2752,112 @@ export const abilities: Record<number, Ability> = {
 
             return AbilityResponse.SUCCESS;
         },
+    },
+    "14909": {
+        usage: 10,
+        used: 0,
+        cost: 80,
+        pause: 0,
+        bladeUsedActive: false,
+        desc: "**Total Usage**: `10 (CD: 4)`\n**Cost**: `80`\\💧\n**Timeout**: `Yes`\n**Role**: `DPS`\n\nCursed with self-healing immortality, Blade works with Kafka and Silverwolf as a stellaron hunter, while seeking to end his own suffering by eternal death. When he is below **50%** HP in battle, he takes **40%** less DMG from damage instances. This is unstackable with other damage mitigation effects, where only the strongest one takes effect.\n\nUpon taking damage from damage instances or countering a hit, gains **1x** `Charge`. Upon having **4x** or more `Charge`, consumes **4x** to unleash Shuhu's Gift. This increases his ATK by **15%** of recorded DMG taken (Up to 50%) for that turn, and recovers his HP by **15%** of recorded DMG taken (Up to 50%), before dealing **80%** undodgeable DMG.\n\nUsing his active deals **30%** missing HP to the enemy, before lowering max HP by **50%** for **4** turns. Moreover, he will also self-inflict **5%** DMG to himself for the next **4** rounds.\n\nIn a party, he intervenes every **4** rounds, dealing **60%** DMG to the enemy before lowering their DEF & MR by **20%**. However, if the ally is Dan Heng, or the fight reaches round **40**, he becomes marastruck, additionally dealing **15%** DMG to the ally every **4th** turn. This marastruck effect however can be completely nullified if Kafka is in the team.",
+        shortdesc: "**Uses**: `10`\n**Cooldown**: `4 rounds`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Charge, Burst survival)`\n\n__**Passive**__\nWhen below **50%** HP:\n- **+40%** DMG mitigation (Unstackable : Only the strongest one takes effect) \n- Upon receiving a damage instance or countering a hit, gains **1x** `Charge`\n\nUpon reaching **4x** or more `Charge`, consumes **4x** to activate Shuhu's Gift:\n- Increases ATK by **15%** of recorded DMG taken for that turn (Up to **50%**)\n- Recovers HP by **15%** of recorded DMG taken (Up to **50** max HP)\n- Deals **80%** undodgeable DMG\n\n__**Active**__ (✨)\n- Deals **30%** missing HP\nFor **4** turns:\n- Decreases max HP by **50%**\n- Self-inflicts **5%** undodgeable DMG (counts as a damage instance)\n\n__**Party**__ (👥)\nIntervenes every **4** rounds\n- Deals **60%** DMG to the enemy\n- Decreases their DEF & MR by **20%** for that turn\n\nIf ally is Dan Heng, or the fight reaches round **40**:\n- Becomes Mara struck: additionally deals **15%** DMG to the ally every **4th** round\n- This marastruck effect can be nullified when Kafka is in the team",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Blade (HSR)
+            if (this.pause > matchStats.round) {
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                myStats.sm += this.cost;
+                return matchStats.interaction.followUp({ content: `Blade needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+            };
+            this.pause = matchStats.round + 4;
+
+            // Sets maxHP to 50% of HP for 4 turns
+            const hpreduction = Math.floor(myStats.maxhp*0.5);
+            myStats.maxhp -= hpreduction;
+            this.bladeUsedActive = true;
+            if (myStats.hp > myStats.maxhp) {myStats.hp = myStats.maxhp};
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                myStats.maxhp += hpreduction;
+                this.bladeUsedActive = false;
+            }));
+
+            // Deals undodgeable DMG based off 30% lost HP
+            const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor((myStats.maxhp - myStats.hp) * 0.3) : 0;
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+
+            // Deals 5% uncounterable DMG to self every turn for 4 turns -> Counts towards CHARGE
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                dealDamage(myStats, myStats, mybuff, mybuff, matchStats, notice, `✨ **${char.name}**'s self-attack`, { atkMultiplier: 0.05, magicDamage: true, canCounter: false });
+            }, 4));
+
+        },
+        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            myStats.charge ??= 0;
+            myStats.damageTaken ??= 0;
+
+            matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) {
+                    myStats.charge += 1;
+                };
+
+                // Shuhu's Gift
+                if (myStats.charge >= 4) {
+                    myStats.charge -= 4;
+                    const bonus = Math.floor(myStats.damageTaken * 0.15);
+                    myStats.atk += Math.min(Math.floor(myStats.atk * 0.5) , bonus);
+                    myStats.hp += Math.min(Math.floor(myStats.maxhp * 0.5) , bonus);
+                    if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *My vengeance will pursuit you...* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, dodge: false });
+                };
+            });
+
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (target === myStats) {
+                    myStats.charge += 1;
+                };
+
+                // Shuhu's Gift
+                if (myStats.charge >= 4) {
+                    myStats.charge -= 4;
+                    const bonus = Math.floor(myStats.damageTaken * 0.15);
+                    myStats.atk += Math.min(Math.floor(myStats.atk * 0.5) , bonus);
+                    myStats.hp += Math.min(Math.floor(myStats.maxhp * 0.5) , bonus);
+                    if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *My vengeance will pursuit you...* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, dodge: false });
+                };
+            });
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if ((myStats.hp / myStats.maxhp < 0.5 || this.bladeUsedActive) && myStats.damageReduction < 0.4) myStats.damageReduction = 0.4;
+                if (myStats.charge >= 4) {
+                    myStats.charge -= 4;
+                    const bonus = Math.floor(myStats.damageTaken * 0.15);
+                    myStats.atk += Math.min(Math.floor(myStats.atk * 0.5) , bonus);
+                    myStats.hp += Math.min(Math.floor(myStats.maxhp * 0.5) , bonus);
+                    if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *My vengeance will pursuit you...* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, dodge: false });
+                }
+            }, 9999));
+        },
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (myStats.name == "Dan Heng") notice.push(`\nI have nothing to do with your past.`);
+            const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 4 === 0) {
+
+                    // When team doesn't have Kafka    
+                    if (!names.includes("Kafka")) {
+                        // Lashes out indiscriminately after round 40 / when char is D.H.
+                        if ((matchStats.round >= 40 && myStats.name !== "Kafka") || myStats.name == "Dan Heng") {
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🩸 **${pStats.name}** attacked **${myStats.name}**! He`, { atkMultiplier: 0.15 })};
+                }
+                    // Regular damage + DEF/MR shred
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${pStats.name}**`, { atkMultiplier: 0.6, magicDamage: true, dodge: false });
+                    eStats.def -= Math.floor(eStats.def * 0.2);
+                    eStats.mr -= Math.floor(eStats.mr * 0.2);
+                };
+            }, 9999));
+        }
     },
     "14917": {
         usage: 1,
@@ -5186,6 +5367,384 @@ export const abilities: Record<number, Ability> = {
             }, 9999, 1));
 
             return AbilityResponse.SUCCESS;
+        },
+    },
+    "1": {
+        usage: 9999,
+        used: 0,
+        cost: 100,
+        pause: -11,
+        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `100 💧+ 25% current HP`\n**Timeout**: `false`\n**Role**: `DPS (Non-critical)`\n\nBuilt out of high-energy pure crystals, Shorekeeper acts as a vessel where data filled with grief, chaos and decay flow through her for analysis. She repairs her scars with new crystals, as she witnesses the tragedies of humanity.\n\nHer ATTACK is altered to __Origin Calculus__, interpreting the reverberations. She deals **80%** DMG. For every `Flare Stare Butterfly` summoned, this hit’s damage scaling is increased by **5%**. If the hit is non-critical, gains **3x** `Core`. When she has **5x** or more `Core`, she immediately follows up with __Astral Chord__.\n\nAfter using DEFEND, she follows up with  __Astral Chord__. For every **5** existing `Core`, transforms them into **1x** `Flare Stare Butterfly` (Up to 10). She then casts Suction, where for every `Flare Stare Butterfly` on-field, the enemy has **-2%** critical rate and **-2%** DEF & MR for **3** rounds, meanwhile boosting her DEF & MR by **5** permanently, up to **750**.\n\nConsuming **100** 💧and **30%** of her current HP, she casts her active, __End Loop__, where she summons a domain of Stellarealm for **10** rounds. During this period, She restores **5%** lost HP every round and has **+3%** ATK for every **1x** `Flare Stare Butterfly` owned. Moreover, attacks will *benefit from the critical damage scaling* even if they don’t land a critical strike\n\nRight before exiting the domain, she increases critical DMG by **50%** for **1** round, before giving a final ordination.\n- [Default] : Deals **50%** DMG\n- [5+ Butterflies] : Deals **150%** DMG + restores **15%** max HP\n- [10 Butterflies] : Deals **250%** DMG + restores **25%** max HP + Increases dodge rate by **100%** for **1** round\n\nIn a party, she increases the ally’s dodge rate by **2%** for every **5%** missing HP, up to **20%** dodge rate. Moreover, allies evade the first **3** lethal attacks and restore **10%** max HP.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `10 rounds`\n**Cost**: `100 💧+ 25% current HP`\n**Timeout**: `No`\n**Role**: `DPS (Non-critical)`\n\n__**Passive**__\n- After using DEF, follows up with “Astral Chord”\n\nATTACK is altered:\n- Deals **80%** DMG\n- For each `Butterfly` summoned, DMG scaling is increased by **5%**\n- If this hit is non-critical, grant **3x** additional `Core`\n- If amount of `Core` reaches **5** or more, follows up with “Astral Chord”\n\n“Astral Chord”:\n- For every **5** existing cores, transforms them to **1x** `Butterfly` (Up to 10)\n- For every `Butterfly` on-field:\n> - Reduces enemy’s critical rate by **2%** for **3** rounds\n> - Reduces enemy’s DEF/MR by **2%** for **3** rounds\n> - Increases DEF/MR by **5** (Up to 750)\n\n__**Active**__ (✨)\nCreates a domain of Stellarealm for **10** rounds, during this period:\n- Restores **5%** lost HP every round\n- Boosts ATK by **3%** for every **1x** `Butterfly` owned (Up to 30%)\n- All attacks **will benefit from the critical damage scaling** even if they don’t land a critical strike\n\nRight before exiting the domain:\n- Increases critical DMG by **50%** for **1** round\n- Grants additional effects based off `Butterfly` owned\n> - [Default] : Deals **50%** DMG\n> - [5+ Butterflies] : Deals **150%** DMG + restores **15%** max HP\n> - [10 Butterflies] : Deals **250%** DMG + restores **25%** max HP + Increases dodge rate by **100%** for **1** round\n\n__**Party**__ (👥):\n- For every **5%** HP missing: Increases ally’s dodge rate by **2%** (Up to 20%)\n- Allies evades lethal attacks and restores **10%** max HP (Up to 3 times)",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Shorekeeper EX
+            matchStats.turn = matchStats.turnSkill ? 0 : 1;
+
+            if (this.pause > matchStats.round) {
+                myStats.sm += this.cost;
+                matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                this.used--;
+                return;
+            };
+            this.pause = matchStats.round + 10;
+
+            const domainLast = 10;
+            
+            myStats.shorekeeperUsedActive = true;
+            myStats.hp -= Math.floor(myStats.hp * 0.25);
+
+            // Enter Stellarealm
+            const atkbuff = Math.floor(myStats.atk * Math.min(0.03 * myStats.butterfly)) 
+            mybuff.atk.push(new buffInfo("+", atkbuff, domainLast - 1));
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
+            }, domainLast - 1));
+
+            // Exit Stellarealm
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                myStats.cd += 0.5;
+
+                // Activates additional effects based off Butterfly
+                switch (true) {
+                    case myStats.butterfly >= 10:
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Rectify!* **${char.name}** dealt`, { atkMultiplier: 2.5, dodge: false});
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.25), {});
+                        myStats.dodge = 1;
+                        break;
+                    case myStats.butterfly >= 5: 
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Perish!* **${char.name}** dealt`, { atkMultiplier: 1.5, dodge: false});
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15), {});
+                        break;
+                    default: 
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Ordained!* **${char.name}** dealt`, { atkMultiplier: 0.5, dodge: false});
+                        break;
+                };
+
+                myStats.shorekeeperUsedActive = false;
+            }));
+
+            notice.push(`\n✨ **${char.name}** summoned the Domain of Stellarealm for ${domainLast} rounds!`);
+        },
+        passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.core ??= 0;
+            myStats.butterfly ??= 0;
+            myStats.astraldefcap = 750;
+            myStats.shorekeeperUsedActive = false;
+
+            // Alter DEFEND
+            const astralchord = () => {
+
+                // Transform Core -> Butterfly (Up to 10)
+                while (myStats.core >= 5) {
+                    myStats.core -= 5;
+                    if (myStats.butterfly < 10) {
+                        myStats.butterfly += 1;
+                }
+            };
+                // Suction - debuffs for 3 turns
+                const def_debuff = 0.02 * myStats.butterfly
+                eStats.cr -= def_debuff;
+                if (eStats.cr < 0) eStats.cr = 0;
+                eStats.def -= Math.floor(eStats.def * def_debuff);
+                eStats.mr -= Math.floor(eStats.mr * def_debuff);
+
+                ebuff.def.push(new buffInfo("+", Math.floor(eStats.def * def_debuff), 2));
+                ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * def_debuff), 2));
+                ebuff.cr.push(new buffInfo("=", Math.min(0, eStats.cr - def_debuff), 2));
+
+                // Increase DEF/MR up to 750
+                if (myStats.astraldefcap > 0) {
+                    const defmrboost = Math.min(5 * myStats.butterfly, myStats.astraldefcap)
+                    myStats.def += defmrboost;
+                    myStats.mr += defmrboost;
+                    mybuff.def.push(new buffInfo("+", defmrboost, 2));
+                    mybuff.mr.push(new buffInfo("+", defmrboost, 2));
+                    myStats.astraldefcap -= defmrboost;
+                };
+                notice.push(`\n🦋 **${char.name}** decreased the enemy's DEF & MR by ${Math.floor(def_debuff * 100)}%`)
+            };
+            
+            // Alter ATTACK
+            myStats.replaceButton.atk = {
+                "emoji": "🫧",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    const buff_multiplier = 0.05 * myStats.butterfly;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🫧 **${char.name}** used Origin Calculus! She`, { atkMultiplier: 0.8 + buff_multiplier, magicDamage: true, combodmg: true});
+                },
+            };
+
+            // Gain 1x Core when ATTACK doesn't crit
+            matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats && !(options.canCrit && (options.critChance < (caster.cr + options.critBuff)))) myStats.core += 3;
+                if (myStats.core >= 5) astralchord();
+            });
+
+            // After DEFEND, uses astralchord
+            matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) astralchord();
+            });
+        },
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            
+            myStats.evadeDeathStrike ??= 0;
+            myStats.evadeDeathStrike += 3;
+
+            // Upon death evasion, restores 10% max HP (up to 3 times)
+            matchStats.on("deathEvade", {
+                maxUsage: 3,
+                callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                    if (caster === myStats) {
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.1), {});           
+                        return true;
+                    }},
+                });
+
+            // Allies cannot fall below 0% dodge rate. Increases dodge rate by 2% for every 5% missing HP, up to 20%
+            if (myStats.dodge < 0) myStats.dodge = 0;
+            const dodgebuff = 0.02 * Math.floor((myStats.maxhp - myStats.hp) / myStats.maxhp);
+            myStats.dodge += Math.min(dodgebuff , 0.2);
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        if (myStats.dodge < 0) myStats.dodge = 0;
+                        const dodgebuff = 0.02 * Math.floor((myStats.maxhp - myStats.hp) / myStats.maxhp);
+                        myStats.dodge += Math.min(dodgebuff , 0.2);
+                    }, 9999));
+        },
+    },
+    "2": {
+        usage: 9999,
+        used: 0,
+        cost: 20,
+        pause: 0,
+        selfhealidx: 0,
+        desc: "**Total Usage**: `1 (CD: 10) +1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+30%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **90%** DMG, before slamming them in a strike, dealing an additional instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%).\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** [ɪɴꜱɪɢʜᴛ], 9S consumes all [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+3%** ATK/MD. Cannot have more than **8** stacks at all time.\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**. Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **2%** permanently (Up to 20%). After using DEFEND, activates “Boost”, increasing dodge rate by **30%** for **2** rounds and decreases enemy’s DEF by **2%** permanently (Up to 20%). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **2%** permanently (Up to 20%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, every even round, 2B pushes forward with her blade. If the ally’s dodge is below **0%**, set dodge to **0%**, before increasing dodge rate by **1%** for every **1%** of the ally’s missing HP, up to 30%.",
+        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+30%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`\n\nATTACK is altered:\n> - Loses **7%** current HP\n> - Deals **90%** DMG, before dealing another instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+3%** ATK. Cannot have more than **8** stacks at all time.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **25%** chance to counter the next hit (stackable)\n- **-2%** enemy's ATK permanently (Up to 20%)\n\nAfter using DEFEND:\n- **+30%** dodge rate for **2** rounds\n- **-2%** enemy's DEF permanently (Up to 20%)\n\nAfter using CLASS SKILL:\n- **+2%** DMG mitigation permanently (Up to 20%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\n- When 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\nEvery even round:\n- If ally’s dodge is below **0%**, set dodge to **0%**\n- Then increases dodge rate by **1%** for every **1%** HP missing, up to 30%",
+        ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // 2B&9S EX
+
+            // Enter respective flight unit for 10 rounds
+            if (this.used === 1 && myStats.sm < 20) {
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                return matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${20}\\💧)`, ephemeral: true });
+            } else if (this.used === 1) {
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                this.pause = matchStats.round + 6;
+
+                notice.push(`\n✨ 2B and 9S entered their flight units for 10 rounds.`);
+                // Additional effects after ATK/DEF/CSKILL
+                matchStats.on("ATK", {
+                    maxRound: 10,
+                    maxUsage: 10,
+                    callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                        if (caster === myStats) {
+                            // 25% chance to gain 1x Counter. Enemy ATK/MD -2% permanently
+                            if (Math.random() < 0.25) {
+                                myStats.counter += 1;
+                                notice.push(`\n${char.name} prepares to counter the next attack`);
+                            };
+                            eStats.atk -= Math.floor(myStats.atk * 0.02);
+                            ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.02), 9999));
+                            notice.push(`\n${char.name} decreased the enemy's ATK by 2%`);         
+                            return true;
+                        }},
+                    });
+                matchStats.on("DEF", {
+                    maxRound: 10,
+                    maxUsage: 10,
+                    callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                        if (caster === myStats) {
+                            // +30% dodge for 2 rounds. Enemy DEF -2% permanently
+                                let dodgeBuff = 0.3;
+                                myStats.dodge += dodgeBuff;
+                                if (myStats.dodge > 1) myStats.dodge = 1;
+                                mybuff.dodge.push(new buffInfo("+", dodgeBuff, 2));
+                                eStats.def -= Math.floor(myStats.def * 0.02);
+                                ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.02), 9999));
+                                notice.push(`\n${char.name} raised dodge and decreased the enemy's DEF by 2%`);           
+                                return true;
+                        }},
+                    });
+                matchStats.on("CSKILL", {
+                    maxRound: 10,
+                    maxUsage: 10,
+                    callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                        if (caster === myStats) {
+                            myStats.damageReduction += 0.02;
+                            if (myStats.damageReduction > 1) myStats.damageReduction = 1;
+                            notice.push(`\n${char.name} gained 2% DMG mitigation`);  
+                        }},
+                    });                    
+            } else {
+                if (this.pause > matchStats.round) return matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                // Self-Destruct : 2B alone
+                if (myStats.hacking) {       
+                    const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * 0.7) : 0;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ ${char.name}`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+                    myStats.hp = 1;
+                }
+                else {
+                    // Amplified when 9S isn't hacking
+                    const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * myStats.cd) : 0;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ ${char.name}`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+                    matchStats.trigger("crit", myStats, eStats, mybuff, ebuff);
+                    myStats.hp = 0;
+            }};
+        },
+        passive: function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            myStats.insight ??= 0;
+
+            let prog = myStats.proginfo;
+            if (prog) {
+                for (let i = 0; i < prog.length; i++) {
+                    switch (prog[i]) {
+                        case "a110" :
+                            notice.push("\n`⚙️` Pod has been equipped with programme : **Slow**.");
+                            myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                                if (matchStats.round % 3 === 0) {
+                                    eStats.dodge = 0;
+                                    ebuff.dodge.push(new buffInfo("=", 0, 2));
+                                };
+                            }, 9999));
+                            break;
+                        case "a120" :
+                            notice.push("\n`⚙️` Pod has been equipped with programme : **Repair**.");
+                            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                if (matchStats.round % 3 === 0) {
+                                    myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                        const heal = Math.floor(myStats.maxhp * 0.05);
+                                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, { }); 
+                                    }, 2));
+                                };
+                            }, 9999));
+                            break;
+                        case "a140" : 
+                            notice.push("\n`⚙️` Pod has been equipped with programme : **Gravity**.");
+                            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                if (matchStats.round % 3 === 0) {
+                                    eStats.atk -= Math.floor(eStats.atk * 0.25);
+                                    eStats.md -= Math.floor(eStats.md * 0.25);
+                                    eStats.def -= Math.floor(eStats.def * 0.25);
+                                    eStats.mr -= Math.floor(eStats.mr * 0.25);
+                                };
+                            }, 9999));
+                            break;
+                        case "a170" : 
+                            notice.push("\n`⚙️` Pod has been equipped with programme : **Scanner**.");
+                            matchStats.lootm += 0.15;
+                            matchStats.xpboost += 0.25;
+                            myStats.insight++;
+                            notice.push(`\n<:coins:1287057582858436648> Ultrasonic waves released...`);
+                            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                myStats.insight++
+                            }, 9999));
+                            break;
+                        case "r020" :
+                            notice.push("\n`⚙️` Pod has been equipped with programme : **Mirage**.");
+                            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                if (matchStats.round % 3 === 0) {
+                                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **Pod**", { atkMultiplier: 0.2, dodge: 0 });
+                                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **Pod**", { atkMultiplier: 0.2, dodge: 0 });
+                                };
+                            }, 9999));
+                            break;        
+                        default: notice.push(`\nFailed to connect to pod...`); break;
+                    };
+                }} else notice.push("\n`⚙️` Pod is not equipped with any programme! Please run `/item equip item:prog` to proceed with choosing one!");
+            myStats.hacking = false;
+            const domainLast = 4;
+            const atklist = ["敵ノ","破壊ヲ","確認"];
+            myStats.atkcount = 0;
+
+            // +30% max HP ; 100% chance to revive with 50% HP
+            myStats.rev ??= 0;
+            myStats.revhp ??= 0;
+            myStats.maxRevivals ??= 0;
+
+            myStats.rev = 1;
+            myStats.revhp += 0.5;
+            myStats.maxRevivals += 1;
+            const maxhpbuff = Math.floor(myStats.maxhp * 0.3)
+            myStats.maxhp += maxhpbuff;
+            myStats.hp += maxhpbuff;
+
+            this.selfhealidx = myStats.selfheal.length - 1;
+
+            // When below 50% HP: +7% lifesteal
+            if (myStats.hp / myStats.maxhp < 0.5) {
+                myStats.selfheal[this.selfhealidx] += 0.07;
+
+                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    myStats.selfheal[this.selfhealidx] -= 0.07;
+                }));
+            }
+
+            myStats.atk += Math.floor(myStats.atk * 0.03 * myStats.insight);
+            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) {
+                    if (myStats.insight < 8) myStats.insight++;
+                }
+            });
+
+            // Alter ATTACK
+            myStats.replaceButton.atk = {
+                "emoji": "⚔️",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    myStats.hp -= Math.floor(myStats.hp * 0.07);
+                    const secondhit = Math.min(0.5, 0.01 * Math.floor((eStats.maxhp - eStats.hp) / eStats.maxhp * 100) / 100);
+                    const flair = atklist[myStats.atkcount];
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⌦ ${flair} **2B**`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true});
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⌦ ${flair} **2B**`, { atkMultiplier: secondhit, magicDamage: true, combodmg: true});
+                    myStats.atkcount++;
+                    if (myStats.atkcount === 3) myStats.atkcount = 0;
+                },
+            };
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                myStats.atk += Math.floor(myStats.atk * 0.03 * myStats.insight);
+                
+                // Enter HACKING mode
+                if (myStats.insight >= 8 && !myStats.hacking) {
+                    notice.push(`\n✨ 9S initiated hacking for **4** rounds`);
+                    myStats.insight -= 8;
+                    myStats.hacking = true;
+                    if (eStats.hp / eStats.maxhp > 0.5) {
+                        let bonus = Math.floor(Math.abs(myStats.hp / myStats.maxhp - eStats.hp / eStats.maxhp) * 100) / 100;
+                        myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                    } else {
+                        eStats.def *= 0.75;
+                    }
+
+                    // Hacking long term effects
+                    myStats.delayedBuffs.push(new delayedBuffs(0, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                        if (eStats.hp / eStats.maxhp > 0.5) {
+                            let bonus = Math.floor(Math.abs(myStats.hp / myStats.maxhp - eStats.hp / eStats.maxhp) * 100) / 100;
+                            myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                        } else {
+                            eStats.def *= 0.75;
+                        }        
+                    }, matchStats.round + domainLast));
+                    
+                    matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                        if (caster === myStats) {
+                            myStats.hp -= Math.floor(myStats.hp * 0.07);
+                        }
+                    });
+
+                    // Exit HACKING mode
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                        myStats.hacking = false;
+                        notice.push(`\n✨ 9S exited hacking`)     
+                }));
+            };}, 9999));
+        },
+        party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 2 === 0) {
+                    if (myStats.dodge < 0) myStats.dodge = 0;
+                    myStats.dodge += Math.min(0.3, 0.1 * Math.floor((myStats.maxhp - myStats.hp) / myStats.maxhp * 100) / 100)
+                };
+            }, 9999));
         },
     },
 };
