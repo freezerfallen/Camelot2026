@@ -535,7 +535,7 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         };
 
         // 2B&9S EX's programmes
-        if (id === 2 && inv.equipment.prog) {
+        if (id === 23185 && inv.equipment.prog) {
             dStats.proginfo = inv.equipment?.prog?.split(",") ?? [];
         };
 
