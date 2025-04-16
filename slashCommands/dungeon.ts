@@ -419,8 +419,6 @@ const exportCommand: SlashCommand = {
                 tutorial: { type: 'append_unique', value: [9] },
             });
 
-            // Ascension material achievement
-            achievements[67].check(interaction, interaction.user),achievements[68].check(interaction, interaction.user),achievements[69].check(interaction, interaction.user),achievements[70].check(interaction, interaction.user);
             // Tutorial
             if (!stats.tutorial.includes(9)) {
                 const row = new ActionRowBuilder<ButtonBuilder>()
@@ -464,7 +462,11 @@ const exportCommand: SlashCommand = {
                 achievements[51].check(interaction); // A New Adventure
             };
 
-            // Daily Quests
+            //* Achievements
+            // Ascension material achievement
+            achievements[67].check(interaction, interaction.user), achievements[68].check(interaction, interaction.user), achievements[69].check(interaction, interaction.user), achievements[70].check(interaction, interaction.user);
+
+            //* Daily Quests
             dailies[2].update(interaction, skipRounds); // Increasing Danger
 
             let xpleft = myClass

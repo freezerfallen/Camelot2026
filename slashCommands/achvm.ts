@@ -187,12 +187,10 @@ const exportCommand: SlashCommand = {
                     const totalAscensionMaterials = Object.entries(stats.items)
                         .filter(([itemId]) => items[parseInt(itemId)]?.type === "ascension material")
                         .reduce((sum, [_, amount]) => sum + amount, 0);
-                
-                    if(id === 67) return achvmBar(totalAscensionMaterials / 2000, ` (${totalAscensionMaterials}/2000)\n`);
-                    if(id === 68) return achvmBar(totalAscensionMaterials / 10000, ` (${totalAscensionMaterials}/10000)\n`);
-                    if(id === 69) return achvmBar(totalAscensionMaterials / 50000, ` (${totalAscensionMaterials}/50000)\n`);
-                    if(id === 70) return achvmBar(totalAscensionMaterials / 200000, ` (${totalAscensionMaterials}/200000)\n`);
-                    break;
+
+                    const threshold = { 67: 2000, 68: 10000, 69: 50000, 70: 200000 }[id];
+
+                    return achvmBar(totalAscensionMaterials / threshold, ` (${totalAscensionMaterials}/${threshold})\n`);
                 }
 
                 default: return achvmBar(0);
