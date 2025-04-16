@@ -100,12 +100,12 @@ const exportCommand: SlashCommand = {
                 if (interaction.channel?.isSendable()) interaction.channel.send(`**${char.name}** reached level ${currLvl + up}!`);
 
                 // Achievements
-                achievements[42].check(interaction, interaction.user, currLvl + up), achievements[43].check(interaction, interaction.user, currLvl + up), achievements[44].check(interaction, interaction.user, currLvl + up), achievements[45].check(interaction, interaction.user, currLvl + up); // The Battle is to the Strongest
+                achievements[42].check(interaction, interaction.user, currLvl + up), achievements[43].check(interaction, interaction.user, currLvl + up), achievements[44].check(interaction, interaction.user, currLvl + up), achievements[45].check(interaction, interaction.user, currLvl + up); // The Battle is to the Strong
 
                 // From Riches to Rags
                 achievements[64].check(interaction, interaction.user, price), achievements[65].check(interaction, interaction.user, price), achievements[66].check(interaction, interaction.user, price);
 
-                // The Battle is to the Strongest II
+                // The Battle is to the Strong II
                 achievements[71].check(interaction, interaction.user, currLvl + up), achievements[72].check(interaction, interaction.user, currLvl + up), achievements[73].check(interaction, interaction.user, currLvl + up), achievements[74].check(interaction, interaction.user, currLvl + up);
             });
 
