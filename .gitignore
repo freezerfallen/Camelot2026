@@ -20,7 +20,7 @@ pids
 
 # IDE specific files
 .idea/
-.vscode/
+# .vscode/
 *.swp
 *.swo
 .DS_Store
