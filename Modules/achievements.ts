@@ -257,6 +257,32 @@ export default class achievInfo {
                 case 73: if (list[0] >= 700) this.addRewards(interaction, user), this.notify(interaction); break;
                 case 74: if (list[0] >= 1000) this.addRewards(interaction, user), this.notify(interaction); break;
 
+                case 75: if (list[0] === 100 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
+                case 76: if (list[0] === 200 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
+                case 77: if (list[0] === 300 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
+
+                case 78: if (list[0] === 40) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 79: if (list[0] === 80) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 80: if (list[0] === 120) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 81: if (list[0] === 170) this.addRewards(interaction, user), this.notify(interaction); break;
+
+                case 82: if(stats.bank >= list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
+
+                case 83:
+                case 84:
+                case 85:
+                case 86:
+                case 87: {
+                    const totalFish = Object.entries(stats.items)
+                    .filter(([itemId]) => items[parseInt(itemId)]?.type === "fish")
+                    .reduce((sum, [_, amount]) => sum + amount, 0);
+
+                const threshold = { 83: 100, 84: 200, 85: 500, 86: 1000, 87: 2000 }[this.id];
+
+                if (totalFish >= threshold) this.addRewards(interaction, user), this.notify(interaction);
+                break;
+                }
+
                 default: false; break;
             };
         } catch {
@@ -366,5 +392,23 @@ export const achievements = [ // Type 1: xp, 2: coins, 3: shards, 4: tickets, 5:
     new achievInfo("The Battle is to the Strong ⅠⅠ", "Reach level 500 with a character", 72, 23, "1,2,3", "xp|600", "coins|15000", "ss shards|16"),
     new achievInfo("The Battle is to the Strong ⅠⅠ", "Reach level 700 with a character", 73, 23, "1,2,3", "xp|800", "coins|25000", "ss shards|24"),
     new achievInfo("The Battle is to the Strong ⅠⅠ", "Reach level 1000 with a character", 74, 23, "1,2,3", "xp|1000", "coins|50000", "ss shards|36"),
+
+    new achievInfo("Zero to Hero", "Defeat floor 100 with a D rank character", 75, 24, "1,2", "xp|50", "coins|2000"),
+    new achievInfo("Zero to Hero", "Defeat floor 200 with a D rank character", 76, 24, "1,2", "xp|75", "coins|5000"),
+    new achievInfo("Zero to Hero", "Defeat floor 300 with a D rank character", 77, 24, "1,2,4", "xp|100", "coins|15000", "ss ticket|1"),
+
+    new achievInfo("Veteran in the Making", "Upgrade an item to level 40", 78, 25, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("Veteran in the Making", "Upgrade an item to level 80", 79, 25, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("Veteran in the Making", "Upgrade an item to level 120", 80, 25, "1,2", "xp|100", "coins|10000"),
+    new achievInfo("Veteran in the Making", "Upgrade an item to level 170", 81, 25, "1,2", "xp|200", "coins|20000"),
+
+    new achievInfo("Stop Hoarding", "Reach max capacity in bank", 82, 26, "2", "coins|2000"),
+
+    new achievInfo("Something's Fishy", "Catch 100 fish", 83, 27, "1,2", "xp|10", "coins|100"),
+    new achievInfo("Something's Fishy", "Catch 200 fish", 84, 27, "1,2", "xp|25", "coins|300"),
+    new achievInfo("Something's Fishy", "Catch 500 fish", 85, 27, "1,2", "xp|50", "coins|500"),
+    new achievInfo("Something's Fishy", "Catch 1000 fish", 86, 27, "1,4", "xp|75", "s ticket|2"),
+    new achievInfo("Something's Fishy", "Catch 2000 fish", 87, 27, "1,4", "xp|100", "ss ticket|2"),
+
 
 ];
