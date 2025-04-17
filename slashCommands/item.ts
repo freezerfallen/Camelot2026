@@ -580,10 +580,8 @@ const exportCommand: SlashCommand = {
                             level: { type: "increment", value: xpSelected },
                         });
 
-
                         interaction.editReply({ components: [] });
                         if (interaction.channel?.isSendable()) interaction.channel.send(`Leveled ${fItem.emoji} __**${fItem.name}**__ up to level **${currLevel}**!`);
-
 
                         //* Achievements
                         // Veteran in the Making

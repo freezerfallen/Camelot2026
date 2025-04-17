@@ -49,9 +49,9 @@ const exportCommand: SlashCommand = {
             }, 200);
         };
 
-        // Achievements
-        achievements[52].check(interaction, interaction.user, caught.grade), achievements[53].check(interaction, interaction.user, caught.grade), achievements[54].check(interaction, interaction.user, caught.grade); // Angler's Triumph
-
+        //* Achievements
+        // Angler's Triumph
+        achievements[52].check(interaction, interaction.user, caught.grade), achievements[53].check(interaction, interaction.user, caught.grade), achievements[54].check(interaction, interaction.user, caught.grade);
         // Something's Fishy
         achievements[83].check(interaction, interaction.user), achievements[84].check(interaction, interaction.user), achievements[85].check(interaction, interaction.user), achievements[86].check(interaction, interaction.user), achievements[87].check(interaction, interaction.user);
     },
