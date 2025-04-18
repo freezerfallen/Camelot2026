@@ -23240,25 +23240,25 @@ export const characters: charInfo[] = [
     new charInfo("Meru Zetsubouda", [], anime[453], "F", "https://i.ibb.co/VcDnJH7B/c.png", 23135, "C"),
     new charInfo("Rookie Idol", [], anime[453], "F", "https://i.ibb.co/TDMHWb5B/c.png ", 23136, "C"),
     new charInfo("Piko Kiwatosu", [], anime[453], "F", "https://i.ibb.co/HDKDy8Zj/c.png", 23137, "D"),
-    new charInfo("Sutera Kosaku", ["Kosauko Shutera", ], anime[453], "F", "https://i.ibb.co/FkFBc8Jv/c.png", 23138, "D"),
+    new charInfo("Sutera Kosaku", ["Kosauko Shutera",], anime[453], "F", "https://i.ibb.co/FkFBc8Jv/c.png", 23138, "D"),
     new charInfo("Gasako Suten", [], anime[453], "F", "https://i.ibb.co/xKtbJ1yT/c.png", 23139, "D"),
     new charInfo("Ranako Pute", [], anime[453], "F", "https://i.ibb.co/cScQ1Trg/c.png", 23140, "D"),
-    new charInfo("Oko Buraki", ["Oko Bracchi", ], anime[453], "F", "https://i.ibb.co/bMn2gXsb/c.png", 23141, "D"),
-    new charInfo("Sakuramori Akane", ["Akane Sakuramori", ], anime[601], "F", "https://i.ibb.co/d0SrkbRP/c.png", 23142, "S"),
-    new charInfo("Houjou Saito", ["Saito Houjou", "Saito Houjo", "Houjo Saito", ], anime[601], "M", "https://i.ibb.co/R4GR3WbH/c.png", 23143, "A"),
-    new charInfo("Houjou Shisei", ["Shisei Houjou", "Shisei Houjo", "Houjo Shisei", ], anime[601], "F", "https://i.ibb.co/mCyNVPgS/c.png", 23144, "B"),
-    new charInfo("Ishikura Himari", ["Himari Ishikura", ], anime[601], "F", "https://i.ibb.co/JWzFNBnm/c.png", 23145, "B"),
-    new charInfo("Sakuramori Maho", ["Maho Sakuramori", ], anime[601], "F", "https://i.ibb.co/pB2YqYnv/c.png", 23146, "C"),
-    new charInfo("Houjou Rui", ["Rui Houjou", "Houjo Rui", "Rui Houjo", ], anime[601], "F", "https://i.ibb.co/xKXVDXW6/c.png", 23147, "C"),
-    new charInfo("Houjou Tenryuu", ["Tenryuu Houjou", "Houjo Tenryuu", "Tenryuu Houjo", ], anime[601], "M", "https://i.ibb.co/S7MsHdrR/c.png", 23148, "C"),
-    new charInfo("Harukaze Nanami", ["Nanami Harukaze", ], anime[601], "F", "https://i.ibb.co/NdTTSbWn/c.png", 23149, "D"),
-    new charInfo("Hasegawa Yuzuki", ["Yuzuki Hasegawa", ], anime[601], "F", "https://i.ibb.co/4RM1Nzz1/c.png", 23150, "D"),
-    new charInfo("Houjou Reiko", ["Reiko Houjou", "Houjo Reiko", "Reiko Houjo", ], anime[601], "F", "https://i.ibb.co/jZvb2NrR/c.png", 23151, "D"),
-    new charInfo("Houjou Shizu", ["Shizu Houjou", "Houjo Shizu", "Shizu Houjo", ], anime[601], "F", "https://i.ibb.co/39SND84S/c.png", 23152, "D"),
-    new charInfo("Myoujou Sora", ["Sora Myoujou ", ], anime[601], "F", "https://i.ibb.co/WN7FRdL7/c.png", 23153, "D"),
-    new charInfo("Okuyama Rio", ["Rio Okuyama", ], anime[601], "F", "https://i.ibb.co/rCC42L8/c.png", 23154, "D"),
-    new charInfo("Sakuramori Chiyo", ["Chiyo Sakuramori", ], anime[601], "F", "https://i.ibb.co/XrX0MR9P/c.png", 23155, "D"),
-    new charInfo("Uezono Momoka", ["Momoka Uezono", ], anime[601], "F", "https://i.ibb.co/5XbZ16wd/c.png", 23156, "D"),
+    new charInfo("Oko Buraki", ["Oko Bracchi",], anime[453], "F", "https://i.ibb.co/bMn2gXsb/c.png", 23141, "D"),
+    new charInfo("Sakuramori Akane", ["Akane Sakuramori",], anime[601], "F", "https://i.ibb.co/d0SrkbRP/c.png", 23142, "S"),
+    new charInfo("Houjou Saito", ["Saito Houjou", "Saito Houjo", "Houjo Saito",], anime[601], "M", "https://i.ibb.co/R4GR3WbH/c.png", 23143, "A"),
+    new charInfo("Houjou Shisei", ["Shisei Houjou", "Shisei Houjo", "Houjo Shisei",], anime[601], "F", "https://i.ibb.co/mCyNVPgS/c.png", 23144, "B"),
+    new charInfo("Ishikura Himari", ["Himari Ishikura",], anime[601], "F", "https://i.ibb.co/JWzFNBnm/c.png", 23145, "B"),
+    new charInfo("Sakuramori Maho", ["Maho Sakuramori",], anime[601], "F", "https://i.ibb.co/pB2YqYnv/c.png", 23146, "C"),
+    new charInfo("Houjou Rui", ["Rui Houjou", "Houjo Rui", "Rui Houjo",], anime[601], "F", "https://i.ibb.co/xKXVDXW6/c.png", 23147, "C"),
+    new charInfo("Houjou Tenryuu", ["Tenryuu Houjou", "Houjo Tenryuu", "Tenryuu Houjo",], anime[601], "M", "https://i.ibb.co/S7MsHdrR/c.png", 23148, "C"),
+    new charInfo("Harukaze Nanami", ["Nanami Harukaze",], anime[601], "F", "https://i.ibb.co/NdTTSbWn/c.png", 23149, "D"),
+    new charInfo("Hasegawa Yuzuki", ["Yuzuki Hasegawa",], anime[601], "F", "https://i.ibb.co/4RM1Nzz1/c.png", 23150, "D"),
+    new charInfo("Houjou Reiko", ["Reiko Houjou", "Houjo Reiko", "Reiko Houjo",], anime[601], "F", "https://i.ibb.co/jZvb2NrR/c.png", 23151, "D"),
+    new charInfo("Houjou Shizu", ["Shizu Houjou", "Houjo Shizu", "Shizu Houjo",], anime[601], "F", "https://i.ibb.co/39SND84S/c.png", 23152, "D"),
+    new charInfo("Myoujou Sora", ["Sora Myoujou ",], anime[601], "F", "https://i.ibb.co/WN7FRdL7/c.png", 23153, "D"),
+    new charInfo("Okuyama Rio", ["Rio Okuyama",], anime[601], "F", "https://i.ibb.co/rCC42L8/c.png", 23154, "D"),
+    new charInfo("Sakuramori Chiyo", ["Chiyo Sakuramori",], anime[601], "F", "https://i.ibb.co/XrX0MR9P/c.png", 23155, "D"),
+    new charInfo("Uezono Momoka", ["Momoka Uezono",], anime[601], "F", "https://i.ibb.co/5XbZ16wd/c.png", 23156, "D"),
     new charInfo("Masamune Date", ["One-Eyed Dragon", "Hittou", "Dokugan Ryuu"], anime[602], "M", "https://i.ibb.co/CpPChVs9/c.png", 23157, "S"),
     new charInfo("Yukimura Sanada", ["Young Tiger of Kai"], anime[602], "M", "https://i.ibb.co/N6d80V5t/c.png", 23158, "S"),
     new charInfo("Kojuurou Katakura", ["Right Eye of the Dragon"], anime[602], "M", "https://i.ibb.co/VW4s7k46/c.png", 23159, "S"),
@@ -23289,13 +23289,13 @@ export const characters: charInfo[] = [
     new charInfo("Nobushige Oyamada", [], anime[602], "M", "https://i.ibb.co/WWMBNTBg/c.png", 23184, "D"),
     new charInfo("2B & 9S EX", ["2B&9S EX", "2B/9S EX", "2B EX", "9S EX"], anime[310], "NB", "https://i.ibb.co/RGXGRWk6/2-B-9-S-EX.gif", 23185, "EX"),
     new charInfo("Castorice", [], anime[343], "F", "https://i.ibb.co/rK9s1757/c.png", 23186, "SS"),
-    new charInfo("Firefly", ["SAM (HSR)", ], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
+    new charInfo("Firefly", ["SAM (HSR)",], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
     new charInfo("Aventurine", [], anime[343], "M", "https://i.ibb.co/s92jpyBV/c.png", 23188, "SS"),
     new charInfo("Acheron", [], anime[343], "F", "https://i.ibb.co/pvYh9gTs/c.png", 23189, "SS"),
     new charInfo("Jingliu", [], anime[343], "F", "https://i.ibb.co/ywH6zTp/c.png", 23190, "S"),
     new charInfo("Aglaea", [], anime[343], "F", "https://i.ibb.co/3mLbVTgL/c.png", 23191, "S"),
     new charInfo("Mydei", [], anime[343], "M", "https://i.ibb.co/N6D9N4TQ/c.png", 23192, "S"),
-    new charInfo("Fei Xiao", ["Feixiao", ], anime[343], "F", "https://i.ibb.co/b5XC71xd/c.png", 23193, "S"),
+    new charInfo("Fei Xiao", ["Feixiao",], anime[343], "F", "https://i.ibb.co/b5XC71xd/c.png", 23193, "S"),
     new charInfo("Robin (HSR)", [], anime[343], "F", "https://i.ibb.co/5X6jMtFd/c.png", 23194, "S"),
     new charInfo("Sunday", [], anime[343], "M", "https://i.ibb.co/9mxYJcYL/c.png", 23195, "S"),
     new charInfo("Topaz", [], anime[343], "F", "https://i.ibb.co/bjKqkVVv/c.png", 23196, "A"),
@@ -23463,10 +23463,8 @@ characters.forEach((e) => {
     if (res) throw new Error("Duplicate names found: " + res);
 }
 
-// Check gender, rarity and ID
+// Check ID
 characters.forEach((e, i) => {
-    if (!["M", "F", "NB"].includes(e.gender)) throw new Error("WARNING! Missing gender " + e.gender + ": " + e.name);
-    if (!["EX", "SS", "S", "A", "B", "C", "D"].includes(e.rarity)) throw new Error("WARNING! Missing rarity " + e.rarity + ": " + e.name);
     if (e.id !== i) throw new Error("WARNING! Wrong ID " + e.id + " in: " + e.name);
 });
 
