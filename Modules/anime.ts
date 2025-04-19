@@ -639,6 +639,9 @@ export const anime: animeInfo[] = [
     new animeInfo("EDENS ZERO", ['EZ', "Eden's Zero", 'EDENSZERO'], 604),
     new animeInfo("Re:Monster", ['Re:Monster Shisatsu Kara Hajimaru Kaibutsu Tensei-ki', 'R:M', 'Stabbed to Death', 'Reincarnated: Monster'], 605),
     new animeInfo("Tears to Tiara", [], 606),
+    new animeInfo("Katsute Mahou Shoujo to Aku wa Tekitai shiteita", ["The Magical Girl and the Evil Lieutenant Used to Be Archenemies", "Katsute Mahou Shoujo to Aku wa Tekitai Shite Ita.", "The Former Magical Girl & Evil Enemy", "The Magical Girl and Evil Officer", "MahoAku"], 607),
+    new animeInfo("Medaka Kuroiwa Is Impervious to My Charms", ["Kuroiwa Medaka ni Watashi no Kawaii ga Tsuujinai", "Medakawa", "My Charms Are Wasted On Kuroiwa Medaka"], 608),  
+    new animeInfo("Legend of the Northern Blade", ["Bukgeom Jeongi", "The Legend of the Northern Blade", "Legend of the Northen Blade"], 609),
 
 ];
 
