@@ -739,7 +739,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         matchStats.trigger("miss", attacker, target, attackerBuff, targetBuff);
 
         return dealDamage(attacker, target, attackerBuff, targetBuff, matchStats, notice, `⚔️ **${target.name}**`, flags);
-    }};
+    };
 
     // Evade Deadly Attack
     if (
