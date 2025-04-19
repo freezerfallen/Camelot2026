@@ -23492,6 +23492,7 @@ export const characters: charInfo[] = [
     new charInfo("Yeop-Wol", [], anime[609], "M", "https://i.ibb.co/rRTkwBwL/c.png", 23387, "D"),
     new charInfo("Yong Mu-Sung", [], anime[609], "M", "https://i.ibb.co/HDbjJ2H9/c.png", 23388, "D"),
     new charInfo("Yoo Seon-Myung", [], anime[609], "M", "https://i.ibb.co/SX3tQ1PN/c.png", 23389, "D"),
+    new charInfo("Garou EX", [], anime[217], "M", "https://i.ibb.co/S496rKBq/image.png", 23390, "EX"),
 
 ];
 
