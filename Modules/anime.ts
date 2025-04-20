@@ -631,7 +631,7 @@ export const anime: animeInfo[] = [
     new animeInfo("Outlaw Star", ['Future Hero Next Generation Outlaw Star', 'Seihou Bukyou Outlaw Star', 'Starward Warrior Knight Outlaw Star'], 596),
     new animeInfo("Arpeggio of Blue Steel", ['Aoki Hagane no Arpeggio', 'Aoki Hagane no Arpeggio: Ars Nova - Cadenza', 'Aoki Hagane no Arpeggio: Ars Nova - DC', 'Arpeggio of Blue Steel - Cadenza', 'Arpeggio of Blue Steel - DC', 'AoBS'], 597),
     new animeInfo("Koto oto Tomare", ["Stop This Sound"], 598),
-    new animeInfo("Beast Tamer", ['Yuusha Party wo Tsuihou Sareta Beast Tamer, Saikyoushu no Nekomimi Shoujo to Deau', 'Beast Tamer and the Cat Girl'], 599),    
+    new animeInfo("Beast Tamer", ['Yuusha Party wo Tsuihou Sareta Beast Tamer, Saikyoushu no Nekomimi Shoujo to Deau', 'Beast Tamer and the Cat Girl'], 599),
     new animeInfo("Cardcaptor Sakura", ["Kadokyaputa Sakura"], 600),
     new animeInfo("I am getting married to a girl I hate in my class", ["Kurakon", "Class no Daikirai na Joshi to Kekkon suru Koto ni Natta.", " I Got Married to the Girl I Hate Most in Class"], 601),
     new animeInfo("Sengoku BASARA", ['SB1', 'Devil Kings'], 602),
@@ -640,7 +640,7 @@ export const anime: animeInfo[] = [
     new animeInfo("Re:Monster", ['Re:Monster Shisatsu Kara Hajimaru Kaibutsu Tensei-ki', 'R:M', 'Stabbed to Death', 'Reincarnated: Monster'], 605),
     new animeInfo("Tears to Tiara", [], 606),
     new animeInfo("Katsute Mahou Shoujo to Aku wa Tekitai shiteita", ["The Magical Girl and the Evil Lieutenant Used to Be Archenemies", "Katsute Mahou Shoujo to Aku wa Tekitai Shite Ita.", "The Former Magical Girl & Evil Enemy", "The Magical Girl and Evil Officer", "MahoAku"], 607),
-    new animeInfo("Medaka Kuroiwa Is Impervious to My Charms", ["Kuroiwa Medaka ni Watashi no Kawaii ga Tsuujinai", "Medakawa", "My Charms Are Wasted On Kuroiwa Medaka"], 608),  
+    new animeInfo("Medaka Kuroiwa Is Impervious to My Charms", ["Kuroiwa Medaka ni Watashi no Kawaii ga Tsuujinai", "Medakawa", "My Charms Are Wasted On Kuroiwa Medaka"], 608),
     new animeInfo("Legend of the Northern Blade", ["Bukgeom Jeongi", "The Legend of the Northern Blade", "Legend of the Northen Blade"], 609),
 
 ];

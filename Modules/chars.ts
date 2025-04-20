@@ -17694,7 +17694,7 @@ export const characters: charInfo[] = [
     new charInfo("Firis Hagerhelm", [], anime[432], "F", "https://i.ibb.co/QCPG8Qq/c.png", 17589, "C"),
     new charInfo("Yuuichi", [], anime[432], "M", "https://i.ibb.co/VMMLSV1/c.png", 17590, "D"),
     new charInfo("Delva Celebrían", [], anime[432], "F", "https://i.ibb.co/Z2fcnss/c.png", 17591, "B"),
-    new charInfo("Duranta", [], anime[432], "F", "https://i.ibb.co/P6xfFXX/c.png", 17592, "B"),
+    new charInfo("Duranta", [], anime[433], "F", "https://i.ibb.co/P6xfFXX/c.png", 17592, "B"),
     new charInfo("Muggina Lytius", ["Lighteus"], anime[433], "F", "https://i.ibb.co/0rb3wb6/c.png", 17593, "B"),
     new charInfo("Lunahasol", [], anime[433], "F", "https://i.ibb.co/Xtr32GZ/c.png", 17594, "C"),
     new charInfo("Marshtal", [], anime[433], "F", "https://i.ibb.co/1bhrxQq/c.png", 17595, "C"),
@@ -23553,7 +23553,7 @@ characters.forEach((e, i) => {
 // Print
 // {
 //     let totalChars = 0, totalAnime = 0;
-//     for (let i = 579; i < anime.length; i++) {
+//     for (let i = 598; i < anime.length; i++) {
 //         const numberOfChars = characters.filter(char => char.animeInfo.id === anime[i].id).length;
 //         console.log(`  - **${anime[i].name}** (${numberOfChars} chars)`);
 //         totalChars += numberOfChars;
