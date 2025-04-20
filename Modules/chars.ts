@@ -23181,7 +23181,7 @@ export const characters: charInfo[] = [
     new charInfo("Chiharu Houzuki", ["Chiharu Hozuki"], anime[598], "F", "https://i.ibb.co/YBZBGpL0/c.png", 23076, "D"),
     new charInfo("Ousuke Kiryuu", ["Ousuke Kiryu"], anime[598], "M", "https://i.ibb.co/GQSn9Xtd/c.png", 23077, "D"),
     new charInfo("Tania", [], anime[599], "F", "https://i.ibb.co/35bydZpF/c.png", 23078, "S"),
-    new charInfo("Kanade", [], anime[599], "F", "https://i.ibb.co/zV0dTPnL/c.png", 23079, "B"),
+    new charInfo("Kanade", [], anime[599], "F", "https://i.ibb.co/qLcX4b5s/c.png", 23079, "S"),
     new charInfo("Rein", ["Rain (BT)"], anime[599], "M", "https://i.ibb.co/84KMJvQc/c.png", 23080, "A"),
     new charInfo("Tina Hollee", [], anime[599], "F", "https://i.ibb.co/b57vgLqz/c.png", 23081, "A"),
     new charInfo("Natalie Flow", [], anime[599], "F", "https://i.ibb.co/JRjgpy0X/c.png", 23082, "B"),
