@@ -7,6 +7,7 @@ import { setImmediate } from 'timers/promises';
 import { CompactUserSchema, ProfileImageArguments } from '../types';
 import { User } from 'discord.js';
 import { raidRankLetters } from './components';
+import { getLetterRank } from './functions';
 
 const newProfileColors = {
     creme: { text: '#FDE8FF', floor: '#a89aa8', gradStart: '#FDE8FF', gradEnd: '#000000' },
@@ -250,7 +251,7 @@ async function getProfileImage(user: User, stats: CompactUserSchema, profileArgu
             sctx.font = '30px Arial';
             sctx.textAlign = 'start';
             sctx.textBaseline = 'middle';
-            sctx.fillText(`${user.username} [${raidRankLetters[stats.rank]}]`, offsetX + 135, offsetY + 59, 280);
+            sctx.fillText(`${user.username} [${getLetterRank(stats.rankscore)}]`, offsetX + 135, offsetY + 59, 280);
 
             // Level
             const levelStr = `${profileArguments.userLvl}`;

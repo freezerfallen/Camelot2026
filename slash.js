@@ -1154,7 +1154,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('raid')
 			.setDescription('Raid overview')
-			.addStringOption(option => option.setName('test').setDescription('Enter the name or ID of the boss you want to fight').setRequired(false)),
+			.addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

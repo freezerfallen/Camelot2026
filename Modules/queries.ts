@@ -2,12 +2,27 @@ import { query } from "../postgres";
 import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdatePartyOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
 import { donationWeekStart } from "./components";
 
+function fixBigintForUser(value: Partial<UserSchema>) {
+    if ("rowid" in value) value.rowid = Number(value.rowid);
+    if ("coins" in value) value.coins = Number(value.coins);
+    if ("gems" in value) value.gems = Number(value.gems);
+    if ("donatedtotal" in value) value.donatedtotal = Number(value.donatedtotal);
+    if ("jades" in value) value.jades = Number(value.jades);
+    if ("celebrateclaimed" in value) value.celebrateclaimed = Number(value.celebrateclaimed);
+    if ("bank" in value) value.bank = Number(value.bank);
+    if ("charxp" in value) value.charxp = Number(value.charxp);
+    if ("cow_timer" in value) value.cow_timer = Number(value.cow_timer);
+    if ("rankscore" in value) value.rankscore = Number(value.rankscore);
+    if ("guild_marks" in value) value.guild_marks = Number(value.guild_marks);
+};
+
 //---------------------------------//
 //           GET SCHEMAS           //
 //---------------------------------//
 
 export const getFullUserSchema = async (id: string): Promise<UserSchema | undefined> => {
     const [user] = await query(`SELECT * FROM users WHERE id = $1`, [id]) as [UserSchema];
+    fixBigintForUser(user);
     return user;
 };
 
@@ -22,18 +37,21 @@ export const getMinimalUserSchemas = async (ids: string[]): Promise<Pick<UserSch
 };
 
 export const getUserSchema = async (id: string): Promise<CompactUserSchema | undefined> => {
-    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rank, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
+    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
+    fixBigintForUser(user);
     return user;
 };
 
 export const getUserSchemas = async (ids: string[] | "*", whereClause?: string): Promise<CompactUserSchema[]> => {
-    const query_str = `SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rank, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points FROM users ${whereClause ? whereClause : ""}`;
+    const query_str = `SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, raidxp, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points FROM users ${whereClause ? whereClause : ""}`;
 
     if (ids === "*") {
         const users = await query(query_str, []) as CompactUserSchema[];
+        users.forEach(fixBigintForUser);
         return users;
     } else {
         const users = await query(`${query_str} WHERE id = ANY($1)`, [ids]) as CompactUserSchema[];
+        users.forEach(fixBigintForUser);
         return users;
     }
 };
@@ -169,7 +187,7 @@ export const getPremiumUsers = async (): Promise<Pick<UserSchema, "id" | "premiu
 };
 
 export const getLatestRaid = async (guildId: string): Promise<RaidSchema | undefined> => {
-    const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
+    const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 AND end_date IS NULL ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
     return raid;
 };
 
@@ -437,6 +455,11 @@ export const insertNewStampede = async (): Promise<void> => {
     await query(`INSERT INTO stampedes (type, bosshp, bosshpmax, generalhp, generalhpmax, generalstotal, generalsleft, monsterstotal, monstersleft) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [values.type, values.bosshp, values.bosshpmax, values.generalhp, values.generalhpmax, values.generalstotal, values.generalsleft, values.monsterstotal, values.monstersleft]);
 };
 
+export const insertNewRaid = async (guildId: string, raidId: number, enemyHp: number): Promise<RaidSchema> => {
+    const { rows: [raid] } = await query(`INSERT INTO raids (guildid, raidid, enemy_hp, enemy_hpmax) VALUES ($1, $2, $3, $4) RETURNING *`, [guildId, raidId, enemyHp, enemyHp]) as { rows: RaidSchema[]; };
+    return raid;
+};
+
 export const insertNewGuild = async (name: string, guildMaster: string): Promise<GuildSchema> => {
     const { rows: [guild] } = await query(`INSERT INTO guilds (name, master, members) VALUES ($1, $2, $3) RETURNING *`, [name, guildMaster, [guildMaster]]) as { rows: GuildSchema[]; };
     return guild;
@@ -581,6 +604,12 @@ export const resetDungeonLimit = async (): Promise<void> => {
 
 export const updateFAQBody = async (name: string, body: string): Promise<void> => {
     await query(`UPDATE faq SET body = $1 WHERE name = $2`, [body, name]);
+};
+
+export const cancelRaid = async (rowid: number): Promise<"success" | "error"> => {
+    const { rows: [raid] } = await query(`UPDATE raids SET end_date = CURRENT_TIMESTAMP WHERE rowid = $1 RETURNING *`, [rowid]) as { rows: RaidSchema[]; };
+    if (raid.end_date) return "success";
+    return "error";
 };
 
 export const updateStampedeParticipation = async (stampedeRowId: number, partyId: string | null, userId: string, damage: number, rounds: number): Promise<void> => {

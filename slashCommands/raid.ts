@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, ColorResolvable, TextInputBuilder, TextInputStyle, ModalBuilder } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, ColorResolvable, TextInputBuilder, TextInputStyle, ModalBuilder, StringSelectMenuBuilder, SelectMenuComponentOptionData } from "discord.js";
 import { abilities } from "../Modules/abilities";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
@@ -7,14 +7,14 @@ import { raids } from "../Modules/raids";
 import { armorInfo, itemInfo, items, ringInfo, weaponInfo } from "../Modules/items";
 import { skills } from "../Modules/skills";
 import { characters } from "../Modules/chars";
-import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search } from "../Modules/functions";
-import { AbilityResponse, dungeonTempBan, raidRankIndices, raidRankLetters } from "../Modules/components";
+import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, getLetterRank } from "../Modules/functions";
+import { AbilityResponse, dungeonTempBan, raidRankIndices } from "../Modules/components";
 import delayedBuffs from "../Modules/delayedBuffs";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { CompactUserSchema, DetailedStats, GuildSchema, RaidSchema, SlashCommand } from '../types';
-import { getGuildSchema, getLatestRaid, getWeaponSchemas, updateRaidParticipation, updateUsers } from '../Modules/queries';
+import { cancelRaid, getGuildSchema, getLatestRaid, getUserSchemas, getWeaponSchemas, insertNewRaid, updateRaidParticipation, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
@@ -84,13 +84,109 @@ const timeLeft = (endDate: Date) => {
     return timeLeft;
 };
 
+async function raidSelection(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema): Promise<void> {
+
+    const members = await getUserSchemas(guild.members);
+    const atkBuff = 1 + (0.2 * guild.atkbuff);
+    const hpBuff = 1 + (0.2 * guild.hpbuff);
+    const defBuff = 1 + (0.1 * guild.defbuff);
+    const guildRankScore = Math.floor((members.reduce((acc, curr) => acc + curr.rankscore, 0) * atkBuff * hpBuff * defBuff) / 20);
+    const guildRankIndex = raidRankIndices[getLetterRank(guildRankScore)];
+
+    let options: SelectMenuComponentOptionData[] = [];
+    raids.filter((e) => e.phase === 1).forEach((e) => {
+        options.push({
+            label: e.name,
+            emoji: guildRankIndex > raidRankIndices[e.rank] ? "🟢" : (guildRankIndex === raidRankIndices[e.rank] ? "🟠" : ((guildRankIndex + 3) >= raidRankIndices[e.rank] ? "🔴" : "⚫")),
+            description: `Rank ${e.rank}`,
+            value: e.id + "",
+        });
+    });
+
+    const selection = new ActionRowBuilder<StringSelectMenuBuilder>()
+        .addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('raid_selection')
+                .setPlaceholder('Select a raid...')
+                .addOptions(options),
+        );
+
+    let currentlySelected: number | undefined;
+
+    function getButtonRow() {
+        return new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('confirm')
+                    .setLabel(`Confirm`)
+                    .setStyle(ButtonStyle.Success)
+                    .setDisabled(currentlySelected === undefined),
+            ).addComponents(
+                new ButtonBuilder()
+                    .setCustomId('rankup')
+                    .setLabel(`Increase Rank`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(currentlySelected === undefined),
+            );
+    };
+
+    function getDesc() {
+        return `## Raid Selection\nPlease select a raid to tackle with your guild. You will have **5** days to complete it, with each of your members getting **4** attempts per day. Attempts can be stacked, so busy guild members can do all 20 on the last day if needed!` +
+            `\n\n**Selected Raid**: ${currentlySelected ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raids[currentlySelected].rank}` : "`None`"}`;
+    };
+
+    const Embed = new EmbedBuilder()
+        .setColor(0xff3838)
+        .setDescription(getDesc());
+    interaction.reply({ embeds: [Embed], components: [selection, getButtonRow()] }).then((msg) => {
+
+        const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "raid_selection", componentType: ComponentType.StringSelect, time: 120000 });
+        const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 120000 });
+
+        collector.on('collect', async r => {
+            await r.deferUpdate().catch(() => {
+                console.log(`ERROR Interaction Failed 'deferUpdate()', command: "${interaction.commandName}"`);
+            });
+
+            currentlySelected = parseInt(r.values[0]);
+
+            Embed
+                .setDescription(getDesc())
+                .setThumbnail(raids[currentlySelected].enemy.image[0])
+                .setColor(raids[currentlySelected].accentColor as ColorResolvable);
+            interaction.editReply({ embeds: [Embed], components: [selection, getButtonRow()] });
+        });
+
+        confirm.on('collect', async () => {
+            collector.stop(); confirm.stop();
+
+            if (currentlySelected === undefined) return interaction.followUp({ content: "Please select a raid first", ephemeral: true });
+
+            const raid = await getLatestRaid(guild.id);
+
+            if (!raid) {
+                const newRaid = await insertNewRaid(guild.id, currentlySelected, 12408000);
+                if (newRaid) {
+                    interaction.followUp({ content: "Raid started successfully!" });
+                } else {
+                    interaction.followUp({ content: "Failed to start raid, please try again later" });
+                };
+                interaction.editReply({ components: [] });
+            } else {
+                interaction.followUp({ content: "You already have an active raid, please finish it before attempting to start a new one.", ephemeral: true });
+            };
+        });
+
+    });
+};
+
 function rankupOverview(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[]): Promise<number> {
     return new Promise((resolve) => {
 
         const currentRaid = raids[raid.raidid];
         if (!currentRaid) return interaction.reply("Unexpected Error: Raid not found\nPlease open a ticket in our `/support` server if you encounter this error.");
 
-        const startDate = new Date(new Date(raid.start_date).setHours(24, 0, 0, 0));
+        const startDate = new Date(raid.start_date);
         const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000);
 
         // const tips = [
@@ -100,7 +196,12 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
         let tab: "overview" | "ranking" = "overview";
 
         const attemptsUsed = raid.participation[interaction.user.id]?.[1] ?? 0;
-        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * 4;
+        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * 4
+
+            //! FOR THE BETA ONLY 
+            * 5;
+        ;   //! FOR THE BETA ONLY 
+
         const attemptsLeft = attemptsTotal - attemptsUsed;
 
         const getDesc = (): string => {
@@ -118,8 +219,8 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         Array(Math.max(0, getRingSlotsTotal(stats) - userItems.filter((e) => e.category === "ring").length)).fill("<:ring_empty:1034509903886299136>")
                     ).concat(["<:locked:1034511902417621002>", "<:locked:1034511902417621002>", "<:locked:1034511902417621002>"]).slice(0, 3).join("")
 
-                    + (stats.rank < raidRankIndices["B"] ? "\n**Support 1**: <:locked:1034511902417621002> (unlocks after reaching rank **B**)" : `\n**Support 1**: ${(stats.raid_supports[0] !== undefined && stats.raid_supports[0] !== null) ? characters[stats.raid_supports[0]].name : "`None`"}`)
-                    + (stats.rank < raidRankIndices["S"] ? "\n**Support 2**: <:locked:1034511902417621002> (unlocks after reaching rank **S**)" : `\n**Support 2**: ${(stats.raid_supports[1] !== undefined && stats.raid_supports[1] !== null) ? characters[stats.raid_supports[1]].name : "`None`"}`)
+                    + (raidRankIndices[getLetterRank(stats.rankscore)] < raidRankIndices["B"] ? "\n**Support 1**: <:locked:1034511902417621002> (unlocks after reaching rank **B**)" : `\n**Support 1**: ${(stats.raid_supports[0] !== undefined && stats.raid_supports[0] !== null) ? characters[stats.raid_supports[0]].name : "`None`"}`)
+                    + (raidRankIndices[getLetterRank(stats.rankscore)] < raidRankIndices["S"] ? "\n**Support 2**: <:locked:1034511902417621002> (unlocks after reaching rank **S**)" : `\n**Support 2**: ${(stats.raid_supports[1] !== undefined && stats.raid_supports[1] !== null) ? characters[stats.raid_supports[1]].name : "`None`"}`)
                     + `\n\n-# Attempts left: ${attemptsLeft}/${attemptsTotal}`;
                 // + `\n\n-# <:info:1131679799207796756> ${tips[Math.floor(Math.random() * tips.length)]}`;
             } else if (tab === "ranking") {
@@ -245,6 +346,8 @@ const exportCommand: SlashCommand = {
 
         const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
 
+        const cancelOption = interaction.options.getBoolean('cancel') ?? false;
+
         const stats = author.schema;
         if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
 
@@ -266,12 +369,26 @@ const exportCommand: SlashCommand = {
         };
 
         const raid = await getLatestRaid(guild.id);
-        if (!raid) return interaction.reply("There is no active raid at the moment. Please ask your guild master or an elder to start one!");
+        if (!raid) {
+            if ([guild.master, ...guild.elders].includes(interaction.user.id)) {
+                return raidSelection(interaction, stats, guild);
+            } else {
+                return interaction.reply("There is no active raid at the moment. Please ask your guild master or an elder to start one!");
+            };
+        };
 
-
-        //! REMOVE THIS
-        const test = interaction.options.getString("test");
-        if (test && raids[parseInt(test)]) raid.raidid = parseInt(test);
+        if (cancelOption) {
+            if ([guild.master, ...guild.elders].includes(interaction.user.id)) {
+                const result = await cancelRaid(raid.rowid);
+                if (result === "success") {
+                    return interaction.reply("Raid cancelled successfully! You may start a new one.");
+                } else {
+                    return interaction.reply("Failed to cancel raid. Please try again later.");
+                };
+            } else {
+                return interaction.reply({ content: "Only the guild master or elders can cancel a raid", ephemeral: true });
+            };
+        };
 
 
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots, stats.equipment.ring1, stats.equipment.ring2, stats.equipment.ring3]);

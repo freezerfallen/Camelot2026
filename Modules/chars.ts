@@ -22814,7 +22814,7 @@ export const characters: charInfo[] = [
     new charInfo("Mayumi Nishikino", [], anime[586], "F", "https://i.ibb.co/GVy62pK/c.png", 22709, "S"),
     new charInfo("Kazunari Usa", [], anime[586], "M", "https://i.ibb.co/S0mrNvp/c.png", 22710, "A"),
     new charInfo("Shirosaki", [], anime[586], "M", "https://i.ibb.co/rkp0wkH/c.png", 22711, "B"),
-    new charInfo("Sayaka  Watanabe", [], anime[586], "F", "https://i.ibb.co/X4kPZyS/c.png", 22712, "A"),
+    new charInfo("Sayaka Watanabe", [], anime[586], "F", "https://i.ibb.co/X4kPZyS/c.png", 22712, "A"),
     new charInfo("Sumiko Kawai", [], anime[586], "F", "https://i.ibb.co/6wRVVXG/c.png", 22713, "B"),
     new charInfo("Hayashi (BMK)", [], anime[586], "F", "https://i.ibb.co/0yjbXKV/c.png", 22714, "C"),
     new charInfo("Miharu Tsuneda", [], anime[586], "F", "https://i.ibb.co/TtcDXB4/c.png", 22715, "C"),

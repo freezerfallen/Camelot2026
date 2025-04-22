@@ -37,7 +37,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
         const getDesc = () => {
             return `### Rank-Up Exam`
                 + `\nAfter the exam you will be assigned a rank based on your performance.`
-                + `\n\n**Stats**\n**Current Rank**: ${raidRankLetters[stats.rank]}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
+                + `\n\n**Stats**\n**Current Rank**: ${getLetterRank(stats.rankscore)}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
                 + `\n\n**Character**\n**Name**: ${characters[stats.battlechar ?? 0].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}\n**Equipment**: ${userItems.find((e) => e.category === "weapon" && e.type !== "shield")?.emoji ?? "<:sword_empty:1034502134474997790>"}${userItems.find((e) => e.type === "shield")?.emoji ?? "<:shield_empty:1087089686809415730>"} ${userItems.find((e) => e.type === "helmet")?.emoji ?? "<:helmet_empty:1034499888878198885>"}${userItems.find((e) => e.type === "cuirass")?.emoji ?? "<:cuirass_empty:1034499890165858305>"}${userItems.find((e) => e.type === "gloves")?.emoji ?? "<:gloves_empty:1034499892409794570>"}${userItems.find((e) => e.type === "boots")?.emoji ?? "<:boots_empty:1034499893919764480>"}`
                 + `\n\n-# <:info:1131679799207796756> ${tips[Math.floor(Math.random() * tips.length)]}`;
         };
@@ -182,7 +182,7 @@ const exportCommand: SlashCommand = {
             // Update users table
             if (stats.rankscore < score) {
                 await updateUsers(interaction.user.id, {
-                    rank: { type: "set", value: raidRankIndices[getLetterRank(score)] },
+                    // rank: { type: "set", value: raidRankIndices[getLetterRank(score)] },
                     rankscore: { type: "set", value: score },
                 });
             };

@@ -1,6 +1,6 @@
 import { EmbedBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable } from "discord.js";
 import { dailies } from "../Modules/dailyQuests";
-import { showPage, searchGuild, getDonationsPageWeek, lastActive, formatNumberWithQuotes, customEmojis } from "../Modules/functions";
+import { showPage, searchGuild, getDonationsPageWeek, lastActive, formatNumberWithQuotes, customEmojis, getLetterRank } from "../Modules/functions";
 import { PageRow, OfferRow, donationWeekStart } from "../Modules/components";
 import { GuildSchema, SlashCommand } from "../types";
 import { addGuildDonation, deleteGuild, getGuildDonationSchemas, getGuildSchema, getGuildSchemas, getUserSchema, getUserSchemas, insertNewGuild, updateGuildDonationsGuildId, updateGuilds, updateUsers } from "../Modules/queries";
@@ -69,6 +69,7 @@ const exportCommand: SlashCommand = {
             const members = guildMembers.map((e) => ({
                 id: e.id,
                 name: e.name,
+                rankscore: e.rankscore,
                 lastdaily: e.lastdaily,
                 status: e.id === guild.master ? " (Guild Master)" : guild?.elders.includes(e.id) ? " (Elder)" : "",
                 value: e.id === guild.master ? 2 : guild?.elders.includes(e.id) ? 1 : 0,
@@ -101,13 +102,18 @@ const exportCommand: SlashCommand = {
                 detailsTab = { name: "Last Online", value: `${members.map((e) => `__${lastActive(e.lastdaily ?? 0)}__`).join("\n")}`, inline: true };
             };
 
+            const atkBuff = 1 + (0.2 * guild.atkbuff);
+            const hpBuff = 1 + (0.2 * guild.hpbuff);
+            const defBuff = 1 + (0.1 * guild.defbuff);
+            const guildRankScore = Math.floor((members.reduce((acc, curr) => acc + curr.rankscore, 0) * atkBuff * hpBuff * defBuff) / 20);
+
             const Embed = new EmbedBuilder()
                 .setTitle(guild.name)
                 .setColor(guild.color as ColorResolvable || 0xbbffff)
                 .setThumbnail(guild.icon || 'https://i.imgur.com/JEvfGSR.png')
                 .setDescription(
                     (guild.description?.replace(/\\n/g, "\n") || "_Missing description. Use `/guild edit` to add one._")
-                    + `\n\n**Guild Level**: \`${guild.level}\`\n**Capacity**: \`${members.length}/${10 + Math.min(guild.level - 1, 10)}\`\n**Tax Rate**: \`${guild.tax}%\`\n**Treasury**: \`${formatNumberWithQuotes(guild.treasury)}\`<:coins:872926669055356939>, \`${formatNumberWithQuotes(guild.treasury_gems)}\`<:genesis_gems:1034179687720681492>`
+                    + `\n\n**Guild Level**: \`${guild.level}\`\n**Guild Rank**: \`${getLetterRank(guildRankScore)}\`\n**Capacity**: \`${members.length}/${10 + Math.min(guild.level - 1, 10)}\`\n**Tax Rate**: \`${guild.tax}%\`\n**Treasury**: \`${formatNumberWithQuotes(guild.treasury)}\`<:coins:872926669055356939>, \`${formatNumberWithQuotes(guild.treasury_gems)}\`<:genesis_gems:1034179687720681492>`
                     + `\n\n**Perks**`
                     + `\n${customEmojis.atk} **XP Buffs**: level ${guild.xpbuff}${guild.xpbuff ? `<:blank:917804200363171860>ㅤ(__+${20 * guild.xpbuff}__%)` : ""}`
                     + `\n<:coins:872926669055356939> **Loot Buffs**: level ${guild.lootbuff}${guild.lootbuff ? `<:blank:917804200363171860>(__+${20 * guild.lootbuff}__%)` : ""}`

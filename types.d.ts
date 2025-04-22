@@ -396,7 +396,7 @@ export interface UserSchema {
     cow_chars: number[];
     cow_timer: number | null;
     cow_rolled_today: number;
-    rank: number;
+    // rank: number;
     rankscore: number;
     raidxp: number;
     guild_marks: number;
@@ -538,6 +538,7 @@ export interface RaidSchema {
     enemy_hpmax: number;
     participation: Record<string, [number, number]>;
     start_date: Date;
+    end_date: Date | null;
 }
 
 export type RankShopTransaction = {

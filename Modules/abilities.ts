@@ -2046,8 +2046,12 @@ export const abilities: Record<number, Ability> = {
         roundUsed: 0,
         buffer: undefined,
         desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%** and rendering them incapable of moving in their next turn.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** DMG\n- Increases active's DMG scaling by **25%** (Up to **175%**)\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the turn unchanged as well",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `no`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** DMG\n- Increases active's DMG scaling by **25%** (Up to **175%**)\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the turn unchanged as well",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+
+            //! Slow ability, have to use mana early to prevent bugs 
+            myStats.sm -= this.cost;
+
             // Aneira
             const dmg = (!eStats.dodge && Math.random() < eStats.br) ? notice.push(`\n💨 **${enemy.name}** dodged the attack!`) : dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.5 + Math.min(0.25 * (matchStats.round - this.roundUsed), 1.75), magicDamage: true, block: false });
             this.roundUsed = matchStats.round;
@@ -2107,8 +2111,11 @@ export const abilities: Record<number, Ability> = {
                     return AbilityResponse.SUCCESS;
                 }));
 
-                notice.push(`\n✨ **${enemy.name}** was frozen for 1 round!`);
+                notice.push(`\n✨ **${enemy.name}** was frozen!`);
             };
+
+            //! Add the failsafe back 
+            myStats.sm += this.cost;
 
             return AbilityResponse.SUCCESS;
         },
@@ -5591,7 +5598,7 @@ export const abilities: Record<number, Ability> = {
             });
 
             // Insight Mechanic
-            myStats.atk += Math.floor(myStats.atk * Math.min( 0.03 * myStats.insight, 0.24 ));            
+            myStats.atk += Math.floor(myStats.atk * Math.min(0.03 * myStats.insight, 0.24));
 
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (caster === myStats) {
@@ -5604,7 +5611,7 @@ export const abilities: Record<number, Ability> = {
                 "emoji": "⚔️",
                 "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     if (myStats.duorevived) {
-                        myStats.hp -= Math.floor(myStats.hp * 0.07)
+                        myStats.hp -= Math.floor(myStats.hp * 0.07);
                     } else {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.hp * 0.07), {});
                     };
@@ -5619,9 +5626,9 @@ export const abilities: Record<number, Ability> = {
                 },
             };
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async  (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.atk += Math.floor(myStats.atk * Math.min( 0.03 * myStats.insight, 0.24 ));
-                
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                myStats.atk += Math.floor(myStats.atk * Math.min(0.03 * myStats.insight, 0.24));
+
                 // When below 50% HP: +7% lifesteal
                 if (myStats.hp / myStats.maxhp < 0.5) {
                     myStats.selfheal[this.selfhealidx] += 0.07;
@@ -5630,8 +5637,8 @@ export const abilities: Record<number, Ability> = {
                         myStats.selfheal[this.selfhealidx] -= 0.07;
 
                         return AbilityResponse.SUCCESS;
-                }));
-            };
+                    }));
+                };
 
 
                 // Enter HACKING mode
@@ -5680,7 +5687,7 @@ export const abilities: Record<number, Ability> = {
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.insight ??= 0;
-            
+
             // Add prog programmes to allies
             let prog = pStats.proginfo;
             if (prog) {
@@ -5754,7 +5761,7 @@ export const abilities: Record<number, Ability> = {
             }
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.atk += Math.floor(myStats.atk * Math.min( 0.02 * myStats.insight, 0.16 ));
+                myStats.atk += Math.floor(myStats.atk * Math.min(0.02 * myStats.insight, 0.16));
                 return AbilityResponse.SUCCESS;
             }, 9999));
 

@@ -126,7 +126,6 @@ async function createTables() {
         cow_chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
-        rank INT DEFAULT 0 NOT NULL,
         rankscore BIGINT DEFAULT 0 NOT NULL,
         raidxp INT DEFAULT 0 NOT NULL,
         guild_marks BIGINT DEFAULT 0 NOT NULL,
@@ -283,7 +282,8 @@ async function createTables() {
         enemy_hp BIGINT NOT NULL,
         enemy_hpmax BIGINT NOT NULL,
         participation JSONB DEFAULT '{}' NOT NULL,
-        start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        end_date TIMESTAMP
     )`);
 };
 
