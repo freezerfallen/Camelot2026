@@ -330,7 +330,7 @@ async function getProfileImage(user: User, stats: CompactUserSchema, profileArgu
     encoder.start();
     encoder.setRepeat(0);
     encoder.setDelay(bg.delay);
-    encoder.setQuality(1); // default: 10, best: 1
+    encoder.setQuality(15); // default: 10, best: 1
 
     // Draw Frames
     for (const frame of frames) {

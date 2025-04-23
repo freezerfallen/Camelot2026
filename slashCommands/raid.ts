@@ -19,6 +19,10 @@ import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
 
+//! FOR THE BETA ONLY
+const DAILY_RAID_ATTEMPTS = 20 as const; // 4 attempts per day
+//! FOR THE BETA ONLY
+
 function getRaidButtonRow(tab: string, canPlay: boolean): ActionRowBuilder<ButtonBuilder> {
     const buttons = [
         new ButtonBuilder()
@@ -196,11 +200,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
         let tab: "overview" | "ranking" = "overview";
 
         const attemptsUsed = raid.participation[interaction.user.id]?.[1] ?? 0;
-        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * 4
-
-            //! FOR THE BETA ONLY 
-            * 5;
-        ;   //! FOR THE BETA ONLY 
+        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
 
         const attemptsLeft = attemptsTotal - attemptsUsed;
 
@@ -398,6 +398,15 @@ const exportCommand: SlashCommand = {
         let start = await rankupOverview(interaction, stats, guild, raid, userItems);
         if (start === -1) return;
 
+        // Return if no attempts left
+        const raidCheck = await getLatestRaid(guild.id);
+        if (!raidCheck) return interaction.followUp("An error occurred while checking your raid attempts. Please try again later.");
+
+        // Attempts left
+        const attemptsUsed = raidCheck.participation[interaction.user.id]?.[1] ?? 0;
+        const attemptsTotal = (Math.floor((Date.now() - new Date(raidCheck.start_date).getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
+        if (attemptsUsed >= attemptsTotal) return interaction.followUp(`You have already used all your available attempts (**0**/${attemptsTotal})`);
+
 
         const currentRaid = raids[raid.raidid];
 
@@ -498,22 +507,45 @@ const exportCommand: SlashCommand = {
 
             if (!raid) return;
 
-
-
             // Damage dealt
             const damageDealt = (eStats.hp - eStatsC.hp) < 0 ? 0 : (eStats.hp - eStatsC.hp);
 
             // Participation
             await updateRaidParticipation(raid.rowid, interaction.user.id, damageDealt);
 
+            //* LOOT DROPS
 
+            // Coins
+            const coinDrops = Math.min(Math.max(Math.floor(
+                (50 + (Math.random() * 25)) // Base: 50-75
+                * (1 + (raidRankIndices[raids[raid.raidid].rank] / 10)) // Raid Rank Buff
+                * (1 + (0.2 * (guild ? guild.lootbuff : 0))) // Guild Buff
+                * matchStats.lootm + matchStats.loot // Player Buffs
+            ), 0), 3000);
+
+            // Guild Marks
+            const guildMarks = Math.min(Math.max(Math.floor(
+                (3 + (Math.random() * 2)) // Base: 3-5
+                * (1 + (0.2 * (guild ? guild.lootbuff : 0))) // Guild Buff
+                + (3 * (raidRankIndices[raids[raid.raidid].rank] / 10)) // Raid Rank Buff
+            ), 0), 100);
+
+            // Skill Point
+            const skillPoints = (Math.random() < 0.04) ? 1 : 0;
+
+            // Update users table
+            await updateUsers(interaction.user.id, {
+                coins: { type: 'increment', value: coinDrops },
+                guild_marks: { type: 'increment', value: guildMarks },
+                skill_points: { type: 'increment', value: skillPoints }
+            });
 
 
             return new EmbedBuilder()
                 .setColor(currentRaid.accentColor as ColorResolvable)
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Raid Results`)
-                .setDescription(`<a:arrow_green:916716811842621450> Score: \n<a:arrow_orange:916716747623641210> Empty\n<a:arrow_red:916716702618767401> Scale: ${enemyScale.toFixed(2)}`)
+                .setDescription(`${eStats.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${damageDealt}**\n<a:arrow_orange:916716747623641210> Attempts: **${attemptsTotal - (attemptsUsed + 1)}**/${attemptsTotal} left\n\n<:npbag:929428030554787892> Loot\n**${coinDrops}**x <:coins:872926669055356939>, **${guildMarks}**x <:guild_mark:1317944450814840923>${skillPoints ? `, **${skillPoints}**x <:skill_point:1351505460301136014>` : ""}`)
                 .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
