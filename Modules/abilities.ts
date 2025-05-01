@@ -838,15 +838,17 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
         party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            const stampede = await getLatestStampede();
+            if (matchStats.interaction.commandName === "stampede") {
+                const stampede = await getLatestStampede();
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-                if (Math.random() < Math.min(125, stampede?.participation[matchStats.interaction.user.id]?.[1] || 0) / 500) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **Tetsuya Kuroko** stole the shot! He`, { atkMultiplier: 1.2 });
-                };
+                myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                    if (Math.random() < Math.min(125, stampede?.participation[matchStats.interaction.user.id]?.[1] || 0) / 500) {
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **Tetsuya Kuroko** stole the shot! He`, { atkMultiplier: 1.2 });
+                    };
 
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+                    return AbilityResponse.SUCCESS;
+                }, 9999));
+            };
 
             return AbilityResponse.SUCCESS;
         },
