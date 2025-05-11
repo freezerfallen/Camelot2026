@@ -136,8 +136,9 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
     };
 
     function getDesc() {
+        const raidRewards = currentlySelected !== undefined ? getRaidRewardPool(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp], 20, 1) : undefined;
         return `## Raid Selection\nPlease select a raid to tackle with your guild. You will have **5** days to complete it, with each of your members getting **4** attempts per day. Attempts can be stacked, so busy guild members can do all 20 on the last day if needed!` +
-            `\n\n**Selected Raid**: ${currentlySelected !== undefined ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}` : "`None`"}`;
+            `\n\n**Selected Raid**: ${(currentlySelected !== undefined && raidRewards) ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}\n### Reward Pool:\n>>> -# **${formatNumberWithQuotes(raidRewards.coins)}x** <:coins:872926669055356939>\n-# **${formatNumberWithQuotes(raidRewards.guild_marks)}x** <:guild_mark:1317944450814840923>\n-# **${formatNumberWithQuotes(raidRewards.skill_points)}x** <:skill_point:1351505460301136014>\n-# **${formatNumberWithQuotes(raidRewards.glorious_chest)}x** <:glorious_chest:1069076067081539726>\n-# **${formatNumberWithQuotes(raidRewards.luxurious_chest)}x** <:luxurious_chest:1069300112364404817>\n-# **${formatNumberWithQuotes(raidRewards.royal_chest)}x** <:royal_chest:1069301128711376976>${raidRewards.deluxe_chest > 0 ? `\n-# **${formatNumberWithQuotes(raidRewards.deluxe_chest)}x** <:deluxe_chest:1069301259603026061>` : ""}\n-# **${formatNumberWithQuotes(raidRewards.featured_ring)}x** ${raids[currentlySelected ?? 0].loot.map((e) => items[e].emoji).join(" | ")}` : "`None`"}`;
     };
 
     const Embed = new EmbedBuilder()
@@ -420,10 +421,10 @@ function getRaidRewardPool(rank: RaidRank, participants: number, sumOfShares: nu
     const rewardPool = _.cloneDeep(raidRewards[raidRankLetters[baseline]]);
 
     // Adjust the reward pool based on the number of participants
-    const multiplier = (1 + (0.15 * offset)) * (participants / 20) * sumOfShares;
+    const multiplier = (participants / 20) * sumOfShares; // (1 + (0.15 * offset)) * (participants / 20) * sumOfShares;
     for (const key in rewardPool) {
         if (Object.prototype.hasOwnProperty.call(rewardPool, key)) {
-            const rawAmount = rewardPool[key as keyof typeof rewardPool] * multiplier;
+            const rawAmount = (rewardPool[key as keyof typeof rewardPool] + (raidRewards["C-"][key as keyof typeof rewardPool] * (0.15 * offset))) * multiplier;
             rewardPool[key as keyof typeof rewardPool] = Math.floor(rawAmount + (((rawAmount % 1) > Math.random()) ? 1 : 0));
         };
     };
