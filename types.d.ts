@@ -179,6 +179,7 @@ type ReplaceButton = {
 };
 
 export type DetailedStats = {
+    id: number;
     name: string;
     hp: number;
     maxhp: number;

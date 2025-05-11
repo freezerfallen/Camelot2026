@@ -7,7 +7,7 @@ import { raids } from "../Modules/raids";
 import { armorInfo, itemInfo, items, ringInfo, weaponInfo } from "../Modules/items";
 import { skills } from "../Modules/skills";
 import { characters } from "../Modules/chars";
-import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, getLetterRank } from "../Modules/functions";
+import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, getLetterRank, formatNumberWithQuotes } from "../Modules/functions";
 import { AbilityResponse, dungeonTempBan, raidRankIndices, raidRankLetters } from "../Modules/components";
 import delayedBuffs from "../Modules/delayedBuffs";
 import Avalon from "../Modules/avalon";
@@ -116,6 +116,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
         );
 
     let currentlySelected: number | undefined;
+    let currentRankUp = 0;
 
     function getButtonRow() {
         return new ActionRowBuilder<ButtonBuilder>()
@@ -136,7 +137,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
 
     function getDesc() {
         return `## Raid Selection\nPlease select a raid to tackle with your guild. You will have **5** days to complete it, with each of your members getting **4** attempts per day. Attempts can be stacked, so busy guild members can do all 20 on the last day if needed!` +
-            `\n\n**Selected Raid**: ${currentlySelected ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raids[currentlySelected].rank}` : "`None`"}`;
+            `\n\n**Selected Raid**: ${currentlySelected !== undefined ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}` : "`None`"}`;
     };
 
     const Embed = new EmbedBuilder()
@@ -146,6 +147,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
 
         const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "raid_selection", componentType: ComponentType.StringSelect, time: 120000 });
         const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 120000 });
+        const rankup = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "rankup", componentType: ComponentType.Button, time: 120000 });
 
         collector.on('collect', async r => {
             await r.deferUpdate().catch(() => {
@@ -153,6 +155,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
             });
 
             currentlySelected = parseInt(r.values[0]);
+            currentRankUp = 0;
 
             Embed
                 .setDescription(getDesc())
@@ -162,14 +165,14 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
         });
 
         confirm.on('collect', async () => {
-            collector.stop(); confirm.stop();
+            collector.stop(); confirm.stop(); rankup.stop();
 
             if (currentlySelected === undefined) return interaction.followUp({ content: "Please select a raid first", ephemeral: true });
 
             const raid = await getLatestRaid(guild.id);
 
             if (!raid) {
-                const newRaid = await insertNewRaid(guild.id, currentlySelected, 12408000);
+                const newRaid = await insertNewRaid(guild.id, currentlySelected, 12408000, raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]);
                 if (newRaid) {
                     interaction.followUp({ content: "Raid started successfully!" });
                 } else {
@@ -179,6 +182,22 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
             } else {
                 interaction.followUp({ content: "You already have an active raid, please finish it before attempting to start a new one.", ephemeral: true });
             };
+        });
+
+        rankup.on('collect', async () => {
+            if (currentlySelected === undefined) return interaction.followUp({ content: "Please select a raid first", ephemeral: true });
+
+            // Check if rank is maxed
+            if ((raids[currentlySelected].rankValue + currentRankUp + 1) > raids[currentlySelected].maxRankValue) {
+                return interaction.followUp({ content: "You have already reached the maximum rank for this raid", ephemeral: true });
+            };
+
+            // Increment rank
+            currentRankUp++;
+
+            // Update embed
+            Embed.setDescription(getDesc());
+            interaction.editReply({ embeds: [Embed], components: [selection, getButtonRow()] });
         });
 
     });
@@ -208,7 +227,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
             if (tab === "overview") {
                 return `### Raid Overview`
                     // + `\nAfter the exam you will be assigned a rank based on your performance.`
-                    + `\n**Enemy**: ${currentRaid.enemy.name} (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${raid.enemy_hp}**/${raid.enemy_hpmax} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
+                    + `\n**Enemy**: ${currentRaid.enemy.name} [${raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${raid.enemy_hp}**/${raid.enemy_hpmax} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
                     + `\n\n**Traits**\n- ${currentRaid.enemy.ability?.list[0].join("\n- ")}`
                     // + `\n\n**Stats**\n**Current Rank**: ${stats.rank}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
                     + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}`
@@ -621,6 +640,7 @@ const exportCommand: SlashCommand = {
         // Battle Scale
         const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min(2192, Math.max(myStatsC.def, myStatsC.mr)));
         const enemyAtk = Math.floor((300 * enemyScale) * 1.05);
+        myStats.damageRescaling = enemyScale / 13; myStatsC.damageRescaling = enemyScale / 13;
 
         myStatsC.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats) => {
             eStats.atk *= (1 + (matchStats.round * 0.05));
@@ -728,12 +748,14 @@ const exportCommand: SlashCommand = {
                 .setColor(currentRaid.accentColor as ColorResolvable)
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Raid Results`)
-                .setDescription(`${eStats.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${damageDealt}**\n<a:arrow_orange:916716747623641210> Attempts: **${attemptsTotal - (attemptsUsed + 1)}**/${attemptsTotal} left\n\n<:npbag:929428030554787892> Loot\n**${coinDrops}**x <:coins:872926669055356939>, **${guildMarks}**x <:guild_mark:1317944450814840923>${skillPoints ? `, **${skillPoints}**x <:skill_point:1351505460301136014>` : ""}`)
+                .setDescription(`${eStats.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${formatNumberWithQuotes(damageDealt)}**\n<a:arrow_orange:916716747623641210> Attempts: **${attemptsTotal - (attemptsUsed + 1)}**/${attemptsTotal} left\n\n<:npbag:929428030554787892> Loot\n**${coinDrops}**x <:coins:872926669055356939>, **${guildMarks}**x <:guild_mark:1317944450814840923>${skillPoints ? `, **${skillPoints}**x <:skill_point:1351505460301136014>` : ""}`)
                 .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
         let matchStats = Avalon.getMatchStats(interaction);
         let notice = ["", "", "", ""];
+        matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined).map((sid) => characters[sid]);
+        // matchStats.partyStats = partyStatsC;
 
         // Apply skill tree
         for (const [skill, level] of Object.entries(stats.skill_tree)) {
@@ -843,6 +865,9 @@ const exportCommand: SlashCommand = {
                         // Reset Buffs
                         if (matchStats.currentCharacter === 0) myStatsC.atk = myStats.atk, myStatsC.md = myStats.md, myStatsC.def = myStats.def, myStatsC.mr = myStats.mr, myStatsC.cd = myStats.cd, myStatsC.cr = myStats.cr, myStatsC.dodge = myStats.dodge, myStatsC.br = myStats.br, myStatsC.mg = myStats.mg;
                         if (matchStats.currentOpponent === 0) eStatsC.atk = eStats.atk, eStatsC.md = eStats.md, eStatsC.def = eStats.def, eStatsC.mr = eStats.mr, eStatsC.cd = eStats.cd, eStatsC.cr = eStats.cr, eStatsC.dodge = eStats.dodge, eStatsC.br = eStats.br, eStatsC.mg = eStats.mg;
+
+                        // // Remove HP debuffs from boss
+                        // eBuffs.hp = eBuffs.hp.filter((buff) => (buff.type === "*" && buff.val > 1) || (buff.type === "+" && buff.val > 0));
 
                         // Apply Buffs
                         if (matchStats.currentCharacter === 0) Avalon.applyBuffs(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice);

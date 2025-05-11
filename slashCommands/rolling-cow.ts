@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction } from "discord.js";
-import { abilities } from "../Modules/abilities";
+import { abilities, Ability } from "../Modules/abilities";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
 import { floors, rollingCowMobs } from "../Modules/enemies";
@@ -380,7 +380,7 @@ const exportCommand: SlashCommand = {
         let partyStatsC = _.cloneDeep(partyStats);
         // let partyClass = partyStats.map((e) => e.class !== -1 ? classes[e.class] : false);
         // let partySkill = partyStats.map((e) => e.class !== -1 ? _.cloneDeep(skills[e.class]) : false);
-        let partyAbility = partyChars.map((e) => e.id in abilities ? _.cloneDeep(abilities[e.id]) : undefined).filter((e) => e !== undefined);
+        const partyAbility: (Ability | undefined)[] = []; // partyChars.map((e) => e.id in abilities ? _.cloneDeep(abilities[e.id]) : undefined).filter((e) => e !== undefined);
 
         // Level Selection
         let level = await levelSelection(interaction, stats, userItems, partySchema);
@@ -499,7 +499,14 @@ const exportCommand: SlashCommand = {
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        partyAbility.filter((e) => e).forEach((e, i) => e?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user));
+        partyStatsC.forEach((e, i) => {
+            if (e.id in abilities) {
+                partyAbility[i] = _.cloneDeep(abilities[e.id]);
+                partyAbility[i]?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            } else {
+                partyAbility[i] = undefined;
+            };
+        });
 
         let ATK_EMOJI = myStatsC.replaceButton?.atk?.emoji || '⚔️',
             DEF_EMOJI = myStatsC.replaceButton?.def?.emoji || '🛡️',

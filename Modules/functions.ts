@@ -148,6 +148,7 @@ const retainItemStats = new Map<string, { timeout: NodeJS.Timeout, stats: Weapon
 export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
 
     let dStats: DetailedStats = {
+        "id": id,
         "name": characters[id].name,
         "hp": baseHP(id),
         "maxhp": 1,
@@ -273,13 +274,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add weapon stats if available
         if (inv.equipment.weapon) {
             clearTimeout(retainItemStats.get(inv.equipment.weapon)?.timeout);
-            weapon = retainItemStats.get(inv.equipment.weapon)?.stats ?? await getWeaponSchema(inv.equipment.weapon);
+            const cachedItem = retainItemStats.get(inv.equipment.weapon)?.stats;
+            weapon = cachedItem ?? await getWeaponSchema(inv.equipment.weapon);
 
             if (weapon) {
                 retainItemStats.set(inv.equipment.weapon, { stats: weapon, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.weapon), 10 * 1000) });
 
                 dStats.uniqueids.push(weapon.uniqueid.split(":")[0]);
-                weapon.level = getItemLevel(weapon.level);
+                if (cachedItem === undefined) weapon.level = getItemLevel(weapon.level);
 
                 const item = items[weapon.itemid];
                 if (item instanceof weaponInfo) {
@@ -321,13 +323,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add shield stats if available
         if (inv.equipment.shield && (inv.premium > 3 || inv.shield_slot)) {
             clearTimeout(retainItemStats.get(inv.equipment.shield)?.timeout);
-            shield = retainItemStats.get(inv.equipment.shield)?.stats ?? await getWeaponSchema(inv.equipment.shield);
+            const cachedItem = retainItemStats.get(inv.equipment.shield)?.stats;
+            shield = cachedItem ?? await getWeaponSchema(inv.equipment.shield);
 
             if (shield) {
                 retainItemStats.set(inv.equipment.shield, { stats: shield, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.shield), 10 * 1000) });
 
                 dStats.uniqueids.push(shield.uniqueid.split(":")[0]);
-                shield.level = getItemLevel(shield.level);
+                if (cachedItem === undefined) shield.level = getItemLevel(shield.level);
 
                 const item = items[shield.itemid];
                 if (item instanceof weaponInfo) {
@@ -364,13 +367,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add helmet stat if available
         if (inv.equipment.helmet) {
             clearTimeout(retainItemStats.get(inv.equipment.helmet)?.timeout);
-            helmet = retainItemStats.get(inv.equipment.helmet)?.stats ?? await getWeaponSchema(inv.equipment.helmet);
+            const cachedItem = retainItemStats.get(inv.equipment.helmet)?.stats;
+            helmet = cachedItem ?? await getWeaponSchema(inv.equipment.helmet);
 
             if (helmet) {
                 retainItemStats.set(inv.equipment.helmet, { stats: helmet, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.helmet), 10 * 1000) });
 
                 dStats.uniqueids.push(helmet.uniqueid.split(":")[0]);
-                helmet.level = getItemLevel(helmet.level);
+                if (cachedItem === undefined) helmet.level = getItemLevel(helmet.level);
 
                 const item = items[helmet.itemid];
                 if (item instanceof armorInfo) {
@@ -388,12 +392,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add cuirass stat if available
         if (inv.equipment.cuirass) {
             clearTimeout(retainItemStats.get(inv.equipment.cuirass)?.timeout);
-            cuirass = retainItemStats.get(inv.equipment.cuirass)?.stats ?? await getWeaponSchema(inv.equipment.cuirass);
+            const cachedItem = retainItemStats.get(inv.equipment.cuirass)?.stats;
+            cuirass = cachedItem ?? await getWeaponSchema(inv.equipment.cuirass);
+
             if (cuirass) {
                 retainItemStats.set(inv.equipment.cuirass, { stats: cuirass, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.cuirass), 10 * 1000) });
 
                 dStats.uniqueids.push(cuirass.uniqueid.split(":")[0]);
-                cuirass.level = getItemLevel(cuirass.level);
+                if (cachedItem === undefined) cuirass.level = getItemLevel(cuirass.level);
 
                 const item = items[cuirass.itemid];
                 if (item instanceof armorInfo) {
@@ -411,13 +417,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.gloves) {
             clearTimeout(retainItemStats.get(inv.equipment.gloves)?.timeout);
-            gloves = retainItemStats.get(inv.equipment.gloves)?.stats ?? await getWeaponSchema(inv.equipment.gloves);
+            const cachedItem = retainItemStats.get(inv.equipment.gloves)?.stats;
+            gloves = cachedItem ?? await getWeaponSchema(inv.equipment.gloves);
 
             if (gloves) {
                 retainItemStats.set(inv.equipment.gloves, { stats: gloves, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.gloves), 10 * 1000) });
 
                 dStats.uniqueids.push(gloves.uniqueid.split(":")[0]);
-                gloves.level = getItemLevel(gloves.level);
+                if (cachedItem === undefined) gloves.level = getItemLevel(gloves.level);
 
                 const item = items[gloves.itemid];
                 if (item instanceof armorInfo) {
@@ -435,13 +442,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.boots) {
             clearTimeout(retainItemStats.get(inv.equipment.boots)?.timeout);
-            boots = retainItemStats.get(inv.equipment.boots)?.stats ?? await getWeaponSchema(inv.equipment.boots);
+            const cachedItem = retainItemStats.get(inv.equipment.boots)?.stats;
+            boots = cachedItem ?? await getWeaponSchema(inv.equipment.boots);
 
             if (boots) {
                 retainItemStats.set(inv.equipment.boots, { stats: boots, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.boots), 10 * 1000) });
 
                 dStats.uniqueids.push(boots.uniqueid.split(":")[0]);
-                boots.level = getItemLevel(boots.level);
+                if (cachedItem === undefined) boots.level = getItemLevel(boots.level);
 
                 const item = items[boots.itemid];
                 if (item instanceof armorInfo) {
@@ -704,6 +712,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             const power = ((Math.log(damage) / Math.log(2)) - 7);
 
             damage = Math.floor(base * Math.pow(scale, power));
+            if (attacker.damageRescaling) damage = Math.floor(damage * attacker.damageRescaling);
         };
     };
 

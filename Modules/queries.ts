@@ -173,7 +173,7 @@ export const getPlayerbaseStats = async (): Promise<{ players: number; active: n
 };
 
 export const getPartyMembers = async (partyId: string, options: { excludeIds: string[], hasStampedeChar?: boolean, hasChristmasChar?: boolean; } = { excludeIds: [], hasStampedeChar: false, hasChristmasChar: false }): Promise<Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[]> => {
-    let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment, battlechar, cow_chars, cow_participation, cow_timer FROM users WHERE party = $1 AND id != ANY($2)`, [partyId, options.excludeIds]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[];
+    let members = await query(`SELECT id, name, party, stampedechar, stampedeenergy, craze_equipment, battlechar, cow_chars, cow_participation, cow_timer FROM users WHERE party = $1 ${options.excludeIds.length > 0 ? 'AND id != ANY($2)' : ''}`, [partyId, ...(options.excludeIds.length > 0 ? [options.excludeIds] : [])]) as Pick<UserSchema, "id" | "name" | "party" | "stampedechar" | "stampedeenergy" | "craze_equipment" | "battlechar" | "cow_chars" | "cow_participation" | "cow_timer">[];
 
     if (options.hasStampedeChar) members = members.filter((e) => e.stampedechar !== null);
     if (options.hasChristmasChar) members = members.filter((e) => e.craze_equipment.char !== undefined);
@@ -460,8 +460,8 @@ export const insertNewStampede = async (): Promise<void> => {
     await query(`INSERT INTO stampedes (type, bosshp, bosshpmax, generalhp, generalhpmax, generalstotal, generalsleft, monsterstotal, monstersleft) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [values.type, values.bosshp, values.bosshpmax, values.generalhp, values.generalhpmax, values.generalstotal, values.generalsleft, values.monsterstotal, values.monstersleft]);
 };
 
-export const insertNewRaid = async (guildId: string, raidId: number, enemyHp: number): Promise<RaidSchema> => {
-    const { rows: [raid] } = await query(`INSERT INTO raids (guildid, raidid, enemy_hp, enemy_hpmax) VALUES ($1, $2, $3, $4) RETURNING *`, [guildId, raidId, enemyHp, enemyHp]) as { rows: RaidSchema[]; };
+export const insertNewRaid = async (guildId: string, raidId: number, enemyHp: number, rank: string): Promise<RaidSchema> => {
+    const { rows: [raid] } = await query(`INSERT INTO raids (guildid, raidid, enemy_hp, enemy_hpmax, rank_letter) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [guildId, raidId, enemyHp, enemyHp, rank]) as { rows: RaidSchema[]; };
     return raid;
 };
 
