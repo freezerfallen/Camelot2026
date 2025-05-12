@@ -446,7 +446,7 @@ export const raidBosses: enemyInfo[] = [
             eStats.mr -= Math.floor(eStats.mr * defScale);
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:sand_absorb:1340461883748126881> **${enemy.name}**'s releases its accumulated damage! **${enemy.name}**`, { overwriteDamage: eStats.damageTakenBuff * 0.5, dodge: false });
+                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:sand_absorb:1340461883748126881> **${enemy.name}** releases its accumulated damage! **${enemy.name}**`, { overwriteDamage: eStats.damageTakenBuff * 0.5, dodge: false });
                 eStats.damageTakenBuff = Math.floor(eStats.damageTakenBuff * 0.5);
 
                 return AbilityResponse.SUCCESS;

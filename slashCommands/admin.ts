@@ -5,7 +5,6 @@ import { classLevelToXP, search, searchItem, showPage } from "../Modules/functio
 import { OfferRow, PageRow, cowSettings } from "../Modules/components";
 import { requestVerification, dungeonTempBan } from "../Modules/components";
 import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
-import * as math from 'mathjs';
 import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers } from '../Modules/queries';
 import { query } from '../postgres';

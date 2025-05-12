@@ -76,8 +76,8 @@ export default class RaidInfo {
 export const raids: RaidInfo[] = [
     // Magma bursts and eruption
     //* Magma
-    new RaidInfo(0, "Kael'thian", "B+", "S+", raidBosses[0], { accentColor: "#bb3838", phase: 1, phasesTotal: 2, nextPhase: 1 }),
-    new RaidInfo(1, "Kael'theron", "B+", "S+", raidBosses[1], { accentColor: "#bb3838", phase: 2, phasesTotal: 2 }),
+    new RaidInfo(0, "Kael'thian", "B+", "EX+", raidBosses[0], { accentColor: "#bb3838", phase: 1, phasesTotal: 2, nextPhase: 1 }),
+    new RaidInfo(1, "Kael'theron", "B+", "EX+", raidBosses[1], { accentColor: "#bb3838", phase: 2, phasesTotal: 2 }),
 
     // Immune to lightning damage
     //* Lightning
@@ -87,16 +87,16 @@ export const raids: RaidInfo[] = [
 
     // Mana dependent boss
     //* Mana
-    new RaidInfo(5, "Zerthrax", "C+", "S+", raidBosses[5], { accentColor: "#205991" }),
+    new RaidInfo(5, "Zerthrax", "C+", "EX+", raidBosses[5], { accentColor: "#205991" }),
 
     // Counter boss
     //* Counter
-    new RaidInfo(6, "Deluvion", "B", "S", raidBosses[6], { accentColor: "#1c8798", phase: 1, phasesTotal: 2, nextPhase: 7 }),
-    new RaidInfo(7, "Deluvian", "B", "S", raidBosses[7], { accentColor: "#1c8798", phase: 2, phasesTotal: 2 }),
+    new RaidInfo(6, "Deluvion", "B", "EX+", raidBosses[6], { accentColor: "#1c8798", phase: 1, phasesTotal: 2, nextPhase: 7 }),
+    new RaidInfo(7, "Deluvian", "B", "EX+", raidBosses[7], { accentColor: "#1c8798", phase: 2, phasesTotal: 2 }),
 
     // Damage Absorption Manipulation boss
     //* Dusty
-    new RaidInfo(8, "Dusty", "D", "S-", raidBosses[8], { accentColor: "#ffa500" }),
+    new RaidInfo(8, "Dusty", "C-", "EX+", raidBosses[8], { accentColor: "#ffa500" }),
 
     // Summoner, eat summoned boss
     //* Nekro
@@ -128,8 +128,8 @@ export const raids: RaidInfo[] = [
 
     // Reflects any dot, but is weak to it
     //* DoT Gimmick
-    new RaidInfo(19, "Hooded Hopper", "D", "EX+", raidBosses[19], { accentColor: "#ff00bc", phase: 1, phasesTotal: 2, nextPhase: 20 }),
-    new RaidInfo(20, "Hooded Striker", "D", "EX+", raidBosses[20], { accentColor: "#7b0013", phase: 2, phasesTotal: 2 }),
+    new RaidInfo(19, "Hooded Hopper", "C+", "EX+", raidBosses[19], { accentColor: "#ff00bc", phase: 1, phasesTotal: 2, nextPhase: 20 }),
+    new RaidInfo(20, "Hooded Striker", "C+", "EX+", raidBosses[20], { accentColor: "#7b0013", phase: 2, phasesTotal: 2 }),
 
     // annoying mail
     //* Mail

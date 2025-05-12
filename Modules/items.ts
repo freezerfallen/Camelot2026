@@ -4508,7 +4508,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Gain **${[1, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4][level - 1]}%** of your max HP as shield every **${[7, 7, 7, 6, 6, 6, 5, 5, 5][level - 1]}** rounds.`, "Runekeeper's Seal is a wizened ring forged from a blend of metals, glinting with wisdom and power. The wide band is intricately carved with protective runes, various ancient symbols swirling in an enigmatic dance around it. A brilliant emerald sits at its center, said to hold the knowledge of past experiences. This ring allows its wearer to recall memories with startling clarity, granting insight into their own life and the legacies of those who wore it before. Perfect for sage scholars and guardians of lore, it's revered as a means of preserving the past.", "legendary", 706),
+    }, (level) => `Gain **${[1, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4][level - 1]}%** of your max HP as shield every **${[7, 7, 7, 6, 6, 6, 5, 5, 5][level - 1]}** rounds.`, "Runekeeper's Seal is a wizened ring forged from a blend of metals, glinting with wisdom and power. The wide band is intricately carved with protective runes, various ancient symbols swirling in an enigmatic dance around it. A brilliant emerald sits at its center, said to hold the knowledge of past experiences. This ring allows its wearer to recall memories with startling clarity, granting insight into their own life and the legacies of those who wore it before. Perfect for sage scholars and guardians of lore, it's revered as a means of preserving the past.", "mythical", 706),
     new ringInfo("Sylvan Echo", "ring", "ring", ["raid"], "<:sylvan_echo:1334173542367105188>", "https://i.ibb.co/xqVRhsr6/Sylvan-Echo.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Hammer
 
         // On shield break: +4% ATK/MD (max 5/6/7 times)
@@ -4672,8 +4672,9 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, (level) => `Each lightning strike has a **${[20, 22.5, 22.5, 25, 25, 27.5, 27.5, 30, 30][level - 1]}%** chance to trigger another lightning strike dealing **${[10, 10, 12.5, 12.5, 15, 15, 17.5, 17.5, 20][level - 1]}%** damage.`, "The Chromatic Nexus features a kaleidoscope of colors, its polished surface shimmering with iridescence. The ring is adorned with gemstones of various hues, each representing a different element—fire, water, earth, and air—surrounding a central orb that pulsates like a heartbeat. The craftsmanship is exquisite, with intricate engravings that depict mythical creatures entwined with the elements. This ring allows the user to harness elemental magic, granting them incredible versatile power in battle. Wielders often feel the ebb and flow of elemental forces when wearing it, making it a treasure for any elemental mage seeking harmony with nature.", "mythical", 716),
     new ringInfo("Conductor's Band", "ring", "ring", ["raid"], "<:conductors_band:1334319260943515698>", "https://i.ibb.co/jZsbrMGd/Conductor-s-Band.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Lightning
-        3;
-        myStats.lightningMultiplier = (myStats.lightningMultiplier ?? 0) + [0.2, 0.225, 0.25, 0.275, 0.3, 0.325, 0.35][level - 1];
+
+        myStats.lightningMultiplier ??= 0;
+        myStats.lightningMultiplier += [0.2, 0.225, 0.25, 0.275, 0.3, 0.325, 0.35][level - 1];
 
         // // On lightning attack: "Conductive" for 2 rounds: +25/25/30/30/35/35% lightning damage, -12/12/15/15/18/18% enemy dodge
         // matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -4705,6 +4706,7 @@ export const items = [
     }, (level) => `After dealing a critical strike, the wearer heals **${[3, 3.5, 4, 4.5, 5][level - 1]}%** of their missing HP.`, "The Reversed Vinebound ring is a striking blend of elegance and dark magic. Crafted from glossy, obsidian metal, its design includes sculpted vines that curve upwards, encasing a luminescent green gemstone at its core. Each vine is adorned with small, jagged crystals that seem to be pulling away, representing a break from natural ties. The inner band is engraved with enigmatic runes that resonate with the wearer's inner strength and resilience. This ring empowers those who seek to break free from nature's constraints, providing buffs to spellcasting while enhancing innate abilities, making it perfect for warlocks and renegade druids.", "legendary", 718),
     new ringInfo("Storm's Caress", "ring", "ring", ["guild"], "<:storms_caress:1334558474931277827>", "https://i.ibb.co/35bQdY9g/Storm-s-Caress.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
+        myStats.lightningMultiplier ??= 0;
         myStats.lightningMultiplier += [20, 25, 30, 35, 40][level - 1] / 100;
 
         return AbilityResponse.SUCCESS;
@@ -4778,7 +4780,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer deals **${[5, 7.5, 10, 12.5, 15][level - 1]}%** of the damage taken back to the enemy.`, "Embodying fierce tenacity and strength, the Barbed Glory ring features a blackened iron band adorned with protruding spikes and thorn-like designs, imparting a formidable presence. At its center lies a deep crimson gem, symbolizing blood and bravery. When activated, the ring allows its wearer to absorb damage, converting it into fleeting bursts of strength and unleashing retaliatory spikes against adversaries. This ring is a testament to the power of resilience and is often favored by warriors who thrive in the midst of combat.", "mythical", 725),
+    }, (level) => `The wearer deals **${[5, 7.5, 10, 12.5, 15][level - 1]}%** of the damage taken back to the enemy.`, "Embodying fierce tenacity and strength, the Barbed Glory ring features a blackened iron band adorned with protruding spikes and thorn-like designs, imparting a formidable presence. At its center lies a deep crimson gem, symbolizing blood and bravery. When activated, the ring allows its wearer to absorb damage, converting it into fleeting bursts of strength and unleashing retaliatory spikes against adversaries. This ring is a testament to the power of resilience and is often favored by warriors who thrive in the midst of combat.", "legendary", 725),
     new ringInfo("Necro's Grasp", "ring", "ring", ["raid"], "<:necros_grasp:1334561554045206530>", "https://i.ibb.co/MyT6nTzR/Necro-s-Grasp.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Nekro
 
         // +1% atk & md per 1% missing HP (max: 10/12.5/15/17.5/20% missing HP)
@@ -5298,7 +5300,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `If the wearer uses no active ability or skill during the first **30** rounds, their attacks gain a **${[20, 22, 24, 26, 28, 30, 32, 33][level - 1]}%** chance to strike twice for the rest of the fight.`, "The Prism Sovereign is a majestic ring that captures the essence of a kaleidoscope in its design. Set in an ornate gold band, this magnificent piece features an array of colorful gemstones, including sapphires, emeralds, and garnets, each skillfully positioned to reflect light in dazzling patterns. The intricate swirls of the band symbolize the flow of magic, and at its center rests a resplendent aquamarine that seems to shimmer with a watery glow. Wearing this ring enhances a mage's spellcasting capabilities, allowing for spontaneous bursts of elemental power. Rumored to contain the soul of an ancient sorcerer, it grants wisdom and resilience against magical interference.", "legendary", 749),
-    new ringInfo("Aurelian Twinkeeper", "ring", "ring", ["guild"], "<:aurelian_twinkeeper:1337936525467455608>", "https://i.ibb.co/rRfVRQ5Q/Aurelian-Twinkeeper.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Aurelian Twinkeeper", "ring", "ring", ["chest"], "<:aurelian_twinkeeper:1337936525467455608>", "https://i.ibb.co/rRfVRQ5Q/Aurelian-Twinkeeper.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         matchStats.twinshot ||= 0;
         matchStats.twinshot += [12.5, 15, 17.5, 20][level - 1];

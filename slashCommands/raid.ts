@@ -14,7 +14,7 @@ import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { CompactUserSchema, DetailedStats, GuildSchema, RaidRank, RaidSchema, SlashCommand } from '../types';
-import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
+import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
@@ -23,13 +23,13 @@ const dungeonInProgress = new Set();
 const DAILY_RAID_ATTEMPTS = 20 as const; // 4 attempts per day
 //! FOR THE BETA ONLY
 
-function getRaidButtonRow(tab: string, canPlay: boolean): ActionRowBuilder<ButtonBuilder> {
+function getRaidButtonRow(tab: string, canPlay: boolean, raidHasEnded: boolean): ActionRowBuilder<ButtonBuilder> {
     const buttons = [
         new ButtonBuilder()
             .setCustomId('play')
-            .setLabel(`Start Battle`)
+            .setLabel(raidHasEnded ? "Raid has Ended!" : "Start Battle")
             .setStyle(ButtonStyle.Danger)
-            .setDisabled(!canPlay),
+            .setDisabled(!canPlay || raidHasEnded),
         new ButtonBuilder()
             .setCustomId('ranking')
             .setLabel(tab === "overview" ? "Show Ranking" : "Show Overview")
@@ -98,7 +98,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
     const guildRankIndex = raidRankIndices[getLetterRank(guildRankScore)];
 
     let options: SelectMenuComponentOptionData[] = [];
-    raids.filter((e) => e.phase === 1).forEach((e) => {
+    raids.filter((e) => e.phase === 1).sort((a, b) => a.rankValue - b.rankValue).forEach((e) => {
         options.push({
             label: e.name,
             emoji: guildRankIndex > raidRankIndices[e.rank] ? "🟢" : (guildRankIndex === raidRankIndices[e.rank] ? "🟠" : ((guildRankIndex + 3) >= raidRankIndices[e.rank] ? "🔴" : "⚫")),
@@ -228,7 +228,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
             if (tab === "overview") {
                 return `### Raid Overview`
                     // + `\nAfter the exam you will be assigned a rank based on your performance.`
-                    + `\n**Enemy**: ${currentRaid.enemy.name} [${raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${raid.enemy_hp}**/${raid.enemy_hpmax} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
+                    + `\n**Enemy**: ${currentRaid.enemy.name} [${raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${formatNumberWithQuotes(Math.max(0, raid.enemy_hp))}**/${formatNumberWithQuotes(raid.enemy_hpmax)} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
                     + `\n\n**Traits**\n- ${currentRaid.enemy.ability?.list[0].join("\n- ")}`
                     // + `\n\n**Stats**\n**Current Rank**: ${stats.rank}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
                     + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}`
@@ -260,7 +260,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
             .setColor(0xff3838)
             .setThumbnail(currentRaid.enemy.image[0])
             .setDescription(getDesc());
-        interaction.reply({ embeds: [Embed], components: [getRaidButtonRow(tab, attemptsLeft > 0)] }).then((msg) => {
+        interaction.reply({ embeds: [Embed], components: [getRaidButtonRow(tab, attemptsLeft > 0, raid.enemy_hp <= 0)] }).then((msg) => {
             const play = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "play", componentType: ComponentType.Button, time: 90000 });
             const ranking = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ranking", componentType: ComponentType.Button, time: 90000 });
             const edit = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ignore_defer-edit", componentType: ComponentType.Button, time: 90000 });
@@ -277,7 +277,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
 
             ranking.on('collect', () => {
                 tab = (tab === "overview") ? "ranking" : "overview";
-                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [getRaidButtonRow(tab, attemptsLeft > 0)] });
+                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [getRaidButtonRow(tab, attemptsLeft > 0, raid.enemy_hp <= 0)] });
             });
 
             edit.on('collect', (rr) => {
@@ -434,17 +434,17 @@ function getRaidRewardPool(rank: RaidRank, participants: number, sumOfShares: nu
 
 const endedRaids = new Set();
 
-async function endRaid(raidId: number) {
+async function endRaid(raidRowId: number) {
 
     // Make sure to only send rewards once
-    if (endedRaids.has(raidId)) return;
-    endedRaids.add(raidId);
+    if (endedRaids.has(raidRowId)) return;
+    endedRaids.add(raidRowId);
     setTimeout(() => {
-        endedRaids.delete(raidId);
+        endedRaids.delete(raidRowId);
     }, 10 * 60 * 1000);
 
     // Fetch Raid
-    const raid = await getRaidByRaidId(raidId);
+    const raid = await getRaidByRaidRowId(raidRowId);
     if (!raid) return;
 
     // Distribute Rewards
@@ -515,7 +515,7 @@ async function endRaid(raidId: number) {
                 `item|454|${player.rewards.glorious_chest}`,
             "message":
                 `## Raid Rewards\n\n` +
-                `You have ranked **#${player.rank}** out of **${players.length}** participants during this raid, dealing **${player.points}** damage over **${player.rounds}** attempts <:Woah:928370799965003826>\n` +
+                `You have ranked **#${player.rank}** out of **${players.length}** participants during this raid, dealing **${formatNumberWithQuotes(player.points)}** damage over **${player.rounds}** attempts <:Woah:928370799965003826>\n` +
                 `You have contributed **${((player.points / totalPoints) * 100).toFixed(2)}%** of the total damage to the boss, and received **${(player.share * 100).toFixed(2)}%** of the rewards`,
             "date": Date.now()
         };
@@ -652,8 +652,8 @@ const exportCommand: SlashCommand = {
 
         let eStats = {
             "name": enemy.name,
-            "hp": 1000000,
-            "maxhp": 1000000,
+            "hp": 1_000_000_000,
+            "maxhp": 1_000_000_000,
             "atk": enemyAtk * 0.2,
             "md": enemyAtk * 0.2,
             "def": 660,
@@ -733,9 +733,9 @@ const exportCommand: SlashCommand = {
                 skill_points: { type: 'increment', value: skillPoints }
             });
 
-
             // Check if the raid is over
             const raidCheck = guild ? await getLatestRaid(guild.id) : undefined;
+
             if (raidCheck && raidCheck.enemy_hp <= 0) {
                 const nextPhase = raids[raidCheck.raidid].nextPhase;
                 if (nextPhase) {

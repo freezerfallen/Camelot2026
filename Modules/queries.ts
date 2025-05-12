@@ -187,12 +187,12 @@ export const getPremiumUsers = async (): Promise<Pick<UserSchema, "id" | "premiu
 };
 
 export const getLatestRaid = async (guildId: string): Promise<RaidSchema | undefined> => {
-    const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 AND end_date IS NULL ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
+    const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 AND end_date IS NULL AND start_date > NOW() - INTERVAL '7 days' ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
     return raid;
 };
 
-export const getRaidByRaidId = async (raidId: number): Promise<RaidSchema | undefined> => {
-    const [raid] = await query(`SELECT * FROM raids WHERE raidid = $1`, [raidId]) as [RaidSchema];
+export const getRaidByRaidRowId = async (raidRowId: number): Promise<RaidSchema | undefined> => {
+    const [raid] = await query(`SELECT * FROM raids WHERE rowid = $1`, [raidRowId]) as [RaidSchema];
     return raid;
 };
 

@@ -691,7 +691,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         mr: Math.max(Math.pow(0.99895, options.defMultiplier * effectiveMr), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
         crit: (isCrit ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
-        lightning: 1 + (options.isLightning ? (attacker.lightningMultiplier ?? 0) : 0),
+        lightning: 1 + (options.isLightning ? (attacker.lightningMultiplier || 0) : 0),
         rng: (1 - (0.2 * Math.random())),
     };
     if (attacker.shorekeeperUsedActive && !isCrit) options.critMultiplier * attacker.cd;
