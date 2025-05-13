@@ -10,7 +10,7 @@ import { achievements } from "../Modules/achievements";
 import { items } from "../Modules/items";
 import { Asset } from "../Modules/assets";
 import { CompactUserSchema, ProfileImageArguments, SlashCommand } from '../types';
-import { getGuildSchema, getPartySchema, getUserSchema, updateUsers } from '../Modules/queries';
+import { getGuildSchema, getPartySchema, getUserSchema, insertNewWeapon, updateUsers } from '../Modules/queries';
 import { botPfp, profileColors } from '../Modules/components';
 
 const workerPool = new WorkerPool('../Camelot/build/Modules/profileWorker.js');
@@ -572,6 +572,7 @@ const exportCommand: SlashCommand = {
                         add_chars: number[] = [],
                         add_skins: number[] = [],
                         add_items: Record<string, number> = {},
+                        add_weapons: number[] = [],
                         add_guild_marks = 0,
                         add_skill_points = 0;
 
@@ -637,7 +638,11 @@ const exportCommand: SlashCommand = {
                             run: () => {
                                 for (const rew of mail.rewards.split(",")) {
                                     if (rew.match(/item/gi)) {
-                                        add_items[parseInt(rew.split("|")[1])] = add_items[parseInt(rew.split("|")[1])] + parseInt(rew.split("|")[2]) || parseInt(rew.split("|")[2]);
+                                        const tempItem = items[parseInt(rew.split("|")[1])];
+                                        if (tempItem) {
+                                            if (["weapon", "armor", "ring"].includes(tempItem.category)) add_weapons.push(parseInt(rew.split("|")[1]));
+                                            else add_items[parseInt(rew.split("|")[1])] = add_items[parseInt(rew.split("|")[1])] + parseInt(rew.split("|")[2]) || parseInt(rew.split("|")[2]);
+                                        };
                                     };
                                 };
                             },
@@ -689,7 +694,7 @@ const exportCommand: SlashCommand = {
                             case "5": mail.rewards.split(",").forEach((rew) => { if (rew.match(/lb/gi)) notification += `Added **${rew.split("|")[1]}** ${rew.split("|")[1] == "1" ? "lootbox" : "lootboxes"}\n`; }); break;
                             case "6": mail.rewards.split(",").forEach((rew) => { if (rew.match(/char/gi)) { notification += `Added ${characters[parseInt(rew.split("|")[1])].rarity}-Tier **${characters[parseInt(rew.split("|")[1])].name}**\n`; Mail.setImage(characters[parseInt(rew.split("|")[1])].image); }; }); break;
                             case "7": mail.rewards.split(",").forEach((rew) => { if (rew.match(/skin/gi)) { notification += `Added **${skins[parseInt(rew.split("|")[1])].name}** skin\n`; Mail.setImage(skins[parseInt(rew.split("|")[1])].image); }; }); break;
-                            case "8": mail.rewards.split(",").forEach((rew) => { if (rew.match(/item/gi)) notification += `Added **${rew.split("|")[2]}**x ${items[parseInt(rew.split("|")[1])].emoji} **__${items[parseInt(rew.split("|")[1])].name}__**\n`; }); break;
+                            case "8": mail.rewards.split(",").forEach((rew) => { if (rew.match(/item/gi)) notification += `Added **${(rew.split("|")[2] ?? 1)}**x ${items[parseInt(rew.split("|")[1])].emoji} **__${items[parseInt(rew.split("|")[1])].name}__**\n`; }); break;
                             case "9": mail.rewards.split(",").forEach((rew) => { if (rew.match(/gems/gi)) notification += `Added **${rew.split("|")[1]}** <:genesis_gems:1034179687720681492>\n`; }); break;
                             case "10": mail.rewards.split(",").forEach((rew) => { if (rew.match(/marks/gi)) notification += `Added **${rew.split("|")[1]}** <:guild_mark:1317944450814840923>\n`; }); break;
                             case "11": mail.rewards.split(",").forEach((rew) => { if (rew.match(/skillpts/gi)) notification += `Added **${rew.split("|")[1]}** <:skill_point:1351505460301136014>\n`; }); break;
@@ -722,6 +727,12 @@ const exportCommand: SlashCommand = {
                         mailbox: { type: "set", value: stats.mailbox },
                         mailreceived: { type: "increment", value: -1 }
                     });
+
+                    if (add_weapons.length) {
+                        for (const add_weapon of add_weapons) {
+                            await insertNewWeapon(interaction.user.id, add_weapon, items[add_weapon].category);
+                        };
+                    };
 
                     Mail.setDescription(notification);
                     if (interaction.channel?.isSendable()) interaction.channel.send({ embeds: [Mail] });

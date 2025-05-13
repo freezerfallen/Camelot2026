@@ -173,7 +173,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
             const raid = await getLatestRaid(guild.id);
 
             if (!raid) {
-                const newRaid = await insertNewRaid(guild.id, currentlySelected, 12408000, raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]);
+                const newRaid = await insertNewRaid(guild.id, currentlySelected, raids[currentlySelected].getRankHp(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]), raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]);
                 if (newRaid) {
                     interaction.followUp({ content: "Raid started successfully!" });
                 } else {
@@ -346,7 +346,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 2,    // 5% =     0.1
         glorious_chest: 60,  // 5% =     3
         luxurious_chest: 20, // 5% =     1
-        royal_chest: 5,      // 5% =     0.25
+        royal_chest: 6,      // 5% =     0.3
         deluxe_chest: 0,     // 5% =     0
     },
     "B-": {
@@ -356,7 +356,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 3,
         glorious_chest: 90,
         luxurious_chest: 30,
-        royal_chest: 7.5,
+        royal_chest: 9,
         deluxe_chest: 0,
     },
     "A-": {
@@ -366,7 +366,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 4,
         glorious_chest: 120,
         luxurious_chest: 40,
-        royal_chest: 10,
+        royal_chest: 12,
         deluxe_chest: 4, // 5% = 0.2
     },
     "S-": {
@@ -376,7 +376,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 5,
         glorious_chest: 150,
         luxurious_chest: 50,
-        royal_chest: 12.5,
+        royal_chest: 15,
         deluxe_chest: 6,
     },
     "SS-": {
@@ -386,7 +386,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 6,
         glorious_chest: 180,
         luxurious_chest: 60,
-        royal_chest: 15,
+        royal_chest: 18,
         deluxe_chest: 8,
     },
     "SSS-": {
@@ -396,7 +396,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 7,
         glorious_chest: 210,
         luxurious_chest: 70,
-        royal_chest: 17.5,
+        royal_chest: 21,
         deluxe_chest: 10,
     },
     "EX-": {
@@ -406,7 +406,7 @@ const raidRewards: Record<string, RaidRewards> = {
         featured_ring: 8,
         glorious_chest: 240,
         luxurious_chest: 80,
-        royal_chest: 20,
+        royal_chest: 24,
         deluxe_chest: 12,
     },
 } as const;
@@ -421,7 +421,7 @@ function getRaidRewardPool(rank: RaidRank, participants: number, sumOfShares: nu
     const rewardPool = _.cloneDeep(raidRewards[raidRankLetters[baseline]]);
 
     // Adjust the reward pool based on the number of participants
-    const multiplier = (participants / 20) * sumOfShares; // (1 + (0.15 * offset)) * (participants / 20) * sumOfShares;
+    const multiplier = (participants / 20); // * sumOfShares; // (1 + (0.15 * offset)) * (participants / 20) * sumOfShares;
     for (const key in rewardPool) {
         if (Object.prototype.hasOwnProperty.call(rewardPool, key)) {
             const rawAmount = (rewardPool[key as keyof typeof rewardPool] + (raidRewards["C-"][key as keyof typeof rewardPool] * (0.15 * offset))) * multiplier;
@@ -504,19 +504,20 @@ async function endRaid(raidRowId: number) {
     // Send mails
     for (const player of players) {
         const mail = {
-            "type": "2,8",
+            "type": "2,10,11,8",
             "rewards":
-                `coins|${player.rewards.coins},` +
-                `marks|${player.rewards.guild_marks},` +
-                `skillpts|${player.rewards.skill_points},` +
-                `item|458|${player.rewards.deluxe_chest},` +
-                `item|457|${player.rewards.royal_chest},` +
-                `item|456|${player.rewards.luxurious_chest},` +
-                `item|454|${player.rewards.glorious_chest}`,
+                `coins|${player.rewards.coins}` +
+                (player.rewards.guild_marks > 0 ? `,marks|${player.rewards.guild_marks}` : "") +
+                (player.rewards.skill_points > 0 ? `,skillpts|${player.rewards.skill_points}` : "") +
+                (player.rewards.deluxe_chest > 0 ? `,item|458|${player.rewards.deluxe_chest}` : "") +
+                (player.rewards.royal_chest > 0 ? `,item|457|${player.rewards.royal_chest}` : "") +
+                (player.rewards.luxurious_chest > 0 ? `,item|456|${player.rewards.luxurious_chest}` : "") +
+                (player.rewards.glorious_chest > 0 ? `,item|454|${player.rewards.glorious_chest}` : "") +
+                (player.rewards.featured_ring > 0 ? `,item|${raids[raid.raidid].loot[Math.floor(Math.random() * raids[raid.raidid].loot.length)]}` : ""),
             "message":
                 `## Raid Rewards\n\n` +
                 `You have ranked **#${player.rank}** out of **${players.length}** participants during this raid, dealing **${formatNumberWithQuotes(player.points)}** damage over **${player.rounds}** attempts <:Woah:928370799965003826>\n` +
-                `You have contributed **${((player.points / totalPoints) * 100).toFixed(2)}%** of the total damage to the boss, and received **${(player.share * 100).toFixed(2)}%** of the rewards`,
+                `You have contributed **${((player.points / totalPoints) * 100).toFixed(2)}%** of the total damage to the boss, and received **${(((player.share / sumOfShares) * (players.length / 20)) * 100).toFixed(2)}%** of the rewards`,
             "date": Date.now()
         };
 
@@ -529,7 +530,7 @@ async function endRaid(raidRowId: number) {
         // await new Promise(resolve => setTimeout(resolve, 100));
     };
 
-    console.log(`Raid Rewards for ${raid.raidid} sent successfully!`);
+    // console.log(`Raid Rewards for ${raid.rowid} sent successfully!`);
 };
 
 const exportCommand: SlashCommand = {
@@ -652,8 +653,8 @@ const exportCommand: SlashCommand = {
 
         let eStats = {
             "name": enemy.name,
-            "hp": 1_000_000_000,
-            "maxhp": 1_000_000_000,
+            "hp": Math.floor(raid.enemy_hpmax / 100) * 10,
+            "maxhp": Math.floor(raid.enemy_hpmax / 100) * 10,
             "atk": enemyAtk * 0.2,
             "md": enemyAtk * 0.2,
             "def": 660,
@@ -699,6 +700,12 @@ const exportCommand: SlashCommand = {
             dungeonInProgress.delete(stats.id);
 
             if (!raid) return;
+
+            // Revert Minion
+            if (matchStats.currentOpponent) {
+                eStatsC = { ...matchStats.eStatsCC };
+                matchStats.currentOpponent = 0;
+            };
 
             // Damage dealt
             const damageDealt = (eStats.hp - eStatsC.hp) < 0 ? 0 : (eStats.hp - eStatsC.hp);
@@ -750,7 +757,7 @@ const exportCommand: SlashCommand = {
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Raid Results`)
                 .setDescription(`${eStats.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${formatNumberWithQuotes(damageDealt)}**\n<a:arrow_orange:916716747623641210> Attempts: **${attemptsTotal - (attemptsUsed + 1)}**/${attemptsTotal} left\n\n<:npbag:929428030554787892> Loot\n**${coinDrops}**x <:coins:872926669055356939>, **${guildMarks}**x <:guild_mark:1317944450814840923>${skillPoints ? `, **${skillPoints}**x <:skill_point:1351505460301136014>` : ""}`)
-                .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
+                .setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
         let matchStats = Avalon.getMatchStats(interaction);
