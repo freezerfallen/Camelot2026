@@ -1134,8 +1134,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 50,
-        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nYue gains Magic Resistance and Health proportional to her ATK (**20%**, **30%** respectively) which she keeps till the end of the match. Additionally, Yue heals herself for **10%** of all damage dealt as a passive.",
-        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank (MR-scaling, Anti-MD, Lifesteal)`\n\n__**Passive**__\n- **+10%** lifesteal\n\n__**Active**__ (✨)\n- Gains MR equivalent to **20%** of her ATK\n- Recovers HP equivalent to **30%** of her ATK",
+        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nYue gains Magic Resistance and Health proportional to her ATK (**20%**, **30%** respectively) which she keeps till the end of the match. Additionally, Yue heals herself for **8%** of all damage dealt as a passive.",
+        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank (MR-scaling, Anti-MD, Lifesteal)`\n\n__**Passive**__\n- **+8%** lifesteal\n\n__**Active**__ (✨)\n- Gains MR equivalent to **20%** of her ATK\n- Recovers HP equivalent to **30%** of her ATK",
         ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Yue
             matchStats.turn = matchStats.turnSkill ? 0 : 1; // Yue
@@ -1151,7 +1151,7 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.selfhealChance.push(1);
-            myStats.selfheal.push(0.1);
+            myStats.selfheal.push(0.8);
 
             return AbilityResponse.SUCCESS;
         },
@@ -3109,11 +3109,11 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 60,
         selfhealidx: 0,
-        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support/DPS`\n\nLuminous, in this form, offers a unique blend of self-sustain, damage amplification, and party support, making her suitable for both individual challenges and team battles.\n\nRight from the onset, Luminous heals **10%** of the damage she deals, which can be amplified by **+2%** with each active use up to **16%**. Her active unleashes a powerful strike causing **140%** damage against monsters, or **115%** against players. Additionally, her offensive capabilities grow with every use of this ability, increasing her ATK and MD by **10%** each time. She also possesses significant defensive strengths, as she inherently takes **15%** reduced damage, making her harder to take down. And when inside the dungeon, she benefits from a **25%** boost to class xp, speeding up her progress.\n\nLuminous' protective nature is not just confined to herself. She extends her protective aura to party members, reducing their damage taken by **15%** and bestowing them with a **5%** healing of their damage dealt. Additionally, for the initial 10 rounds, party members will lose **15** DEF and MR, gaining **2.5%** ATK and MD instead. This dynamic shift promotes an aggressive approach, compelling the team to capitalize on their enhanced damage during the early rounds.",
-        shortdesc: "**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Lifesteal, DMG-boost)`\n\n__**Passive**__\n- **+10%** lifesteal\n- **+155** DEF & MR\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **140%** DMG (115% in arenas)\n- **+2%** lifesteal\n- **+10%** ATK & MD\n\n__**Party**__ (👥)\n- **+155** DEF & MR\n- **+5%** lifesteal\n- During the first **10** rounds: Lose **15** DEF & MR every round for **2.5%** ATK & MD",
+        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support/DPS`\n\nLuminous, in this form, offers a unique blend of self-sustain, damage amplification, and party support, making her suitable for both individual challenges and team battles.\n\nRight from the onset, Luminous heals **7.5%** of the damage she deals, which can be amplified by **+1.5%** with each active use up to **16%**. Her active unleashes a powerful strike causing **140%** damage against monsters, or **115%** against players. Additionally, her offensive capabilities grow with every use of this ability, increasing her ATK and MD by **10%** each time. She also possesses significant defensive strengths, as she inherently takes **15%** reduced damage, making her harder to take down. And when inside the dungeon, she benefits from a **25%** boost to class xp, speeding up her progress.\n\nLuminous' protective nature is not just confined to herself. She extends her protective aura to party members, reducing their damage taken by **15%** and bestowing them with a **5%** healing of their damage dealt. Additionally, for the initial 10 rounds, party members will lose **15** DEF and MR, gaining **2.5%** ATK and MD instead. This dynamic shift promotes an aggressive approach, compelling the team to capitalize on their enhanced damage during the early rounds.",
+        shortdesc: "**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Lifesteal, DMG-boost)`\n\n__**Passive**__\n- **+7.5%** lifesteal\n- **+155** DEF & MR\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **140%** DMG (115% in arenas)\n- **+1.5%** lifesteal\n- **+10%** ATK & MD\n\n__**Party**__ (👥)\n- **+155** DEF & MR\n- **+5%** lifesteal\n- During the first **10** rounds: Lose **15** DEF & MR every round for **2.5%** ATK & MD",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Luminous EX | Lumi EX
-            myStats.selfheal[this.selfhealidx] += 0.02; // Increase to max 16% selfheal
+            myStats.selfheal[this.selfhealidx] += 0.015; // Increase to max 12% selfheal
             let dungeonBoost = 1.4;
             if (matchStats.interaction.commandName === "arena") dungeonBoost = 1.15;
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: dungeonBoost, magicDamage: true, ignoreShield: true, selfHeal: true });
@@ -3128,7 +3128,7 @@ export const abilities: Record<number, Ability> = {
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             matchStats.xpboost += 0.25;
             myStats.selfhealChance.push(1);
-            myStats.selfheal.push(0.1);
+            myStats.selfheal.push(0.075);
             this.selfhealidx = myStats.selfheal.length - 1;
 
             mybuff.def.push(new buffInfo("+", 155, 9999)); // Takes 15% less damage

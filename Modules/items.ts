@@ -5303,7 +5303,7 @@ export const items = [
     new ringInfo("Aurelian Twinkeeper", "ring", "ring", ["chest"], "<:aurelian_twinkeeper:1337936525467455608>", "https://i.ibb.co/rRfVRQ5Q/Aurelian-Twinkeeper.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         matchStats.twinshot ||= 0;
-        matchStats.twinshot += [12.5, 15, 17.5, 20][level - 1];
+        matchStats.twinshot += [12.5, 15, 17.5, 20][level - 1] / 100;
 
         return AbilityResponse.SUCCESS;
     }, (level) => `The wearer's attacks have a **${[12.5, 15, 17.5, 20][level - 1]}%** chance to strike twice.`, "The Aurelian Twinkeeper is a splendid ring, crafted in gleaming bronze with intricate scrollwork that spirals around its band like wisps of light. Embedded within are delicate azure gems that resemble stars frozen in time, creating an enchanting twilight effect. At the heart lies a deep green gemstone, capturing the essence of a perpetual dawn. This ring is not only a symbol of elegance but also a beacon of hope in dark times, granting the wearer the ability to illuminate their surroundings and inspire courage in allies. It is said that those who wear the Aurelian Twinkeeper can manipulate light to daze their foes.", "genesis", 750),
@@ -5699,13 +5699,13 @@ export const items = [
         //! new ability
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Lightning attacks cost **5**💧 but follow up by an additional lightning strike dealing damage based on your current mana.`, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
+    }, (level) => ``, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
     new ringInfo("Deathbloom Ring", "ring", "ring", ["raid"], "<:deathbloom_ring:1336031521181532280>", "https://i.ibb.co/Nn74bhyg/Deathbloom-Ring.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         //! new ability
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `If you recover HP, negates the healing of the enemy that turn.`, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
+    }, (level) => ``, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
     new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:defiant_survivals_ring:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         //! new ability
@@ -5718,6 +5718,62 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => ``, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
+    new ringInfo("Vermillion Vow", "ring", "ring", ["raid"], "<:vermillion_vow:1371784821281652736>", "https://i.ibb.co/Swgkb8KT/c.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        myStats.vermillionVowStacks = 0;
+        const buffValue = [20, 25, 30, 30][level - 1] / 100;
+
+        // On Ability|CSkill: Gain a stack. At 5-4 stacks, +20-30% ATK/MD for 2-3 turns, then reset.
+        matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats) {
+                myStats.vermillionVowStacks++;
+
+                if (myStats.vermillionVowStacks >= 5) {
+                    mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buffValue), 2));
+                    mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * buffValue), 2));
+                    myStats.atk += Math.floor(myStats.atk * buffValue);
+                    myStats.md += Math.floor(myStats.md * buffValue);
+                    myStats.vermillionVowStacks = 0;
+                };
+            };
+        });
+        matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats) {
+                myStats.vermillionVowStacks++;
+
+                if (myStats.vermillionVowStacks >= 5) {
+                    mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buffValue), 2));
+                    mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * buffValue), 2));
+                    myStats.atk += Math.floor(myStats.atk * buffValue);
+                    myStats.md += Math.floor(myStats.md * buffValue);
+                    myStats.vermillionVowStacks = 0;
+                };
+            };
+        });
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => `Every ability usage grants a stack. Upon reaching **${[5, 5, 4, 4][level - 1]}** stacks, increase the wearer's attack and magic damage by **${[20, 25, 30, 30][level - 1]}%** for **${[2, 2, 2, 3][level - 1]}** turns.`, "Vermillion Vow is a mesmerizing relic crafted from dark crimson alloys, its band sculpted into swirling, baroque patterns that seem to dance like living flame. At its heart rests a flawless blood-red gemstone, refracting light in brilliant, ominous glimmers. Legends speak of the ring as a pact sealed in the depths of forgotten catacombs, a promise of relentless power for those who persevere through hardship. Worn by warlocks and champions alike, the ring rewards unwavering resolve, amplifying strength after consistent strikes. It is said that each glow of the gem marks another step toward overwhelming dominance, a vow of crimson fury fulfilled in battle.", "legendary", 774),
+    new ringInfo("Solstice Radiance", "ring", "ring", ["raid"], "<:solstice_radiance:1371787642882228295>", "https://i.ibb.co/CfqFwQp/Solstice-Radiance.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        //! new ability
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => ``, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
+    new ringInfo("Prismfire Band", "ring", "ring", ["raid"], "<:prismfire_band:1371789341143076935>", "https://i.ibb.co/RkK44qDW/Prismfire-Band.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        //! new ability
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => ``, "The Prismfire Band is a dazzling relic forged from stardust and crystallized rainbow flames. Its radiant gemstone twists light into a mesmerizing vortex of shifting colors, representing the boundless potential of elemental harmony. Worn by ancient archmages and cosmic wanderers, it pulses with unpredictable surges of power. When its chaotic energy aligns, it floods the wearer with overwhelming strength. Many seek the Prismfire Band for its beauty, but only those daring to embrace the unknown can harness its true potential.", "legendary", 776),
+    new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        //* Don't fix, it's already working as intended
+
+        matchStats.lootm += 0.24;
+        matchStats.xpboost += 0.24;
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus for a brief moment until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
 ];
 

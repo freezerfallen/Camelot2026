@@ -81,6 +81,7 @@ async function createTables() {
         guild TEXT,
         donatedtotal BIGINT DEFAULT 0 NOT NULL,
         genesispity INT DEFAULT 0 NOT NULL,
+        genesisdupepity INT DEFAULT 0 NOT NULL,
         presets JSONB[] DEFAULT ARRAY[]::JSONB[] NOT NULL,
         itemlock TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         party TEXT,
@@ -468,6 +469,9 @@ async function createTriggers() {
 async function alterTables() {
     // Example:
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
+
+    // add genesisdupepity INT DEFAULT 0 NOT NULL,
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS genesisdupepity INT DEFAULT 0 NOT NULL');
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");

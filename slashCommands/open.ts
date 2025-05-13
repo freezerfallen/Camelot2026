@@ -3,7 +3,10 @@ import { chestInfo, itemInfo, items } from "../Modules/items";
 import { showPage } from "../Modules/functions";
 import { PageRow } from "../Modules/components";
 import { ItemRarity, SlashCommand } from "../types";
-import { insertNewWeapon, updateUsers } from "../Modules/queries";
+import { getUserWeapons, insertNewWeapon, updateUsers } from "../Modules/queries";
+
+const GENESIS_PITY = 24;
+const GENESIS_DUPE_PITY = 3;
 
 const row = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
@@ -169,6 +172,10 @@ const exportCommand: SlashCommand = {
                 items: { type: "merge_json", value: newItemsValues },
             });
 
+            // Get already owned items
+            const ownedItems = await getUserWeapons(interaction.user.id);
+            const ownedItemIds = ownedItems.map((e) => e.itemid);
+
             // Get item pools to draw from
             const fIds = getItemPools(stats.itemwishlist);
 
@@ -176,9 +183,26 @@ const exportCommand: SlashCommand = {
             const drops: (itemInfo & { uid?: string; })[] = [];
             for (let j = 0; j < chest.drops * amount; j++) {
                 let grade = weightedRandom(chest.dropratesFull);
-                if (chest.id === 458 && j % 6 === 0 && ++stats.genesispity >= 24) grade = "genesis";
+                if (chest.id === 458 && j % 6 === 0 && ++stats.genesispity >= GENESIS_PITY) grade = "genesis";
                 if (chest.id === 458 && grade === "genesis") stats.genesispity = 0;
-                drops.push(items[fIds[grade][Math.floor(Math.random() * fIds[grade].length)]]);
+
+                // Get random drop
+                let tempDrop = items[fIds[grade][Math.floor(Math.random() * fIds[grade].length)]];
+
+                // Genesis Dupe Pity
+                if (tempDrop.grade === "genesis") {
+                    if (ownedItemIds.includes(tempDrop.id)) stats.genesisdupepity++;
+                    else stats.genesisdupepity = 0;
+                };
+                if (stats.genesisdupepity >= GENESIS_DUPE_PITY) {
+                    const newGenesis = fIds[grade].filter((e) => !ownedItemIds.includes(e));
+                    if (newGenesis.length > 0) tempDrop = items[newGenesis[Math.floor(Math.random() * newGenesis.length)]];
+                    stats.genesisdupepity = 0;
+                };
+                ownedItemIds.push(tempDrop.id);
+
+                // Push drop
+                drops.push(tempDrop);
 
                 // Insert new weapon
                 const drop = await insertNewWeapon(interaction.user.id, drops[j].id, drops[j].category);
@@ -188,7 +212,8 @@ const exportCommand: SlashCommand = {
 
             // Update users table
             await updateUsers(interaction.user.id, {
-                genesispity: { type: "set", value: stats.genesispity }
+                genesispity: { type: "set", value: stats.genesispity },
+                genesisdupepity: { type: "set", value: stats.genesisdupepity },
             });
 
             let page = 0;

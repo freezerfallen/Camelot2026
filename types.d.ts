@@ -342,6 +342,7 @@ export interface UserSchema {
     guild: string | null;
     donatedtotal: number;
     genesispity: number;
+    genesisdupepity: number;
     presets: Array<{
         character?: number;
         class?: number;
