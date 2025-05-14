@@ -128,7 +128,6 @@ async function createTables() {
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
         rankscore BIGINT DEFAULT 0 NOT NULL,
-        raidxp INT DEFAULT 0 NOT NULL,
         guild_marks BIGINT DEFAULT 0 NOT NULL,
         created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         image_credits INT DEFAULT 0 NOT NULL,
@@ -500,11 +499,17 @@ async function dropTables() {
 // import { migrateData } from './migration';
 async function resetDatabase(migrate: boolean = false) {
     // await dropTables();
+    // console.log('Dropped tables');
     // await createTables();
+    // console.log('Created tables');
     // await createIndexes();
+    // console.log('Created indexes');
     // await alterTables();
+    // console.log('Altered tables');
     // await createTriggers();
+    // console.log('Created triggers');
     // if (migrate) await migrateData().catch(console.error);
+    // console.log('Migrated data');
 };
 
 // Self-executing async function to initialize database

@@ -268,7 +268,7 @@ export const skillTree: SkillPath[] = [
         });
         return AbilityResponse.SUCCESS;
     }, 18),
-    new SkillPath("Executioner", "extra", "Gain **+10%** ATK & MD againstenemies below **25%** HP.", 3, 5, "attack", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new SkillPath("Executioner", "extra", "Gain **+10%** ATK & MD against enemies below **25%** HP.", 3, 5, "attack", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const healthThreshold = 0.25;
         const bonusDamagePercent = 0.10 * level;
 

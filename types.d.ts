@@ -400,7 +400,6 @@ export interface UserSchema {
     cow_rolled_today: number;
     // rank: number;
     rankscore: number;
-    raidxp: number;
     guild_marks: number;
     image_credits: number;
     skill_tree: Record<string, number>;

@@ -220,7 +220,7 @@ const exportCommand: SlashCommand = {
             const item = searchItem(args.join(" "), interaction, true);
             if (!item?.name) return interaction.reply({ content: `Error: Couldn't find item "${args.join(" ")}"\n\nUsage: \`/admin add weapon <name> user:@user [--id:string] [--level:number]\`\n\n**Options**\n\`name\`: Name or ID of the item to be added\n\`--id\`: Custom ID for the item\n\`--level\`: Starting level for the item`, ephemeral });
 
-            if (!(item.category === "weapon" || item.category === "armor")) return interaction.reply({ content: `Error: Item must be a weapon or armor piece`, ephemeral });
+            if (!(item.category === "weapon" || item.category === "armor" || item.category === "ring")) return interaction.reply({ content: `Error: Item must be a weapon, an armor piece or a ring`, ephemeral });
 
             // Calculate XP and required ascension if level provided
             let xp = 0;

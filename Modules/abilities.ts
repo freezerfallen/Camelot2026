@@ -1374,9 +1374,11 @@ export const abilities: Record<number, Ability> = {
                 matchStats.interaction.followUp({ content: "You can't stack Tatsumaki's ability", ephemeral: true });
                 return AbilityResponse.FAILURE;
             };
+            this.roundUsed = matchStats.round;
+
             eStats.mr = Math.floor(eStats.mr * 0.7);
             ebuff.mr.push(new buffInfo("*", 0.7, 4));
-            this.roundUsed = matchStats.round;
+
             notice.push(`\n✨ **${char.name}** decreased enemy magic resistance by **30%** for 4 rounds!`);
 
             return AbilityResponse.SUCCESS;
@@ -5501,6 +5503,7 @@ export const abilities: Record<number, Ability> = {
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.insight ??= 0;
             myStats.duorevived ??= false;
+            myStats.counter ??= 0;
 
             let prog = myStats.proginfo;
             if (prog) {

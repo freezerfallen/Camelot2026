@@ -5626,8 +5626,8 @@ export const items = [
 
         // Delayed Buff
         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            if (myStats.hp / myStats.maxhp < 0.1) {
-                myStats.mana = 0;
+            if ((myStats.hp / myStats.maxhp) < 0.1) {
+                myStats.sm = 0;
 
                 // Deal damage
                 const damage = Math.floor((myStats.maxhp - myStats.hp));
@@ -5765,15 +5765,15 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => ``, "The Prismfire Band is a dazzling relic forged from stardust and crystallized rainbow flames. Its radiant gemstone twists light into a mesmerizing vortex of shifting colors, representing the boundless potential of elemental harmony. Worn by ancient archmages and cosmic wanderers, it pulses with unpredictable surges of power. When its chaotic energy aligns, it floods the wearer with overwhelming strength. Many seek the Prismfire Band for its beauty, but only those daring to embrace the unknown can harness its true potential.", "legendary", 776),
-    new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //* Don't fix, it's already working as intended
+    //     //* Don't fix, it's already working as intended
 
-        matchStats.lootm += 0.24;
-        matchStats.xpboost += 0.24;
+    //     matchStats.lootm += 0.24;
+    //     matchStats.xpboost += 0.24;
 
-        return AbilityResponse.SUCCESS;
-    }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus for a brief moment until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
+    //     return AbilityResponse.SUCCESS;
+    // }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus for a brief moment until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
 ];
 

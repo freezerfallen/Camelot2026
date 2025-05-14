@@ -620,6 +620,7 @@ const exportCommand: SlashCommand = {
         myStats.atk += Math.floor(myStats.atk * (guild.atkbuff * 0.2));
         myStats.md += Math.floor(myStats.md * (guild.atkbuff * 0.2));
         myStats.hp += Math.floor(myStats.hp * (guild.hpbuff * 0.2));
+        myStats.maxhp += Math.floor(myStats.maxhp * (guild.hpbuff * 0.2));
         const defBuff = guild.defbuff * 100;
         myStats.def += defBuff;
         myStats.mr += defBuff;
