@@ -1610,7 +1610,7 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.FAILURE;
             };
             this.pause = matchStats.round + 3;
-            
+
             // +10% unremovable dodge rate
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             myStats.permdodge += 0.1;
@@ -1664,17 +1664,18 @@ export const abilities: Record<number, Ability> = {
             // Vulnerability on enemy crit
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (caster === eStats && myStats.memeanticrit <= matchStats.round) {
-                    eStats.vulnerability = Math.max(Math.min(1 + 0.01 * (myStats.dodge / 0.02) , 1.4), eStats.vulnerability);
+                    eStats.vulnerability = Math.max(Math.min(1 + 0.01 * (myStats.dodge / 0.02), 1.4), eStats.vulnerability);
                     notice.push(`\n✨ The enemy will take **+${Math.floor((eStats.vulnerability - 1) * 100)}%** damage the next round`);
                     myStats.memeanticrit = matchStats.round + 3;
 
                     // When vulnerability ends
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    eStats.vulnerability = 1;
+                        eStats.vulnerability = 1;
 
-                    return AbilityResponse.SUCCESS;
-                }));
-            }});
+                        return AbilityResponse.SUCCESS;
+                    }));
+                }
+            });
             return AbilityResponse.SUCCESS;
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -4788,7 +4789,7 @@ export const abilities: Record<number, Ability> = {
                 if (firstWisp !== undefined) {
                     if (firstWisp === 0) {
                         // Ursae Majoris
-                        const increaseHp = Math.floor(myStats.maxhp * 0.2)
+                        const increaseHp = Math.floor(myStats.maxhp * 0.2);
                         myStatsFixed.maxhp += increaseHp;
                         myStatsFixed.hp += increaseHp;
                         myStats.maxhp += increaseHp;
@@ -4810,10 +4811,10 @@ export const abilities: Record<number, Ability> = {
                         // Draconis
                         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                             if (caster == myStats) {
-                                const increaseHp = Math.floor( Math.min(options.damage * 0.25 , (myStats.maxhp - myStats.hp) * 0.15));
+                                const increaseHp = Math.floor(Math.min(options.damage * 0.25, (myStats.maxhp - myStats.hp) * 0.15));
                                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
                             }
-             });
+                        });
                     } /*else if (firstWisp === 4) {
                         // Centauri
                         matchStats.critbleed = true;
@@ -4848,11 +4849,13 @@ export const abilities: Record<number, Ability> = {
                 matchStats.on("counter", {
                     maxUsage: 10,
                     callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster == myStats) {
-                        myStats.cr += 0.02;
-                        if (myStats.cr > 1) myStats.cr = 1;
-                        myStats.cd += 0.03;
-            }}});
+                        if (caster == myStats) {
+                            myStats.cr += 0.02;
+                            if (myStats.cr > 1) myStats.cr = 1;
+                            myStats.cd += 0.03;
+                        }
+                    }
+                });
             } /* else if (this.rolledWisp === 4) {
                 // Centauri
                 mybuff.cr.push(new buffInfo("+", 0.1, 9999));
@@ -4877,7 +4880,7 @@ export const abilities: Record<number, Ability> = {
             const stats = await getUserSchema(matchStats.interaction.user.id);
 
             const favcharref = stats?.char_ref[stats?.favchar ?? 21929];
-            
+
             /*// Get SS shards
             const stats = await getUserSchema(matchStats.interaction.user.id);
 
@@ -4970,7 +4973,7 @@ export const abilities: Record<number, Ability> = {
                         // Draconis
                         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                             if (caster == myStats) {
-                                const increaseHp = Math.floor( Math.min(options.damage * 0.25 , (myStats.maxhp - myStats.hp) * 0.15));
+                                const increaseHp = Math.floor(Math.min(options.damage * 0.25, (myStats.maxhp - myStats.hp) * 0.15));
                                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
                             }
                         });

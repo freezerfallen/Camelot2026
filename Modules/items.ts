@@ -4536,8 +4536,8 @@ export const items = [
                 let shockDMG2 = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { atkMultiplier: 0.4, isLightning: true });
 
                 // each 40% chance: 50% of the previous hit as DoT (2 rounds)
-                if (Math.random() < 0.4) ebuff.hp.push(new buffInfo("+", shockDMG1 * 0.5, 2));
-                if (Math.random() < 0.4) ebuff.hp.push(new buffInfo("+", shockDMG2 * 0.5, 2));
+                if (Math.random() < 0.4) ebuff.hp.push(new buffInfo("+", -(shockDMG1 * 0.5), 2));
+                if (Math.random() < 0.4) ebuff.hp.push(new buffInfo("+", -(shockDMG2 * 0.5), 2));
 
                 return AbilityResponse.SUCCESS;
             },
@@ -4723,12 +4723,13 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `The wearer deals **${[10, 15, 20][level - 1]}%** additional lightning damage every round. This attack also heals you for **20%** of the damage dealt.`, "The Vortex Thorn ring is a testament to the chaotic dance of nature's fury. This piece displays a light, twisted band of obsidian, accentuated with sharp, thorny protrusions that seem alive with energy. At its heart lies a brilliant sapphire gem, swirling with internal storms that captivate the eye. This ring is favored by rogues and shadowy figures, granting its wearer the ability to manipulate temporal distortions. Those donning the ring can slip between the cracks of time, avoiding attacks and repositioning themselves in an instant.", "genesis", 720),
-    new ringInfo("Sneak Attack", "ring", "ring", ["chest"], "<:sneak_attack:1334561501540909100>", "https://i.ibb.co/7ths4Kk2/Sneak-Attack.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Sneak Attack", "ring", "ring", ["chest"], "<:sneak_attack:1334561501540909100>", "https://i.ibb.co/7ths4Kk2/Sneak-Attack.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:sneak_attack:1334561501540909100> **${char.name}**`, { atkMultiplier: [0.75, 1, 1.25][level - 1], dodge: false, block: false });
+        const atkMultiplier = [60, 70, 80, 90, 100, 110, 120][level - 1] / 100;
+        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:sneak_attack:1334561501540909100> **${char.name}**`, { atkMultiplier, magicDamage: true });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `At the start of the battle, the wearer hits the enemy with an attack dealing **${[75, 100, 125][level - 1]}%** damage, which can't miss.`, "The Sneak Attack ring whispers the promise of irrationality and cunning. Its band features a textured design that mimics the surface of a leather-bound path, sleek and unobtrusive. Atop, a cunningly crafted dagger-shaped ornament points outward, encrusted with dim orichalcum. Impulsive, this ring lashes out indiscriminately afront, sacrificing the bearer’s stealth for a self-determined lethal strike.", "rare", 721),
+    }, (level) => `At the start of the battle, the wearer hits the enemy with an attack dealing **${[60, 70, 80, 90, 100, 110, 120][level - 1]}%** damage.`, "The Sneak Attack ring whispers the promise of irrationality and cunning. Its band features a textured design that mimics the surface of a leather-bound path, sleek and unobtrusive. Atop, a cunningly crafted dagger-shaped ornament points outward, encrusted with dim orichalcum. Impulsive, this ring lashes out indiscriminately afront, sacrificing the bearer’s stealth for a self-determined lethal strike.", "rare", 721),
     new ringInfo("Verdant Melody", "ring", "ring", ["guild"], "<:verdant_melody:1334561565935931465>", "https://i.ibb.co/Jj1qG9nh/Verdant-Melody.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const atkDebuff = [0.3, 0.275, 0.25, 0.225, 0.2][level - 1];
