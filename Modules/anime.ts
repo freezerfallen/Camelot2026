@@ -582,7 +582,7 @@ export const anime: animeInfo[] = [
     new animeInfo("Rune Soldier", ['Magical Soldier Louie', 'Mahou Senshi Louie'], 547),
     new animeInfo("Nana", [], 548),
     new animeInfo("APPARE-RANMAN!", ['Appare Ranman!', 'Appare-Ranman!', 'AR!'], 549),
-    new animeInfo("I'm Standing on a Million Lives", ['100-man no Inochi no Ue ni Ore wa Tatteiru', "I'm standing on 1,000,000 lives."], 550),
+    new animeInfo("I'm Standing on a Million Lives", ['100-man no Inochi no Ue ni Ore wa Tatteiru', "I'm standing on 1,000,000 lives.", "I'm standing on 1'000'000 lives."], 550),
     new animeInfo("The Unwanted Undead Adventurer", ['Nozomanu Fushi no Boukensha', 'The Adventurer Who Received Undesired Immortality', 'The Unwanted Immortal Adventurer', 'TUUA'], 551),
     new animeInfo("Tales of Wedding Rings", ['Kekkon Yubiwa Monogatari', 'Wedding Ring Story'], 552),
     new animeInfo("The Wrong Way to Use Healing Magic", ['Chiyu Mahou no Machigatta Tsukaikata', 'ChiyuMahou'], 553),

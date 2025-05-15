@@ -4570,7 +4570,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `The wearer creates and immediately breaks a shield ${["every **2** rounds", "every **2** rounds", "every round"][level - 1]}. Deals **${[10, 12.5, 15][level - 1]}%** damage to the enemy on every shield break.`, "Forged from the remnants of an ancient frost titan’s crown, the Fractured Whisper hums with the echoes of a winter long lost. Its crystalline shards shimmer with spectral whispers, promising power to those who dare to listen.", "genesis", 709),
-    new ringInfo("Ecplise Gem", "ring", "ring", ["chest"], "<:eclipse_gem:1338658011560018002>", "https://i.ibb.co/h19dPqqh/Eclipse-Gem.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Eclipse Gem", "ring", "ring", ["chest"], "<:eclipse_gem:1338658011560018002>", "https://i.ibb.co/h19dPqqh/Eclipse-Gem.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.eclipseGemStacks = 0;
 
@@ -4638,7 +4638,7 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // Every 3 rounds: Deal 40/42.5/45/47.5/50/52.5/55/57.5/60/62.5/65/67.5/70/72.5/75% lightning damage
             if (matchStats.round % 3 === 0) {
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: [0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75][level - 1] });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: [0.4, 0.425, 0.45, 0.475, 0.5, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75][level - 1] });
             };
 
             return AbilityResponse.SUCCESS;
@@ -4651,7 +4651,7 @@ export const items = [
         // On Crit: Deal 15/17.5/20/22.5/25/27.5/30% lightning damage
         matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: [0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3][level - 1] });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: [0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3][level - 1] });
             };
         });
 
@@ -4665,7 +4665,7 @@ export const items = [
         // On lightning attack 20-30% chance to deal 10-20% lightning damage
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && options.isLightning && Math.random() < triggerChance) {
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { atkMultiplier, isLightning: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { atkMultiplier, isLightning: true });
             };
         });
 
@@ -4715,7 +4715,7 @@ export const items = [
 
         // Deal 10/15/20% lightning dmg every round, heal 50% of lightning damage dealt
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            let lightningDMG = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: 0.1 + 0.05 * (level - 1) });
+            let lightningDMG = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: 0.1 + 0.05 * (level - 1) });
             addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, lightningDMG * 0.2);
 
             return AbilityResponse.SUCCESS;
@@ -4725,7 +4725,7 @@ export const items = [
     }, (level) => `The wearer deals **${[10, 15, 20][level - 1]}%** additional lightning damage every round. This attack also heals you for **20%** of the damage dealt.`, "The Vortex Thorn ring is a testament to the chaotic dance of nature's fury. This piece displays a light, twisted band of obsidian, accentuated with sharp, thorny protrusions that seem alive with energy. At its heart lies a brilliant sapphire gem, swirling with internal storms that captivate the eye. This ring is favored by rogues and shadowy figures, granting its wearer the ability to manipulate temporal distortions. Those donning the ring can slip between the cracks of time, avoiding attacks and repositioning themselves in an instant.", "genesis", 720),
     new ringInfo("Sneak Attack", "ring", "ring", ["chest"], "<:sneak_attack:1334561501540909100>", "https://i.ibb.co/7ths4Kk2/Sneak-Attack.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: [0.75, 1, 1.25][level - 1], dodge: false, block: false });
+        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:sneak_attack:1334561501540909100> **${char.name}**`, { atkMultiplier: [0.75, 1, 1.25][level - 1], dodge: false, block: false });
 
         return AbilityResponse.SUCCESS;
     }, (level) => `At the start of the battle, the wearer hits the enemy with an attack dealing **${[75, 100, 125][level - 1]}%** damage, which can't miss.`, "The Sneak Attack ring whispers the promise of irrationality and cunning. Its band features a textured design that mimics the surface of a leather-bound path, sleek and unobtrusive. Atop, a cunningly crafted dagger-shaped ornament points outward, encrusted with dim orichalcum. Impulsive, this ring lashes out indiscriminately afront, sacrificing the bearer’s stealth for a self-determined lethal strike.", "rare", 721),
@@ -4841,7 +4841,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `After being hit by a critical strike, the wearer heals **${[3, 3.5, 4, 4.5, 5][level - 1]}%** of their missing HP.`, "The Gemweaver ring boasts a luxurious silver base entwined with intricate vines of alloy, symbolizing the harmony of nature and craftsmanship. At its heart sits a large, round emerald, backed by a delicate array of smaller gemstones in hues of purple and green, resembling a lush garden in full bloom. The craftsmanship showcases fine details, like curling tendrils that wrap around the band. Empowered by ancient magic, this ring allows its wearer to manipulate the power of gems, enhancing their spells and abilities while granting protection against elemental forces, making it ideal for artisans and elementalists alike.", "legendary", 729),
-    new ringInfo("Malakay's Legacy", "ring", "ring", ["raid"], "<:crimson_pulse:1336032778680143942>", "https://i.ibb.co/ksrQz96V/Crimson-Pulse.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
+    new ringInfo("Malakay's Legacy", "ring", "ring", ["raid"], "<:malakays_legacy:1336032778680143942>", "https://i.ibb.co/ksrQz96V/Crimson-Pulse.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         // On own miss: -3% HP; +7.5/8.75/10% atk, +7.5/8.75/10% md for 2 turns
         matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -4867,7 +4867,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer increases their ATK & MD by **${[5, 6.25, 7.5, 8.75, 10, 11.25, 12.5][level - 1]}%** for **3** rounds if they evade an attack, but also loses **3%** of current HP every time. After **3** consecutive dodges or blocks, the wearer additionally increases their ATK & MD by **${[10, 12.5, 15, 17.5, 20, 22.5, 25][level - 1]}%** for **1** round.`, "Malakai's Legacy is a broad obsidian ring adorned with intricate silver and gold patterns. Its striking centerpiece contains a pool of swirling azure energy that pulses like captured lightning, flanked by two golden medallions bearing mysterious emblems. Small crimson crystals circle the band, each glowing warmly, while ancient runes etched into the dark metal surface create an elaborate lattice of shifting symbols.", "legendary", 730),
+    }, (level) => `The wearer increases their ATK & MD by **${[5, 6.25, 7.5, 8.75, 10, 11.25, 12.5][level - 1]}%** for **3** rounds if they evade an attack, but also loses **3%** of current HP every time. After **3** consecutive dodges or blocks, the wearer additionally increases their ATK & MD by **${[10, 12.5, 15, 17.5, 20, 22.5, 25][level - 1]}%** for **1** round.`, "Malakay's Legacy is a broad obsidian ring adorned with intricate silver and gold patterns. Its striking centerpiece contains a pool of swirling azure energy that pulses like captured lightning, flanked by two golden medallions bearing mysterious emblems. Small crimson crystals circle the band, each glowing warmly, while ancient runes etched into the dark metal surface create an elaborate lattice of shifting symbols.", "legendary", 730),
     new ringInfo("Radiant Ember", "ring", "ring", ["raid"], "<:radiant_ember:1336036400264515756>", "https://i.ibb.co/QF7G1X7H/Radiant-Ember.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Magma
 
         const cdBuff = 0.05 + 0.025 * (level - 1);
@@ -5622,7 +5622,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `If an ability is used on an even turn, the wearer loses **20%** of their current HP (unless the wearer also has <:the_departed_one:1338646510392315924> The Departed One). If an ability is used on an odd turn, the wearer gains **${[27.5, 30, 32.5, 35, 37.5, 40][level - 1]}%** crit damage for **2** turns.`, "The Parted One ring is a mesmerizing piece that embodies a mix of elegance and mystery. Its band is made of finely crafted silver, shaped to resemble a twisting current that divides at the center. Here, a radiant gem glows in an enchanting aquamarine shade, continuously shifting and swirling like water caught in eternal motion. This ring grants its wearer the ability to navigate through tumultuous waters, quite literally and metaphorically, facilitating smoother paths during turbulent times. Lore speaks of seers who attune themselves to the energies of the sea, finding peace with the help of this remarkable ring.", "legendary", 765),
-    new ringInfo("Cindercrest", "ring", "ring", ["chest"], "<:cindercrest:1338653441668419697>", "https://i.ibb.co/TGsHkrK/Cindercrest.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Cindercrest", "ring", "ring", ["chest"], "<:cindercrest:1338653441668419697>", "https://i.ibb.co/TGsHkrK/Cindercrest.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // Delayed Buff
         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
@@ -5686,7 +5686,7 @@ export const items = [
                 const atkMultiplier = (myStats.sm * ([0.5, 1, 1.5, 2][level - 1] / 100));
                 myStats.sm = 0;
 
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:gamas_awakening:1334260075304321167> **${char.name}**`, { atkMultiplier });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:gamas_awakening:1334260075304321167> **${char.name}**`, { atkMultiplier, magicDamage: true });
             };
 
             return AbilityResponse.SUCCESS;

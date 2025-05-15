@@ -677,8 +677,10 @@ export const raidBosses: enemyInfo[] = [
     new enemyInfo("Sledgefist", "Golem", "the Stonebreaker", "M", true, {}, {}, { mana: 120 }, [705, 707, 709, 768], ["https://i.ibb.co/B5n382Vc/sledgefist.png"], [], 14,
         new skillInfo(15, 120, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            myStats.shield = 0;
-            notice.push(`\n<:steal_shield:1340630053695918100> ${enemy.name} has broken your shield!`);
+            if (myStats.shield > 0) {
+                myStats.shield = 0;
+                notice.push(`\n<:steal_shield:1340630053695918100> **${enemy.name}** has broken your shield!`);
+            };
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

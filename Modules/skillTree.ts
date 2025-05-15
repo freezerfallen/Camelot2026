@@ -80,7 +80,7 @@ class SkillPath {
     };
     desc(level: number = 1) {
         level ||= 1;
-        return this._description.replace(/\+(\d+)/g, (match, num) => `+${num * level}`);
+        return this._description.replace(/\+(\d*\.?\d+)/g, (match, numStr) => `+${Math.round(parseFloat(numStr) * level * 100) / 100}`);
     };
 };
 
