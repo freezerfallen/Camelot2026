@@ -1,5 +1,5 @@
 import { AttachmentBuilder, EmbedBuilder, Message, User } from "discord.js";
-import { getDetailedStats, dealDamage, addHeal } from "./functions";
+import { getDetailedStats, dealDamage, addHeal, getRefinement } from "./functions";
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import charInfo, { characters } from "./chars";
 import { items } from "./items";
@@ -140,7 +140,7 @@ export const abilities: Record<number, Ability> = {
         usage: 1,
         used: 0,
         cost: 50,
-        desc: "**Total Usage**: `1`\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nBy transforming into a Titan, Eren will boost his HP, ATK, MD, DEF and MR stats by **20%**. More Specifically, 15% of his max HP and 15% of his current DEF and current ATK each.",
+        desc: "**Total Usage**: `1`\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nBy transforming into a Titan, Eren will boost his HP, ATK, MD, DEF and MR stats by **20%**. More Specifically, 20% of his max HP and 20% of his current DEF and current ATK each.",
         shortdesc: "**Uses**: `1`\n**Cost**: `50`💧\n**Timeout**: `Yes`\n**Role**: `DPS/Tank (Versatile)`\n\n__**Active**__ (✨)\n- **+20%** max HP, ATK & MD, DEF & MR",
         ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Eren increases his stats by 20% of his max HP, current DEF and current ATK
@@ -504,16 +504,19 @@ export const abilities: Record<number, Ability> = {
                 "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     if (Math.random() < 0.04) {
                         notice.push("\n✨ Zoro missed the enemy. He is too tired to continue.");
+                        matchStats.trigger("miss", myStats, eStats, mybuff, ebuff);
                         delete myStats.replaceButton.atk;
                     } else {
                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:zoro:1084242647339761704> **${char.name}**`, { magicDamage: true });
                         if (Math.random() < 0.07) {
                             notice.push("\n✨ Zoro missed the enemy. He is too tired to continue.");
+                            matchStats.trigger("miss", myStats, eStats, mybuff, ebuff);
                             delete myStats.replaceButton.atk;
                         } else {
                             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:zoro:1084242647339761704> **${char.name}**`, { magicDamage: true });
                             if (Math.random() < 0.12) {
                                 notice.push("\n✨ Zoro missed the enemy. He is too tired to continue.");
+                                matchStats.trigger("miss", myStats, eStats, mybuff, ebuff);
                                 delete myStats.replaceButton.atk;
                             } else {
                                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:zoro:1084242647339761704> **${char.name}**`, { magicDamage: true });
@@ -763,7 +766,7 @@ export const abilities: Record<number, Ability> = {
         usage: 9999,
         used: 0,
         cost: 80,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `80`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nWhen fighting an enemy, Guts channels his relentless fury in every strike, increasing his ATK by **20%**. However, his reckless and aggressive fighting style causes him to lose **5%** of his max HP every round, due to the wear and tear on his body from the intense battle.\nWhen Guts endures the relentless onslaught of his enemies, he gathers a portion of the pain and anguish they inflict upon him. He absorbs and stares damage taken (DoT excluded). When Guts uses his ability, he expends all stored up damage and releases a devastating strike dealing twice as much damage as he took, up to a maximum of **300%** of his base attack damage. This powerful attack serves as a testament to Guts' sheer resilience and indomitable spirit.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `80`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nWhen fighting an enemy, Guts channels his relentless fury in every strike, increasing his ATK by **20%**. However, his reckless and aggressive fighting style causes him to lose **5%** of his max HP every round, due to the wear and tear on his body from the intense battle.\nWhen Guts endures the relentless onslaught of his enemies, he gathers a portion of the pain and anguish they inflict upon him. He records damage taken (DoT excluded). When Guts uses his ability, he expends all recorded damage and releases a devastating strike dealing twice as much damage as he took, up to a maximum of **300%** of his base attack damage. This powerful attack serves as a testament to Guts' sheer resilience and indomitable spirit.",
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial)`\n\n__**Passive**__\n- **+20%** ATK\n- Loses **5%** max HP every round\n- Records DMG taken\n\n__**Active**__ (✨)\n- Deals **2x** the recorded DMG taken to the enemy (Up to **300%** of his ATK)\n- Resets recorded DMG taken",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Active: Guts records damage taken and releases it x2 (max 300% ATK). DoT is excluded
@@ -933,8 +936,9 @@ export const abilities: Record<number, Ability> = {
 
     //         // Upon ally counter, follows up with additional hit
     //         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${char.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
-    //         });
+    //             if (caster == myStats) {
+    //         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${char.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
+    //         }});
 
     //         return AbilityResponse.SUCCESS;
     //     },
@@ -961,7 +965,7 @@ export const abilities: Record<number, Ability> = {
         brId: -1,
         cost: 0,
         desc: "**Total Usage**: `1+1`\n**Mana**: `20`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nLugh Tuatha Dé is a character built around timing and strategical thinking, offering both a long-term pay-off and immediate gains. His normal attacks fire off a ten-bullet barrage, each one dealing **9%** damage and increasing his crit damage by **3%** per hit for the following two rounds.\n\nHis ability, when activated, starts charging his attack Gungnir. During this time, Lugh stops generating mana but increases his block rate by **20%** as he focuses on defending himself and winning time. The second activation finally releases his charged attack, whose power increases by **40%** for each round up to a maximum of **10** rounds. This is followed by a permanent **20%** ATK & MD reduction on the enemy as they are pierced by this attack.\n\nWhen in a party, Lugh brings a combination of utility and raw power. For the first five rounds while charging his attack, he boosts mana generation by **+25**. After that, he fires off his charged Gungnir, dealing **200%** damage and reducing the enemy's ATK & MD by **20%** permanently. Additionally, the ally gains **15%** boosts on crit rate and crit damage for the rest of the battle.",
-        shortdesc: "**Uses**: `1+1`\n**Cost**: `20 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank (Nuke, Block, Disarm)`\n\n__**Passive**__\nATTACK is altered to **10** bullet hits:\n- Each deal **9%** DMG\n- Every hit bullet increases his critical DMG by **3%** for the next **2** rounds\n\n__**Active**__ (✨)\nBegins charging Gungir:\n- Halts mana regeneration\n- **+20%** Block rate\n\nUsing the active (✨) again releases Gungir:\n- Removes effects of charging\n- Deals **40%** DMG for every round charged, up to **400%**\n- **-20%** enemy's ATK & MD\n\n__**Party**__ (👥)\nDuring the first **5** rounds:\n- **+4** Mana regeneration\n\nAfterwards:\n- Deals **130%** DMG once\n- **-20%** enemy's ATK & MD\n- **+15%** critical rate & critical DMG",
+        shortdesc: "**Uses**: `1+1`\n**Cost**: `20 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank (Nuke, Block, Disarm)`\n\n__**Passive**__\nATTACK is altered to **10** bullet hits:\n- Each deal **9%** DMG\n- Every hit bullet increases his critical DMG by **3%** for the next **2** rounds\n- Missing any of the 10 hits will only tigger effects related to missing an attack once.\n\n__**Active**__ (✨)\nBegins charging Gungir:\n- Halts mana regeneration\n- **+20%** Block rate\n\nUsing the active (✨) again releases Gungir:\n- Removes effects of charging\n- Deals **40%** DMG for every round charged, up to **400%**\n- **-20%** enemy's ATK & MD\n\n__**Party**__ (👥)\nDuring the first **5** rounds:\n- **+4** Mana regeneration\n\nAfterwards:\n- Deals **130%** DMG once\n- **-20%** enemy's ATK & MD\n- **+15%** critical rate & critical DMG",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Lugh Tuatha Dé
             if (this.roundUsed === -1) {
@@ -1006,6 +1010,7 @@ export const abilities: Record<number, Ability> = {
                     };
                     mybuff.cd.push(new buffInfo("+", 0.03 * hits, 2));
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**'s ${hits}/10 bullets hit! He`, { atkMultiplier: 0.09 * hits, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true }); // normal magical damage
+                    if (hits < 10) matchStats.trigger("miss", myStats, eStats, mybuff, ebuff);
 
                     return AbilityResponse.SUCCESS;
                 },
@@ -1017,9 +1022,9 @@ export const abilities: Record<number, Ability> = {
             const name = pStats.name;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round < 6) {
-                    myStats.sm += 4;
+                    myStats.sm += 25;
                 } else if (matchStats.round === 6) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 1.3, shieldBreak: true, magicDamage: false, dodge: false, block: false });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 2, shieldBreak: true, magicDamage: false, dodge: false, block: false });
                     ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
                     ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * 0.2), 9999));
                     eStats.atk -= Math.floor(eStats.atk * 0.2);
@@ -1040,7 +1045,7 @@ export const abilities: Record<number, Ability> = {
         usage: 1,
         used: 0,
         cost: 80,
-        desc: "**Total Usage**: `max 1`\n**Mana**: `80`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nCid Kagenou tries his best to blend into the background and become a mob character. His attack and magic damage are decreased by **20%** for that during this phase, as well as his dodge chance and block rate which are nonexistent. However, when his HP falls below **50%** he will unveil his true identity as Shadow and increase his attack & magic damage by **25%**, defense & magic resist by **10%**, dodge chance & block rate by **+10%** and heal himself for **30%** of missing HP. Using his active, Shadow will use his almighty power and deal **200%** damage which can't be dodged nor blocked.",
+        desc: "**Total Usage**: `max 1`\n**Mana**: `80`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nCid Kagenou tries his best to blend into the background and become a mob character. His attack and magic damage are decreased by **20%** for that during this phase, as well as his dodge chance and block rate which are nonexistent. However, when his HP falls below **50%** he will unveil his true identity as Shadow and increase his attack & magic damage by **25%**, defense & magic resist by **10%**, dodge chance & block rate by **+10%** and heal himself for **30%** of missing HP. Moreover, this removes all existing shield (SH) on the enemy. Using his active, Shadow will use his almighty power and deal **200%** damage which can't be dodged nor blocked.",
         shortdesc: "**Uses**: `1`\n**Cost**: `0 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Transform, Burst)`\n\n__**Passive**__\n- **-20%** ATK & MD\n- Dodge and Block rate reduced to **0%**\n\nWhen fallen below **50%** HP:\n- Removes previous passive debuffs\n- **+25%** ATK & MD\n- **+10%** DEF & MR\n- **+10%** Dodge & Block rate\n- Restore **30%** lost HP\n- Removes all existing enemy shield\n\n__**Active**__ (✨)\n- Deals **200%** undodgeable unblockable DMG",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Active: Cid Kagenou deals 250% damage. Passive: Enters his shadow form when HP falls below 50%
@@ -1160,9 +1165,10 @@ export const abilities: Record<number, Ability> = {
         usage: 0,
         used: 0,
         cost: 100,
-        desc: "**Total Usage**: `0`\n**Role**: `Support/Sub-DPS`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **25%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy is marked with a **20%** vulnerability debuff (does not stack with other vulnerability sources), taking more damage from attacks.\n\nMoreover, for each **S** or **SS** character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself), Vladilena's chance of intervention is increased by an additional **+25%** (up to **100%**).",
-        shortdesc: "**Uses**: `0`\n**Role**: `Support/Sub-DPS`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n\n__**Party**__ (👥)\n- Applies a **20%** vulnerability debuff to the enemy\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n- **25%** chance to intervene every round and deal **120%** DMG\n  - The chance to intervene is increased by an additional **+25%** for each S or SS character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself)",
+        desc: "**Total Usage**: `0`\n**Role**: `Support/Sub-DPS`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **25%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy takes **+20%** damage from attacks. This is considered a vulnerability effect, where only the highest takes effect.\n\nMoreover, for each **S** or **SS** character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself), Vladilena's chance of intervention is increased by an additional **+25%** (up to **100%**).",
+        shortdesc: "**Uses**: `0`\n**Role**: `Support/Sub-DPS`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n\n__**Party**__ (👥)\n- Applies a **20%** vulnerability debuff to the enemy (Only the highest takes effect)\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n- **25%** chance to intervene every round and deal **120%** DMG\n  - The chance to intervene is increased by an additional **+25%** for each S or SS character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself)",
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.vulnerability ??= 1;
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Don't leave me behind... **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
 
             return AbilityResponse.SUCCESS;
@@ -1239,7 +1245,7 @@ export const abilities: Record<number, Ability> = {
         cost: 50,
         stacks: 0,
         pause: 0,
-        desc: "**Total Usage**: `unlimited` (4 rounds cooldown on `Dark Blast Inferno`)\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nZeref, the Black Wizard, thrives in the heart of battle, using his dark powers to overwhelm his foes, even passively killing things around him. He deals **15-25%** magic damage randomly every round until his opponent has less than **33%** hp left. And due to his curse, Zeref is immortal, which causes him to regenerate 5% of his missing HP every round.\n\nHis active ability grants him a stack of Dark Cage, each one reducing damage taken by **4%** (up to **5** stacks). While his stacks are less than 4, Zeref will use `Dark Blaze`, dealing **130%** magic damage and inflicting a black flame debuff which will deal additional **20%** magic damage for 2 rounds. If he has **4+** stacks of Dark Cage, Zeref will use `Dark Blast Inferno`, dealing **160%** magic damage and inflicting black flame for 3 rounds.\n\nWhen in a party, everyone suffers from his `Death Predation` passive, dealing **20%** magic damage to party members and **40%** magic damage to enemies every round. However, if **Natsu Dragneel** is in the party, he will not only be immune to the passive damage, but also receive a **40%** ATK and MD increase thanks to Zeref enacting the `E.N.D.` protocol. But because of this, Zeref himself will take **40%** magic damage every round due to `E.N.D.`",
+        desc: "**Total Usage**: `unlimited` (4 rounds cooldown on `Dark Blast Inferno`)\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nZeref, the Black Wizard, thrives in the heart of battle, using his dark powers to overwhelm his foes, even passively killing things around him. He deals **15-25%** magic damage randomly every round until his opponent has less than **33%** hp left. And due to his curse, Zeref is immortal, which causes him to regenerate **5%** of his missing HP every round.\n\nHis active ability grants him a stack of Dark Cage, each one reducing damage taken by **4%** (up to **5** stacks). While his stacks are less than 4, Zeref will use `Dark Blaze`, dealing **130%** magic damage and inflicting a black flame debuff which will deal additional **20%** magic damage for 2 rounds. If he has **4+** stacks of Dark Cage, Zeref will use `Dark Blast Inferno`, dealing **160%** magic damage and inflicting black flame for 3 rounds.\n\nWhen in a party, everyone suffers from his `Death Predation` passive, dealing **20%** magic damage to party members and **40%** magic damage to enemies every round. However, if **Natsu Dragneel** is in the party, he will not only be immune to the passive damage, but also receive a **40%** ATK and MD increase thanks to Zeref enacting the `E.N.D.` protocol. But because of this, Zeref himself will take **40%** magic damage every round due to `E.N.D.`",
         shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds after Dark Blast Inferno`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Additional Attack, Survival, DoT)`\n\n__**Passive**__\n- Recovers **5%** missing HP every round\n- Deals **15%-25%** MD to the enemy when they have **33%+** HP\n\n__**Active**__ (✨)\n- Every use of his active (✨) grants him **1x** `Dark Cage` (Up to 5x)\n- Every `Dark Cage` increases his DEF/MR by **40**\nWhen he has less than **4x** `Dark Cage`:\n- Deals **130%** MD\n- Deals **20%** MD for **2** rounds\nElse, uses Dark Blast Inferno:\n- Deals **160%** MD\n- Deals **20%** MD for **3** rounds\n\n__**Party**__ (👥)\nevery round:\n- Deals **20%** MD to allies\n- Deals **40%** MD to enemies\n\nIf Natsu Dragneel is in party:\n- Natsu will be immune to the passive DMG\n- Natsu will have **+40%** ATK & MD\n- Zeref takes **40%** MD every round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Zeref Dragneel
@@ -1364,7 +1370,7 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 40,
         roundUsed: 0,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `40`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nBeing one of the strongest psychic heroes, Tatsumaki's attacks always deal magic damage. She has **20%** increased magic damage throughout the battle, and decreases her enemy's magic resistance by **30%** when using her ability, making them more vulnerable towards her attacks.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `40`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nBeing one of the strongest psychic heroes, Tatsumaki's attacks always deal magic damage. She has **20%** increased magic damage throughout the battle, and decreases her enemy's magic resistance by **30%** for **5** rounds when using her ability, making them more vulnerable towards her attacks.",
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `40 💧`\n**Timeout**: `No`\n**Role**: `DPS (MR-shred, MD-boost)`\n\n__**Passive**__\n- Attacks deal MD hits\n- **+20%** MD\n\n__**Active**__ (✨)\n- **-30%** enemy's MR for **4** rounds (including turn of activation)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Tatsumaki decreases enemy magic resistance
@@ -1379,7 +1385,7 @@ export const abilities: Record<number, Ability> = {
             eStats.mr = Math.floor(eStats.mr * 0.7);
             ebuff.mr.push(new buffInfo("*", 0.7, 4));
 
-            notice.push(`\n✨ **${char.name}** decreased enemy magic resistance by **30%** for 4 rounds!`);
+            notice.push(`\n✨ **${char.name}** decreased enemy magic resistance by **30%** for 5 rounds!`);
 
             return AbilityResponse.SUCCESS;
         },
@@ -1557,7 +1563,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.vulnerability ??= 0;
+            eStats.vulnerability ??= 1;
 
             // Freezes enemy and boosts vuln rate every 5 turns
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1590,25 +1596,94 @@ export const abilities: Record<number, Ability> = {
         },
     },
     "9606": {
-        usage: 9999,
+        usage: 3,
         used: 0,
         cost: 55,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `55`\\💧\n**Timeout**: `no`\n**Role**: `Support`\n\nAs agile as she is, Meme truly is difficult to catch. She has **10**% increased dodge chances at all times, and through the use of her ability she can increase it by up to **30%** for 3 rounds (max 50%).",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `55 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Dodge, Followup Attack, Nuke)`\n\n__**Passive**__\n- **+10%** Dodge rate\n\n__**Active**__ (✨)\n- **+30%** Dodge rate\n- Dodge rate won't exceed **50%** this way",
-        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
-            // Meme increases her dodge chance by 30% (max 50%) and has +10% passively
+        pause: -10,
+        desc: "**Total Usage**: `3 (CD: 3)`\n**Mana**: `55`\\💧\n**Timeout**: `No`\n**Role**: `DPS/Support`\n\nAs agile as she is, Meme truly is difficult to catch. She has **15%** increased dodge chances permanently, and cannot have more than **80%** dodge rate at all times. Her ATTACK deals **90%** DMG, but has a **50%** chance of hitting twice. Upon the enemy dealing a critical strike, the enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%**. This has a **3** round cooldown, and only the highest vulnerability effect takes place.\n\nUsing her active increases her permanent dodge rate by **10%**, and allows her ATTACK to hit twice for **3** rounds.",
+        shortdesc: "**Uses**: `3 (CD: 3)`\n**Cost**: `55 💧`\n**Timeout**: `No`\n**Role**: `DPS/Support (Dodge, Followup Attack)`\n\n__**Passive**__\n- **+15%** permanent dodge rate\n- dodge rate won't exceed **80%**\n- ATTACK deals **90%** DMG only but has a **50%** chance of striking twice\nWhen the enemy deals a critical strike:\n- The enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%** (CD: 3). Only the highest vulnerability effect takes place.\n\n__**Active**__ (✨)\n- **+10%** dodge rate permanently\n- ATTACK is guaranteed to hit twice for **3** rounds",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            if (this.pause > matchStats.round) {
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}.`, ephemeral: true });
+                this.used--;
+                return AbilityResponse.FAILURE;
+            };
+            this.pause = matchStats.round + 3;
+            
+            // +10% unremovable dodge rate
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
-            let increase_eva = myStats.dodge < 0.2 ? 0.3 : (0.5 - myStats.dodge);
+            myStats.permdodge += 0.1;
+            myStats.dodge += 0.1;
+            if (myStats.dodge > 0.8) myStats.dodge = 0.8;
+
+            // ATK guaranteed to hit twice
+            myStats.memehittwice = true;
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 3, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                myStats.memehittwice = false;
+
+                return AbilityResponse.SUCCESS;
+            }));
+
+            /*let increase_eva = myStats.dodge < 0.2 ? 0.3 : (0.5 - myStats.dodge);
             if (increase_eva < 0) increase_eva = 0;
             myStats.dodge += increase_eva;
-            mybuff.dodge.push(new buffInfo("+", increase_eva, 3));
-            notice.push(`\n✨ **${char.name}** increased her dodge chance to **${(myStats.dodge + increase_eva) * 100}%** for 3 rounds!`);
+            mybuff.dodge.push(new buffInfo("+", increase_eva, 3));*/
+            notice.push(`\n🎧 Lights are fading out now...`);
+            notice.push(`\n✨ **${char.name}** gained **10%** permanent dodge rate!`);
 
             return AbilityResponse.SUCCESS;
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.dodge += 0.1;
-            mybuff.dodge.push(new buffInfo("+", 0.1, 9999));
+            // 15% perm dodge. Has dodge cap of 80%
+            myStats.permdodge = 0.15;
+            myStats.memehittwice = false;
+            myStats.dodge += myStats.permdodge;
+            if (myStats.dodge > 0.8) myStats.dodge = 0.8;
+            eStats.vulnerability ??= 1;
+            myStats.memeanticrit = matchStats.round;
+
+            // ATK has a 50% chance to hit twice
+            myStats.replaceButton.atk = {
+                run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** shot and`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                    if (0.5 > Math.random() || myStats.memehittwice) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🫴🏻 **${char.name}** pulled the opponent in and`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            // Permanent dodge
+            myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                if (myStats.dodge < 0) myStats.dodge = 0;
+                myStats.dodge += Math.min(0.8 - myStats.dodge, myStats.permdodge);
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            // Vulnerability on enemy crit
+            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === eStats && myStats.memeanticrit <= matchStats.round) {
+                    eStats.vulnerability = Math.max(Math.min(1 + 0.01 * (myStats.dodge / 0.02) , 1.4), eStats.vulnerability);
+                    notice.push(`\n✨ The enemy will take **+${Math.floor((eStats.vulnerability - 1) * 100)}%** damage the next round`);
+                    myStats.memeanticrit = matchStats.round + 3;
+
+                    // When vulnerability ends
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    eStats.vulnerability = 1;
+
+                    return AbilityResponse.SUCCESS;
+                }));
+            }});
+            return AbilityResponse.SUCCESS;
+        },
+        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.dodge -= 0.15;
+            if (eStats.dodge < 0) eStats.dodge = 0;
+            ebuff.dodge.push(new buffInfo("+", -0.15, 9999));
+            myStats.dodge += 0.15;
+            if (myStats.dodge > 1) myStats.dodge = 1;
+            mybuff.dodge.push(new buffInfo("+", 0.15, 9999));
 
             return AbilityResponse.SUCCESS;
         },
@@ -1648,7 +1723,7 @@ export const abilities: Record<number, Ability> = {
         cost: 0,
         pause: -10,
         desc: "**Total Usage**: `unlimited` (2 round cd)\n**Cost**: `10%`\\🩸\n**Timeout**: `only on cyberpsychosis`\n**Role**: `DPS`\n\nDavid's arms are cybernetically modified to be arm cannons. He deals **20%** more damage with normal attacks. As David is partly cybernetic, he is immune against HP debuffs.\n### Sandevistan; Militech \"Apogee\"\nThe sandevistan is a spinal replacement type cyberwear that modifies David's neural interface. Its usage immensely increases the user's perception of movement and time, making them move and perceive so fast, the world around seems to be much slower, thus increasing his crit damage by **50%** and dodge chance to **100%** for the turn his active was used.\n\nHowever, it burns out nerve cells rapidly, causing him to push his mind to cyberpsychosis, and break his own body in the process. After every **3rd** usage of his sandevistan, he enters `Cyberpsychosis` dealing a massive **180%** cannon blast from his arms with **twice** his crit damage, which permanently reduces enemy DEF and MR by **15%** after the first usage of it. After this, he recovers **30%** of his missing HP with a MaxTac Inhaler MK II, and has **20%** increased crit rate for the remainder of the battle (cr buff only applies after his first cyberpsychosis).",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `2 rounds`\n**Cost**: `10% max HP`\n**Timeout**: `No/Yes for cyberpsychosis`\n**Role**: `DPS (Sacrificial, Dodge, Nuke)`\n\n__**Passive**__\n- ATTACK is altered to deal **120%** DMG\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+50%** critical DMG\n- Increases Dodge rate to **100%** for **1** round\n\nEvery **3rd** use additionally causes *Cyberpsychosis*:\n- Deals **180%** DMG\n- If it hits, deals **50%** of DMG dealt as DoT to the enemy for **3** rounds\n- **+20%** critical rate (once)\n- **-15%** enemy's DEF & MR\n- Restores **30%** missing HP",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `2 rounds`\n**Cost**: `10% max HP`\n**Timeout**: `No/Yes for cyberpsychosis`\n**Role**: `DPS (Sacrificial, Dodge, Nuke)`\n\n__**Passive**__\n- ATTACK is altered to deal **120%** DMG\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+50%** critical DMG\n- Increases Dodge rate to **100%** for **1** round\n\nEvery **3rd** use additionally causes *Cyberpsychosis*:\n- Deals **180%** DMG with **2x** the critical DMG\n- **+20%** critical rate (once)\n- **-15%** enemy's DEF & MR (once)\n- Restores **30%** missing HP",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // David Martinez 
             if (this.pause > matchStats.round) {
@@ -1785,7 +1860,7 @@ export const abilities: Record<number, Ability> = {
         cost: 0,
         roundUsed: 0,
         usedThisRound: 0,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `0`\\💧 on active, `-25`\\💧 on passive\n**HP**: `5%`<:HP:1062043800979116143>\n**Timeout**: `no`\n**Role**: `DPS`\n\nVictoria, an accomplished knight and a decorated war hero, has become a formidable force on the battlefield through her countless skirmishes. Her vast experience and relentless determination have honed her skills, allowing her to stand toe to toe with dragons, with her prowess mirroring their ferocity and prestige.\n\nIn an ongoing testament to her thirst for knowledge and self-improvement, Victoria gains **+25%** class xp, and her countless encounters with dragons have sharpened her combat abilities against them, resulting in a **20%** increase in ATK when facing dragons.\n\nVictoria's resilience in combat is further enhanced by her ability to use mana to heal herself. When enough mana is available, Victoria will consume **25**\\💧 to regenerate **6%** of max HP, showcasing her ability to adapt and endure even in the direst of situations.\n\nVictoria can also tap into the raw energy of life itself, making the ultimate sacrifice for the promise of power. She can willingly sacrifice **5%** of her HP to gain a **25%** ATK boost for that round. This effect can be stacked up to **3 times** at once, embodying Victoria's willingness to risk everything for overwhelming power, mirroring the very dragons she battles in ferocity and resilience.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `0`\\💧 on active, `-25`\\💧 on passive\n**HP**: `5%`<:HP:1062043800979116143>\n**Timeout**: `no`\n**Role**: `DPS`\n\nVictoria, an accomplished knight and a decorated war hero, has become a formidable force on the battlefield through her countless skirmishes. Her vast experience and relentless determination have honed her skills, allowing her to stand toe to toe with dragons, with her prowess mirroring their ferocity and prestige.\n\nIn an ongoing testament to her thirst for knowledge and self-improvement, Victoria gains **+25%** class xp, and her countless encounters with dragons have sharpened her combat abilities against them, resulting in a **20%** increase in ATK when facing dragons.\nShe begins battles by countering the next **3** hits (stackable). When she is ready to counter a hit, she has **+25%** critical rate & critical DMG\n\nVictoria's resilience in combat is further enhanced by her ability to use mana to heal herself. When enough mana is available, Victoria will consume **25**\\💧 to regenerate **6%** of max HP, showcasing her ability to adapt and endure even in the direst of situations.\n\nVictoria can also tap into the raw energy of life itself, making the ultimate sacrifice for the promise of power. She can willingly sacrifice **5%** of her HP to gain a **25%** ATK boost for that round. This effect can be stacked up to **3 times** at once, embodying Victoria's willingness to risk everything for overwhelming power, mirroring the very dragons she battles in ferocity and resilience.",
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `5% max HP`\n**Timeout**: `No`\n**Role**: `DPS (Mana-losing, Healing, Counter, Anti-dragon)`\n\n__**Passive**__\n- Begins battles by countering the next **3** hits (stackable)\n- When she is ready to counter a hit: **+25%** critical rate & critical DMG\n- When against dragons: **+20%** ATK\n- At the start of every round, if available, consumes **25** 💧 to restore **6%** max HP (once)\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- **+25%** ATK for **1** round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Victoria gains 20% more class xp. Has 20% increased ATK if she fights against a dragon.
@@ -2050,7 +2125,7 @@ export const abilities: Record<number, Ability> = {
         cost: 30,
         roundUsed: 0,
         buffer: undefined,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%** and rendering them incapable of moving in their next turn.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%**. Moreover, the action will be considered Timeout false, allowing Aneira to make another action that round.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `no`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** DMG\n- Increases active's DMG scaling by **25%** (Up to **175%**)\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the turn unchanged as well",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
 
@@ -2651,8 +2726,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         pause: 0,
         cost: 50, // 5% current HP on Passive, 50 Mana on Active
-        desc: "**Total Usage**: `unlimited` (5 rounds cooldown)\n**Cost**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMarch 7th is an enthusiastic girl who was saved from eternal ice by the Astral Express Crew. Following the path of Preservation, she's going to make sure that she keeps her allies and herself stay longer in the fight.\n\nEvery **5** rounds, she converts **5%** of her current HP into a shield equivalent to **5%** of her max HP. While this shield is up, her DEF and MR are increased by **20%** and her ATK and MD gain a **30%** increase.\n\nHer active ability will cast her ultimate, Glacial Cascade, which deals **110%** damage and has a **75%** chance of freezing the enemy for 1 round. The enemy is more vulnerable while the enemy is veiled by her ice, taking **20%** extra damage.\n\nIn a party, she shares her defensive passive to her allies, converting **5%** of their max HP into a shield. While this shield is up, they get a **20%** DEF and MR boost, and a **15%** boost in ATK and MD.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `5 rounds`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Shield, Freeze)`\n\n__**Passive**__\n- Every **5** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of her max HP\n- When she has a shield (The SH stat): **+20%** DEF & MR, **+30%** ATK\n\n__**Active**__ (✨)\n- Deals **110%** DMG\n- Has a **75%** chance of freezing the enemy\n- If successful, applies **20%** vulnerability to the enemy\n\n__**Party**__ (👥)\n- Every **7** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of max HP\n- While having shield (The SH stat): **+20%** DEF & MR, **+15%** ATK & MD",
+        desc: "**Total Usage**: `unlimited` (5 rounds cooldown)\n**Cost**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMarch 7th is an enthusiastic girl who was saved from eternal ice by the Astral Express Crew. Following the path of Preservation, she's going to make sure that she keeps her allies and herself stay longer in the fight.\n\nEvery **5** rounds, she converts **5%** of her current HP into a shield equivalent to **5%** of her max HP. While this shield is up, her DEF and MR are increased by **20%** and her ATK and MD gain a **30%** increase.\n\nHer active ability will cast her ultimate, Glacial Cascade, which deals **110%** damage and has a **75%** chance of freezing the enemy for 1 round. The enemy is more vulnerable while the enemy is veiled by her ice, taking **20%** extra damage. Only the highest vulnerability takes effect.\n\nIn a party, she shares her defensive passive to her allies, converting **5%** of their max HP into a shield. While this shield is up, they get a **20%** DEF and MR boost, and a **15%** boost in ATK and MD.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `5 rounds`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Shield, Freeze)`\n\n__**Passive**__\n- Every **5** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of her max HP\n- When she has a shield (The SH stat): **+20%** DEF & MR, **+30%** ATK\n\n__**Active**__ (✨)\n- Deals **110%** DMG\n- Has a **75%** chance of freezing the enemy\n- If successful, applies **20%** vulnerability to the enemy (Only the highest effect takes place)\n\n__**Party**__ (👥)\n- Every **7** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of max HP\n- While having shield (The SH stat): **+20%** DEF & MR, **+15%** ATK & MD",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // March 7th
             if (this.pause > matchStats.round) {
@@ -2666,7 +2741,7 @@ export const abilities: Record<number, Ability> = {
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** uses Glacial Cascade! She`, { atkMultiplier: 1.1, magicDamage: true });
             if (Math.random() < 0.75) {
                 eStats.timeFrozen = true;
-                eStats.vulnerability = 1.2;
+                if (eStats.vulnerability < 1.2) eStats.vulnerability = 1.2;
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     eStats.timeFrozen = false;
                     eStats.vulnerability = 1;
@@ -3111,7 +3186,7 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 60,
         selfhealidx: 0,
-        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support/DPS`\n\nLuminous, in this form, offers a unique blend of self-sustain, damage amplification, and party support, making her suitable for both individual challenges and team battles.\n\nRight from the onset, Luminous heals **7.5%** of the damage she deals, which can be amplified by **+1.5%** with each active use up to **16%**. Her active unleashes a powerful strike causing **140%** damage against monsters, or **115%** against players. Additionally, her offensive capabilities grow with every use of this ability, increasing her ATK and MD by **10%** each time. She also possesses significant defensive strengths, as she inherently takes **15%** reduced damage, making her harder to take down. And when inside the dungeon, she benefits from a **25%** boost to class xp, speeding up her progress.\n\nLuminous' protective nature is not just confined to herself. She extends her protective aura to party members, reducing their damage taken by **15%** and bestowing them with a **5%** healing of their damage dealt. Additionally, for the initial 10 rounds, party members will lose **15** DEF and MR, gaining **2.5%** ATK and MD instead. This dynamic shift promotes an aggressive approach, compelling the team to capitalize on their enhanced damage during the early rounds.",
+        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `Support/DPS`\n\nLuminous, in this form, offers a unique blend of self-sustain, damage amplification, and party support, making her suitable for both individual challenges and team battles.\n\nRight from the onset, Luminous heals **7.5%** of the damage she deals, which can be amplified by **+1.5%** with each active use up to **12%**. Her active unleashes a powerful strike causing **140%** damage against monsters, or **115%** against players. Additionally, her offensive capabilities grow with every use of this ability, increasing her ATK and MD by **10%** each time. She also possesses significant defensive strengths, as she inherently takes **15%** reduced damage, making her harder to take down. And when inside the dungeon, she benefits from a **25%** boost to class xp, speeding up her progress.\n\nLuminous' protective nature is not just confined to herself. She extends her protective aura to party members, reducing their damage taken by **15%** and bestowing them with a **5%** healing of their damage dealt. Additionally, for the initial **10** rounds, party members will lose **15** DEF and MR, gaining **2.5%** ATK and MD instead. This dynamic shift promotes an aggressive approach, compelling the team to capitalize on their enhanced damage during the early rounds.",
         shortdesc: "**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Lifesteal, DMG-boost)`\n\n__**Passive**__\n- **+7.5%** lifesteal\n- **+155** DEF & MR\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **140%** DMG (115% in arenas)\n- **+1.5%** lifesteal\n- **+10%** ATK & MD\n\n__**Party**__ (👥)\n- **+155** DEF & MR\n- **+5%** lifesteal\n- During the first **10** rounds: Lose **15** DEF & MR every round for **2.5%** ATK & MD",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Luminous EX | Lumi EX
@@ -3326,8 +3401,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 0,
-        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧 on first 2 usages, `80`\\💧 on 3rd usage, `0` on 4th usage\n**Timeout**: `Yes // No (on 4th usage)`\n**Role**: `DPS/Support`\n\nEscanor, known as the Lion's Sin of Pride, offers a gameplay style tied to a day-night cycle which changes every **3** rounds. Escanor's power dramatically shifts with the day-night cycle. During the day, he gains a **20%** boost to attack, magic damage, defense, and magic resistance, but loses **4%** of his max HP per round due to the strain to his body.\n\nMoreover, the last day in the cycle is regarded as Noon, where he unleashes his `The One` power, gaining double the stat boosts from normal day cycles. In addition, his DEFEND that round is altered to a Divine Attack, decreasing the enemy's dodge and block rate to **0%**, removing all of their counter attempts, before dealing **150%** DMG and granting himself 10x `Heat`. At last, after every round in Daytime, he gains 1x `Heat`.\n\nAs the night falls, he loses **20%** of attack, magic damage, defense, and magic resistance instead, but gains **20%** dodge chance as his power is so insignificant that he's barely sensable.\n\nEscanor's sunshine allows him to scorch the enemy for **2** rounds whenever they dare inflict an attack on Escanor. Scorch is a stackable DoT that deals his current HP to the enemy every round, **1%** for every 10x `Heat` owned, up to **4%**.\n\nMoving onto his active. During daytime rounds, Escanor can use `Crazy Prominence` with his first two usages, dealing additional damage based on the percentage of his remaining health (**100%** + **1%** damage for every **2%** remaining HP). With his 3rd usage, Escanor unleashes `Final Prominence`, which significantly enhances his damage output based on the percentage of his missing health (**100%** + **1%** damage for every **1%** missing HP). Escanor's final usage summons a miniature Sun on the sky, raising his critical rate by **2%** for every `Heat` owned, up to 90% maximum crit rate. Any overflowing critical rate this way will be converted into **1%** Defense reduction on the enemy (up to 30%) and **1%** critical DMG for Escanor (up to 30%).",
-        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧 (first 2 usages), 80 💧 (3rd usage), 0 💧 (4th usage)`\n**Timeout**: `Yes/ No (4th usage)`\n**Role**: `DPS (Progressive, DoT, Burst, Anti-dodge/block/counter)`\n\n__**Passive**__\nWhenever receives an attack -> Inflicts Scorch for **2** rounds:\n- Deals his current HP to the enemy every round (**1%** for every **10x** `Heat` owned, up to **4%**)\n\nShifts Day and Night cycle every **3** rounds ; The last turn of Day is regarded as *Noon*\n\nDay :\n- **+20%** ATK/MD & DEF/MR\n- Lose **4%** max HP every round\n- Gain **1x** `Heat`\n\nNoon:\n- **+40%** ATK/MD & DEF/MR\n- Lose **4%** max HP\n- Gain **1x** Heat\n- DEFEND is altered to Divine Attack\n> Enemy dodge rate & block rate drops to **0%** for **1** round. Removes any counter attempts (Counter next hit effects), before dealing **150%** DMG and gaining **10x** `Heat`)\n\nNight:\n- **-20%** ATK/MD & DEF/MR\n- **+20%** dodge chance \n\n__**Active**__ (✨)\nFirst TWO activations: *Crazy Prominence*\nCondition: `During Day/Noon`\n- Deals **100%** DMG, **+1%** DMG for every **2%** HP remaining\n\nTHIRD activation: *Final Prominence*\n- Deals **100%** DMG, **+1%** DMG for every **1%** HP missing\n\nFOURTH activation: *Miniature Sun*\n- Increases critical rate by **2%** for every `Heat` owned, up to 90%\n\nEvery overflowing critical rate this way will be converted into:\n- Enemy DEF/MR **-1%** (max: 30%)\n- Own critical DMG **+1%** (max: 30%)",
+        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧 on first 2 usages, `80`\\💧 on 3rd usage, `0` on 4th usage\n**Timeout**: `Yes // No (on 4th usage)`\n**Role**: `DPS/Support`\n\nEscanor, known as the Lion's Sin of Pride, offers a gameplay style tied to a day-night cycle which changes every **3** rounds. Escanor's power dramatically shifts with the day-night cycle. During the day, he gains a **20%** boost to attack, magic damage, defense, and magic resistance, but loses **4%** of his max HP per round due to the strain to his body.\n\nMoreover, the last day in the cycle is regarded as Noon, where he unleashes his `The One` power, gaining double the stat boosts from normal day cycles. In addition, his DEFEND that round is altered to a Divine Attack, decreasing the enemy's dodge and block rate to **0%**, removing all of their counter attempts, before dealing **150%** DMG and granting himself 10x `Heat`. At last, after every round in Daytime, he gains 1x `Heat`.\n\nAs the night falls, he loses **20%** of attack, magic damage, defense, and magic resistance instead, but gains **20%** dodge chance as his power is so insignificant that he's barely sensable.\n\nEscanor's sunshine allows him to scorch the enemy for **2** rounds whenever they dare inflict an attack on Escanor. Scorch is a stackable DoT that deals his current HP to the enemy every round, **1%** for every 10x `Heat` owned, up to **4%**.\n\nMoving onto his active. During daytime rounds, Escanor can use `Crazy Prominence` with his first two usages, dealing additional damage based on the percentage of his remaining health (**100%** + **1%** damage for every **2%** remaining HP).\nWith his 3rd usage, Escanor unleashes `Final Prominence`, which significantly enhances his damage output based on the percentage of his missing health (**100%** + **1%** damage for every **1%** missing HP).\n\nEscanor's final usage summons a miniature Sun on the sky, raising his critical rate by **2%** for every `Heat` owned, up to 90% maximum crit rate. Any overflowing critical rate this way will be converted into **1%** Defense reduction on the enemy (up to 30%) and **1%** critical DMG for Escanor (up to 30%).",
+        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧 (first 2 usages), 80 💧 (3rd usage), 0 💧 (4th usage)`\n**Timeout**: `Yes/ No (4th usage)`\n**Role**: `DPS (Progressive, DoT, Burst, Anti-dodge/block/counter)`\n\n__**Passive**__\nWhenever receives an attack -> Inflicts Scorch for **2** rounds:\n- Deals his current HP to the enemy every round (**1%** for every **10x** `Heat` owned, up to **4%**)\n\nShifts Day and Night cycle every **3** rounds ; The last turn of Day is regarded as *Noon*\n\nDay :\n- **+20%** ATK/MD & DEF/MR\n- Lose **4%** max HP every round\n- Gain **1x** `Heat`\n\nNoon:\n- **+40%** ATK/MD & DEF/MR\n- Lose **4%** max HP\n- Gain **1x** `Heat`\n- DEFEND is altered to Divine Attack\n> Enemy dodge rate & block rate drops to **0%** for **1** round. Removes any counter attempts (Counter next hit effects), before dealing **150%** DMG and gaining **10x** `Heat`)\n\nNight:\n- **-20%** ATK/MD & DEF/MR\n- **+20%** dodge chance \n\n__**Active**__ (✨)\nFirst TWO activations: *Crazy Prominence*\nCondition: `During Day/Noon`\n- Deals **100%** MD, **+1%** MD for every **2%** HP remaining\n\nTHIRD activation: *Final Prominence*\n- Deals **100%** MD, **+1%** MD for every **1%** HP missing\n\nFOURTH activation: *Miniature Sun*\n- Increases critical rate by **2%** for every `Heat` owned, up to 90%\n\nEvery overflowing critical rate this way will be converted into:\n- Enemy DEF/MR **-1%** (max: 30%)\n- Own critical DMG **+1%** (max: 30%)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Escanor EX
             let roundTime = (matchStats.round - 1) % 6; // day: [0, 1], noon: [2], night: [3, 4, 5];
@@ -3467,7 +3542,7 @@ export const abilities: Record<number, Ability> = {
         domainLastRound: 0,
         hasArtemis: false,
         usedDef: 0,
-        desc: "**Total Usage**: `1`\n**Mana**: `150`\\💧, lasts 10 rounds\n**Timeout**: `no`\n**Role**: `DPS`\n\nApollo EX brings in a dynamic and sustained damage and utility with her intricate set of abilities that empowers her over the course of a prolonged battle. Her active ability, `Domain of Ascendancy`, transforms the battlefield for 10 rounds. During this period, her stats get a substantial **20%** boost and she absorbs **33%** of the damage and stores it to release upon exiting her domain. Additionally, she replaces her ATK, DEF and ABILITY for the duration of her Domain. Her normal attacks deal guaranteed  critical hits and true damage. Her DEF becomes impervious, absorbing **100%** of the damage on the next round, and her ABILITY applies a vulnerability debuff on enemies, increasing the damage they take by **15%** with every use (or **25%** if **Artemis EX** is owned). The enemy also suffers from bleed, losing up to **3%** of their max HP over time, or **6%** of the users HP if the enemy has more than twice the HP.\n\nApollo EX can evade a fatal attack once per battle and execute her enemies when their HP drops below **10%**. Her normal attacks deal both physical and magic damage, **60%** of each, with a **20%** chance of causing the enemy to bleed for **3** rounds. Additionally, she'll gain **25%** more XP from the dungeon.",
+        desc: "**Total Usage**: `1`\n**Mana**: `150`\\💧, lasts 10 rounds\n**Timeout**: `no`\n**Role**: `DPS`\n\nApollo EX brings in a dynamic and sustained damage and utility with her intricate set of abilities that empowers her over the course of a prolonged battle. Her active ability, `Domain of Ascendancy`, transforms the battlefield for **10** rounds. During this period, her stats get a substantial **20%** boost and she absorbs **33%** of the damage and stores it to release upon exiting her domain.\n\nAdditionally, she replaces her ATK, DEF and ABILITY for the duration of her Domain. Her normal attacks deal guaranteed  critical hits and true damage. Her DEF becomes impervious, absorbing **100%** of the damage on the next round, and her ABILITY applies a vulnerability debuff on enemies, increasing the damage they take by **15%** with every use (or **25%** if **Artemis EX** is owned). The enemy also suffers from bleed, losing up to **3%** of their max HP over time, or **6%** of the users HP if the enemy has more than twice the HP.\n\nApollo EX can evade a fatal attack once per battle and execute her enemies when their HP drops below **10%**. Her normal attacks deal both physical and magic damage, **60%** of each, with a **20%** chance of causing the enemy to bleed for **3** rounds. Additionally, she'll gain **25%** more XP from the dungeon.",
         shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `DPS/Tank (Burst, Mitigation/Critical)`\n\n__**Passive**__\n- Evades **1** lethal hit\n- Executes enemy when their HP falls below **10%** HP\n- ATTACK is altered:\n- Deal **60%** ATK + **60%** MD\n- This has a **20%** chance to apply bleed (3% of the enemy's current HP, up to 6% of her HP) for **3** rounds\n\n__**Active**__(✨)\nActivates her domain for **10** rounds with the following effects:\n- **+20%** ATK, MD, DEF, MR, CR, CD\n- **+10%** Dodge rate\n- Mitigates **33%** of incoming damage and increases nuke's dmg scaling by **33%**\n- Apply bleed (3% of the enemy's current HP, up to 6% of her HP) for **3** rounds\n- ATTACK is altered to deal critical hits and true DMG (Bypass shields)\n- DEFEND is altered to mitigate **100%** of incoming damage and increase nuke's dmg scaling by **100%** instead of **33%** (DMG mitigation excludes DoT)\n- Using active (✨) causes the enemy to take **+15%** DMG every activation (**25%** if Artemis EX is owned)\n\nUpon exiting domain:\n- Releases a nuke (DMG-scaling depends on previous DMG mitigation%)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Apollo EX
@@ -3638,7 +3713,7 @@ export const abilities: Record<number, Ability> = {
         hasApollo: false,
         usedDef: 0,
         desc: "**Total Usage**: `1`\n**Mana**: `150`\\💧, lasts 5 rounds\n**Timeout**: `no`\n**Role**: `Support`\n\nArtemis EX wields the `Domain of Sanction`, a fearsome realm where she holds dominion over the very fabric of reality. When activated, her domain lasts for **5** rounds and halts her enemy's actions, effectively stopping time. Within this domain, her opponent suffer a **25%** vulnerability debuff. Her DEF extends the duration of all debuffs on the enemy by an additional round, and her ABILITY deals **130%** damage (**145%** if **Apollo EX** is owned), and applies a bleed effect that lasts for the entire duration of the domain if **Apollo EX** is owned. Additionally she depletes the enemy's mana completely and blocks mana generation for 5 rounds upon exiting her domain.\n\nArtemis recovers **5%** of her max HP and steals **3** mana from her enemy every round. If defeated, she can revive once with **40%** of her max HP. Her normal attacks deal both physical and magic damage, **60%** of each, with a **33%** chance (**66%** if domain is active) of inflicting a debuff. The debuffs include **burn** dealing **3%** of max HP as damage (or **6%** of her own HP if enemy has twice as much HP), **impair** decreasing DEF and MR by **15%**, **poison** decreasing **ATK** and **MD** by **15%**, and **paralyse** which prevents the enemy from attacking once. Additionally, she'll gain **20%** more XP from the dungeon.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `Support/Tank (Burst, Mana-reset, Freeze, Healing, Revive)`\n\n__**Passive**__\n- every round: Restores **5%** max HP , steals **3** 💧 from enemy\n- Upon death, revives with **40%** HP\n- ATTACK is altered to deal **60%** ATK & 60% MD, each has a **33%** chance (**66%** if domain is active) of inflicting a debuff\n> List of debuffs: `Burn` dealing **3%** of max HP as damage (Caps at **6%** of Artemis' current HP) // `Impair` (**-15%** DEF & MR) // `Poison` (**-15%** ATK & MD) // Paralyse (Prevents enemy from attacking once)\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\nEnters domain for **5** rounds with the following effects:\n- Enemy frozen (cannot make actions)\n- Enemy receives **+25%** DMG\n- Doubled chances of debuffing from passive ATTACK\n- DEFEND is altered to extend all debuffs on the enemy by **1** round\n- ACTIVE (✨) deals **130%** DMG with no cost. If Apollo EX is owned, deals **140%** DMG instead and applies bleed (**2%** of the enemy's current HP, up to **4%** of her current HP), lasting until the end of the domain\nUpon exiting domain:\n- Depletes all enemy mana\n- Blocks enemy's mana regeneration for **5** rounds",
+        shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `Support/Tank (Burst, Mana-reset, Freeze, Healing, Revive)`\n\n__**Passive**__\n- every round: Restores **5%** max HP , steals **3** 💧 from enemy\n- Upon death, revives with **40%** HP\n- ATTACK is altered to deal **60%** ATK & 60% MD, each has a **33%** chance (**66%** if domain is active) of inflicting a debuff\n> List of debuffs: `Burn` dealing **3%** of max HP as damage (Caps at **6%** of Artemis' current HP) // `Impair` (**-15%** DEF & MR) // `Poison` (**-15%** ATK & MD) // `Paralyse` (Prevents enemy from attacking that round, functions as timeout false)\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\nEnters domain for **5** rounds with the following effects:\n- Enemy frozen (cannot make actions)\n- Enemy receives **+25%** DMG\n- Doubled chances of debuffing from passive ATTACK\n- DEFEND is altered to extend all debuffs on the enemy by **1** round\n- ACTIVE (✨) deals **130%** DMG with no cost. If Apollo EX is owned, deals **140%** DMG instead and applies bleed (**2%** of the enemy's current HP, up to **4%** of her current HP), lasting until the end of the domain\nUpon exiting domain:\n- Depletes all enemy mana\n- Blocks enemy's mana regeneration for **5** rounds",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Artemis EX
             const domainLast = 5, mana_cost = 150;
@@ -3678,7 +3753,7 @@ export const abilities: Record<number, Ability> = {
                 this.domainLastRound = matchStats.round + domainLast;
 
                 // Apply Vulnerability, Freeze Time
-                eStats.vulnerability = 1.25;
+                if (eStats.vulnerability < 1.25) eStats.vulnerability = 1.25;
                 eStats.timeFrozen = true;
                 eStats.frozenMessage = "is frozen in time";
 
@@ -3722,6 +3797,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            eStats.vulnerability ??= 1;
             // User has Apollo?
             const stats = await getUserSchema(matchStats.interaction.user.id);
 
@@ -3800,7 +3876,7 @@ export const abilities: Record<number, Ability> = {
         cost: 60,
         stacks: 1,
         pause: -5,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? every round, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to an endurance mode for **4 rounds**. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **10 rounds**.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **5 rounds**, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? every round, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to an endurance mode for **4** rounds. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **10** rounds.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **5** rounds, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
         shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds`\n**Cost**: `60 💧`\n**Timeout**: `yes`\n**Role**: `DPS/Tank (DMG-boost, Mitigation, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **4** rounds\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **10** rounds\n\n__**Party**__ (👥)\nEvery **5** rounds:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Gintoki EX
@@ -3846,6 +3922,8 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.gintokiStacks = 0;
+            eStats.vulnerability ??= 1;
+            myStats.vulnerability ??= 1;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.atk += Math.floor(myStats.atk * (myStats.gintokiStacks * 0.05));
                 myStats.md += Math.floor(myStats.md * (myStats.gintokiStacks * 0.05));
@@ -3855,8 +3933,8 @@ export const abilities: Record<number, Ability> = {
 
                 // Enraged
                 if ((myStats.hp / myStats.maxhp) < 0.3) {
-                    myStats.vulnerability = 1.2;
-                    eStats.vulnerability = 1.2;
+                    if (myStats.vulnerability < 1.2) myStats.vulnerability = 1.2;
+                    if (eStats.vulnerability < 1.2) eStats.vulnerability = 1.2;
                 } else {
                     myStats.vulnerability = 1;
                     eStats.vulnerability = 1;
@@ -3898,7 +3976,7 @@ export const abilities: Record<number, Ability> = {
         cost: 0,
         stacks: 1,
         pause: -5,
-        desc: "**Total Usage**: `5`/`3`/`2`/`3`\n**Mana**: `30`\\💧/`60`\\💧/`50`\\💧/`70`\\💧\n**Timeout**: `no`/`yes`/`no`/`yes`\n**Role**: `Support/DPS/Tank/DPS`\n\nLria stands out not just for her extraordinary abilities, but for her unyielding spirit and versatile skills. She possesses a unique blend of skills that make her adaptable to various combat situations by harnessing the powers of the mystical masks she has acquired through her daring ventures.\n\n**Maskless Form**\n- This form showcases lria's exceptional agility and keen sense of anticipation. When activated, she gains **20%** dodge chance for 3 rounds. If she successfully dodges an attack during this period, she gains a temporary boost of **20%** ATK for her next attack. Additionally, she heal **5%** of her max HP after successful dodges, and has **10%** increased DEF. This is her default form, and can be selected with the command `/item equip item:remove mask`.\n\n**Phantasmal Deathmask**\n- When Lria dons the Phantasmal Deathmask, she becomes an avatar of Morithia, the Underworld Sovereign. Her pact cloaks her in an ethereal aura, bolstering her MR by **25%** and causing her strikes to inherently deal magic damage. Her normal attacks carry a **30%** chance to afflict the enemy with `Haunt`, a dread curse dealing an additional **5%** magic damage for **4 rounds**. Using her active, she lashes out at enemies, dealing **120%** magic damage and invoking `Soul Drain`, which siphons **5%** the equivalent of **5%** of her max HP from the enemy for 2 rounds, converting it into **5** mana for Lria. In a party, she increases the party's MD by **20%** for **4** rounds. If Artemis EX is present, this buff is increased to **25%** and lasts 5 rounds. Additionally, she heals allies for **10%** of the damage they deal. This mask can be equipped using the command `/item equip item:phantasmal mask`.\n\n**Verdant Guardian Mask**\n- When Lria adorns the Verdant Guardian Mask, she invokes the power of Sylvaria, Goddess of the Forest. She is granted a **20%** increase in DEF and MR, and a **10%** increase in block rate. After using her active, she absorbs **30%** of incoming damage and recovers **5%** of her max HP for 3 rounds. In a party, Lria grants her team a **20%** increase in DEF and MR for **4** rounds and regenerating **3%** of their max HP every round. If Apollo EX is in her party, she increases MD by **10%** and her healing buff is increased to **5%**. This mask can be equipped using the command `/item equip item:verdant mask`.\n\n**Valkyrie's Battle Mask**\n- Wearing the Valkyrie's Battle Mask, Lria's ATK is increased by **20%**. When her health falls below **10%** of max HP, she triggers `Final Gambit`, a devastating counterattack that Lria can unleash once per battle, delivering a powerful strike with of **200%** damage. When using her active, she unleashes **3-6** attacks that deal **30%** physical damage each. Each strike has a **25%** chance to inflict `Warrior's Bleed` on the enemy, causing an additional **5%** of Lria's ATK as damage for **3** rounds. In a party, Lria boosts her team's offensive capabilities, granting a **25%** increase in **ATK** and a **15%** in CD.  In the absence of Apollo EX and Artemis EX, Lria's combat spirit intensifies, unlocking `Lone Valkyrie's Might`. This further enhances the team's offensive prowess, adding an extra **10%** to her CD buff. This mask can be equipped using the command `/item equip item:valkyrie mask`.",
+        desc: "**Total Usage**: `5`/`3`/`2`/`3`\n**Mana**: `30`\\💧/`60`\\💧/`50`\\💧/`70`\\💧\n**Timeout**: `no`/`yes`/`no`/`yes`\n**Role**: `Support/DPS/Tank/DPS`\n\nLria stands out not just for her extraordinary abilities, but for her unyielding spirit and versatile skills. She possesses a unique blend of skills that make her adaptable to various combat situations by harnessing the powers of the mystical masks she has acquired through her daring ventures.\n\n**Maskless Form**\n- This form showcases lria's exceptional agility and keen sense of anticipation. When activated, she gains **20%** dodge chance for 3 rounds. If she successfully dodges an attack during this period, she gains a temporary boost of **20%** ATK for her next attack. Additionally, she heal **5%** of her max HP after successful dodges, and has **10%** increased DEF. This is her default form, and can be selected with the command `/item equip item:remove mask`.\n\n**Phantasmal Deathmask**\n- When Lria dons the Phantasmal Deathmask, she becomes an avatar of Morithia, the Underworld Sovereign. Her pact cloaks her in an ethereal aura, bolstering her MR by **25%** and causing her strikes to inherently deal magic damage. Her normal attacks carry a **30%** chance to afflict the enemy with `Haunt`, a dread curse dealing an additional **5%** magic damage for **4** rounds. Using her active, she lashes out at enemies, dealing **120%** magic damage and invoking `Soul Drain`, which siphons **5%** the equivalent of **5%** of her max HP from the enemy for 2 rounds, converting it into **5** mana for Lria. In a party, she increases the party's MD by **20%** for **4** rounds. If Artemis EX is present, this buff is increased to **25%** and lasts 5 rounds. Additionally, she heals allies for **10%** of the damage they deal. This mask can be equipped using the command `/item equip item:phantasmal mask`.\n\n**Verdant Guardian Mask**\n- When Lria adorns the Verdant Guardian Mask, she invokes the power of Sylvaria, Goddess of the Forest. She is granted a **20%** increase in DEF and MR, and a **10%** increase in block rate. After using her active, she absorbs **30%** of incoming damage and recovers **5%** of her max HP for 3 rounds. In a party, Lria grants her team a **20%** increase in DEF and MR for **4** rounds and regenerating **3%** of their max HP every round. If Apollo EX is in her party, she increases MD by **10%** and her healing buff is increased to **5%**. This mask can be equipped using the command `/item equip item:verdant mask`.\n\n**Valkyrie's Battle Mask**\n- Wearing the Valkyrie's Battle Mask, Lria's ATK is increased by **20%**. When her health falls below **10%** of max HP, she triggers `Final Gambit`, a devastating counterattack that Lria can unleash once per battle, delivering a powerful strike with of **200%** damage. When using her active, she unleashes **3-6** attacks that deal **30%** physical damage each. Each strike has a **25%** chance to inflict `Warrior's Bleed` on the enemy, causing an additional **5%** of Lria's ATK as damage for **3** rounds. In a party, Lria boosts her team's offensive capabilities, granting a **25%** increase in **ATK** and a **15%** in CD.  In the absence of Apollo EX and Artemis EX, Lria's combat spirit intensifies, unlocking `Lone Valkyrie's Might`. This further enhances the team's offensive prowess, adding an extra **10%** to her CD buff. This mask can be equipped using the command `/item equip item:valkyrie mask`.",
         shortdesc: "**Role**: `DPS (Versatile)`\nLria is split into **4** modes which you may select.\n\n__**Maskless**__:\nPassive:\n- Restores **5%** max HP after dodging\n- **+10%** DEF\n\nActive (✨):\n**Uses**: `5`\n**Cost**: `30 💧`\n**Timeout**: `No`\n- **+20%** Dodge rate for **3** rounds\n- During this period, dodging grants **+20%** ATK\n\n__**Phantasmal mask**__:\nPassive:\n- ATTACK has a **30%** chance to deal additional **5%** MD for **4** rounds\n- **+25%** MR\n\nActive (✨):\n**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n- Deal **120%** MD\n- For **2** rounds: Drains **5%** max HP + Gains additional **5** 💧\n\nParty (👥)\n- **+20%** MD for the first **4** rounds\nIf Artemis EX in party:\n- **+25%** MD (instead of 20%) for **5** rounds\n- **+10%** lifesteal\n\n__**Verdant mask**__:\nPassive:\n- **+20%** DEF & MR\n- **+10%** Block rate\n\nActive (✨):\n**Uses**: `2`\n**Cost**: `50 💧`\n**Timeout**: `No`\n- For **3** rounds: Mitigates **30%** DMG taken + Recovers **5%** max HP\n\nParty (👥)\n- **+20%** DEF & MR for the first **4** rounds\n- Restores **3%** max HP every round\nIf Apollo EX in party:\n- **+10%** MD\n- Recovers **5%** max HP (instead of 3%) every round\n\n__**Valkyrie mask**__:\nPassive:\n- **+20%** ATK\n- Deals **200%** DMG upon falling below **10%** HP\n\nActive (✨):\n**Uses**: `3`\n**Cost**: `70 💧`\n**Timeout**: `Yes`\n- Deals **30%** physical DMG **3-6** times\n- Each hit has a **25%** chance to deal additional **5%** ATK for **3** rounds\n\nParty (👥)\n- **+25%** ATK\n- **+15%** critical DMG\nIf Artemis EX & Apollo EX are not in party:\n- **+25%** critical DMG (instead of 15%)\n\nTo swap forms, do` /item equip item:mask_name`. If you wish to remove the mask (maskless), do `/item equip item:remove mask`",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Lria EX
@@ -4486,7 +4564,7 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         buffID: 0,
         cost: 120,
-        desc: "**Total Usage**: `1`\n**Cost**: `120`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nSung Jin-Woo, the Shadow Monarch, brings his unique arsenal of skills to the battlefield. His abilities, deeply intertwined with the creatures he has vanquished and the artifacts he has acquired, reflect his journey and strength.\n\nSung Jin-Woo's prowess grows with the treasures he has collected from his conquests:\n- __King's Crown__: Each set of **10** increases his ATK by **1%**, up to a maximum of **30%**.\n- __Monster Egg__: Each set of **10** increases his MR by **0.75%**, up to a maximum of **22.5%**.\n- __Dragon Scales__: Each set of **10** increases his DEF by **0.75%**, up to a maximum of **22.5%**.\n- __Pendant of Silence__: Each set of **10** increases his crit rate by **0.5%**, up to a maximum of **15%**.\n- __Devil Claws__: Each set of **10** increases his crit damage by **1%**, up to a maximum of **30%**.\n- __Odious Brain__: Each set of **10** increases his dodge by **0.5%**, up to a maximum of **10%**.\n\nAfter using his active, Sung Jin-Woo summons his shadow army who will aid him for the rest of the battle, each member contributing uniquely:\n- **Beru**: Each successfully attack causes **6%** damage for 2 rounds.\n- **Igris**: Every critical hit drains **3.5%** of the enemy's max HP (or **7%** of own max HP if the enemy has more than twice of yours).\n- **Tusk**: Successfully dodging an attack steals **12%** of the enemy's current mana.\n\nAs a solo hunter, Sung Jin-Woo cannot be part of a party with more than one ability character. However, when he is the sole ability character in a party, his ATK, DEF, MR, MD and max HP are increased by **50%**.",
+        desc: "**Total Usage**: `1`\n**Cost**: `120`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nSung Jin-Woo, the Shadow Monarch, brings his unique arsenal of skills to the battlefield. His abilities, deeply intertwined with the creatures he has vanquished and the artifacts he has acquired, reflect his journey and strength.\n\nSung Jin-Woo's prowess grows with the treasures he has collected from his conquests:\n- __King's Crown__: Each set of **10** increases his ATK by **1%**, up to a maximum of **30%**.\n- __Monster Egg__: Each set of **10** increases his MR by **0.75%**, up to a maximum of **22.5%**.\n- __Dragon Scales__: Each set of **10** increases his DEF by **0.75%**, up to a maximum of **22.5%**.\n- __Pendant of Silence__: Each set of **10** increases his crit rate by **0.5%**, up to a maximum of **15%**.\n- __Devil Claws__: Each set of **10** increases his crit damage by **1%**, up to a maximum of **30%**.\n- __Odious Brain__: Each set of **10** increases his dodge by **0.5%**, up to a maximum of **10%**.\n\nAfter using his active, Sung Jin-Woo summons his shadow army who will aid him for the rest of the battle, each member contributing uniquely:\n- **Beru**: Each successfully attack causes **6%** damage for **2** rounds.\n- **Igris**: Every critical hit drains **3.5%** of the enemy's max HP (or **7%** of own max HP if the enemy has more than twice of yours).\n- **Tusk**: Successfully dodging an attack steals **12%** of the enemy's current mana.\n-# Note that you don't need to own the member in your inventory to utilize this active\n\nAs a solo hunter, Sung Jin-Woo cannot be part of a party with more than one ability character. However, when he is the sole ability character in a party, his ATK, DEF, MR, MD and max HP are increased by **50%**.",
         shortdesc: "**Uses**: `1`\n**Cost**: `0 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Mana-losing, Followup Attack, Nuke)`\n\n__**Passive**__\nEvery 10 sets owned of the following materials grant stat buffs:\n- `King's Crown` =✧= ATK **+1%** (Up to 30%)\n- `Monster Egg` =✧= MR **+0.75%** (Up to 22.5%)\n- `Dragon Scales` =✧= DEF **+0.75%** (Up to 22.5%)\n- `Pendant of Silence` =✧= Crit Rate **+0.5%** (Up to 15%)\n- `Devil Claws` =✧= Crit DMG **+1%** (Up to 30%)\n- `Odious Brain`: =✧= Dodge **+0.5%** (Up to 10%)\nNote:\n> 10 sets owned means owning 10 of that material type. E.g. you need 300 King's Crown in your inventory for the max 30% ATK buff. \n\n__**Active**__ (✨)\nBuffs himself permanently:\n- Successful attacks each deal additional **6%** damage for **2** rounds.\n- Critical hits drain **3.5%** of the enemy's max HP (or **7%** of own max HP if the enemy has more than twice of yours).\n- Dodging an attack steals **12%** of the enemy's current mana.\n\n__**Party**__ (👥)\n- He refuses to fight (Dies) when in a party with ability characters\n- When in a party where he is the sole ability, he has **+50%** max HP, ATK & MD, DEF & MR",
         ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Sung Jin Woo EX | SJW EX
@@ -4558,8 +4636,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 75,
         pause: -10,
-        desc: "**Total Usage**: `unlimited`\n**Cost**: `75`\\💧\n**Timeout**: `yes` (8 round cd)\n**Role**: `Support`\n\n**Seductive Strikes**\n- Boa Hancock's normal attacks are infused with her captivating charm, thus deal **110%** damage and inflict a stack of `Perfume Fever` on her opponent. Each stack of `Perfume Fever` reduces the enemy's DEF and MR by **4%** (up to **20%**) and their dodge rate by **10%**.\n- After reaching **6** stacks of `Perfume Fever`, Hancock deals **150%** damage and her opponent is turned to stone for 1 round, unable to make any actions.\n\n**Alluring Domination**\n- When facing male opponents, if Hancock has at least **3x** her opponent's EP, she sets their HP to **1**, leaving them on the brink of death, effectively allowing her to one-shot them.\n\n**Disarming Beauty**\n- When facing enemies with at least **3x** her own EP, Boa Hancock's cuteness and overwhelming beauty take effect, reducing the damage they deal to her by **33%**.\n\n**Active: Mero Mero Mellow**\n- Boa Hancock unleashes her most potent charm, turning her enemy to stone for **3** rounds. While petrified, the enemy is completely helpless, taking **1.2x** damage from all sources and unable to dodge or perform any actions. After they manage to break free from the petrification, their ATK and MD is **halved** for the next turn, as they struggle to recover.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `8 rounds`\n**Cost**: `75 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank/Farming (Stun, Mitigation, DMG-boosting)`\n\n__**Passive**__\n- ATTACK is altered to deal **110%** DMG + Apply **1x** `Perfume Fever`\n`Perfume Fever`:\n- For every stack present, **-4%** enemy’s DEF & MR (Up to 20%), **-10%** enemy Dodge rate\n- Upon reaching **6** stacks: Consume all stacks to deal **150%** DMG + Disable enemy’s action for **1** round\n\n- When enemy is a male + Boa has **3x** their EP:\n- Lowers their HP to **1** at the start of the fight\n- When the enemy has **3x** her EP: **+33%** DMG mitigation\n\n__**Active**__ (✨)\nFor **3** rounds on the enemy:\n- Disables actions\n- Takes **+20%** DMG\n- Cannot dodge\n\nOn the **4th** turn:\n- **-50%** enemy’s ATK & MD for **1** round",
+        desc: "**Total Usage**: `unlimited`\n**Cost**: `75`\\💧\n**Timeout**: `yes` (8 round cd)\n**Role**: `Support`\n\n**Seductive Strikes**\n- Boa Hancock's normal attacks are infused with her captivating charm, thus deal **110%** damage and inflict a stack of `Perfume Fever` on her opponent. Each stack of `Perfume Fever` reduces the enemy's DEF and MR by **4%** (up to **20%**) and their dodge rate by **10%**.\n- After reaching **6** stacks of `Perfume Fever`, Hancock deals **150%** damage and her opponent is turned to stone for 1 round, unable to make any actions.\n\n**Alluring Domination**\n- When facing male opponents, if Hancock has at least **3x** her opponent's EP, she sets their HP to **1**, leaving them on the brink of death, effectively allowing her to one-shot them.\n\n**Disarming Beauty**\n- When facing enemies with at least **3x** her own EP, Boa Hancock's cuteness and overwhelming beauty take effect, reducing the damage they deal to her by **33%**.\n\n**Active: Mero Mero Mellow**\n- Boa Hancock unleashes her most potent charm, turning her enemy to stone for **3** rounds. While petrified, the enemy is completely helpless, taking **1.2x** damage from all sources and unable to dodge or perform any actions. This is considered a vulnerability effect, where only the highest takes effect. After they manage to break free from the petrification, their ATK and MD is **halved** for the next turn, as they struggle to recover.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `8 rounds`\n**Cost**: `75 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Tank/Farming (Stun, Mitigation, DMG-boosting)`\n\n__**Passive**__\n- ATTACK is altered to deal **110%** DMG + Apply **1x** `Perfume Fever`\n`Perfume Fever`:\n- For every stack present, **-4%** enemy’s DEF & MR (Up to 20%), **-10%** enemy Dodge rate\n- Upon reaching **6** stacks: Consume all stacks to deal **150%** DMG + Disable enemy’s action for **1** round\n\n- When enemy is a male + Boa has **3x** their EP:\n- Lowers their HP to **1** at the start of the fight\n- When the enemy has **3x** her EP: **+33%** DMG mitigation\n\n__**Active**__ (✨)\nFor **3** rounds on the enemy:\n- Disables actions\n- Takes **+20%** DMG. This is considered a vulnerability effect, where only the highest takes effect.\n- Cannot dodge\n\nOn the **4th** turn:\n- **-50%** enemy’s ATK & MD for **1** round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Boa Hancock EX
             if (this.pause > matchStats.round) {
@@ -4574,7 +4652,7 @@ export const abilities: Record<number, Ability> = {
             const domainLast = 3;
             eStats.timeFrozen = true;
             eStats.frozenMessage = "was turned into stone";
-            eStats.vulnerability = 1.2;
+            if (eStats.vulnerability < 1.2) eStats.vulnerability = 1.2;
 
             ebuff.dodge.push(new buffInfo("=", 0, 3));
 
@@ -4594,6 +4672,7 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.perfumeFever = 0;
+            eStats.vulnerability ??= 1;
 
             myStats.replaceButton.atk = {
                 "emoji": "<:BoaLeg:1272508603454066750>",
@@ -4660,8 +4739,8 @@ export const abilities: Record<number, Ability> = {
         pool: [],
         rolledWisp: -1,
         lockedWisps: [],
-        desc: "**Total Usage**: `unlimited` (max 2 wisps)\n**Cost**: `20`\\💧\n**Timeout**: `no`\n**Role**: `Support`\n\nUrashima wears a star pendant with a strange aura that grows depending on the magical items he carries. For every **50** SS Shards owned (max **250**), Urashima gains:\n- **+0.6** Mana Regen (max **+3**)\n- **+6%** ATK & MD (max **+30%**)\n- **+2.5%** max HP (max **+12.5%**)\n## __Celestial Wisps__\nUsing his active, Urashima summons a random celestial wisp. He can lock the wisp by using his ability again that same turn, or let it fade and summon a different wisp the next turn. **2** wisps can be locked this way at most. Skipping a wisp removes it from the summoning pool until one is locked or all are skipped.\n\n**Ursae Majoris**\n:low_brightness: Wildcard: No effects on its own. Amplifies the other wisp by the effects marked as :sunny:\n:sunny: Increases dodge chance by **16%**.\n\n**Andromedae**\n:low_brightness: Increases block rate by **13%**.\n:sunny: Block streaks increase block rate by **+2%** each (max **+12%**) until the streak gets interrupted.\n\n**Phoenicis**\n:low_brightness: Increases MR by **212** (**20%** damage reduction). The user is immune to HP debuffs.\n:sunny: Adds **340** DEF and increases MR to **340** as well (**30%**damage reduction).\n\n**Draconis**\n:low_brightness: Has a **10%** chance of countering enemy attacks.\n:sunny: Heals the user by **10%** of damage dealt.\n\n**Centauri **\n:low_brightness: Increases crit rate by **10%**, crit damage by **15%**.\n:sunny: Crits inflict bleed, dealing **3%** of the enemy's max HP as damage for **2** rounds.\n\nIn a party, Urashima intervenes during the first turn to let their allies summon a wisp, rotating between them with their character skill. They confirm their choice by raising their shields (🛡️) once before the fight begins.",
-        shortdesc: "**Uses**: `Unlimited (max. 2 wisps)`\n**Cost**: `20 💧`\n**Timeout**: `No`\n**Role**: `Support (Block/Counter/Tank+DoT-Immunity/Crit)`\n\n__**Passive**__\nFor every **50** SS Shards owned (max **250**):\n- Regenerates **+0.6** Mana (max +3)\n- **+6%** ATK/MD (max 30%)\n- **+2.5%** MaxHP (max **+12.5%**).\n\n__**Active**__ (✨)\nRolls a random wisp (click ✨ again to lock it), up to 1.\n-# (1) = locked once, (2) = locked same wisp twice.\n\n__Ursae Majoris:__\n- (1) Gives the “(2)” effect to any other wisp\n- (2) **+16%** Dodge\n\n__Andromedae:__\n- (1) **+13%** Block Rate\n- (2) **+2%** Block Rate (max. **+12%**) for every successful consecutive block\n__Phoenicis__:\n- (1) **+212** MR (20% DMG reduction) + Immunity to DoT\n- (2) **+340** total DEF/MR (**30%** DMG reduction)\n__Draconis:__\n- (1) **+10%** Counter chance\n- (2) **+10%** lifesteal.\n__Centauri:__\n- (1) **+10%** Critical rate, **+15%** Critical DMG\n- (2) Critical hits additionally deal **3%** of enemy Max HP as damage for **2** rounds\n\n__**Party**__ (👥)\nAllies summon a Wisp on the first turn:\n- Rotating wisps with active (✨)\n- Lock an effect with DEFEND (🛡️)",
+        desc: "**Total Usage**: `unlimited` (max 2 wisps)\n**Cost**: `5`\\💧\n**Timeout**: `no`\n**Role**: `Support`\n\nUrashima wears a star pendant with a strange aura that grows depending on the magical items he carries. For every **1** refinement level on your favorite character (max **6**), Urashima gains:\n- **+10** Mana upon entering battle (max **+60**)\n- **+5%** ATK & MD (max **+30%**)\n- **+3%** dodge rate (max **+18%**)\n## __Celestial Wisps__\nUsing his active, Urashima summons a random celestial wisp. He can lock the wisp by using his ability again that same turn, lowering his mana regeneration by **5** permanently, or let it fade and summon a different wisp the next turn. **2** wisps can be locked this way at most. Skipping a wisp removes it from the summoning pool until one is locked or all are skipped.\n\n**Ursae Majoris**\n:low_brightness: Wildcard: No effects on its own. Amplifies the other wisp by the effects marked as :sunny:\n:sunny: Increases max HP by **20%**.\n\n**Andromedae**\n:low_brightness: Increases block rate by **13%**.\n:sunny: Block streaks increase block rate by **+2%** each (max **+12%**) until the streak gets interrupted.\n\n**Phoenicis**\n:low_brightness: Increases MR by **212** (**20%** damage reduction). The user is immune to HP debuffs.\n:sunny: Adds **340** DEF and increases MR to **340** as well (**30%** damage reduction).\n\n**Draconis**\n:low_brightness: Has a **10%** chance of countering enemy attacks. A successful counter boosts own critical rate by **2%** and critical DMG by **3%**, up to 10 times.\n:sunny: Upon countering, heals himself by **25%** of DMG avoided, up to **15%** of his missing HP.\n\nIn a party, Urashima intervenes during the first turn to let their allies summon a wisp, rotating between them with their character active (✨). They confirm their choice by using DEFEND (🛡️) once before the fight begins.",
+        shortdesc: "**Uses**: `Unlimited (max. 2 wisps)`\n**Cost**: `5 💧`\n**Timeout**: `No`\n**Role**: `Support (Block/Counter/Tank+DoT-Immunity/Crit)`\n\n__**Passive**__\nFor every **1** refinement level on your favorite character (max **6**):\n- Begins battle with **+10** Mana (max +60)\n- **+5%** ATK/MD (max 30%)\n- **+3%** dodge rate (max **+18%**).\n\n__**Active**__ (✨)\nRolls a random wisp (click ✨ again to lock it), up to **1** per round. Locking lowers Urashima's mana regeneration by **5** permanently.\n-# (1) = locked once, (2) = locked same wisp twice.\n\n__Ursae Majoris:__\n- (1) Gives the “(2)” effect to any other wisp\n- (2) **+20%** max HP\n\n__Andromedae:__\n- (1) **+13%** Block Rate\n- (2) **+2%** Block Rate (max. **+12%**) for every successful consecutive block\n__Phoenicis__:\n- (1) **+212** MR (20% DMG reduction) + Immunity to DoT\n- (2) **+340** total DEF/MR (**30%** DMG reduction)\n__Draconis:__\n- (1) **+10%** Counter chance, every counter grants **+2%** critical rate and **+3%** critical DMG (Up to 10 times)\n- (2) Restores HP equal to **25%** of DMG avoided upon countering, up to **15%** of his missing HP.\n\n__**Party**__ (👥)\nAllies summon a Wisp on the first turn:\n- Rotating wisps with active (✨)\n- Lock an effect with DEFEND (🛡️)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Urashima EX
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -4678,19 +4757,19 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.FAILURE;
             };
 
-            const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis", 4: "Centauri" };
+            const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis" }; // 4: "Centauri"
 
             if (this.roundUsed !== matchStats.round) {
                 this.roundUsed = matchStats.round;
 
-                if (myStats.sm < 20) {
+                if (myStats.sm < 5) {
                     matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/20\\💧)`, ephemeral: true });
                     this.used--;
                     return AbilityResponse.FAILURE;
                 };
-                myStats.sm -= 20;
+                myStats.sm -= 5;
 
-                if (this.pool.length === 0) this.pool.push(0, 1, 2, 3, 4);
+                if (this.pool.length === 0) this.pool.push(0, 1, 2, 3); // 4 excluded
                 this.pool.sort(() => Math.random() - 0.5);
                 this.rolledWisp = this.pool.pop();
                 notice.push(`\n🔅 **${char.name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ✨ to keep it.`);
@@ -4709,9 +4788,11 @@ export const abilities: Record<number, Ability> = {
                 if (firstWisp !== undefined) {
                     if (firstWisp === 0) {
                         // Ursae Majoris
-                        mybuff.dodge.push(new buffInfo("+", 0.16, 9999));
-                        myStats.dodge += 0.16;
-                        if (myStats.dodge > 0.9) myStats.dodge = 0.9;
+                        const increaseHp = Math.floor(myStats.maxhp * 0.2)
+                        myStatsFixed.maxhp += increaseHp;
+                        myStatsFixed.hp += increaseHp;
+                        myStats.maxhp += increaseHp;
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
                     } else if (firstWisp === 1) {
                         // Andromedae
                         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -4727,13 +4808,17 @@ export const abilities: Record<number, Ability> = {
                         myStats.mr += 128;
                     } else if (firstWisp === 3) {
                         // Draconis
-                        myStats.selfhealChance.push(1);
-                        myStats.selfheal.push(0.1);
-                    } else if (firstWisp === 4) {
+                        matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                            if (caster == myStats) {
+                                const increaseHp = Math.floor( Math.min(options.damage * 0.25 , (myStats.maxhp - myStats.hp) * 0.15));
+                                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
+                            }
+             });
+                    } /*else if (firstWisp === 4) {
                         // Centauri
                         matchStats.critbleed = true;
                         matchStats.critbleedlast = 2;
-                    };
+                    };*/
                 };
             } else if (this.rolledWisp === 1) {
                 // Andromedae
@@ -4754,12 +4839,21 @@ export const abilities: Record<number, Ability> = {
                 }, 9999));
             } else if (this.rolledWisp === 3) {
                 // Draconis
+                myStats.counter ??= 0;
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     if (Math.random() < 0.1) myStats.counter = 1;
 
                     return AbilityResponse.SUCCESS;
                 }, 9999));
-            } else if (this.rolledWisp === 4) {
+                matchStats.on("counter", {
+                    maxUsage: 10,
+                    callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                    if (caster == myStats) {
+                        myStats.cr += 0.02;
+                        if (myStats.cr > 1) myStats.cr = 1;
+                        myStats.cd += 0.03;
+            }}});
+            } /* else if (this.rolledWisp === 4) {
                 // Centauri
                 mybuff.cr.push(new buffInfo("+", 0.1, 9999));
                 myStats.cr += 0.1;
@@ -4767,37 +4861,46 @@ export const abilities: Record<number, Ability> = {
 
                 mybuff.cd.push(new buffInfo("+", 0.15, 9999));
                 myStats.cd += 0.15;
-            };
+            }; */
 
             // Lock wisp
             this.lockedWisps.push(this.rolledWisp);
-            this.pool = [0, 1, 2, 3, 4];
+            this.pool = [0, 1, 2, 3]; // 4 excluded
             notice.push(`\n🔅 **${wisps[this.rolledWisp as keyof typeof wisps]}** was locked!`);
+            myStats.mg -= 5;
+            if (myStats.mg < 0) myStats.mg = 0;
+            mybuff.mg.push((new buffInfo("+", -5, 9999)));
             this.rolledWisp = -1;
             return AbilityResponse.SUCCESS;
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            const stats = await getUserSchema(matchStats.interaction.user.id);
 
-            // Get SS shards
+            const favcharref = stats?.char_ref[stats?.favchar ?? 21929];
+            
+            /*// Get SS shards
             const stats = await getUserSchema(matchStats.interaction.user.id);
 
             const shardStacks = Math.min(5, (stats?.ssshard ?? 0) / 50);
+            */
 
-            // Max HP buff
-            const increaseHp = Math.floor(myStatsFixed.maxhp * 0.025 * shardStacks);
-            myStatsFixed.maxhp += increaseHp;
-            myStatsFixed.hp += increaseHp;
-            myStats.maxhp += increaseHp;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
+            if (favcharref == undefined) return AbilityResponse.FAILURE;
+            // Dodge rate buff
+            const increase_eva = 0.03 * favcharref;
+            myStats.dodge += increase_eva;
+            if (myStats.dodge > 1) myStats.dodge = 1;
+            mybuff.dodge.push(new buffInfo("+", Math.min(increase_eva, 1 - myStats.dodge), 9999));
 
             // ATK & MD buffs
-            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * (0.06 * shardStacks)), 9999));
-            mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * (0.06 * shardStacks)), 9999));
-            myStats.atk += Math.floor(myStats.atk * (0.06 * shardStacks));
-            myStats.md += Math.floor(myStats.md * (0.06 * shardStacks));
+            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * (0.05 * favcharref)), 9999));
+            mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * (0.05 * favcharref)), 9999));
+            myStats.atk += Math.floor(myStats.atk * (0.05 * favcharref));
+            myStats.md += Math.floor(myStats.md * (0.05 * favcharref));
 
-            // mg buff
-            mybuff.mg.push(new buffInfo("+", Math.floor(0.6 * shardStacks), 9999));
+            // Burst mana
+            myStats.sm += 10 * favcharref;
+            if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+
 
             return AbilityResponse.SUCCESS;
         },
@@ -4811,9 +4914,9 @@ export const abilities: Record<number, Ability> = {
 
             notice.push(`\n🔅 **Urashima**: Please use ${tempAbility?.emoji || "✨"} to roll a wisp.`);
 
-            const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis", 4: "Centauri" };
+            const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis" }; // 4: "Centauri"
 
-            if (this.pool.length === 0) this.pool.push(1, 2, 3, 4);
+            if (this.pool.length === 0) this.pool.push(1, 2, 3); // 4
             this.pool.sort(() => Math.random() - 0.5);
             this.rolledWisp = this.pool.pop();
             notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
@@ -4823,7 +4926,7 @@ export const abilities: Record<number, Ability> = {
                 run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     matchStats.turn = matchStats.turnSkill ? 0 : 1;
 
-                    if (this.pool.length === 0) this.pool.push(1, 2, 3, 4);
+                    if (this.pool.length === 0) this.pool.push(1, 2, 3); // 4
                     this.pool.sort(() => Math.random() - 0.5);
                     this.rolledWisp = this.pool.pop();
                     notice.push(`\n🔅 **${name}** has summoned **__${wisps[this.rolledWisp as keyof typeof wisps]}__**. Use ${tempDef?.emoji || "🛡️"} to keep it, ${tempAbility?.emoji || "✨"} to reroll.`);
@@ -4865,12 +4968,13 @@ export const abilities: Record<number, Ability> = {
                         }, 9999));
                     } else if (this.rolledWisp === 3) {
                         // Draconis
-                        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                            if (Math.random() < 0.1) myStats.counter = 1;
-
-                            return AbilityResponse.SUCCESS;
-                        }, 9999));
-                    } else if (this.rolledWisp === 4) {
+                        matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                            if (caster == myStats) {
+                                const increaseHp = Math.floor( Math.min(options.damage * 0.25 , (myStats.maxhp - myStats.hp) * 0.15));
+                                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, increaseHp, {});
+                            }
+                        });
+                    } /* else if (this.rolledWisp === 4) {
                         // Centauri
                         mybuff.cr.push(new buffInfo("+", 0.1, 9999));
                         myStats.cr += 0.1;
@@ -4878,9 +4982,9 @@ export const abilities: Record<number, Ability> = {
 
                         mybuff.cd.push(new buffInfo("+", 0.15, 9999));
                         myStats.cd += 0.15;
-                    };
+                    };*/
 
-                    const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis", 4: "Centauri" };
+                    const wisps = { 0: "Ursae Majoris", 1: "Andromedae", 2: "Phoenicis", 3: "Draconis" }; // 4: "Centauri"
                     notice.push(`\n🔅 **${wisps[this.rolledWisp as keyof typeof wisps]}** was locked!`);
                     return AbilityResponse.SUCCESS;
                 },
@@ -4934,6 +5038,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.vulnerability ??= 1;
 
             // MR buff
             mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.3), 9999));
@@ -4944,7 +5049,7 @@ export const abilities: Record<number, Ability> = {
                 if (matchStats.round % 4 === 0) {
                     eStats.timeFrozen = true;
                     eStats.frozenMessage = "was crippled for **1** round";
-                    eStats.vulnerability = 1.5;
+                    if (eStats.vulnerability < 1.5) eStats.vulnerability = 1.5;
                 } else if (matchStats.round % 4 === 1) {
                     eStats.timeFrozen = false;
                     eStats.vulnerability = 1;
@@ -4957,7 +5062,7 @@ export const abilities: Record<number, Ability> = {
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             const name = pStats.name;
-
+            eStats.vulnerability ??= 1;
             myStats.isLucynaInParty = true;
 
             // Cripple once every 4 rounds
@@ -4965,7 +5070,7 @@ export const abilities: Record<number, Ability> = {
                 if (matchStats.round % 4 === 0) {
                     eStats.timeFrozen = true;
                     eStats.frozenMessage = "was crippled for **1** round";
-                    eStats.vulnerability = 1.5;
+                    if (eStats.vulnerability < 1.5) eStats.vulnerability = 1.5;
                 } else if (matchStats.round % 4 === 1) {
                     eStats.timeFrozen = false;
                     eStats.vulnerability = 1;
@@ -5169,7 +5274,7 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 20,
         pause: 0,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `20` or `80`\\💧\n**Timeout**: `yes`, 3 round cd\n**Role**: `DPS`\n\nFrieren, the elven mage who has witnessed centuries pass, harnesses her immense magical prowess in both offense and support roles. Her abilities adapt dynamically to the flow of battle, allowing her to deal magic damage while debuffing and disabling enemies. And against certain foes, demons and their likes, her magic reaches unparalleled heights, granting her a **20%** increase in attack and magic damage. And as an ancient mage having honed her magic over centuries, Frieren has an enormous mana pool, as well as a boosted mana generation, gaining **+5** mana per round.\n\nAs a mage who loves collecting spells, Frieren casts a different spell depending on the situation and amount of mana she has. When running low on mana, she casts offensive magic `Zoltraak`, dealing **110%** magic damage, for only **20** mana. And when she has at least **80** mana, she casts `Destructive Lightning: Judradjim`, dealing **150%** magic damage and stunning her opponent for 1 round, or, if her opponent's HP is under **50%**, she casts `Hellfire Summoning: Vollzanbel`, dealing **150%** magic damage and an additional **30%** for 2 rounds. Moreover, after casting one of her two powerful spells, `Judradjim` or `Vollzanbel`, Frieren has a **30%** chance to follow up on it, casting her other spell immediately after. This chance increases by **+1%** for every **5** excess mana she has, up to a total of **50%**.\n\nFinally, when Frieren's HP falls below **30%** for the first time, she automatically unleashes the Height of Magic, an ultimate and desperate retaliatory attack dealing **80%** magic damage + an additional **5%** for every round she's survived so far (capping at **180%** total).\n\nIn a party, Frieren assists her party members by casting `Zoltraak` once every **4** rounds.",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `20` or `80`\\💧\n**Timeout**: `yes`, 3 round cd\n**Role**: `DPS`\n\nFrieren, the elven mage who has witnessed centuries pass, harnesses her immense magical prowess in both offense and support roles. Her abilities adapt dynamically to the flow of battle, allowing her to deal magic damage while debuffing and disabling enemies. And against certain foes, demons and their likes, her magic reaches unparalleled heights, granting her a **20%** increase in attack and magic damage. And as an ancient mage having honed her magic over centuries, Frieren has an enormous mana pool, as well as a boosted mana generation, gaining **+5** mana per round.\n\nAs a mage who loves collecting spells, Frieren casts a different spell depending on the situation and amount of mana she has. When running low on mana, she casts offensive magic `Zoltraak`, dealing **110%** magic damage, for only **20** mana. And when she has at least **80** mana, she casts `Destructive Lightning: Judradjim`, dealing **150%** magic damage and stunning her opponent for 1 round, or, if her opponent's HP is under **50%**, she casts `Hellfire Summoning: Vollzanbel`, dealing **150%** magic damage and an additional **30%** for 2 rounds.\n\nBut that's not all, after casting one of her two powerful spells, `Judradjim` or `Vollzanbel`, Frieren has a **30%** chance to follow up on it, casting her other spell immediately after. This chance increases by **+1%** for every **5** excess mana she has, up to a total of **50%**.\n\nFinally, when Frieren's HP falls below **30%** for the first time, she automatically unleashes the Height of Magic, an ultimate and desperate retaliatory attack dealing **80%** magic damage + an additional **5%** for every round she's survived so far (capping at **180%** total).\n\nIn a party, Frieren assists her party members by casting `Zoltraak` once every **4** rounds.",
         shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `3 rounds`\n**Cost**: `20/80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Mana-boost, Followup Attack, Nuke)`\n\n__**Passive**__\n- **+20%** ATK & MD\n- Regenerates **+5** 💧\n- **+500** mana pool (capacity)\n\nWhen falls below **30%** HP for the first time:\n- Deals **80%** MD\n- The DMG scaling of this hit is increased by **5%** for every round she has survived (Up to 180% in total)\n\n__**Active**__ (✨)\n20 💧 : Zoltraak\n- Deal **110%** MD\n\n80 💧:\nWhen the enemy has **50%** HP or more: casts Judradjim\n- Deal **150%** MD\n- Stuns opponent for **1** round\n\nElse: casts Vollzanbe\n- Deals **150%** MD\n- Additionally deals **30%** MD for **2** rounds\n\nAfter using 80-cost active (✨):\n- Has a **30%** chance to followup with her other 80-cost active\n- **+1%** followup chance for every **5** excess 💧 (Up to 50% in total)\n\n__**Party**__ (👥)\n- At the start of every **4** rounds: Uses Voltraak (Deals **110%** MD)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Frieren EX
@@ -5415,8 +5520,8 @@ export const abilities: Record<number, Ability> = {
         cost: 20,
         pause: 0,
         selfhealidx: 0,
-        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+30%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **90%** DMG, before slamming them in a strike, dealing an additional instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%). If 2B has revived, no longer loses **7%** current HP but instead heals **7%** current HP.\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+3%** ATK/MD, up to **+24%** ATK\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**. Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **2%** permanently (Up to 20%). After using DEFEND, activates “Boost”, increasing dodge rate by **30%** for **2** rounds and decreases enemy’s DEF by **2%** permanently (Up to 20%). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **2%** permanently (Up to 20%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team. The effect of ɪɴꜱɪɢʜᴛ instead grants allies **+2%** ATK per stack, up to **+16%** ATK.",
-        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+30%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`\n\nATTACK is altered:\n> - Loses **7%** current HP (*Heals* instead after the first revive)\n> - Deals **100%** DMG, before dealing another instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+3%** ATK. Cannot have more than **8** stacks at all time.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **25%** chance to counter the next hit (stackable)\n- **-2%** enemy's ATK permanently (Up to 20%)\n\nAfter using DEFEND:\n- **+30%** dodge rate for **2** rounds\n- **-2%** enemy's DEF permanently (Up to 20%)\n\nAfter using CLASS SKILL:\n- **+2%** DMG mitigation permanently (Up to 20%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\n- When 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\nEvery even round:\n- If ally’s dodge is below **0%**, set dodge to **0%**\n- Then increases dodge rate by **1%** for every **1%** HP missing, up to 30%",
+        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+30%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **90%** DMG, before slamming them in a strike, dealing an additional instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%). If 2B has revived, no longer loses **7%** current HP but instead heals **7%** current HP.\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+3%** ATK/MD, up to **+24%** ATK\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**. Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **2%** permanently (Up to 20%). After using DEFEND, activates “Boost”, increasing dodge rate by **30%** for **2** rounds and decreases enemy’s DEF by **2%** permanently (Up to 20%). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **2%** permanently (Up to 20%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team. The effect of [ɪɴꜱɪɢʜᴛ] instead grants allies **+2%** ATK per stack, up to **+16%** ATK.",
+        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+30%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`\n\nATTACK is altered:\n> - Loses **7%** current HP (*Heals* instead after the first revive)\n> - Deals **100%** DMG, before dealing another instance of **1%** DMG for every **1%** HP missing from the enemy (Up to 50%).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+3%** ATK. Cannot have more than **8** stacks at all time.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **25%** chance to counter the next hit (stackable)\n- **-2%** enemy's ATK permanently (Up to 20%)\n\nAfter using DEFEND:\n- **+30%** dodge rate for **2** rounds\n- **-2%** enemy's DEF permanently (Up to 20%)\n\nAfter using CLASS SKILL:\n- **+2%** DMG mitigation permanently (Up to 20%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\n- When 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, has **+2%** ATK, up to 16%",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // 2B&9S EX
 
@@ -5436,7 +5541,7 @@ export const abilities: Record<number, Ability> = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.pause = matchStats.round + 10;
 
-                notice.push(`\n✨ 2B and 9S entered their flight units for 10 rounds.`);
+                notice.push(`\n✨ 2B and 9S entered their flight units for **10** rounds.`);
 
                 // Additional effects after ATK/DEF/CSKILL
                 matchStats.on("ATK", {

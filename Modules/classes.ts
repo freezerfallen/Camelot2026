@@ -68,7 +68,7 @@ const skillDescs: SkillDescription[] = [
     { "active": `Attacks ignoring **60%** of enemy DEF and MR.`, "passive": `None` },
     { "active": `Increases own DEF and Magic Resist depending on mana consumtion for 6 rounds. Starting with **100** DEF and **25** Magic Resist, the user gains **+8** DEF and **+2** Magic Resist for every mana consumed above 20.`, "passive": `Gains **+25%** increased class xp from the dungeon.` },
     { "active": `Summons a spirit to fight for you. The spirit will have **30%** of your stats, but has a **20%** chance of summoning a stronger spirit which has **50%** of your stats. During this mode your mana generation will halt until the spirit is defeated. Once the spirit dies, you will continue fighting with your character.`, "passive": `Has a **20%** chance of dealing magic damage.` },
-    { "active": `Creates a shield equal to **20%** of max HP.`, "passive": `When shield breaks down freezes the enemy's next action and increases own ATK and MD by **50%** for **1** round. All attacks deal magic damage by default.` },
+    { "active": `Creates a shield equal to **20%** of max HP.`, "passive": `When shield breaks down from taking DMG, freezes the enemy and increases own ATK and MD by **50%** for **1** round. All attacks deal magic damage by default.` },
     { "active": `Deals **125%** magic damage and causes burning, dealing **6%** damage over 2 rounds.`, "passive": `All attacks deal magic damage.` },
     { // Wizard
         "active": `Deals **150%** magic damage and causes burning, dealing an additional **50%** damage over 3 rounds.`,
