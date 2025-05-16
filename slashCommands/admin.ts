@@ -22,7 +22,7 @@ const exportCommand: SlashCommand = {
         const cmd = args.shift()?.toLowerCase();
 
         // Return if not owner
-        if (interaction.user.id !== "829924643657220158") {
+        if (interaction.user.id !== "489490486734880774") {
             return interaction.reply({ content: "You're not allowed to use this command", ephemeral });
         };
 
