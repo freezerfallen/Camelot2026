@@ -112,5 +112,5 @@
     "javascript.suggestionActions.enabled": true,
     "javascript.validate.enable": true,
     "js/ts.implicitProjectConfig.checkJs": false,
-    "js/ts.implicitProjectConfig.experimentalDecorators": false,
+    "js/ts.implicitProjectConfig.experimentalDecorators": false
 }
