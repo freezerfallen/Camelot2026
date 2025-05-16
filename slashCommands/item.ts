@@ -623,7 +623,7 @@ const exportCommand: SlashCommand = {
                 };
 
                 // 2B/9S Duo Programmes
-                if (itemChoice.toLowerCase().startsWith("prog ")) {
+                if (itemChoice.toLowerCase().startsWith("prog")) {
                     let action = itemChoice.toLowerCase().split(" ")[1] ?? "info";
 
                     if (action === "remove") {

@@ -2,6 +2,7 @@ import { characters, auniq } from "./chars.js";
 import { ChatInputCommandInteraction, User } from "discord.js";
 import { getUserSchema, updateUsers } from "./queries.js";
 import { items } from "./items.js";
+import { UpdateUserOptions } from "../types.js";
 
 // Set to track ongoing achievement checks (userId:achievementId)
 const achvmLock = new Set<string>();
@@ -96,7 +97,8 @@ export default class achievInfo {
             types[type as keyof typeof types].run();
         });
 
-        await updateUsers(user.id, {
+        // Update users table
+        const userUpdates: UpdateUserOptions = {
             xp: { type: "increment", value: add_xp },
             coins: { type: "increment", value: add_coins },
             lootbox: { type: "increment", value: add_lb },
@@ -112,9 +114,10 @@ export default class achievInfo {
             bticket: { type: "increment", value: add_tickets["b"] },
             cticket: { type: "increment", value: add_tickets["c"] },
             dticket: { type: "increment", value: add_tickets["d"] },
-            shield_slot: { type: "set", value: add_shield },
             achievements: { type: "append_unique", value: [this.id] }
-        });
+        };
+        if (add_shield > 0) userUpdates.shield_slot = { type: "set", value: add_shield };
+        await updateUsers(user.id, userUpdates);
 
         // Achievements
         achievements[15].check(interaction, user), achievements[16].check(interaction, user), achievements[17].check(interaction, user), achievements[18].check(interaction, user); // Rising

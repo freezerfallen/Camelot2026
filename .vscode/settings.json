@@ -112,5 +112,16 @@
     "javascript.suggestionActions.enabled": true,
     "javascript.validate.enable": true,
     "js/ts.implicitProjectConfig.checkJs": false,
-    "js/ts.implicitProjectConfig.experimentalDecorators": false
+    "js/ts.implicitProjectConfig.experimentalDecorators": false,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Camelot",
+            "database": "mydb",
+            "username": "HP"
+        }
+    ]
 }

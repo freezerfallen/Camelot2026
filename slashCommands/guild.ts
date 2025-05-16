@@ -795,7 +795,7 @@ const exportCommand: SlashCommand = {
 
             const emoji = { coins: "<:coins:872926669055356939>", gems: "<:genesis_gems:1034179687720681492>" }[currency];
             if (donation < 1) return interaction.reply(`You can't donate less than 1 ${emoji}`);
-            if (donation > 1000000000) return interaction.reply(`You can't donate more than 1,000,000,000 ${emoji} at once`);
+            if (donation > 1000000000) return interaction.reply(`You can't donate more than 1'000'000'000 ${emoji} at once`);
 
             if (stats[currency] < donation) return interaction.reply(`You don't have **${donation}**${emoji} (current balance: ${stats[currency]}${emoji})`);
 

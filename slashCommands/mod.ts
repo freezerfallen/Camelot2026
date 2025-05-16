@@ -1,8 +1,8 @@
 import fs from 'fs';
 import csvWriter from 'fast-csv';
 import { ComponentType, ActionRowBuilder, ButtonBuilder, EmbedBuilder, AttachmentBuilder, ButtonStyle } from "discord.js";
-import { characters } from "../Modules/chars";
-import { showPage, search } from "../Modules/functions";
+import charInfo, { characters } from "../Modules/chars";
+import { showPage, search, classLevelToXP, searchClass } from "../Modules/functions";
 import { PageRow } from "../Modules/components";
 import { PassThrough } from 'stream';
 import { SlashCommand } from '../types';
@@ -80,6 +80,61 @@ const exportCommand: SlashCommand = {
             };
 
             return interaction.reply({ content: "No match found", ephemeral });
+        };
+
+        // Set db
+        if (cmd === "set") {
+            if (interaction.client.user.id !== "695286837568340119") return interaction.reply({ content: "This command is only available in Elder", ephemeral });
+            if (!user) return interaction.reply({ content: "Usage: `/mod set <option> <value>`\n\n**Options**\n`level`: Set the level of a user\n`clvl`: Set the character level of a user", ephemeral });
+
+            const stats = await getUserSchema(user.id);
+            if (!stats) return interaction.reply({ content: "User not found", ephemeral });
+
+            const subcmd = args[0].toLowerCase();
+            const value = args[1];
+
+            if (subcmd === "level") {
+                await updateUsers(user ? user.id : "*", {
+                    level: { type: "set", value: parseInt(value) }
+                });
+            };
+
+            if (subcmd === "clvl") {
+                let pickedClass: number | undefined = undefined;
+                if (args.slice(2).join(" ")) {
+                    const fClass = searchClass(args.slice(2).join(" "), interaction, true);
+                    if (fClass) pickedClass = fClass.id;
+                };
+                if (pickedClass === undefined) {
+                    pickedClass = stats.class ?? undefined;
+                };
+
+                if (pickedClass === undefined) return interaction.reply({ content: "Usage: `/mod set clvl <level> <class>`\n\n**Options**\n`level`: Level to set the character to\n`class`: Class name or ID", ephemeral });
+
+                // Update users table
+                stats.dungeon_classlevels[pickedClass] = classLevelToXP(parseInt(value));
+                await updateUsers(user ? user.id : "*", {
+                    dungeon_classlevels: { type: "set", value: stats.dungeon_classlevels }
+                });
+            };
+
+            if (subcmd === "coins") {
+                await updateUsers(user ? user.id : "*", {
+                    coins: { type: "set", value: parseInt(value) }
+                });
+            };
+
+            if (subcmd === "skill_points") {
+                await updateUsers(user ? user.id : "*", {
+                    skill_points: { type: "set", value: parseInt(value) }
+                });
+            };
+
+            // await updateUsers(user ? user.id : "*", {
+            //     [key]: { type: "set", value: isNaN(parseInt(value)) ? value : parseInt(value) }
+            // });
+
+            return interaction.reply({ content: "Action Successful", ephemeral });
         };
 
         if (cmd === "faq") {
@@ -332,22 +387,31 @@ const exportCommand: SlashCommand = {
             if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/mod add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
 
             args.shift();
-            const char = search(args.join(" "), [0], interaction, true);
-            if (!char) return interaction.reply({ content: `Error: Couldn't find character "${args.join(" ")}"\n\nUsage: \`/mod add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
+            const charNames = [...new Set(args.join(" ").split(",").map((e) => e.trim()))].filter(Boolean);
+            if (charNames.length === 0) return interaction.reply({ content: `Error: No characters provided\n\nUsage: \`/mod add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
+            if (charNames.length > 10) return interaction.reply({ content: `Error: Too many characters provided\n\nUsage: \`/mod add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
+
+            const newChars: charInfo[] = [];
+            for (const charName of charNames) {
+                const char = search(charName, [0], interaction, true);
+                if (!char) return interaction.reply({ content: `Error: Couldn't find character "${charName}"\n\nUsage: \`/mod add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
+
+                newChars.push(char);
+            };
 
             // Update users table
             await updateUsers(user.id, {
-                chars: { type: "append", value: [char.id] },
+                chars: { type: "append", value: newChars.map((e) => e.id) },
             });
 
             // Mod Log
             const chnl = interaction.client.channels.cache.find(channel => channel.id === "1239976849866752041");
             const Embed = new EmbedBuilder()
                 .setColor(0xbbffff)
-                .setDescription(`${interaction.user.tag} added **${char.rarity}** **${char.name}** to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
+                .setDescription(`${interaction.user.tag} added ${newChars.map((e) => `**${e.rarity}** **${e.name.slice(0, 100)}**`).join(", ")} to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
             if (chnl?.isSendable()) chnl.send({ embeds: [Embed] });
 
-            return interaction.reply({ content: `Action Successful: Added **${char.name}** to ${user.toString()}`, ephemeral });
+            return interaction.reply({ content: `Action Successful: Added ${newChars.map((e) => `**${e.rarity}** **${e.name.slice(0, 100)}**`).join(", ")} to ${user.toString()}`, ephemeral });
         };
 
         // Remove char
