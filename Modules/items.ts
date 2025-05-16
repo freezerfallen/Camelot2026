@@ -274,6 +274,7 @@ export class ringInfo extends itemInfo {
     };
 
     getBuff(level: number = 1) {
+        level++;
         level = Math.min(Math.max(level, 1), this.maxlevel) || 1;
         return this.buffs(level);
     };
@@ -4500,7 +4501,7 @@ export const items = [
 
         // every 7/7/7/6/6/6/5/5/5 rounds: +1/1.5/2/2/2.5/3/3/3.5/4% max HP as shield
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.round % [7, 7, 7, 6, 6, 6, 5, 5, 5][level - 1] === 0) {
+            if (matchStats.round % [7, 7, 7, 6, 6, 6, 5, 5, 5][level - 1] === 0) {
                 myStats.shield += Math.floor(myStats.maxhp * [0.01, 0.015, 0.02, 0.02, 0.025, 0.03, 0.03, 0.035, 0.04][level - 1]);
             };
 
@@ -5237,15 +5238,22 @@ export const items = [
     }, (level) => `Upon receiving a critical hit, the wearer steals **${[3, 3, 4, 4, 5, 5][level - 1]}%** crit rate from the enemy, lasting **${[4, 5, 5, 6, 6, 7][level - 1]}** rounds.`, "The smooth, iridescent band of the Starlit Whirl glimmers with ethereal colors resembling a night sky filled with shimmering stars. Elegantly spiraled arms cradle a mesmerizing gem that captures light like a celestial body, reflected in its depths. The enchanting design embodies the essence of cosmic beauty, evoking whispers of lost constellations and ancient prophecies. This ring enhances the wearer's connection to the cosmos, granting visions of alternate realities and the ability to draw upon celestial magic. Worn by oracles and stargazers, this ring serves as a bridge to the mysteries of the universe.", "legendary", 746),
     new ringInfo("Drakul's Thirst", "ring", "ring", ["raid"], "<:drakuls_thirst:1336659107091841034>", "https://i.ibb.co/JWhjNFHX/Drakul-s-Thirst.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Drain
 
-        // Drain: 1/1.2/1.4/1.6/1.8/2% HP
-        const drainAmount = Math.floor(myStats.hp * ([1, 1.2, 1.4, 1.6, 1.8, 2][level - 1] / 100));
-        ebuff.hp.push(new buffInfo("+", -drainAmount, 9999));
+        // // Drain: 1/1.2/1.4/1.6/1.8/2% HP
+        // const drainAmount = Math.floor(myStats.maxhp * ([1, 1.2, 1.4, 1.6, 1.8, 2][level - 1] / 100));
+        // ebuff.hp.push(new buffInfo("+", -drainAmount, 9999));
 
         // Converts 50% of the drain to ATK/MD / cap: 10% ATK/MD
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+            // Drain: 1/1.2/1.4/1.6/1.8/2% HP
+            const drainAmount = Math.floor(myStats.maxhp * ([1, 1.2, 1.4, 1.6, 1.8, 2][level - 1] / 100));
+            eStats.hp -= drainAmount;
+            if (eStats.hp < 0) eStats.hp = 0;
+
+            // ATK|MD buff
             const buffCap = [10, 11, 12, 13, 14, 15][level - 1] / 100;
-            myStats.atk += Math.floor(Math.min(myStats.atk * buffCap, drainAmount));
-            myStats.md += Math.floor(Math.min(myStats.md * buffCap, drainAmount));
+            myStats.atk += Math.floor(Math.min(myStats.atk * buffCap, Math.round(drainAmount / 2)));
+            myStats.md += Math.floor(Math.min(myStats.md * buffCap, Math.round(drainAmount / 2)));
 
             return AbilityResponse.SUCCESS;
         }, 9999));
@@ -5452,17 +5460,17 @@ export const items = [
         // Else: Deal damage and reset stacks
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
-                const stackedBuffs = myStats.rsBuffs.length;
+                // const stackedBuffs = myStats.rsBuffs.length;
 
                 if (!options.isCrit) {
-                    if (stackedBuffs > 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:radiant_spike:1338627362119487529> **${char.name}**`, { atkMultiplier: stackedBuffs * buffScale, magicDamage: true });
+                    if (myStats.rsBuffs.length > 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:radiant_spike:1338627362119487529> **${char.name}**`, { atkMultiplier: myStats.rsBuffs.length * buffScale, magicDamage: true });
 
                     // Reset buffs
                     mybuff.atk = mybuff.atk.filter((buff) => !myStats.rsBuffs.includes(buff.id));
                     mybuff.md = mybuff.md.filter((buff) => !myStats.rsBuffs.includes(buff.id));
                     myStats.rsBuffs = [];
 
-                } else if ((stackedBuffs / 2) < 8) {
+                } else if ((myStats.rsBuffs.length / 2) < 8) {
                     const atkBuff = new buffInfo("+", Math.floor(myStats.atk * buffScale), 9999);
                     const mdBuff = new buffInfo("+", Math.floor(myStats.md * buffScale), 9999);
 

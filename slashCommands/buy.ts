@@ -346,7 +346,7 @@ const exportCommand: SlashCommand = {
                     } else if (fItem.section === "Chests") {
                         if (fItem.custom.itemid) updateOptions.items = { type: "merge_json", value: { [fItem.custom.itemid]: amount } };
                     } else if (fItem.section === "Image Credits") {
-                        updateOptions.image_credits = { type: "increment", value: amount };
+                        updateOptions.image_credits = { type: "increment", value: (fItem.custom.amount ?? 1) * amount };
                     };
 
                     await updateUsers(interaction.user.id, updateOptions);

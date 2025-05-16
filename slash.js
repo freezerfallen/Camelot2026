@@ -1372,6 +1372,38 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('set')
+			.setDescription('Set account properties')
+			.addSubcommand(subcommand => subcommand
+				.setName('level')
+				.setDescription('Set your character level between 1 and 2000')
+				.addIntegerOption(option =>
+					option.setName('value')
+						.setDescription('The level to set | 1-2000')
+						.setRequired(true)
+				)
+			)
+			.addSubcommand(subcommand => subcommand
+				.setName('clvl')
+				.setDescription('Set your account level between 1 and 15000')
+				.addIntegerOption(option =>
+					option.setName('value')
+						.setDescription('The class level to set | 1-15000')
+						.setRequired(true)
+				)
+			)
+			.addSubcommand(subcommand => subcommand
+				.setName('acclvl')
+				.setDescription('Set your account level between 1 and 120')
+				.addIntegerOption(option =>
+					option.setName('value')
+						.setDescription('The account level to set | 1-120')
+						.setRequired(true)
+				)
+			)
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('shards')
 			.setDescription('See your shards')
 			.addUserOption(option => option.setName('user').setDescription('See someone elses shards')),
