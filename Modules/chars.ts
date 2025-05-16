@@ -22031,7 +22031,7 @@ export const characters: charInfo[] = [
     new charInfo("Chiyoko Nakamine", [], anime[537], "F", "https://i.ibb.co/Xsyys6P/c.png", 21926, "D"),
     new charInfo("Lahla", [], anime[537], "F", "https://i.ibb.co/nLCbK5B/c.png", 21927, "C"),
     new charInfo("Boa Hancock EX", ["Boa EX", "Hancock EX"], anime[0], "F", "https://i.imgur.com/VK2Pz8I.png", 21928, "EX"),
-    new charInfo("Urashima EX", ["Romeo EX"], anime[242], "M", "https://i.imgur.com/VeySk8w.png", 21929, "EX"),
+    new charInfo("Urashima EX", ["Romeo EX"], anime[242], "M", "https://i.ibb.co/Jj6L5brL/c.png", 21929, "EX"),
     new charInfo("Lucy EX", ["Lucyna EX", "Lucyna Kushinada EX"], anime[237], "F", "https://i.ibb.co/R69tLRf/Lucyna-EX.png", 21930, "EX"),
     new charInfo("Acheron EX", [], anime[343], "F", "https://i.ibb.co/bLwYmTx/Acheron-EX.gif", 21931, "EX", { staticImage: "https://i.ibb.co/vqrstCP/c.png" }),
     new charInfo("Megumi Katou", [], anime[538], "F", "https://i.ibb.co/mCTLMYX/c.png", 21932, "SS"),

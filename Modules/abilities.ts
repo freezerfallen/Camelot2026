@@ -222,13 +222,13 @@ export const abilities: Record<number, Ability> = {
         usage: 1,
         used: 0,
         cost: 50,
-        desc: "**Total Usage**: `1`\n**Mana**: `50`\\💧\n**Timeout**: `no`\n**Role**: `Tank`\n\nMash Kyrielight, the Shield of Chaldea, takes her defensive prowess to new heights in battle, turning her durability into an asset for her and her party. Mash's ability allows her to create a protective shield amounting to **25%** of her max HP. This tactical layer of defense provides a significant cushion against incoming damage, but it can only be utilized once per battle.\n\nHer passive ability, meanwhile, further fortifies her defenses. Mash inherently takes 10% less damage, and as long as she maintains her shield, her attack increases by **15%**, turning defense into offense.\n\nWhen it comes to party support, Mash's protective nature shines through once more. All of her allies begin the fight with a shield equal to **10%** of their max HP, **10%** increased block rate and they take **10%** less damage. Her abilities emphasize a balance of protection and power, making her an indispensable part of any team.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `50 💧` \n**Timeout**: `No`\n**Role**: `Tank (Burst shield)`\n\n__**Passive**__\n- **+100** DEF & MR\n- When a shield is active, own ATK **+15%**\n\n__**Active**__ (✨)\n- Summons a shield equivalent to **25%** of her max HP\n\n__**Party**__ (👥)\n- **+100** DEF & MR\n- **+10%** Block rate\n- Enters battles with a **10%** max HP shield",
+        desc: "**Total Usage**: `1`\n**Mana**: `50`\\💧\n**Timeout**: `no`\n**Role**: `Tank`\n\nMash Kyrielight, the Shield of Chaldea, takes her defensive prowess to new heights in battle, turning her durability into an asset for her and her party. Mash's ability allows her to create a protective shield amounting to **50%** of her max HP. This tactical layer of defense provides a significant cushion against incoming damage, but it can only be utilized once per battle.\n\nHer passive ability, meanwhile, further fortifies her defenses. Mash inherently takes 10% less damage, and as long as she maintains her shield, her attack increases by **15%**, turning defense into offense.\n\nWhen it comes to party support, Mash's protective nature shines through once more. All of her allies begin the fight with a shield equal to **10%** of their max HP, **10%** increased block rate and they take **10%** less damage. Her abilities emphasize a balance of protection and power, making her an indispensable part of any team.",
+        shortdesc: "**Uses**: `1`\n**Cost**: `50 💧` \n**Timeout**: `No`\n**Role**: `Tank (Burst shield)`\n\n__**Passive**__\n- **+100** DEF & MR\n- When a shield is active, own ATK **+15%**\n\n__**Active**__ (✨)\n- Summons a shield equivalent to **50%** of her max HP\n\n__**Party**__ (👥)\n- **+100** DEF & MR\n- **+10%** Block rate\n- Enters battles with a **10%** max HP shield",
         ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
             // Mash Kyrielight 
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
             notice.push(`\n✨ Manifest yourself, Lord Camelot!`);
-            myStats.shield += Math.floor(myStats.maxhp * 0.25);
+            myStats.shield += Math.floor(myStats.maxhp * 0.5);
 
             return AbilityResponse.SUCCESS;
         },
@@ -1246,7 +1246,7 @@ export const abilities: Record<number, Ability> = {
         stacks: 0,
         pause: 0,
         desc: "**Total Usage**: `unlimited` (4 rounds cooldown on `Dark Blast Inferno`)\n**Mana**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nZeref, the Black Wizard, thrives in the heart of battle, using his dark powers to overwhelm his foes, even passively killing things around him. He deals **15-25%** magic damage randomly every round until his opponent has less than **33%** hp left. And due to his curse, Zeref is immortal, which causes him to regenerate **5%** of his missing HP every round.\n\nHis active ability grants him a stack of Dark Cage, each one reducing damage taken by **4%** (up to **5** stacks). While his stacks are less than 4, Zeref will use `Dark Blaze`, dealing **130%** magic damage and inflicting a black flame debuff which will deal additional **20%** magic damage for 2 rounds. If he has **4+** stacks of Dark Cage, Zeref will use `Dark Blast Inferno`, dealing **160%** magic damage and inflicting black flame for 3 rounds.\n\nWhen in a party, everyone suffers from his `Death Predation` passive, dealing **20%** magic damage to party members and **40%** magic damage to enemies every round. However, if **Natsu Dragneel** is in the party, he will not only be immune to the passive damage, but also receive a **40%** ATK and MD increase thanks to Zeref enacting the `E.N.D.` protocol. But because of this, Zeref himself will take **40%** magic damage every round due to `E.N.D.`",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds after Dark Blast Inferno`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Additional Attack, Survival, DoT)`\n\n__**Passive**__\n- Recovers **5%** missing HP every round\n- Deals **15%-25%** MD to the enemy when they have **33%+** HP\n\n__**Active**__ (✨)\n- Every use of his active (✨) grants him **1x** `Dark Cage` (Up to 5x)\n- Every `Dark Cage` increases his DEF/MR by **40**\nWhen he has less than **4x** `Dark Cage`:\n- Deals **130%** MD\n- Deals **20%** MD for **2** rounds\nElse, uses Dark Blast Inferno:\n- Deals **160%** MD\n- Deals **20%** MD for **3** rounds\n\n__**Party**__ (👥)\nevery round:\n- Deals **20%** MD to allies\n- Deals **40%** MD to enemies\n\nIf Natsu Dragneel is in party:\n- Natsu will be immune to the passive DMG\n- Natsu will have **+40%** ATK & MD\n- Zeref takes **40%** MD every round",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds after Dark Blast Inferno`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Additional Attack, Survival, DoT)`\n\n__**Passive**__\n- Recovers **5%** missing HP every round\n- Deals **15%-25%** MD to the enemy when they have **33%+** HP\n\n__**Active**__ (✨)\n- Every use of his active (✨) grants him **1x** `Dark Cage` (Up to 5x)\n- Every `Dark Cage` increases his DEF/MR by **40**\nWhen he has less than **4x** `Dark Cage`:\n- Deals **130%** MD\n- Deals **20%** MD for **2** rounds\nElse, uses Dark Blast Inferno:\n- Deals **160%** MD\n- Deals **20%** MD for **3** rounds\n\n__**Party**__ (👥)\nEvery round:\n- Deals **20%** MD to allies\n- Deals **40%** MD to enemies\n\nIf Natsu Dragneel is in party:\n- Natsu will be immune to the passive DMG\n- Natsu will have **+40%** ATK & MD\n- Zeref takes **40%** MD every round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Zeref Dragneel
             if (this.pause > matchStats.round) {
@@ -1477,6 +1477,7 @@ export const abilities: Record<number, Ability> = {
             const domainLast = 4;
             this.pause = matchStats.round + 10;
             myStats.rukiaUsedActive = true;
+            embed.setThumbnail("https://i.imgur.com/g56Plhs.png");
 
             // During Domain
             eStats.frost += 4;
@@ -1509,6 +1510,7 @@ export const abilities: Record<number, Ability> = {
                 if (eStats.hp < 0) eStats.hp = 0;
                 eStats.frozenwounds = 0;
 
+                embed.setThumbnail(myStatsFixed.thumbnail);
                 return AbilityResponse.SUCCESS;
             }));
 
@@ -1600,8 +1602,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 55,
         pause: -10,
-        desc: "**Total Usage**: `3 (CD: 3)`\n**Mana**: `55`\\💧\n**Timeout**: `No`\n**Role**: `DPS/Support`\n\nAs agile as she is, Meme truly is difficult to catch. She has **15%** increased dodge chances permanently, and cannot have more than **80%** dodge rate at all times. Her ATTACK deals **90%** DMG, but has a **50%** chance of hitting twice. Upon the enemy dealing a critical strike, the enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%**. This has a **3** round cooldown, and only the highest vulnerability effect takes place.\n\nUsing her active increases her permanent dodge rate by **10%**, and allows her ATTACK to hit twice for **3** rounds.",
-        shortdesc: "**Uses**: `3 (CD: 3)`\n**Cost**: `55 💧`\n**Timeout**: `No`\n**Role**: `DPS/Support (Dodge, Followup Attack)`\n\n__**Passive**__\n- **+15%** permanent dodge rate\n- dodge rate won't exceed **80%**\n- ATTACK deals **90%** DMG only but has a **50%** chance of striking twice\nWhen the enemy deals a critical strike:\n- The enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%** (CD: 3). Only the highest vulnerability effect takes place.\n\n__**Active**__ (✨)\n- **+10%** dodge rate permanently\n- ATTACK is guaranteed to hit twice for **3** rounds",
+        desc: "**Total Usage**: `3 (CD: 3)`\n**Mana**: `55`\\💧\n**Timeout**: `No`\n**Role**: `DPS/Support`\n\nAs agile as she is, Meme truly is difficult to catch. She has **15%** increased dodge chances permanently, and cannot have more than **80%** dodge rate at all times. Her ATTACK deals **90%** DMG, but has a **50%** chance of hitting twice. Upon the enemy dealing a critical strike, the enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%**. This has a **3** round cooldown, and only the highest vulnerability effect takes place.\n\nUsing her active increases her permanent dodge rate by **10%**, and allows her ATTACK to hit twice for **3** rounds.\n\nIn a party, Meme steals **15%** dodge rate from the enemy and grants it to her allies.",
+        shortdesc: "**Uses**: `3 (CD: 3)`\n**Cost**: `55 💧`\n**Timeout**: `No`\n**Role**: `DPS/Support (Dodge, Followup Attack)`\n\n__**Passive**__\n- **+15%** permanent dodge rate\n- dodge rate won't exceed **80%**\n- ATTACK deals **90%** DMG only but has a **50%** chance of striking twice\nWhen the enemy deals a critical strike:\n- The enemy takes **+1%** DMG the next round for every **2%** dodge rate she has, up to **+40%** (CD: 3). Only the highest vulnerability effect takes place.\n\n__**Active**__ (✨)\n- **+10%** dodge rate permanently\n- ATTACK is guaranteed to hit twice for **3** rounds\n\n__**Party**__ (👥)\n- **-15%** enemy's dodge rate\n- **+15%** ally's dodge rate",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             if (this.pause > matchStats.round) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -1934,17 +1936,18 @@ export const abilities: Record<number, Ability> = {
         usage: 9999,
         used: 0,
         cost: 30,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nRosalia is a character with an interesting balance of manipulation and damage abilities. Her passive ability inflicts a bleeding effect on the enemy, causing them to lose an amount equal to **5%** of Rosalia's max HP every round. Additionally, Rosalia drains **3** mana from the enemy every round, increasing her own mana pool and allowing her to use her abilities more frequently. Moreover, Rosalia gains a **20%** boost on class xp.\n\nRosalia doesn't simply use her own mana alone when activating her ability, instead she consumes **20** mana from the enemy as well to deal **125%** magic damage. If her attack hits the target, there's a **50%** chance of doubling the bleeding effect on her enemy for 2 rounds.\n\nIn a party, Rosalia extends her mana draining ability to aid her allies, draining **3** mana from the enemy every round.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧 + 20 💧 from enemy`\n**Timeout**: `Yes`\n**Role**: `Support (Mana-drain, Bleed)`\n\n__**Passive**__\n- Bleed: Enemy loses **5%** of her max HP every round\n- Drains **3** 💧 from the enemy every round\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\n- Deals **125%** MD\n- If it hits: **50%** chance to inflict another instance of Bleeding, lasting for **2** rounds\n\n__**Party**__ (👥)\n- Drains **3** 💧 from the enemy every round",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nRosalia is a character with an interesting balance of manipulation and damage abilities. Her passive ability inflicts a bleeding effect on the enemy, causing them to lose an amount equal to **5%** of Rosalia's max HP every round. Additionally, Rosalia drains **3** mana from the enemy every round, increasing her own mana pool and allowing her to use her abilities more frequently. Moreover, Rosalia gains a **20%** boost on class xp.\n\nRosalia doesn't simply use her own mana alone when activating her ability, instead she decreases enemy's current mana owned by **20** 💧, before dealing **125%** magic damage. If her attack hits the target, there's a **50%** chance of doubling the bleeding effect on her enemy for 2 rounds.\n\nIn a party, Rosalia extends her mana draining ability to aid her allies, draining **3** mana from the enemy every round.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧 + 20 💧 from enemy if possible`\n**Timeout**: `Yes`\n**Role**: `Support (Mana-drain, Bleed)`\n\n__**Passive**__\n- Bleed: Enemy loses **5%** of her max HP every round\n- Drains **3** 💧 from the enemy every round\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\n- Deals **125%** MD\n- The active works even when the enemy has less than 20 💧\n- If it hits: **50%** chance to inflict another instance of Bleeding, lasting for **2** rounds\n\n__**Party**__ (👥)\n- Drains **3** 💧 from the enemy every round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rosalia
-            if (eStats.sm < 20) {
+            /*if (eStats.sm < 20) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 myStats.sm += 30;
                 matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
                 return AbilityResponse.FAILURE;
-            };
+            };*/
             eStats.sm -= 20;
+            if (eStats.sm < 0) eStats.sm = 0;
             let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.25, magicDamage: true, mdChance: -1 });
             if (dmg && Math.random() < 0.5) {
                 ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 2));
