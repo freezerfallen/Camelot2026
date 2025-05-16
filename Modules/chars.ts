@@ -1709,7 +1709,7 @@ export const characters: charInfo[] = [
     new charInfo("Ukkari", [], anime[0], "M", "https://i.ibb.co/BqRGHQt/c.png", 1604, "D"),
     new charInfo("Ulti", [], anime[0], "F", "https://i.ibb.co/XXmtkGc/c.png", 1605, "A"),
     new charInfo("Umit", [], anime[0], "M", "https://i.ibb.co/QdJpSg7/c.png", 1606, "D"),
-    new charInfo("Urashima", [], anime[0], "M", "https://i.imgur.com/Nku258u.png", 1607, "D"),
+    new charInfo("Urashima", [], anime[0], "M", "https://i.ibb.co/Lz8hWxF/c.png", 1607, "D"),
     new charInfo("Urouge", ["Mad Monk"], anime[0], "M", "https://i.ibb.co/wSzSFgW/c.png", 1608, "B"),
     new charInfo("Van Augur", ["Augur Van"], anime[0], "M", "https://i.ibb.co/V3d2Ypm/c.png", 1609, "C"),
     new charInfo("Vander Decken IX", [], anime[0], "M", "https://i.ibb.co/4RykqpS/c.png", 1610, "D"),
