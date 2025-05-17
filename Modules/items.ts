@@ -5443,12 +5443,12 @@ export const items = [
             // After not using ability for 15/14/13/12/11/10+ turns: recover 50/60/70/80/90/100 mana, +1/1.2/1.4/1.6/1.8/2% lifesteal 
             if (matchStats.round - myStats.geLastAbilityRoundUsed >= [15, 14, 13, 12, 11, 10][level - 1]) {
                 // Recover mana
-                myStats.sm += [50, 60, 70, 80, 90, 100][level - 1];
+                myStats.sm += [30, 34, 38, 42, 46, 50][level - 1];
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
 
                 // Selfheal
                 myStats.selfhealChance.push(1);
-                myStats.selfheal.push([1, 1.2, 1.4, 1.6, 1.8, 2][level - 1] / 100);
+                myStats.selfheal.push([1, 1.1, 1.2, 1.3, 1.4, 1.5][level - 1] / 100);
 
                 //@ts-expect-error
                 this._used++;
@@ -5458,7 +5458,7 @@ export const items = [
         }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After not having used ability ✨ for **${[15, 14, 13, 12, 11, 10][level - 1]}** turns straight, the wearer recovers **${[50, 60, 70, 80, 90, 100][level - 1]}**💧 mana and attacks start healing **${[1, 1.2, 1.4, 1.6, 1.8, 2][level - 1]}%** of the damage dealt.`, "The Galaxy's Embrace ring is a splendid marvel of arcane craftsmanship, featuring a sleek obsidian band adorned with intricate golden filigree resembling swirling galaxies. Nestled in its heart is a staggering starstone, a luminous gem that radiates an otherworldly glow, shifting colors as if capturing the essence of the cosmos itself. Surrounding the central stone are twinkling smaller jewels that appear like distant stars. Worn by cosmic mages and celestial knights, this ring enhances the wearer's ability to tap into cosmic energy, allowing them to manipulate time and space. Legends tell of those who, while donning this ring, have glimpsed the fabric of reality itself.", "legendary", 757),
+    }, (level) => `After not having used ability ✨ for **${[15, 14, 13, 12, 11, 10][level - 1]}** turns straight, the wearer recovers **${[30, 34, 38, 42, 46, 50][level - 1]}**💧 mana and attacks start healing **${[1, 1.1, 1.2, 1.3, 1.4, 1.5][level - 1]}%** of the damage dealt.`, "The Galaxy's Embrace ring is a splendid marvel of arcane craftsmanship, featuring a sleek obsidian band adorned with intricate golden filigree resembling swirling galaxies. Nestled in its heart is a staggering starstone, a luminous gem that radiates an otherworldly glow, shifting colors as if capturing the essence of the cosmos itself. Surrounding the central stone are twinkling smaller jewels that appear like distant stars. Worn by cosmic mages and celestial knights, this ring enhances the wearer's ability to tap into cosmic energy, allowing them to manipulate time and space. Legends tell of those who, while donning this ring, have glimpsed the fabric of reality itself.", "legendary", 757),
     new ringInfo("Radiant Spike", "ring", "ring", ["guild"], "<:radiant_spike:1338627362119487529>", "https://i.ibb.co/8WWHKJq/Radiant-Spike.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const buffScale = [2.5, 2.75, 3, 3.25, 3.5][level - 1] / 100;

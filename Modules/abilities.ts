@@ -5726,7 +5726,7 @@ export const abilities: Record<number, Ability> = {
 
             // Alter ATTACK
             myStats.replaceButton.atk = {
-                "emoji": "<:2BATK:1373223079227949067>",
+                "emoji": "<:2BATK:1373261622432501770>",
                 "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     if (myStats.duorevived) {
                         myStats.hp -= Math.floor(myStats.hp * 0.07);
@@ -5735,8 +5735,8 @@ export const abilities: Record<number, Ability> = {
                     };
                     const secondhit = Math.min(0.5, 0.01 * Math.floor(((eStats.maxhp - eStats.hp) / eStats.maxhp) * 100));
                     const flair = atklist[myStats.atkcount];
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:2BATK:1373223079227949067> ${flair} **2B**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true });
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:2BATK:1373223079227949067> ${flair} **2B**`, { atkMultiplier: 0.1 + secondhit, magicDamage: true, combodmg: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:2BATK:1373261622432501770> ${flair} **2B**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:2BATK:1373261622432501770> ${flair} **2B**`, { atkMultiplier: 0.1 + secondhit, magicDamage: true, combodmg: true });
                     myStats.atkcount++;
                     if (myStats.atkcount === 3) myStats.atkcount = 0;
 
@@ -5761,7 +5761,7 @@ export const abilities: Record<number, Ability> = {
 
                 // Enter HACKING mode
                 if (myStats.insight >= 8 && !myStats.hacking) {
-                    notice.push(`\n<:9SHack:1373223075696349244> 9S initiated hacking for **4** rounds`);
+                    notice.push(`\n<:9SHack:1373261619924172940> 9S initiated hacking for **4** rounds`);
                     myStats.insight -= 8;
                     myStats.hacking = true;
                     if (eStats.hp / eStats.maxhp > 0.5) {
@@ -5792,7 +5792,7 @@ export const abilities: Record<number, Ability> = {
                     // Exit HACKING mode
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                         myStats.hacking = false;
-                        notice.push(`\n<:9SHack:1373223075696349244> 9S exited hacking`);
+                        notice.push(`\n<:9SHack:1373261619924172940> 9S exited hacking`);
 
                         return AbilityResponse.SUCCESS;
                     }));
