@@ -106,7 +106,7 @@ export const skillTree: SkillPath[] = [
 
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && Math.random() < triggerChance) {
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1, magicDamage: true });
             };
         });
 
@@ -120,7 +120,7 @@ export const skillTree: SkillPath[] = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats && trigger.used < trigger.maxUsage) {
                     trigger.used++;
-                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: Math.floor(options.damage * extraDamage), magicDamage: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: Math.floor(options.damage * extraDamage), magicDamage: true });
                 };
             },
         });
@@ -262,7 +262,7 @@ export const skillTree: SkillPath[] = [
             if (caster === myStats && options.damage > 0 && Math.random() < triggerChance) {
                 const bonusDamage = Math.floor(options.damage * bonusDamagePercent);
                 if (bonusDamage > 0) {
-                    dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `💥 **${myStats.name}'s** Chain Reaction`, { overwriteDamage: bonusDamage, magicDamage: true, canCrit: false });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `💥 **${myStats.name}'s** Chain Reaction`, { overwriteDamage: bonusDamage, magicDamage: true, canCrit: false });
                 };
             };
         });

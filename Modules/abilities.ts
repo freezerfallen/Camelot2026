@@ -1940,15 +1940,16 @@ export const abilities: Record<number, Ability> = {
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧 + 20 💧 from enemy if possible`\n**Timeout**: `Yes`\n**Role**: `Support (Mana-drain, Bleed)`\n\n__**Passive**__\n- Bleed: Enemy loses **5%** of her max HP every round\n- Drains **3** 💧 from the enemy every round\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\n- Deals **125%** MD\n- The active works even when the enemy has less than 20 💧\n- If it hits: **50%** chance to inflict another instance of Bleeding, lasting for **2** rounds\n\n__**Party**__ (👥)\n- Drains **3** 💧 from the enemy every round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rosalia
-            /*if (eStats.sm < 20) {
-                matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                myStats.sm += 30;
-                matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
-                return AbilityResponse.FAILURE;
-            };*/
+            // if (eStats.sm < 20) {
+            //     matchStats.turn = matchStats.turnSkill ? 0 : 1;
+            //     myStats.sm += 30;
+            //     matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
+            //     return AbilityResponse.FAILURE;
+            // };
             eStats.sm -= 20;
             if (eStats.sm < 0) eStats.sm = 0;
-            let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.25, magicDamage: true, mdChance: -1 });
+
+            const dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.25, magicDamage: true, mdChance: -1 });
             if (dmg && Math.random() < 0.5) {
                 ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 2));
                 notice.push(`\n⚜️ ${char.name} caused bleeding for 2 rounds`);

@@ -340,9 +340,9 @@ const exportCommand: SlashCommand = {
                     } else if (fItem.section === "Ascension Materials") {
                         if (fItem.custom.itemid) updateOptions.items = { type: "merge_json", value: { [fItem.custom.itemid]: amount } };
                     } else if (fItem.section === "Shards") {
-                        if (fItem.custom.itemid) updateOptions[fItem.custom.column as "ssshard"] = { type: "increment", value: amount };
+                        updateOptions[fItem.custom.column as "ssshard"] = { type: "increment", value: amount };
                     } else if (fItem.section === "Tickets") {
-                        if (fItem.custom.itemid) updateOptions[fItem.custom.column as "ssticket"] = { type: "increment", value: amount };
+                        updateOptions[fItem.custom.column as "ssticket"] = { type: "increment", value: amount };
                     } else if (fItem.section === "Chests") {
                         if (fItem.custom.itemid) updateOptions.items = { type: "merge_json", value: { [fItem.custom.itemid]: amount } };
                     } else if (fItem.section === "Image Credits") {

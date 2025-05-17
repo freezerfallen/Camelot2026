@@ -4346,7 +4346,9 @@ export const items = [
 
         // On Counter: Heal 3/4/5/6/7/8% current HP
         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.hp * 0.03 + 0.01 * (level - 1)));
+            if (caster === eStats) {
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.hp * ([3, 4, 5, 6, 7, 8][level - 1] / 100)));
+            };
         });
 
         return AbilityResponse.SUCCESS;
@@ -4557,7 +4559,7 @@ export const items = [
 
         // Create and break shield
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.round % [2, 2, 1][level - 1] === 0) {
+            if (matchStats.round % [2, 2, 1][level - 1] === 0) {
                 myStats.shield = 0;
                 matchStats.trigger("shieldBreak", eStats, myStats, ebuff, mybuff);
             };
@@ -4762,10 +4764,12 @@ export const items = [
     }, (level) => `No ability yet`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
     new ringInfo("Amber's Dawn", "ring", "ring", ["guild"], "<:ambers_dawn:1334561580041371668>", "https://i.ibb.co/bjZqgN9h/Amber-s-Dawn.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
+        const increase = [8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1] / 100;
+
         // +8/9/10/11/12/13/14/15/16% max HP, 0% Dodge
-        myStatsFixed.maxhp += Math.floor(myStatsFixed.maxhp * (0.08 + 0.01 * (level - 1)));
-        myStats.maxhp += Math.floor(myStats.maxhp * (0.08 + 0.01 * (level - 1)));
-        myStats.hp = Math.min(myStats.maxhp, myStats.hp);
+        myStatsFixed.maxhp += Math.floor(myStatsFixed.maxhp * increase);
+        myStats.maxhp += Math.floor(myStats.maxhp * increase);
+        myStats.hp += Math.floor(myStats.maxhp * increase);
 
         myStats.dodge = 0;
         mybuff.dodge.push(new buffInfo("=", 0, 9999));
@@ -4926,8 +4930,6 @@ export const items = [
     }, (level) => `The wearer begins the battle with **50%** less max HP, but attack and magic damage are increased by **${[30, 35, 40, 45, 50, 55, 60][level - 1]}%**.`, "The Glass Shard ring captivates with its simplicity and brilliance, crafted from delicate and transparent crystal-like glass formed into razor-sharp edges. The band seems almost ethereal and wisps of light dance around it like fireflies. Adorned with shards that refract light into vibrant patterns, this piece symbolizes clarity, truth, and strength. Wearers find their perception sharpened, both in battle and in the intricacies of life. It is said that those who bear this ring gain insight into their adversaries' weaknesses, turning the odds in their favor with razor-like precision.", "mythical", 734),
     new ringInfo("Yuletide Band", "ring", "ring", ["raid"], "<:yuletide_band:1336068419509944320>", "https://i.ibb.co/mrWDF4Hj/Yuletide-Band.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mail
 
-        //! TESTING
-
         const ATK_EMOJI = myStats.replaceButton?.atk?.emoji || '⚔️',
             DEF_EMOJI = myStats.replaceButton?.def?.emoji || '🛡️',
             ABILITY_EMOJI = myStats.replaceButton?.ability?.emoji || '✨',
@@ -4952,19 +4954,25 @@ export const items = [
             new ButtonBuilder().setCustomId('SKIP').setEmoji(SKIP_EMOJI).setStyle(ButtonStyle.Secondary)
         );
 
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (matchStats.round % [8, 8, 7, 7, 6, 6][level - 1] === 0) {
-                // every 6th turn: Update ATK/DEF to green/red envelopes
-                matchStats.interaction.editReply({ components: [updatedButtonsRow] });
+        const repeatOnEvery = [8, 8, 7, 7, 6, 6][level - 1];
 
-                // Increases CD by 50% on ATK
-                matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster === myStats) myStats.cd += 0.5;
-                });
-                // Gain 100 shield on DEF
-                matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster === myStats) myStats.shield += 100;
-                });
+        // Increases CD by 50% on ATK
+        matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats && matchStats.round % repeatOnEvery === 0) {
+                mybuff.cd.push(new buffInfo("+", 0.5, 1));
+            };
+        });
+        // Gain 100 shield on DEF
+        matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats && matchStats.round % repeatOnEvery === 0) {
+                myStats.shield += 100;
+            };
+        });
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % repeatOnEvery === 0) {
+                // Update ATK/DEF to green/red envelopes
+                matchStats.interaction.editReply({ components: [updatedButtonsRow] });
 
                 // Reset
                 myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -5460,17 +5468,18 @@ export const items = [
         // Else: Deal damage and reset stacks
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
-                // const stackedBuffs = myStats.rsBuffs.length;
+                const stackedBuffs = myStats.rsBuffs.length;
 
                 if (!options.isCrit) {
-                    if (myStats.rsBuffs.length > 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:radiant_spike:1338627362119487529> **${char.name}**`, { atkMultiplier: myStats.rsBuffs.length * buffScale, magicDamage: true });
+                    if (stackedBuffs > 0) {
+                        // Reset buffs
+                        mybuff.atk = mybuff.atk.filter((buff) => !myStats.rsBuffs.includes(buff.id));
+                        mybuff.md = mybuff.md.filter((buff) => !myStats.rsBuffs.includes(buff.id));
+                        myStats.rsBuffs = [];
 
-                    // Reset buffs
-                    mybuff.atk = mybuff.atk.filter((buff) => !myStats.rsBuffs.includes(buff.id));
-                    mybuff.md = mybuff.md.filter((buff) => !myStats.rsBuffs.includes(buff.id));
-                    myStats.rsBuffs = [];
-
-                } else if ((myStats.rsBuffs.length / 2) < 8) {
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:radiant_spike:1338627362119487529> **${char.name}**`, { atkMultiplier: stackedBuffs * buffScale, magicDamage: true });
+                    };
+                } else if ((stackedBuffs / 2) < 8) {
                     const atkBuff = new buffInfo("+", Math.floor(myStats.atk * buffScale), 9999);
                     const mdBuff = new buffInfo("+", Math.floor(myStats.md * buffScale), 9999);
 
