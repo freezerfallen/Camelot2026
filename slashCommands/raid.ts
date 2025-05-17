@@ -293,6 +293,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         let getChar = search(support1, stats.chars, interaction, true);
                         if (getChar?.name) {
                             if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
+                            if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
                             stats.raid_supports[0] = getChar.id;
                         };
                         if (support1 === "remove") stats.raid_supports.shift();
@@ -302,6 +303,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         let getChar = search(support2, stats.chars, interaction, true);
                         if (getChar?.name) {
                             if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
+                            if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
                             if (stats.raid_supports[0] !== 0) stats.raid_supports[1] = getChar.id;
                             else stats.raid_supports[0] = getChar.id;
                         };
@@ -763,7 +765,7 @@ const exportCommand: SlashCommand = {
 
         let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false });
         let notice = ["", "", "", ""];
-        matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined).map((sid) => characters[sid]);
+        matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined && sid !== stats.battlechar).map((sid) => characters[sid]);
         // matchStats.partyStats = partyStatsC;
 
         // Apply skill tree
@@ -784,7 +786,7 @@ const exportCommand: SlashCommand = {
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
         for (const sid of stats.raid_supports) {
-            if (sid !== undefined && sid !== null) {
+            if (sid !== undefined && sid !== null && sid !== stats.battlechar) {
                 const myStatsP = { ...myStatsC };
                 myStatsP.name = characters[sid].name;
                 await abilities[sid]?.party?.(myStatsP, myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
