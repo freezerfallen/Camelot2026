@@ -1162,6 +1162,16 @@ export const userLevel = (xpr: number) => {
     return level;
 };
 
+export const userLevelToXP = (level: number): number => {
+    if (level <= 1) return 0;
+
+    let totalXP = 0;
+    for (let i = 1; i < level; i++) {
+        totalXP += Math.floor(5 * Math.log(i) ** 4 + 30);
+    };
+    return Math.floor(totalXP);
+};
+
 export const getClassLvl = (cls: number, classLevels: Record<string, number>) => {
     let clvl = 1, classxp = 0;
     if (cls in classLevels) classxp = classLevels[cls];

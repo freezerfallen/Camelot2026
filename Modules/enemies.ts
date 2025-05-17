@@ -772,7 +772,7 @@ export const raidBosses: enemyInfo[] = [
                 embed.setImage("https://i.ibb.co/MxTH1q1s/kyntheris.png");
 
                 eStats.hp = eStats.minionHealth;
-                eStats.maxhp = Math.floor(eStats.maxhp * 0.9);
+                // eStats.maxhp = Math.floor(eStats.maxhp * 0.9);
                 eStats.def = Math.floor(eStats.def * 0.9);
                 eStats.mr = Math.floor(eStats.mr * 1.1);
                 eStats.atk = Math.floor(eStats.atk * 0.9);
@@ -816,7 +816,7 @@ export const raidBosses: enemyInfo[] = [
                 eStats.dodge += 0.1; ebuff.dodge.push(new buffInfo("+", 0.1, 5));
                 ebuff.atk.push(new buffInfo("+", Math.floor(eStats.atk * 0.075), 5));
                 eStats.atk += Math.floor(eStats.atk * 0.075);
-            }
+            };
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
