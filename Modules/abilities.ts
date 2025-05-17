@@ -5695,11 +5695,10 @@ export const abilities: Record<number, Ability> = {
 
             // +30% max HP ; 100% chance to revive with 50% HP
             myStats.rev ??= 0;
-            myStats.revhp ??= 0;
+            myStats.revhp ??= 0.5;
             myStats.maxRevivals ??= 0;
 
             myStats.rev = 1;
-            myStats.revhp += 0.5;
             myStats.maxRevivals += 1;
             const maxhpbuff = Math.floor(myStats.maxhp * 0.3);
             myStats.maxhp += maxhpbuff;
