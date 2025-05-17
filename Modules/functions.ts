@@ -837,9 +837,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     // if (options.selfheal && matchStats.selfhealChance > options.selfhealChance) attacker.hp += Math.floor(damage * matchStats.selfheal);
     if (options.selfheal && options.selfhealAmount) attacker.hp += Math.floor(damage * options.selfhealAmount);
     if (options.selfheal && attacker.selfheal) {
+        let selfHealedTotal = 0;
         for (let i = 0; i < attacker.selfheal.length; i++) {
-            if (attacker.selfhealChance[i] > Math.random()) attacker.hp += Math.floor(damage * attacker.selfheal[i]);
+            if (attacker.selfhealChance[i] > Math.random()) selfHealedTotal += damage * attacker.selfheal[i];
         };
+        attacker.hp += Math.floor(Math.min(selfHealedTotal, attacker.maxhp * 0.5));
     };
     if (options.selfdmg && Math.random() < matchStats.selfdmg) attacker.hp -= damage;
     if ("gintokiStacks" in attacker && isCrit) attacker.gintokiStacks = 0;

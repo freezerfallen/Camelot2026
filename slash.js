@@ -1381,6 +1381,8 @@ const commands = [
 					option.setName('value')
 						.setDescription('The level to set | 1-2000')
 						.setRequired(true)
+						.setMinValue(1)
+						.setMaxValue(2000)
 				)
 			)
 			.addSubcommand(subcommand => subcommand
@@ -1390,6 +1392,8 @@ const commands = [
 					option.setName('value')
 						.setDescription('The class level to set | 1-15000')
 						.setRequired(true)
+						.setMinValue(1)
+						.setMaxValue(15000)
 				)
 			)
 			.addSubcommand(subcommand => subcommand
@@ -1399,6 +1403,19 @@ const commands = [
 					option.setName('value')
 						.setDescription('The account level to set | 1-120')
 						.setRequired(true)
+						.setMinValue(1)
+						.setMaxValue(120)
+				)
+			)
+			.addSubcommand(subcommand => subcommand
+				.setName('guildcoins')
+				.setDescription('Set your guild coins between 1 and 100\'000\'000')
+				.addIntegerOption(option =>
+					option.setName('value')
+						.setDescription('The amount of guild coins to set | 1-100\'000\'000')
+						.setRequired(true)
+						.setMinValue(1)
+						.setMaxValue(100_000_000)
 				)
 			)
 	}.data.toJSON(),
