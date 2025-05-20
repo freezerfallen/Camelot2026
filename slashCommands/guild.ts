@@ -893,9 +893,9 @@ const exportCommand: SlashCommand = {
             if (!guild || guild.master !== interaction.user.id) return interaction.reply(`You don't own a guild.`);
 
             const price = upgradePrice(guild.level);
-            if (price > guild.treasury) return interaction.reply(`Your guild does not have enough coins in the treasury to upgrade (**${guild.treasury}**/${price}<:coins:872926669055356939>)`);
+            if (price > guild.treasury) return interaction.reply(`Your guild does not have enough coins in the treasury to upgrade (**${formatNumberWithQuotes(guild.treasury)}**/${formatNumberWithQuotes(price)}<:coins:872926669055356939>)`);
 
-            return interaction.reply({ content: `Are you sure you want to upgrade **${guild.name}** to level **${guild.level + 1}** for **${price}**<:coins:872926669055356939>?`, components: [OfferRow] }).then(msg => {
+            return interaction.reply({ content: `Are you sure you want to upgrade **${guild.name}** to level **${guild.level + 1}** for **${formatNumberWithQuotes(price)}**<:coins:872926669055356939>?`, components: [OfferRow] }).then(msg => {
 
                 const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 45000 });
                 const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 45000 });
@@ -908,7 +908,7 @@ const exportCommand: SlashCommand = {
 
                     const price = upgradePrice(guild.level);
                     if (price > guild.treasury) {
-                        if (interaction.channel?.isSendable()) interaction.channel.send(`Your guild does not have enough coins in the treasury to upgrade (**${guild.treasury}**/${price}<:coins:872926669055356939>)`);
+                        if (interaction.channel?.isSendable()) interaction.channel.send(`Your guild does not have enough coins in the treasury to upgrade (**${formatNumberWithQuotes(guild.treasury)}**/${formatNumberWithQuotes(price)}<:coins:872926669055356939>)`);
                         return;
                     };
 

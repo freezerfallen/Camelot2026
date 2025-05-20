@@ -120,7 +120,7 @@ export const skillTree: SkillPath[] = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats && trigger.used < trigger.maxUsage) {
                     trigger.used++;
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: Math.floor(options.damage * extraDamage), magicDamage: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { overwriteDamage: Math.floor(options.damage * extraDamage), magicDamage: true, canCrit: false });
                 };
             },
         });
@@ -150,7 +150,7 @@ export const skillTree: SkillPath[] = [
 
     // Health
     new SkillPath("Vital Surge", "common", "Increases max HP by **+4%**.", 2, 10, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const buff = Math.floor(myStatsFixed.maxhp * 0.03 * level);
+        const buff = Math.floor(myStatsFixed.maxhp * 0.04 * level);
         myStatsFixed.maxhp += buff;
         myStatsFixed.hp += buff;
         myStats.maxhp += buff;
@@ -184,9 +184,9 @@ export const skillTree: SkillPath[] = [
 
         return AbilityResponse.SUCCESS;
     }, 8),
-    new SkillPath("Bloodlust", "common", "Heals **+0.5%** of damage dealt.", 2, 10, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new SkillPath("Bloodlust", "common", "Heals **+0.3%** of damage dealt.", 2, 10, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.selfhealChance.push(1);
-        myStats.selfheal.push(0.005 * level);
+        myStats.selfheal.push(0.003 * level);
 
         return AbilityResponse.SUCCESS;
     }, 9),
@@ -217,7 +217,7 @@ export const skillTree: SkillPath[] = [
 
         return AbilityResponse.SUCCESS;
     }, 12),
-    new SkillPath("Sorcerer's Will", "common", "Increases mana generation by **+1**.", 2, 10, "mana", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new SkillPath("Sorcerer's Will", "common", "Increases mana generation by **+1**.", 2, 5, "mana", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const buff = 1 * level;
         myStatsFixed.mg += buff;
         myStats.mg += buff;
@@ -233,13 +233,13 @@ export const skillTree: SkillPath[] = [
     }, 14),
 
     // Utility
-    new SkillPath("Treasure Hunter", "common", "Increases coin drops by **+15%**.", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        matchStats.lootm += 0.15 * level;
+    new SkillPath("Treasure Hunter", "common", "Increases coin drops by **+10%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.lootm += 0.1 * level;
 
         return AbilityResponse.SUCCESS;
     }, 15),
-    new SkillPath("Born to Grind", "common", "Increases class xp by **+20%**.", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        matchStats.xpboost += 0.2 * level;
+    new SkillPath("Born to Grind", "common", "Increases class xp by **+15%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.xpboost += 0.15 * level;
 
         return AbilityResponse.SUCCESS;
     }, 16),
@@ -268,14 +268,21 @@ export const skillTree: SkillPath[] = [
         });
         return AbilityResponse.SUCCESS;
     }, 18),
-    new SkillPath("Executioner", "extra", "Gain **+10%** ATK & MD against enemies below **25%** HP.", 3, 5, "attack", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const healthThreshold = 0.25;
+    new SkillPath("Executioner", "extra", "Gain **+10%** ATK & MD against enemies that fall below **30%** HP.", 3, 5, "attack", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        const healthThreshold = 0.3;
         const bonusDamagePercent = 0.10 * level;
 
-        if ((eStats.hp / eStats.maxhp) < healthThreshold) {
-            mybuff.atk.push(new buffInfo("*", bonusDamagePercent, 9999));
-            mybuff.md.push(new buffInfo("*", bonusDamagePercent, 9999));
-        };
+        myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            if ((eStats.hp / eStats.maxhp) < healthThreshold) {
+                mybuff.atk.push(new buffInfo("*", bonusDamagePercent, 9999));
+                mybuff.md.push(new buffInfo("*", bonusDamagePercent, 9999));
+
+                //@ts-ignore
+                this._used++;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
     }, 19),
@@ -288,7 +295,7 @@ export const skillTree: SkillPath[] = [
             if (target === myStats && options.damage > 0 && caster !== target) {
                 const reflectedDamage = Math.floor(options.damage * reflectPercent);
                 if (reflectedDamage > 0) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🛡️ **${myStats.name}**`, { overwriteDamage: reflectedDamage, magicDamage: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🛡️ **${myStats.name}**`, { overwriteDamage: reflectedDamage, magicDamage: true, canCrit: false });
                 };
             };
         });
@@ -418,7 +425,7 @@ export const skillTree: SkillPath[] = [
     }, 28),
 
     // Utility
-    new SkillPath("Adventurer's Spirit", "extra", "Increases coin drops by **+10%** and class xp by **+10%**.", 3, 5, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new SkillPath("Adventurer's Spirit", "extra", "Increases coin drops by **+10%** and class xp by **+10%** (works in the `/dungeon`).", 3, 5, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const bonusPercent = 0.10 * level;
         matchStats.lootm += bonusPercent;
         matchStats.xpboost += bonusPercent;
