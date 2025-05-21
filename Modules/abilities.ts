@@ -1725,8 +1725,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 0,
         pause: -10,
-        desc: "**Total Usage**: `unlimited` (2 round cd)\n**Cost**: `10%`\\🩸\n**Timeout**: `only on cyberpsychosis`\n**Role**: `DPS`\n\nDavid's arms are cybernetically modified to be arm cannons. He deals **20%** more damage with normal attacks. As David is partly cybernetic, he is immune against HP debuffs.\n### Sandevistan; Militech \"Apogee\"\nThe sandevistan is a spinal replacement type cyberwear that modifies David's neural interface. Its usage immensely increases the user's perception of movement and time, making them move and perceive so fast, the world around seems to be much slower, thus increasing his crit damage by **50%** and dodge chance to **100%** for the turn his active was used.\n\nHowever, it burns out nerve cells rapidly, causing him to push his mind to cyberpsychosis, and break his own body in the process. After every **3rd** usage of his sandevistan, he enters `Cyberpsychosis` dealing a massive **180%** cannon blast from his arms with **twice** his crit damage, which permanently reduces enemy DEF and MR by **15%** after the first usage of it. After this, he recovers **30%** of his missing HP with a MaxTac Inhaler MK II, and has **20%** increased crit rate for the remainder of the battle (cr buff only applies after his first cyberpsychosis).",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `2 rounds`\n**Cost**: `10% max HP`\n**Timeout**: `No/Yes for cyberpsychosis`\n**Role**: `DPS (Sacrificial, Dodge, Nuke)`\n\n__**Passive**__\n- ATTACK is altered to deal **120%** DMG\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+50%** critical DMG\n- Increases Dodge rate to **100%** for **1** round\n\nEvery **3rd** use additionally causes *Cyberpsychosis*:\n- Deals **180%** DMG with **2x** the critical DMG\n- **+20%** critical rate (once)\n- **-15%** enemy's DEF & MR (once)\n- Restores **30%** missing HP",
+        desc: "**Total Usage**: `unlimited` (2 round cd)\n**Cost**: `10%`\\🩸\n**Timeout**: `only on cyberpsychosis`\n**Role**: `DPS`\n\nDavid's arms are cybernetically modified to be arm cannons. He deals **10%** more damage with normal attacks. As David is partly cybernetic, he is immune against HP debuffs.\n### Sandevistan; Militech \"Apogee\"\nThe sandevistan is a spinal replacement type cyberwear that modifies David's neural interface. Its usage immensely increases the user's perception of movement and time, making them move and perceive so fast, the world around seems to be much slower, thus increasing his crit damage by **50%** and dodge chance to **100%** for the turn his active was used.\n\nHowever, it burns out nerve cells rapidly, causing him to push his mind to cyberpsychosis, and break his own body in the process. After every **3rd** usage of his sandevistan, he enters `Cyberpsychosis` dealing a massive **180%** cannon blast from his arms, which permanently reduces enemy DEF and MR by **15%** after the first usage of it. After this, he recovers **30%** of his missing HP with a MaxTac Inhaler MK II, and has **20%** increased crit rate for the remainder of the battle (cr buff only applies after his first cyberpsychosis).",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `2 rounds`\n**Cost**: `10% max HP`\n**Timeout**: `No/Yes for cyberpsychosis`\n**Role**: `DPS (Sacrificial, Dodge, Nuke)`\n\n__**Passive**__\n- ATK is altered to deal **110%** DMG\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+50%** critical DMG\n- Increases Dodge rate to **100%** for **1** round\n\nEvery **3rd** use additionally causes *Cyberpsychosis*:\n- Deals **180%** damage\n- **+20%** critical rate (once)\n- **-15%** enemy's DEF & MR (once)\n- Restores **30%** missing HP",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // David Martinez 
             if (this.pause > matchStats.round) {
@@ -1747,8 +1747,6 @@ export const abilities: Record<number, Ability> = {
 
             // Cyberpsychosis
             if (this.used % 3 === 0) {
-                myStats.cd *= 2;
-
                 const damage = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.8, dodge: false, combodmg: true, selfdmg: true, selfheal: true });
                 if (damage) ebuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.5), 3));
 
@@ -1783,10 +1781,10 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.SUCCESS;
             }, 9999));
 
-            // 20% increased normal attacks
+            // 10% increased normal attacks
             myStats.replaceButton.atk = {
                 run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.1, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
                     return AbilityResponse.SUCCESS;
                 },

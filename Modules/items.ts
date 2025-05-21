@@ -4197,15 +4197,17 @@ export const items = [
         myStats.HSusedAbilityOnRound = 0;
         myStats.HSusedSkillOnRound = 0;
 
+        const multiplier = 1 + ([15, 20, 25][level - 1] / 100);
+
         // On Ability: +20/25/30% MD (3 turns)
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && myStats.HSusedAbilityOnRound !== matchStats.round) {
                 myStats.HSusedAbilityOnRound = matchStats.round;
-                const amount = Math.floor(myStats.md * (0.2 + 0.05 * (level - 1)));
-                const buff = new buffInfo("+", amount, 3);
-                buff.label = `HES MD: +${amount}`;
+                // const amount = Math.floor(myStats.md * multiplier);
+                const buff = new buffInfo("*", multiplier, 3);
+                buff.label = `HES MD: *${multiplier.toFixed(2)}`;
                 mybuff.md.push(buff);
-                myStats.md += amount;
+                myStats.md = Math.floor(myStats.md * multiplier);
             };
         });
 
@@ -4213,16 +4215,16 @@ export const items = [
         matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && myStats.HSusedSkillOnRound !== matchStats.round) {
                 myStats.HSusedSkillOnRound = matchStats.round;
-                const amount = Math.floor(myStats.atk * (0.2 + 0.05 * (level - 1)));
-                const buff = new buffInfo("+", amount, 3);
-                buff.label = `HES ATK: +${amount}`;
+                // const amount = Math.floor(myStats.atk * multiplier);
+                const buff = new buffInfo("*", multiplier, 3);
+                buff.label = `HES ATK: *${multiplier.toFixed(2)}`;
                 mybuff.atk.push(buff);
-                myStats.atk += amount;
+                myStats.atk = Math.floor(myStats.atk * multiplier);
             };
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After using an ability, increases the wearer's magic damage by **${[20, 25, 30][level - 1]}%** for **3** turns. And after using a skill, increases attack by **${[20, 25, 30][level - 1]}%** for **3** turns. These can only be triggered once per round each.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
+    }, (level) => `After using an ability, increases the wearer's magic damage by **${[15, 20, 25][level - 1]}%** for **3** turns. And after using a skill, increases attack by **${[20, 25, 30][level - 1]}%** for **3** turns. These can only be triggered once per round each.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
     new ringInfo("Eclipse", "ring", "ring", ["raid"], "<:eclipse:1333953559988928606>", "https://i.ibb.co/MD73rWtJ/Eclipse.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Magma
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -4621,7 +4623,7 @@ export const items = [
         ebuff.mg.push(new buffInfo("+", -[2, 3, 4, 5][level - 1], 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Decreases the enemy's magic generation by **${[2, 3, 4, 5][level - 1]}** for the rest of battle.`, "The Eye of Avarice is a striking ring that captures attention instantly, featuring a large, glimmering gemstone at its center, reminiscent of an eye surveying its domain. The band is crafted from deep, burnished gold, intricately etched with symbols of greed and wealth. Surrounding the eye are smaller gems that gleam in shades of green and amethyst, each representing the potential for profit and power. This ring bestows the wearer heightened perception and insight into treasures, guiding them toward hidden riches. However, with great power comes great temptation, and the allure of wealth may lead down a dark path.", "mythical", 712),
+    }, (level) => `Decreases the enemy's mana generation by **${[2, 3, 4, 5][level - 1]}** for the rest of battle.`, "The Eye of Avarice is a striking ring that captures attention instantly, featuring a large, glimmering gemstone at its center, reminiscent of an eye surveying its domain. The band is crafted from deep, burnished gold, intricately etched with symbols of greed and wealth. Surrounding the eye are smaller gems that gleam in shades of green and amethyst, each representing the potential for profit and power. This ring bestows the wearer heightened perception and insight into treasures, guiding them toward hidden riches. However, with great power comes great temptation, and the allure of wealth may lead down a dark path.", "mythical", 712),
     new ringInfo("Stoneheart", "ring", "ring", ["chest"], "<:stoneheart:1338658007612915822>", "https://i.ibb.co/chn2PNbD/Stoneheart.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // +15/17.5/20/22.5/25/27.5/30% max HP
@@ -5442,6 +5444,9 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // After not using ability for 15/14/13/12/11/10+ turns: recover 50/60/70/80/90/100 mana, +1/1.2/1.4/1.6/1.8/2% lifesteal 
             if (matchStats.round - myStats.geLastAbilityRoundUsed >= [15, 14, 13, 12, 11, 10][level - 1]) {
+                //@ts-expect-error
+                this._used++;
+
                 // Recover mana
                 myStats.sm += [30, 34, 38, 42, 46, 50][level - 1];
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
@@ -5449,9 +5454,6 @@ export const items = [
                 // Selfheal
                 myStats.selfhealChance.push(1);
                 myStats.selfheal.push([1, 1.1, 1.2, 1.3, 1.4, 1.5][level - 1] / 100);
-
-                //@ts-expect-error
-                this._used++;
             };
 
             return AbilityResponse.SUCCESS;

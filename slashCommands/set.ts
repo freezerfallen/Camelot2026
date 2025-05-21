@@ -1,5 +1,5 @@
-import { classLevelToXP, userLevelToXP } from '../Modules/functions';
-import { updateUsers } from '../Modules/queries';
+import { classLevelToXP, formatNumberWithQuotes, userLevelToXP } from '../Modules/functions';
+import { updateGuilds, updateUsers } from '../Modules/queries';
 import { SlashCommand } from '../types';
 
 const exportCommand: SlashCommand = {
@@ -20,7 +20,7 @@ const exportCommand: SlashCommand = {
                 level: { type: "set", value },
             });
 
-            return interaction.reply(`Successfully set your level to **${value}**`);
+            return interaction.reply(`Successfully set your level to **${formatNumberWithQuotes(value)}**`);
         };
 
         if (subcommand === "clvl") {
@@ -35,7 +35,7 @@ const exportCommand: SlashCommand = {
                 dungeon_classlevels: { type: "set", value: author.schema.dungeon_classlevels },
             });
 
-            return interaction.reply(`Successfully set your class level to **${value}**`);
+            return interaction.reply(`Successfully set your class level to **${formatNumberWithQuotes(value)}**`);
         };
 
         if (subcommand === "acclvl") {
@@ -47,6 +47,20 @@ const exportCommand: SlashCommand = {
             });
 
             return interaction.reply(`Successfully set your account level to **${value}**`);
+        };
+
+        if (subcommand === "guildcoins") {
+            if (value < 1 || value > 100_000_000) return interaction.reply("Please provide a value between 1 and 100'000'000");
+
+            const guildId = author.schema.guild;
+            if (!guildId) return interaction.reply("You are not in a guild");
+
+            // Update users table
+            await updateGuilds(guildId, {
+                treasury: { type: "set", value },
+            });
+
+            return interaction.reply(`Successfully set your guild's treasury to **${formatNumberWithQuotes(value)}** <:coins:872926669055356939>`);
         };
 
     },
