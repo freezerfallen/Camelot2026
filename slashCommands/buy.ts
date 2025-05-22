@@ -83,6 +83,7 @@ const exportCommand: SlashCommand = {
                 else if (item === "3") fChars = fChars.filter((e) => e.gender === "M");
                 let num = Math.floor(Math.random() * fChars.length);
                 tempChars.push(fChars[num].id);
+                stats.chars.push(fChars[num].id);
                 displayMy(fChars[num], stats.chars, stats.char_ref[fChars[num].id], interaction);
 
                 // Daily Quests
@@ -133,6 +134,7 @@ const exportCommand: SlashCommand = {
                 let fChars = characters.filter((e) => e.rarity === rar);
                 let num = Math.floor(Math.random() * fChars.length);
                 tempChars.push(fChars[num].id);
+                stats.chars.push(fChars[num].id);
                 displayMy(fChars[num], stats.chars, stats.char_ref[fChars[num].id], interaction);
 
                 // Daily Quests
@@ -178,6 +180,7 @@ const exportCommand: SlashCommand = {
                 let fChars = newChars.filter((e) => e.rarity === rarUp);
                 const num = Math.floor(Math.random() * fChars.length);
                 tempChars.push(fChars[num].id);
+                stats.chars.push(fChars[num].id);
                 displayMy(fChars[num], stats.chars, stats.char_ref[fChars[num].id], interaction);
 
                 // Daily Quests

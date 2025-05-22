@@ -4365,12 +4365,13 @@ export const items = [
     new ringInfo("Ocean's Reverie", "ring", "ring", ["raid"], "<:oceans_reverie:1333987029590999111>", "https://i.ibb.co/XrTCXyfM/Ocean-s-Reverie.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana
 
         myStats.oceanReverie = 0;
-        const steal = Math.floor(eStats.sm * 0.3 + 0.05 * (level - 1));
 
         // On every 3rd ability/ cskill usage: Steal 30/35/40/45/50% mana
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
                 myStats.oceanReverie++;
+
+                const steal = Math.floor(eStats.sm * 0.3 + 0.05 * (level - 1));
                 if (myStats.oceanReverie % 3 === 0) {
                     myStats.sm += steal;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
@@ -4378,9 +4379,12 @@ export const items = [
                 };
             };
         });
+
         matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
                 myStats.oceanReverie++;
+
+                const steal = Math.floor(eStats.sm * 0.3 + 0.05 * (level - 1));
                 if (myStats.oceanReverie % 3 === 0) {
                     myStats.sm += steal;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
@@ -5176,8 +5180,10 @@ export const items = [
     new ringInfo("Vile Revenant", "ring", "ring", ["raid"], "<:vile_revenant:1336499647971328055>", "https://i.ibb.co/tPb3Nr6y/Vile-Revenant.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Nekro
 
         // On Revival: immortal for 2/3/4/5 rounds, +25/30/35/40% ATK/MD, dies after that
+        myStats.maxRevivals = 1;
         myStats.rev = 1;
         myStats.revhp = 0.1;
+
         matchStats.on("revival", {
             maxUsage: 1,
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -5754,7 +5760,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => ``, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
-    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:defiant_survivals_ring:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:thalamirs_promise:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         //! new ability
 
