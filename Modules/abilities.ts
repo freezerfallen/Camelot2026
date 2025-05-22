@@ -5663,7 +5663,7 @@ export const abilities: Record<number, Ability> = {
                             matchStats.lootm += 0.15;
                             matchStats.xpboost += 0.25;
                             myStats.insight++;
-                            notice.push(`\n<:coins:1287057582858436648> Ultrasonic waves released...`);
+                            notice.push(`\n<:coins:872926669055356939> Ultrasonic waves released...`);
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                                 myStats.insight++;
 
