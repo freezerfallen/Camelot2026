@@ -3452,6 +3452,7 @@ export const abilities: Record<number, Ability> = {
                     eStats.def -= Math.min(eStats.def * 0.3, Math.floor(eStats.def * overflowingpercent));
                     myStats.cd += Math.min(overflowingpercent, 0.3);
                     notice.push(`\n☀️**${char.name}** used Cruel Sun! Increased his critical rate by **${Math.floor((buffpercent - overflowingpercent) * 100)}%**. Overflowing heat additionally decreased the enemy's DEF and increased his critical damage by **${Math.min(overflowingpercent, 0.3) * 100}%**!`);
+                    mybuff.cr.push(new buffInfo("+", buffpercent - overflowingpercent, 9999));
                     ebuff.def.push(new buffInfo("+", -Math.min(eStats.def * 0.3, Math.floor(eStats.def * overflowingpercent)), 9999));
                     mybuff.cd.push(new buffInfo("+", Math.min(overflowingpercent, 0.3), 9999));
                 };
