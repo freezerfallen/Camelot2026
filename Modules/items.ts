@@ -5167,7 +5167,8 @@ export const items = [
                     myStats.md += Math.floor(myStats.md * atkBuff);
 
                     myStats.damageReduction = 1;
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + [2, 3, 4, 5][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    const lastUntil = matchStats.round + 1 + [2, 3, 4, 5][level - 1];
+                    myStats.delayedBuffs.push(new delayedBuffs(lastUntil, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         myStats.damageReduction = 0;
                         myStats.hp = 0;
 
@@ -5720,24 +5721,61 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `Every **${[5, 5, 4, 4][level - 1]}** rounds, consumes all mana owned to deal **${[0.5, 1, 1.5, 2][level - 1]}%** damage for each mana consumed.`, "The Gama's Awakening ring radiates an aura of transformation, carved from sapphire-blue stone and entwined with ethereal symbols that evoke nature's untamed splendor. Pinkish jewerly glisten like dewdrops around the central piece of a purplish gemstone, resembling a watchful eye, attuned to the energies of the world. Soft waves ripple across its surface, akin to tears from the breakthrough. When worn, this ring enhances the wearer's connection to the natural world, allowing them to understand and constantly evolve themselves. It's a perfect ally for druids and nature guardians, embodying the spirit of rebirth and awakening.", "legendary", 769),
-    new ringInfo("Voltage Overload", "ring", "ring", ["guild"], "<:voltage_overload:1334325589242544269>", "https://i.ibb.co/PZfXXBLt/Voltage-Overload.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Voltage Overload", "ring", "ring", ["guild"], "<:voltage_overload:1334325589242544269>", "https://i.ibb.co/PZfXXBLt/Voltage-Overload.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //! new ability
+        // on receiving crit, deal 20-30% damage
+        matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === eStats) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:voltage_overload:1334325589242544269> **${char.name}**`, { atkMultiplier: [20, 22.5, 25, 27.5, 30][level - 1] / 100, magicDamage: true, isLightning: true });
+            };
+        });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
+    }, (level) => `Upon receiving a critical hit, the wielder deals **${[20, 22.5, 25, 27.5, 30][level - 1]}%** lightning damage to the enemy.`, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
     new ringInfo("Deathbloom Ring", "ring", "ring", ["raid"], "<:deathbloom_ring:1336031521181532280>", "https://i.ibb.co/Nn74bhyg/Deathbloom-Ring.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         //! new ability
 
         return AbilityResponse.SUCCESS;
     }, (level) => ``, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
-    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:thalamirs_promise:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:thalamirs_promise:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //! new ability
+        // On start, lose 99% HP
+        myStats.hp = Math.ceil(myStats.maxhp * 0.01);
+
+        // Gain buffs upon reaching certain rounds
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round === 20) {
+                mybuff.atk.push(new buffInfo("*", 1.2, 9999));
+                mybuff.md.push(new buffInfo("*", 1.2, 9999));
+                myStats.atk = Math.floor(myStats.atk * 1.2);
+                myStats.md = Math.floor(myStats.md * 1.2);
+            };
+
+            if (matchStats.round === 30) {
+                myStats.damageReduction += 0.1;
+            };
+
+            if (matchStats.round === 50) {
+                const maxhpIncrease = Math.floor(myStatsFixed.maxhp * 0.2);
+                myStatsFixed.maxhp += maxhpIncrease;
+                myStats.maxhp += maxhpIncrease;
+                myStats.hp += maxhpIncrease;
+            };
+
+            if (matchStats.round === 70) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:thalamirs_promise:1336068330330525826> **${char.name}**`, { atkMultiplier: 2.5, magicDamage: true });
+            };
+
+            if (matchStats.round === 100) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:thalamirs_promise:1336068330330525826> **${char.name}**`, { atkMultiplier: 5, magicDamage: true });
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "Thalamir's Promise is forged from an alloy that shimmers between copper and twilight hues, centered by a deep emerald said to contain an ancient guardian's last breath. Silver spirals thread through the band like moonlight streams, bearing whispered enchantments of preservation. When death approaches, ethereal vines of pure energy emerge to anchor their bearer to the mortal realm, fulfilling Thalamir's ancient vow that life shall endure.", "legendary", 772),
+    }, (level) => `Upon entering battle, the ring shatters, causing the wielder to lose **99%** of their max HP. Despite the shattering of physicalities, the promise shines through, granting buffs and effects upon reaching certain round counts:\n\n\` 20\`: **+10%** ATK and MD\n\` 30\`: **+10%** damage mitigation\n\` 50\`: **+10%** max HP\n\` 70\`: Deals **250%** damage\n\`100\`: Deals **500%** damage`, "Thalamir's Promise is forged from an alloy that shimmers between copper and twilight hues, centered by a deep emerald said to contain an ancient guardian's last breath. Silver spirals thread through the band like moonlight streams, bearing whispered enchantments of preservation. When death approaches, ethereal vines of pure energy emerge to anchor their bearer to the mortal realm, fulfilling Thalamir's ancient vow that life shall endure.", "legendary", 772),
     new ringInfo("Ferocious Overflow", "ring", "ring", ["raid"], "<:ferocious_overflow:1336068414015279124>", "https://i.ibb.co/JjHcKqZ2/Ferocious-Overflow.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana
 
         //! new ability
