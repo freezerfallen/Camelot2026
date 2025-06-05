@@ -285,7 +285,6 @@ export const raidBosses: enemyInfo[] = [
 
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
                 if (caster === myStats && Math.random() < retaliationChance && matchStats.round % 2 === 0) {
-                    eStats.sm += 25;
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
@@ -309,7 +308,6 @@ export const raidBosses: enemyInfo[] = [
 
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
                 if (caster === myStats && Math.random() < retaliationChance) {
-                    eStats.sm += 35;
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
@@ -339,7 +337,6 @@ export const raidBosses: enemyInfo[] = [
 
             matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
                 if (caster === myStats && Math.random() < retaliationChance) {
-                    eStats.sm += 50;
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
