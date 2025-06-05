@@ -1073,6 +1073,10 @@ const exportCommand: SlashCommand = {
                 });
 
             });
+        } else if (subcommand === "shop") {
+
+            // Guild Shop missing
+
         };
     },
     async executeButtonInteraction({ interaction }) {
