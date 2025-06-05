@@ -4622,7 +4622,7 @@ export const items = [
                 myStats.sm += steal;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
             };
-        if (myStats.maxhp < myStatsFixed.maxhp) myStats.maxhp = myStatsFixed.maxhp;
+            if (myStats.maxhp < myStatsFixed.maxhp) myStats.maxhp = myStatsFixed.maxhp;
             return AbilityResponse.SUCCESS;
         }, 9999));
 
@@ -4657,15 +4657,18 @@ export const items = [
     }, (level) => `The wearer deals **${[40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75][level - 1]}%** lightning damage every **3** rounds.`, "Designed like an intricate circuit board, the Lightning Circuit combines modernity with mysticism. Its sleek, metallic band is accented with glowing electric patterns that pulse rhythmically, mimicking the flow of energy itself. This ring is lightweight yet durable, emphasizing agility and speed. The wearer gains enhanced reflexes and the ability to channel lightning in combat. Each spark that leaps from the band serves as a reminder of the unseen forces at play. Ideal for rogue engineers or swift spellcasters, this ring merges technology and ancient magic into a singular embodiment of power.", "unique", 714),
     new ringInfo("Static Surge", "ring", "ring", ["raid"], "<:static_surge:1334266402026291322>", "https://i.ibb.co/Z7m5Zhs/Static-Surge.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Lightning
 
+        myStats.staticSurgeRoundUsed = -1;
+
         // On Crit: Deal 15/17.5/20/22.5/25/27.5/30% lightning damage
         matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
+            if (caster === myStats && myStats.staticSurgeRoundUsed !== matchStats.round) {
+                myStats.staticSurgeRoundUsed = matchStats.round;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: [0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3][level - 1] });
             };
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Deal **${[15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1]}%** lightning damage when you critically hit.`, "The Static Surge is a bold symbol of raw, chaotic energy. Crafted from dark iron, the ring appears rugged, with jagged edges and a unique, rough texture. Blue and white sparks seem to burst from the band, creating an electrifying aura around its wearer. Depictions of storm clouds and bolts of lightning wind around its circumference, epitomizing the tumultuous nature of storm magic. When invoked, this ring amplifies electrical-based spells, creating powerful surges that can overwhelm foes. Its fierce design and vibrant energy make it a perfect companion for storm-wielding mages and daring adventurers alike.", "legendary", 715),
+    }, (level) => `Deal **${[15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1]}%** lightning damage when you critically hit. This effect can only be triggered once per round.`, "The Static Surge is a bold symbol of raw, chaotic energy. Crafted from dark iron, the ring appears rugged, with jagged edges and a unique, rough texture. Blue and white sparks seem to burst from the band, creating an electrifying aura around its wearer. Depictions of storm clouds and bolts of lightning wind around its circumference, epitomizing the tumultuous nature of storm magic. When invoked, this ring amplifies electrical-based spells, creating powerful surges that can overwhelm foes. Its fierce design and vibrant energy make it a perfect companion for storm-wielding mages and daring adventurers alike.", "legendary", 715),
     new ringInfo("Chromatic Nexus", "ring", "ring", ["raid"], "<:chromatic_nexus:1334268634092273785>", "https://i.ibb.co/MydshW7n/Chromatic-Nexus.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Lightning
 
         const triggerChance = [20, 22.5, 22.5, 25, 25, 27.5, 27.5, 30, 30][level - 1] / 100;
@@ -4794,7 +4797,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `No ability yet`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
+    }, (level) => `The wearer rotates between \`Mist\` and \`True Shadow\`, entering battles with \`Mist\`. Upon being hit **5** times, changes into \`True Shadow\` for **5** rounds, before reverting back to \`Mist\`.\n\n\`Mist\`: The wearer has **-20%** crit damage, but deflects **33%** of damage taken.\n\`True Shadow\`: The enemy has **0%** crit rate and dodge chance, but the wearer will also refuse to dodge.`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
     new ringInfo("Amber's Dawn", "ring", "ring", ["guild"], "<:ambers_dawn:1334561580041371668>", "https://i.ibb.co/bjZqgN9h/Amber-s-Dawn.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const increase = [8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1] / 100;
@@ -5195,7 +5198,8 @@ export const items = [
                     myStats.md += Math.floor(myStats.md * atkBuff);
 
                     myStats.damageReduction = 1;
-                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + [2, 3, 4, 5][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    const lastUntil = matchStats.round + 1 + [2, 3, 4, 5][level - 1];
+                    myStats.delayedBuffs.push(new delayedBuffs(lastUntil, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         myStats.damageReduction = 0;
                         myStats.hp = 0;
 
@@ -5448,7 +5452,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer loses **${[4, 5, 6][level - 1]}%** of their max HP every round. However, after a successful revival, the wearer no longer loses but instead recovers said **${[2, 3, 4][level - 1]}%** of max HP every round.`, "Abyssal Bloom is a hauntingly beautiful piece that encapsulates the mysteries of unseen depths. Its band is crafted from darkened silver, entwined with tangled vines that appear alive, each adorned with small emeralds resembling dew drops. At its heart lies a glowing blue crystal, resembling the rarest flower blooming in the depths of an abyss. Worn by dark druids and sorcerers, this ring enhances the user's connection to the arcane mysteries of nature. It whispers secrets of the ancient ocean, allowing the wearer to summon tidal waves or ensnare enemies in vines, making it a prized possession among those who thrive in darkness.", "genesis", 755),
+    }, (level) => `The wearer loses **${[4, 5, 6][level - 1]}%** of their max HP every round. However, after a successful revival, the wearer no longer loses but instead recovers said **${[4, 5, 6][level - 1]}%** of max HP every round.`, "Abyssal Bloom is a hauntingly beautiful piece that encapsulates the mysteries of unseen depths. Its band is crafted from darkened silver, entwined with tangled vines that appear alive, each adorned with small emeralds resembling dew drops. At its heart lies a glowing blue crystal, resembling the rarest flower blooming in the depths of an abyss. Worn by dark druids and sorcerers, this ring enhances the user's connection to the arcane mysteries of nature. It whispers secrets of the ancient ocean, allowing the wearer to summon tidal waves or ensnare enemies in vines, making it a prized possession among those who thrive in darkness.", "genesis", 755),
     new ringInfo("Mariner's Halo", "ring", "ring", ["guild"], "<:mariners_halo:1340469222819627078>", "https://i.ibb.co/TD1xF9LC/Mariner-s-Halo.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // On 1st Ability: deal 80/90/100/110/120/130/140/150/160% dmg 
@@ -5748,30 +5752,99 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `Every **${[5, 5, 4, 4][level - 1]}** rounds, consumes all mana owned to deal **${[0.5, 1, 1.5, 2][level - 1]}%** damage for each mana consumed.`, "The Gama's Awakening ring radiates an aura of transformation, carved from sapphire-blue stone and entwined with ethereal symbols that evoke nature's untamed splendor. Pinkish jewerly glisten like dewdrops around the central piece of a purplish gemstone, resembling a watchful eye, attuned to the energies of the world. Soft waves ripple across its surface, akin to tears from the breakthrough. When worn, this ring enhances the wearer's connection to the natural world, allowing them to understand and constantly evolve themselves. It's a perfect ally for druids and nature guardians, embodying the spirit of rebirth and awakening.", "legendary", 769),
-    new ringInfo("Voltage Overload", "ring", "ring", ["guild"], "<:voltage_overload:1334325589242544269>", "https://i.ibb.co/PZfXXBLt/Voltage-Overload.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Voltage Overload", "ring", "ring", ["guild"], "<:voltage_overload:1334325589242544269>", "https://i.ibb.co/PZfXXBLt/Voltage-Overload.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //! new ability
-
-        return AbilityResponse.SUCCESS;
-    }, (level) => ``, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
-    new ringInfo("Deathbloom Ring", "ring", "ring", ["raid"], "<:deathbloom_ring:1336031521181532280>", "https://i.ibb.co/Nn74bhyg/Deathbloom-Ring.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
-
-        //! new ability
-
-        return AbilityResponse.SUCCESS;
-    }, (level) => ``, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
-    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:thalamirs_promise:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
-        //! new ability
+        // on receiving crit, deal 20-30% damage
+        matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === eStats) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:voltage_overload:1334325589242544269> **${char.name}**`, { atkMultiplier: [20, 22.5, 25, 27.5, 30][level - 1] / 100, magicDamage: true, isLightning: true });
+            };
+        });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "Thalamir's Promise is forged from an alloy that shimmers between copper and twilight hues, centered by a deep emerald said to contain an ancient guardian's last breath. Silver spirals thread through the band like moonlight streams, bearing whispered enchantments of preservation. When death approaches, ethereal vines of pure energy emerge to anchor their bearer to the mortal realm, fulfilling Thalamir's ancient vow that life shall endure.", "legendary", 772),
-    new ringInfo("Ferocious Overflow", "ring", "ring", ["raid"], "<:ferocious_overflow:1336068414015279124>", "https://i.ibb.co/JjHcKqZ2/Ferocious-Overflow.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana
+    }, (level) => `Upon receiving a critical hit, the wielder deals **${[20, 22.5, 25, 27.5, 30][level - 1]}%** lightning damage to the enemy.`, "Forged in the heart of a thunderstorm, the Voltage Overload ring radiates with a majestic aura of electrifying energy. Its deep blue steel band is accentuated by intricate engravings resembling bolts of lightning, while a shimmering emerald gem rests prominently at its center. Emanating a soft glow, the gem feels alive, surging with static electricity, ready to unleash chaotic charges when called upon. Worn by those who dance with the tempest, this ring grants its bearer heightened reflexes and an affinity for electric magic, empowering attacks with volatile bursts of energy.", "legendary", 770),
+    new ringInfo("Deathbloom Ring", "ring", "ring", ["raid"], "<:deathbloom_ring:1336031521181532280>", "https://i.ibb.co/Nn74bhyg/Deathbloom-Ring.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
-        //! new ability
+        const healPercent = [1, 1.2, 1.4, 1.6, 1.8][level - 1] / 100;
+        const atkBuff = [10, 12.5, 15, 17.5, 20][level - 1] / 100;
+
+        // HP < 50%: heal 0.85/1/1.15/1.25/1.4/1.5% max HP
+        // HP >= 50%: +5/6/7/9/10/12% crit rate
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (myStats.hp < myStats.maxhp * 0.5) {
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * healPercent));
+            } else {
+                myStats.atk = Math.floor(myStats.atk * (1 + atkBuff));
+                myStats.md = Math.floor(myStats.md * (1 + atkBuff));
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
+    }, (level) => `While the wearer's HP is less than **50%**, heals **${[1, 1.2, 1.4, 1.6, 1.8][level - 1]}%** of missing HP per round. When the wearer's HP is greater than or equal to **50%**, increases the wearer's ATK and MD by **${[10, 12.5, 15, 17.5, 20][level - 1]}%**.`, "The Deathbloom ring is a macabre masterpiece crafted from obsidian, adorned with twisted thorns and faintly glowing purple flowers. At its center lies a dark amethyst, encapsulated by grotesque skulls—a reminder of life's fleeting nature. The flowers bloom eternally, echoing life amid decay. This ring grants its wearer dominion over the energies of life and death, empowering necromantic spells and drawing upon the despair of the fallen. It exudes an eerie charm, enticing those who seek dark knowledge and power. Legends tell of its creation in the Valley of Lost Souls, where the balance between life and death is forever debated.", "legendary", 771),
+    new ringInfo("Thalamir's Promise", "ring", "ring", ["guild"], "<:thalamirs_promise:1336068330330525826>", "https://i.ibb.co/60kDLhT0/Defiant-Survival-s-Ring.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        // On start, lose 99% HP
+        myStats.hp = Math.ceil(myStats.maxhp * 0.01);
+
+        // Gain buffs upon reaching certain rounds
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round === 20) {
+                mybuff.atk.push(new buffInfo("*", 1.2, 9999));
+                mybuff.md.push(new buffInfo("*", 1.2, 9999));
+                myStats.atk = Math.floor(myStats.atk * 1.2);
+                myStats.md = Math.floor(myStats.md * 1.2);
+            };
+
+            if (matchStats.round === 30) {
+                myStats.damageReduction += 0.1;
+            };
+
+            if (matchStats.round === 50) {
+                const maxhpIncrease = Math.floor(myStatsFixed.maxhp * 0.2);
+                myStatsFixed.maxhp += maxhpIncrease;
+                myStats.maxhp += maxhpIncrease;
+                myStats.hp += maxhpIncrease;
+            };
+
+            if (matchStats.round === 70) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:thalamirs_promise:1336068330330525826> **${char.name}**`, { atkMultiplier: 2.5, magicDamage: true });
+            };
+
+            if (matchStats.round === 100) {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:thalamirs_promise:1336068330330525826> **${char.name}**`, { atkMultiplier: 5, magicDamage: true });
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => `Upon entering battle, the ring shatters, causing the wielder to lose **99%** of their max HP. Despite the shattering of physicalities, the promise shines through, granting buffs and effects upon reaching certain round counts:\n\n\` 20\`: **+10%** ATK and MD\n\` 30\`: **+10%** damage mitigation\n\` 50\`: **+10%** max HP\n\` 70\`: Deals **250%** damage\n\`100\`: Deals **500%** damage`, "Thalamir's Promise is forged from an alloy that shimmers between copper and twilight hues, centered by a deep emerald said to contain an ancient guardian's last breath. Silver spirals thread through the band like moonlight streams, bearing whispered enchantments of preservation. When death approaches, ethereal vines of pure energy emerge to anchor their bearer to the mortal realm, fulfilling Thalamir's ancient vow that life shall endure.", "legendary", 772),
+    new ringInfo("Ferocious Overflow", "ring", "ring", ["raid"], "<:ferocious_overflow:1336068414015279124>", "https://i.ibb.co/JjHcKqZ2/Ferocious-Overflow.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana
+
+        const manaCost = [30, 25, 20, 15, 10][level - 1];
+        const shieldPercent = [5, 10, 15, 20, 25][level - 1] / 100;
+
+        // Delayed Buff
+        myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            if ((myStats.hp / myStats.maxhp) < 0.3) {
+
+                // Check mana
+                if (myStats.sm >= manaCost) {
+                    // Consume mana
+                    myStats.sm -= manaCost;
+
+                    // Gain shield
+                    myStats.shield += Math.floor(myStats.maxhp * shieldPercent);
+                };
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, (level) => `When under **30%** HP, the wearer consumes **${[30, 25, 20, 15, 10][level - 1]}** mana to generate a shield equal to **${[5, 10, 15, 20, 25][level - 1]}%** of their max HP.`, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
     new ringInfo("Vermillion Vow", "ring", "ring", ["raid"], "<:vermillion_vow:1371784821281652736>", "https://i.ibb.co/Swgkb8KT/c.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.vermillionVowStacks = 0;

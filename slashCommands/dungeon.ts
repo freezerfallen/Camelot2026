@@ -304,7 +304,7 @@ const exportCommand: SlashCommand = {
             loot *= matchStats.lootm;
             loot += matchStats.loot;
             loot = Math.floor(loot * skipRounds);
-            if (loot > 500000) loot = 42187;
+            if (loot > 1_000_000) loot = 42187;
 
             // Guild Tax
             if (loot > 0 && guild && guild.tax) {

@@ -644,6 +644,11 @@ export const anime: animeInfo[] = [
     new animeInfo("Legend of the Northern Blade", ["Bukgeom Jeongi", "The Legend of the Northern Blade", "Legend of the Northen Blade"], 609),
     new animeInfo("Tower of Druaga", ['Druaga no Tou: The Aegis of Uruk - Jil no Bouken', 'Druaga no Tou: the Aegis of URUK', 'Druaga no Tou: the Sword of URUK', 'Tower of Druaga: The Aegis of Uruk', "Tower of Druaga: The Aegis of Uruk - Jil's Adventure", 'Tower of Druaga: The Aegis of Uruk Alternate First Episode', 'Tower of Druaga: The Aegis of Uruk Special', 'Tower of Druaga: The Sword of Uruk'], 610),
     new animeInfo("Hinomaru Sumo", ['Hinomaru-Zumou', 'Hinomaruzumou', 'Sumo of the Rising Sun', 'Sumo Wrestler Hinomaru'], 611),
+    new animeInfo("Villains Are Destined To Die", ["Death Is The Only Ending For The Villainess", "The Villain's Ending Is Death"], 612),
+    new animeInfo("Great Pretender", ['GREAT PRETENDER', 'GrePre'], 613),
+    new animeInfo("Selection Project", ['SelePro'], 614),
+    new animeInfo("Sergeant Keroro", ['Keroro Gunsou', 'Sgt. Frog', 'Seargeant Frog', 'Sgt. Keroro', 'Sgt Frog'], 615),
+    new animeInfo("Girls Band Cry", ['GBC', 'Garukura'], 616),
 
 ];
 
