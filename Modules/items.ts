@@ -4281,20 +4281,12 @@ export const items = [
     }, (level) => `Increases the wearer's ATK and MD by their shield amount at any given time, up to **${[10, 15, 20, 25][level - 1]}%** of their ATK/MD.`, "The Azure Aegis is a stunning ring, designed in the shape of a shield encasing a radiant blue gem. Intricate patterns of swirling that evoke ocean waves cover the band, embodying strength and protection. Crafted from a blue-tinted metal that glistens like the sea at sunrise, it shimmers with a soft, inviting light. When worn, it enhances defensive abilities, creating a protective aura around the bearer, thus ensuring their safety and fortitude in challenging situations.", "legendary", 692),
     new ringInfo("Ethereal Spiral", "ring", "ring", ["raid"], "<:ethereal_spiral:1333967191678390333>", "https://i.ibb.co/TDqBgJpr/Ethereal-Spiral.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana (DoT before)
 
-        // Steals 2/3/4/5 💧 from the enemy
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            const steal = Math.min(eStats.sm, Math.floor(2 + 2 * (level - 1)));
-            if (steal > 0) {
-                eStats.sm -= steal;
-                myStats.sm += steal;
-                if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-            };
-
-            return AbilityResponse.SUCCESS;
-        }, 9999));
+        // -2/3/4/5 enemy mana generation
+        eStats.mg -= [2, 3, 4, 5][level - 1];
+        ebuff.mg.push(new buffInfo("+", -[2, 3, 4, 5][level - 1], 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer steals **${[2, 3, 4, 5][level - 1]}**💧 from the enemy every turn.`, "The Ethereal Spiral is a ring infused with the essence of the astral plane. Its design features an intricate, spiral pattern that shimmers with an iridescent sheen, evoking the majestic colors of distant galaxies. The band itself appears to be forged from a translucent material, allowing light to bend through it, creating a mesmerizing aura. Engraved runes encircle the ring, harnessing celestial energies, granting the wearer enhanced magical abilities and a connection to the stars. This ethereal artifact is said to hold the power to traverse dimensions, making it a coveted prize among scholars and adventurers alike.", "legendary", 693),
+    }, (level) => `Decreases the enemy's mana generation by **${[2, 3, 4, 5][level - 1]}** for the rest of battle.`, "The Ethereal Spiral is a ring infused with the essence of the astral plane. Its design features an intricate, spiral pattern that shimmers with an iridescent sheen, evoking the majestic colors of distant galaxies. The band itself appears to be forged from a translucent material, allowing light to bend through it, creating a mesmerizing aura. Engraved runes encircle the ring, harnessing celestial energies, granting the wearer enhanced magical abilities and a connection to the stars. This ethereal artifact is said to hold the power to traverse dimensions, making it a coveted prize among scholars and adventurers alike.", "legendary", 693),
     new ringInfo("Radiant Heart", "ring", "ring", ["chest"], "<:radiant_heart:1338658015951327254>", "https://i.ibb.co/kVZ4NPxt/Radiant-Heart.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // On Revival: ATK/MD debuff for enemy (10 turns)
@@ -4369,7 +4361,7 @@ export const items = [
         }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer gains **${[2, 3, 4][level - 1]}** counter stacks, when their HP falls below **30%** of their max HP for the first time.`, "Forged from obsidian-black metal, the Shadow Drake Band is adorned with cruel, jagged spikes that seem to absorb light. Intricate draconic runes, etched in dark crimson, encircle the band, pulsating with an eerie glow under moonlight. This formidable ring is said to resonate with the spirits of ancient drakes, granting its bearer enhanced agility and stealth. As shadows twist and crawl, whispers of the drakes' secrets flicker in the wearer's mind, empowering their spells with eldritch energy. Treasures that glitter from within can lure thieves, but only those with a true heart may harness its dark potential without succumbing to madness.", "legendary", 698),
+    }, (level) => `The wearer counters the next **${[2, 3, 4][level - 1]}** hits (stackable), when their HP falls below **30%** of their max HP for the first time.`, "Forged from obsidian-black metal, the Shadow Drake Band is adorned with cruel, jagged spikes that seem to absorb light. Intricate draconic runes, etched in dark crimson, encircle the band, pulsating with an eerie glow under moonlight. This formidable ring is said to resonate with the spirits of ancient drakes, granting its bearer enhanced agility and stealth. As shadows twist and crawl, whispers of the drakes' secrets flicker in the wearer's mind, empowering their spells with eldritch energy. Treasures that glitter from within can lure thieves, but only those with a true heart may harness its dark potential without succumbing to madness.", "legendary", 698),
     new ringInfo("Ocean's Reverie", "ring", "ring", ["raid"], "<:oceans_reverie:1333987029590999111>", "https://i.ibb.co/XrTCXyfM/Ocean-s-Reverie.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Mana
 
         myStats.oceanReverie = 0;
@@ -4622,12 +4614,20 @@ export const items = [
     }, (level) => `Every time the enemy evades an attack, the wearer has a **${[30, 35, 40, 45, 50][level - 1]}%** chance to hit twice the next turn.`, "Crafted from gleaming gold, the Lucky Star Band shines with an inviting warmth. This ring features a horseshoe shape, adorned with delicate engravings of stars, layered with vibrant turquoise gemstones. The stars appear as if they twinkle, shifting in color with each movement, radiating luck and prosperity. When worn, this ring enhances the wearer's chances in games of chance and ensures favorable outcomes in their adventures. Its charm is irresistible, making it a must-have for rogues and gamblers seeking fortune's favor.", "mythical", 711),
     new ringInfo("Eye of Avarice", "ring", "ring", ["raid"], "<:eye_of_avarice:1334258299411107924>", "https://i.ibb.co/SX0GtSLz/Eye-of-Avarice.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Cakey
 
-        // -2/3/4/5 enemy mana generation
-        eStats.mg -= [2, 3, 4, 5][level - 1];
-        ebuff.mg.push(new buffInfo("+", -[2, 3, 4, 5][level - 1], 9999));
+        // Steals 2/3/4/5 💧 from the enemy
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            const steal = Math.min(eStats.sm, Math.floor(2 + 2 * (level - 1)));
+            if (steal > 0) {
+                eStats.sm -= steal;
+                myStats.sm += steal;
+                if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+            };
+        if (myStats.maxhp < myStatsFixed.maxhp) myStats.maxhp = myStatsFixed.maxhp;
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Decreases the enemy's mana generation by **${[2, 3, 4, 5][level - 1]}** for the rest of battle.`, "The Eye of Avarice is a striking ring that captures attention instantly, featuring a large, glimmering gemstone at its center, reminiscent of an eye surveying its domain. The band is crafted from deep, burnished gold, intricately etched with symbols of greed and wealth. Surrounding the eye are smaller gems that gleam in shades of green and amethyst, each representing the potential for profit and power. This ring bestows the wearer heightened perception and insight into treasures, guiding them toward hidden riches. However, with great power comes great temptation, and the allure of wealth may lead down a dark path.", "mythical", 712),
+    }, (level) => `The wearer steals **${[2, 3, 4, 5][level - 1]}**💧 from the enemy every turn.`, "The Eye of Avarice is a striking ring that captures attention instantly, featuring a large, glimmering gemstone at its center, reminiscent of an eye surveying its domain. The band is crafted from deep, burnished gold, intricately etched with symbols of greed and wealth. Surrounding the eye are smaller gems that gleam in shades of green and amethyst, each representing the potential for profit and power. This ring bestows the wearer heightened perception and insight into treasures, guiding them toward hidden riches. However, with great power comes great temptation, and the allure of wealth may lead down a dark path.", "mythical", 712),
     new ringInfo("Stoneheart", "ring", "ring", ["chest"], "<:stoneheart:1338658007612915822>", "https://i.ibb.co/chn2PNbD/Stoneheart.png", 7, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // +15/17.5/20/22.5/25/27.5/30% max HP
@@ -4762,9 +4762,36 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **30** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
-    new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.shadowPact = 0;
+        myStats.trueShadow = false;
+        mybuff.cd.push(new buffInfo("+", -0.2, 9999));
+        matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === eStats && !myStats.trueShadow) {
+                // Deflects 30% of DMG taken
+                eStats.hp -= Math.floor(options.damage * (0.05 + 0.05 * (level - 1)));
+                myStats.hp += Math.floor(options.damage * (0.05 + 0.05 * (level - 1)));
+                myStats.shadowPact++;
 
-        //! new ability
+                if (myStats.shadowPact === 5) {
+                    // True Shadow Form
+                    myStats.trueShadow = true;
+                    myStats.cd += 0.2;
+                    mybuff.cd.push(new buffInfo("+", 0.2, 5));
+                    eStats.dodge = 0;
+                    ebuff.dodge.push(new buffInfo("=", 0, 5));
+                    eStats.cr = 0;
+                    ebuff.cr.push(new buffInfo("=", 0, 5));
+
+                    // Reset form
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        myStats.trueShadow = false;
+
+                        return AbilityResponse.SUCCESS;
+                    }, 1));
+                };
+            };
+        });
 
         return AbilityResponse.SUCCESS;
     }, (level) => `No ability yet`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
@@ -4809,19 +4836,20 @@ export const items = [
     new ringInfo("Vinebound Bond", "ring", "ring", ["raid"], "<:vinebound_bond:1334561559195942984>", "https://i.ibb.co/chz7YprQ/Vinebound-Bond.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal/ Nekro
 
         // HP < 50%: heal 0.85/1/1.15/1.25/1.4/1.5% max HP
-        // HP >= 50%: +5% crit rate
+        // HP >= 50%: +5/6/7/9/10/12% crit rate
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             if (myStats.hp < myStats.maxhp * 0.5) {
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.0085, 0.01, 0.0115, 0.0125, 0.014, 0.015][level - 1]));
             } else {
-                myStats.cr += 0.05;
+                myStats.cr += [0.05, 0.06, 0.07, 0.09, 0.10, 0.12][level - 1];
+                if (myStats.cr > 1) myStats.cr = 1;
             };
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `While the wearer's HP is less than **50%**, heals **${[0.85, 1, 1.15, 1.25, 1.4, 1.5][level - 1]}%** of max HP per round. When the wearer's HP is greater than or equal to **50%**, increases the wearer's crit rate by **5%**.`, "The Vinebound Bond ring is a verdant wonder, showcasing a band entwined with delicate emerald leaves and tiny blossoms. At its heart is a vivid green gem that reflects the essence of nature's vitality. Each leaf appears to rustle softly, as if in conversation with the living world. This ring is a symbol of unity with the earth, allowing its wearer to foster growth and harmony. It is believed to bring good fortune in harvests and encourages empathy toward all living creatures, cementing a bond with nature that strengthens with each passing day.", "unique", 727),
+    }, (level) => `While the wearer's HP is less than **50%**, heals **${[0.85, 1, 1.15, 1.25, 1.4, 1.5][level - 1]}%** of max HP per round. When the wearer's HP is greater than or equal to **50%**, increases the wearer's crit rate by **${[5, 6, 7, 9, 10, 12][level - 1]}%**.`, "The Vinebound Bond ring is a verdant wonder, showcasing a band entwined with delicate emerald leaves and tiny blossoms. At its heart is a vivid green gem that reflects the essence of nature's vitality. Each leaf appears to rustle softly, as if in conversation with the living world. This ring is a symbol of unity with the earth, allowing its wearer to foster growth and harmony. It is believed to bring good fortune in harvests and encourages empathy toward all living creatures, cementing a bond with nature that strengthens with each passing day.", "unique", 727),
     new ringInfo("Shadowspire", "ring", "ring", ["raid"], "<:shadowspire:1334561562547191908>", "https://i.ibb.co/fz2PGrd1/Shadowspire.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         // On own miss: -3% max HP, +3/4/5% dodge & br (max: 5 times)
@@ -4905,7 +4933,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Alters Defense: Reduces incoming damage by **${[30, 35, 40][level - 1]}%** for **1** turn`, "The Defender's Signet stands as a symbol of strength and protection, made of rugged iron with a broad, flat surface. It boasts a brilliant sapphire at its center, set within a circular shield-like design. Intricate engravings of armor and swords embellish the band, depicting tales of glorious battles fought by great heroes. This ring enhances the wearer's defense, creating a palpable energy that can absorb damage. When activated, glowing runes rise from the gem, encasing the wearer in a glimmering shield of ethereal light. It is favored by paladins and guardians who uphold justice and valor, making them an indomitable force against darkness.", "mythical", 732),
+    }, (level) => `After using Defense, reduces incoming damage by **${[30, 35, 40][level - 1]}%** (stackable) for **1** turn`, "The Defender's Signet stands as a symbol of strength and protection, made of rugged iron with a broad, flat surface. It boasts a brilliant sapphire at its center, set within a circular shield-like design. Intricate engravings of armor and swords embellish the band, depicting tales of glorious battles fought by great heroes. This ring enhances the wearer's defense, creating a palpable energy that can absorb damage. When activated, glowing runes rise from the gem, encasing the wearer in a glimmering shield of ethereal light. It is favored by paladins and guardians who uphold justice and valor, making them an indomitable force against darkness.", "mythical", 732),
     new ringInfo("Glyph of Growth", "ring", "ring", ["chest"], "<:glyph_of_growth:1338654486067019827>", "https://i.ibb.co/JwKymcMJ/Glyph-of-Growth.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // 20/22.5/25/27.5/30% counter chance on crit received
@@ -5092,7 +5120,7 @@ export const items = [
     new ringInfo("Tenebris Diadem", "ring", "ring", ["raid"], "<:tenebris_diadem:1336487284861698128>", "https://i.ibb.co/mF9ZPwyJ/Tenebris-Diadem.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Nekro
 
         // Decrease DEF/MR by 30%; Increase ATK/MD by 20/22.5/25/27.5/30%
-        myStats.delayedBuffs.push(new delayedBuffs([9, 10, 11, 12, 13][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.delayedBuffs.push(new delayedBuffs([13, 12, 11, 10, 9][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
             const atkScale = [20, 22.5, 25, 27.5, 30][level - 1] / 100;
             // mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * atkScale), 9999));
@@ -5401,7 +5429,7 @@ export const items = [
     }, (level) => `The wearer has a **${[20, 25, 30, 35, 40, 45, 50][level - 1]}%** chance to revive after their first death. After reviving, attacks heal the wearer by **${[1, 1.25, 1.5, 1.75, 2, 2.25, 2.5][level - 1]}%** of the damage dealt.`, "The Ring of the Lone Swan showcases a breathtakingly delicate design, featuring a swirling band of pearly white that mimics flowing water. Atop the ring rests a gracefully sculpted swan, its wings elegantly outstretched as if taking flight. The mesmerizing detail captures the tranquil essence of a serene lake, where even the slight fluttering of wings echoes amongst the quietness. This ring grants its wearer the power of swiftness and grace. Legends say it bestows an aura of calmness in the midst of chaos, often found among those who seek serenity or aspire to inspire others through artistry and poise.", "mythical", 754),
     new ringInfo("Abyssal Bloom", "ring", "ring", ["guild"], "<:abyssal_bloom:1337947536920416306>", "https://i.ibb.co/b594j5c1/Abyssal-Bloom.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        const amount = Math.floor(myStats.maxhp * [2, 3, 4][level - 1] / 100);
+        const amount = Math.floor(myStats.maxhp * [4, 5, 6][level - 1] / 100);
         const hpDebuff = new buffInfo("+", -amount, 9999);
         mybuff.hp.push(hpDebuff);
 
@@ -5421,7 +5449,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer loses **${[2, 3, 4][level - 1]}%** of their max HP every round. However, after a successful revival, the wearer no longer loses but instead recovers said **${[2, 3, 4][level - 1]}%** of max HP every round.`, "Abyssal Bloom is a hauntingly beautiful piece that encapsulates the mysteries of unseen depths. Its band is crafted from darkened silver, entwined with tangled vines that appear alive, each adorned with small emeralds resembling dew drops. At its heart lies a glowing blue crystal, resembling the rarest flower blooming in the depths of an abyss. Worn by dark druids and sorcerers, this ring enhances the user's connection to the arcane mysteries of nature. It whispers secrets of the ancient ocean, allowing the wearer to summon tidal waves or ensnare enemies in vines, making it a prized possession among those who thrive in darkness.", "genesis", 755),
+    }, (level) => `The wearer loses **${[4, 5, 6][level - 1]}%** of their max HP every round. However, after a successful revival, the wearer no longer loses but instead recovers said **${[2, 3, 4][level - 1]}%** of max HP every round.`, "Abyssal Bloom is a hauntingly beautiful piece that encapsulates the mysteries of unseen depths. Its band is crafted from darkened silver, entwined with tangled vines that appear alive, each adorned with small emeralds resembling dew drops. At its heart lies a glowing blue crystal, resembling the rarest flower blooming in the depths of an abyss. Worn by dark druids and sorcerers, this ring enhances the user's connection to the arcane mysteries of nature. It whispers secrets of the ancient ocean, allowing the wearer to summon tidal waves or ensnare enemies in vines, making it a prized possession among those who thrive in darkness.", "genesis", 755),
     new ringInfo("Mariner's Halo", "ring", "ring", ["guild"], "<:mariners_halo:1340469222819627078>", "https://i.ibb.co/TD1xF9LC/Mariner-s-Halo.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // On 1st Ability: deal 80/90/100/110/120/130/140/150/160% dmg 
