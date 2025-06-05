@@ -4768,19 +4768,22 @@ export const items = [
     new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.shadowPact = 0;
         myStats.trueShadow = false;
-        mybuff.cd.push(new buffInfo("+", -0.2, 9999));
+        const cdBuff = [0.2, 0.18, 0.16, 0.14, 0.12, 0.1][level - 1];
+        const dmgReflect = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3][level - 1];
+        mybuff.cd.push(new buffInfo("+", cdBuff, 9999));
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === eStats && !myStats.trueShadow) {
-                // Deflects 30% of DMG taken
-                eStats.hp -= Math.floor(options.damage * (0.05 + 0.05 * (level - 1)));
-                myStats.hp += Math.floor(options.damage * (0.05 + 0.05 * (level - 1)));
+                // Deflects 5/10/15/20/25/30% of DMG taken
+                eStats.hp -= Math.floor(options.damage * dmgReflect);
+                myStats.hp += Math.floor(options.damage * dmgReflect);
                 myStats.shadowPact++;
 
                 if (myStats.shadowPact === 5) {
                     // True Shadow Form
+                    notice.push(`\n${char.name} entered True Shadow form for **5** rounds`);
                     myStats.trueShadow = true;
-                    myStats.cd += 0.2;
-                    mybuff.cd.push(new buffInfo("+", 0.2, 5));
+                    myStats.cd += cdBuff;
+                    mybuff.cd.push(new buffInfo("+", cdBuff, 5));
                     eStats.dodge = 0;
                     ebuff.dodge.push(new buffInfo("=", 0, 5));
                     eStats.cr = 0;
@@ -4789,7 +4792,7 @@ export const items = [
                     // Reset form
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         myStats.trueShadow = false;
-
+                        notice.push(`\n${char.name} has returned to the Mist`);
                         return AbilityResponse.SUCCESS;
                     }, 1));
                 };
@@ -4797,7 +4800,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer rotates between \`Mist\` and \`True Shadow\`, entering battles with \`Mist\`. Upon being hit **5** times, changes into \`True Shadow\` for **5** rounds, before reverting back to \`Mist\`.\n\n\`Mist\`: The wearer has **-20%** crit damage, but deflects **33%** of damage taken.\n\`True Shadow\`: The enemy has **0%** crit rate and dodge chance, but the wearer will also refuse to dodge.`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
+    }, (level) => `The wearer rotates between \`Mist\` and \`True Shadow\`, entering battles with \`Mist\`. Upon being hit **5** times, changes into \`True Shadow\` for **5** rounds, before reverting back to \`Mist\`.\n\n\`Mist\`: The wearer has **- ${[0.2, 0.18, 0.16, 0.14, 0.12, 0.1][level - 1] * 100}%** crit damage, but deflects **${[0.05, 0.1, 0.15, 0.2, 0.25, 0.3][level - 1] * 100}%** of damage taken.\n\`True Shadow\`: The enemy has **0%** crit rate and dodge chance.`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
     new ringInfo("Amber's Dawn", "ring", "ring", ["guild"], "<:ambers_dawn:1334561580041371668>", "https://i.ibb.co/bjZqgN9h/Amber-s-Dawn.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const increase = [8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1] / 100;
