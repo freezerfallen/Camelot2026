@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction } from "discord.js";
-import { abilities } from "../Modules/abilities.js";
+import { abilities, Ability } from "../Modules/abilities.js";
 import { classes } from "../Modules/classes.js";
 import { curses } from "../Modules/curses.js";
 import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items.js";
@@ -330,7 +330,7 @@ const exportCommand: SlashCommand = {
         let partyStatsC = _.cloneDeep(partyStats);
         // let partyClass = partyStats.map((e) => e.class !== -1 ? classes[e.class] : false);
         // let partySkill = partyStats.map((e) => e.class !== -1 ? _.cloneDeep(skills[e.class]) : false);
-        let partyAbility = partyChars.map((e) => e.id in abilities ? _.cloneDeep(abilities[e.id]) : undefined).filter((e) => e !== undefined);
+        const partyAbility: (Ability | undefined)[] = []; // partyChars.map((e) => e.id in abilities ? _.cloneDeep(abilities[e.id]) : undefined).filter((e) => e !== undefined);
 
         // Menu
         const boss = await bossSelection(interaction, stampede, myChar, partySchema, stats);
@@ -653,7 +653,14 @@ const exportCommand: SlashCommand = {
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        partyAbility.filter((e) => e).forEach((e, i) => e?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user));
+        partyStatsC.forEach((e, i) => {
+            if (e.id in abilities) {
+                partyAbility[i] = _.cloneDeep(abilities[e.id]);
+                partyAbility[i]?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            } else {
+                partyAbility[i] = undefined;
+            };
+        });
 
         const ATK_EMOJI = myStatsC.replaceButton?.atk?.emoji || '⚔️',
             DEF_EMOJI = myStatsC.replaceButton?.def?.emoji || '🛡️',
@@ -785,7 +792,7 @@ const exportCommand: SlashCommand = {
                             };
                         };
 
-                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                     };
 
                     function attack() {
@@ -807,16 +814,16 @@ const exportCommand: SlashCommand = {
                                     curse.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     eStatsC.sm -= curse.cost;
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else if (matchStats.blockAbilities-- < 0 && myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.5) {
                                     eAbility.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else {
                                     dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `⚔️ **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     if (!(matchStats.playerPausingRounds > 0)) matchStats.turn = 1;
                                     matchStats.turn = 1;
                                     matchStats.round++;
@@ -834,7 +841,7 @@ const exportCommand: SlashCommand = {
 
                     // Write passive actions if any
                     if (notice.length > 4) {
-                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                         editEmbed();
                     };
 
@@ -851,7 +858,7 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                 if (matchStats.turn === 0) attack();
                             }
 
@@ -863,12 +870,12 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
 
                                 if (matchStats.twinshot > Math.random()) setTimeout(() => {
                                     dealDamage(eStatsC, myStatsC, eBuffs, buffs, matchStats, notice, `⚔️ **${myChar.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 }, aDelay);
 
@@ -892,7 +899,7 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("DEF", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                 if (matchStats.turn === 0) attack();
                             }
 
@@ -917,7 +924,7 @@ const exportCommand: SlashCommand = {
 
                                 attack();
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             }
 
                         } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
@@ -936,7 +943,7 @@ const exportCommand: SlashCommand = {
                             };
 
                             editEmbed();
-                            Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                            Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             attack();
                         }
 
@@ -961,7 +968,7 @@ const exportCommand: SlashCommand = {
                                         };
 
                                         editEmbed();
-                                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                         attack();
                                     };
                                 } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
@@ -984,7 +991,7 @@ const exportCommand: SlashCommand = {
                             };
 
                             editEmbed();
-                            Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                            Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             attack();
                         }
 
@@ -1006,7 +1013,7 @@ const exportCommand: SlashCommand = {
                                     };
 
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                             };

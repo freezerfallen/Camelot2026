@@ -4,9 +4,22 @@ import GIFEncoder from 'gifencoder';
 import { Asset } from "./assets";
 import { profileSets } from "./profileDecorations";
 import { setImmediate } from 'timers/promises';
-import { CompactUserSchema, ProfileImageArguments } from '../types';
+import { CompactUserSchema, ProfileImageArguments, RaidRank } from '../types';
 import { User } from 'discord.js';
-import { raidRankLetters } from './components';
+import { rankLowerRanges } from './components';
+
+// Copied from functions.ts to prevent multiple db connections
+const getLetterRank = (score: number) => {
+    const ranks = Object.keys(rankLowerRanges) as (keyof typeof rankLowerRanges)[];
+    let highestRank: RaidRank = "F-", highestRankScore = 0;
+    for (const rank of ranks) {
+        if (score >= rankLowerRanges[rank] && rankLowerRanges[rank] > highestRankScore) {
+            highestRank = rank;
+            highestRankScore = rankLowerRanges[rank];
+        };
+    };
+    return highestRank;
+};
 
 const newProfileColors = {
     creme: { text: '#FDE8FF', floor: '#a89aa8', gradStart: '#FDE8FF', gradEnd: '#000000' },
@@ -250,7 +263,7 @@ async function getProfileImage(user: User, stats: CompactUserSchema, profileArgu
             sctx.font = '30px Arial';
             sctx.textAlign = 'start';
             sctx.textBaseline = 'middle';
-            sctx.fillText(`${user.username} [${raidRankLetters[stats.rank]}]`, offsetX + 135, offsetY + 59, 280);
+            sctx.fillText(`${user.username} [${getLetterRank(stats.rankscore)}]`, offsetX + 135, offsetY + 59, 280);
 
             // Level
             const levelStr = `${profileArguments.userLvl}`;
@@ -329,7 +342,7 @@ async function getProfileImage(user: User, stats: CompactUserSchema, profileArgu
     encoder.start();
     encoder.setRepeat(0);
     encoder.setDelay(bg.delay);
-    encoder.setQuality(1); // default: 10, best: 1
+    encoder.setQuality(15); // default: 10, best: 1
 
     // Draw Frames
     for (const frame of frames) {

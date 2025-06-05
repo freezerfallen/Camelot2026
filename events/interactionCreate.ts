@@ -62,7 +62,7 @@ const event: BotEvent = {
             if (interaction.user.id in blacklist) return interaction.reply(`Your account has been suspended${blacklist[interaction.user.id]}.\nIf you believe there to be a mistake, please join the support server below to appeal for this decision.\n**Support Server**: https://discord.gg/myy9PBCdEW`);
 
             // Spam Control (User)
-            const bypassedCommands = ["admin", "balance", "camelot", "guess", "info", "item", "mod", "pull", "rp", "shop"];
+            const bypassedCommands = ["admin", "balance", "buy", "camelot", "guess", "info", "item", "mod", "pull", "rp", "shop"];
             if (userCooldown.has(interaction.user.id)) {
                 const cd = userCooldown.get(interaction.user.id);
                 if (!bypassedCommands.includes(interaction.commandName)) cd.count++;

@@ -12,17 +12,17 @@ export default class Avalon {
 
     };
 
-    static checkIfEnded(myStatsC: DetailedStats, eStatsC: DetailedStats, matchStats: MatchStats, notice: string[], interaction: ChatInputCommandInteraction, minionDefeated: any, editEmbed: any, endMatch: any) {
+    static checkIfEnded(myStatsC: DetailedStats, eStatsC: DetailedStats, mybuffs: Buffs, ebuffs: Buffs, matchStats: MatchStats, notice: string[], interaction: ChatInputCommandInteraction, minionDefeated: any, editEmbed: any, endMatch: any) {
         if (myStatsC.hp < 1) {
             if (matchStats.currentCharacter) {
-                matchStats.trigger("minionDeath", myStatsC, eStatsC, myStatsC.buffs, eStatsC.buffs, {});
+                matchStats.trigger("minionDeath", myStatsC, eStatsC, mybuffs, ebuffs, {});
                 return minionDefeated("my");
             };
             if (!eStatsC.blockRevival && myStatsC.revivedTotal < myStatsC.maxRevivals && myStatsC.rev > Math.random()) {
                 myStatsC.revivedTotal++;
                 myStatsC.hp = Math.floor(myStatsC.maxhp * myStatsC.revhp);
                 notice.push(`\n🪽 ${myStatsC.name} survived! Restored **${myStatsC.hp}** HP`);
-                matchStats.trigger("revival", myStatsC, eStatsC, myStatsC.buffs, eStatsC.buffs, {});
+                matchStats.trigger("revival", myStatsC, eStatsC, mybuffs, ebuffs, {});
                 matchStats.turn === 1;
                 editEmbed();
 
@@ -33,14 +33,14 @@ export default class Avalon {
             };
         } else if (eStatsC.hp < 1) {
             if (matchStats.currentOpponent) {
-                matchStats.trigger("minionDeath", eStatsC, myStatsC, eStatsC.buffs, myStatsC.buffs, {});
+                matchStats.trigger("minionDeath", eStatsC, myStatsC, ebuffs, mybuffs, {});
                 return minionDefeated("e");
             };
             if (!myStatsC.blockRevival && eStatsC.revivedTotal < eStatsC.maxRevivals && eStatsC.rev > Math.random()) {
                 eStatsC.revivedTotal++;
                 eStatsC.hp = Math.floor(eStatsC.maxhp * eStatsC.revhp);
                 notice.push(`\n<:revival:1341347208590790759> ${eStatsC.name} survived! Restored **${eStatsC.hp}** HP`);
-                matchStats.trigger("revival", eStatsC, myStatsC, eStatsC.buffs, myStatsC.buffs, {});
+                matchStats.trigger("revival", eStatsC, myStatsC, ebuffs, mybuffs, {});
                 matchStats.turn === 1;
                 editEmbed();
             } else {

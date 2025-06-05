@@ -81,6 +81,7 @@ async function createTables() {
         guild TEXT,
         donatedtotal BIGINT DEFAULT 0 NOT NULL,
         genesispity INT DEFAULT 0 NOT NULL,
+        genesisdupepity INT DEFAULT 0 NOT NULL,
         presets JSONB[] DEFAULT ARRAY[]::JSONB[] NOT NULL,
         itemlock TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         party TEXT,
@@ -126,9 +127,7 @@ async function createTables() {
         cow_chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         cow_timer BIGINT,
         cow_rolled_today INT DEFAULT 0 NOT NULL,
-        rank INT DEFAULT 0 NOT NULL,
         rankscore BIGINT DEFAULT 0 NOT NULL,
-        raidxp INT DEFAULT 0 NOT NULL,
         guild_marks BIGINT DEFAULT 0 NOT NULL,
         created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         image_credits INT DEFAULT 0 NOT NULL,
@@ -280,10 +279,12 @@ async function createTables() {
         rowid BIGINT NOT NULL DEFAULT nextval('raids_rowid_seq'::regclass),
         guildid TEXT NOT NULL,
         raidid INT NOT NULL,
+        rank_letter TEXT NOT NULL DEFAULT 'A+',
         enemy_hp BIGINT NOT NULL,
         enemy_hpmax BIGINT NOT NULL,
         participation JSONB DEFAULT '{}' NOT NULL,
-        start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        end_date TIMESTAMP
     )`);
 };
 
@@ -468,6 +469,9 @@ async function alterTables() {
     // Example:
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
+    // add genesisdupepity INT DEFAULT 0 NOT NULL,
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS genesisdupepity INT DEFAULT 0 NOT NULL');
+
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_points INT DEFAULT 0 NOT NULL");
@@ -495,11 +499,17 @@ async function dropTables() {
 // import { migrateData } from './migration';
 async function resetDatabase(migrate: boolean = false) {
     // await dropTables();
+    // console.log('Dropped tables');
     // await createTables();
+    // console.log('Created tables');
     // await createIndexes();
+    // console.log('Created indexes');
     // await alterTables();
+    // console.log('Altered tables');
     // await createTriggers();
+    // console.log('Created triggers');
     // if (migrate) await migrateData().catch(console.error);
+    // console.log('Migrated data');
 };
 
 // Self-executing async function to initialize database

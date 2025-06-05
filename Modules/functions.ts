@@ -25,7 +25,7 @@ const statsOp: { base: { hp: Record<number, number>; atk: Record<number, number>
         "hp": { "238": -20, "405": -6, "460": 54, "512": 60, "2016": -10, "2079": 12, "2360": 12, "2597": 24, "3150": 6, "3307": -20, "3408": -20, "3409": 12, "3886": 20, "4769": -20, "5032": -9, "5341": 20, "5344": 16, "5819": -20, "8188": 30, "8189": 40, "8521": 12, "8582": 20, "9606": -6, "10520": 37, "10521": -14, "10523": 30, "10530": 40, "12000": 16, "12121": 10, "12424": 1, "17583": -11, "17688": -25, "17689": 12, "17871": -13, "18011": -9 },
         "atk": { "238": -11, "405": 12, "460": -12, "512": -10, "2079": 9, "2016": -2, "3150": 4, "3409": 14, "3886": 4, "4250": 10, "4712": -8, "5341": 6, "5344": 10, "6082": -13, "8187": 7, "8189": 10, "8521": 5, "9606": 3, "10517": 10, "10520": 20, "10521": -4, "10523": 5, "10530": 8, "12000": 10, "12121": 7, "12393": -5, "12424": 15, "17583": -10, "17689": -2, "17871": -4, "18011": -6 },
         "def": { "405": 1, "460": 1, "512": 15, "2360": 9, "2597": 5, "3150": 8, "3409": 6, "9606": 19, "10517": 5, "12121": 5, "12393": 10, "12424": 10, "17583": -18, "17871": -5, "18011": -4 },
-        "expertise": { "72": "sword", "73": "sword", "77": "bow", "159": "sword", "405": "sword", "408": "any", "460": "sword", "463": "sword", "512": "shield", "523": "sword", "577": "staff", "578": "staff", "680": "lance", "688": "sword", "712": "lance", "733": "sword", "735": "bow", "767": "staff", "769": "sword", "844": "dagger", "999": "lance", "1001": "sword", "1550": "sword", "1824": "dagger", "1850": "lance", "1851": "lance", "2078": "staff", "2079": "axe", "2080": "lance", "2291": "staff", "2420": "sword", "2597": "sword", "2814": "bow", "2848": "dagger", "3109": "shield", "3150": "dagger", "3307": "axe", "3308": "lance", "4250": "sword", "4474": "staff", "4767": "sword", "4769": "staff", "4942": "sword", "5224": "dagger", "5341": "lance", "6029": "bow", "6030": "bow", "8189": "sword", "8521": "dagger", "9000": "sword", "9365": "staff", "9454": "dagger", "9648": "dagger", "9677": "sword", "9824": "axe", "10300": "lance", "10324": "sword", "10517": "sword", "10520": "lance", "10521": "staff", "10522": "dagger", "10523": "bow", "10524": "staff", "10527": "dagger", "10800": "sword", "10958": "sword", "11244": "sword", "11246": "sword", "12345": "staff", "12387": "axe", "12388": "any", "12393": "bow", "12399": "bow", "12450": "lance", "12451": "sword", "12775": "dagger", "12776": "dagger", "12857": "sword", "13186": "bow", "13285": "sword", "13288": "staff", "13574": "staff", "13780": "sword", "14091": "bow", "14405": "bow", "14903": "bow", "14904": "sword", "15251": "lance", "16107": "bow", "16109": "sword", "16110": "lance", "16119": "bow", "16919": "sword", "17115": "sword", "17116": "sword", "17117": "staff", "17118": "sword", "17583": "any", "17686": "axe", "17687": "bow", "17688": "any", "17689": "any", "19048": "staff", "19050": "sword", "19051": "bow", "19277": "dagger", "21928": "bow", "21931": "sword" },
+        "expertise": { "72": "sword", "73": "sword", "77": "bow", "159": "sword", "405": "sword", "408": "any", "460": "sword", "463": "sword", "512": "shield", "523": "sword", "577": "staff", "578": "staff", "680": "lance", "688": "sword", "712": "lance", "733": "sword", "735": "bow", "767": "staff", "769": "sword", "844": "dagger", "999": "lance", "1001": "sword", "1550": "sword", "1824": "dagger", "1850": "lance", "1851": "lance", "2078": "staff", "2079": "axe", "2080": "lance", "2291": "staff", "2420": "sword", "2597": "sword", "2814": "bow", "2848": "dagger", "3109": "shield", "3150": "dagger", "3307": "axe", "3308": "lance", "4250": "sword", "4474": "staff", "4767": "sword", "4769": "staff", "4942": "sword", "5224": "dagger", "5341": "lance", "6029": "bow", "6030": "bow", "8189": "sword", "8521": "dagger", "9000": "sword", "9365": "staff", "9454": "dagger", "9648": "dagger", "9677": "sword", "9824": "axe", "10300": "lance", "10324": "sword", "10517": "sword", "10520": "lance", "10521": "staff", "10522": "dagger", "10523": "bow", "10524": "staff", "10527": "dagger", "10800": "sword", "10958": "sword", "11244": "sword", "11246": "sword", "12345": "staff", "12387": "axe", "12388": "any", "12393": "bow", "12399": "bow", "12450": "lance", "12451": "sword", "12775": "dagger", "12776": "dagger", "12857": "sword", "13186": "bow", "13285": "sword", "13288": "staff", "13574": "staff", "13780": "sword", "14091": "bow", "14405": "bow", "14903": "bow", "14904": "sword", "15251": "lance", "16107": "bow", "16109": "sword", "16110": "lance", "16119": "bow", "16919": "sword", "17115": "sword", "17116": "sword", "17117": "staff", "17118": "sword", "17583": "any", "17686": "axe", "17687": "bow", "17688": "any", "17689": "any", "19048": "staff", "19050": "sword", "19051": "bow", "19277": "dagger", "21928": "bow", "21931": "sword", "23185": "sword" },
     },
 };
 
@@ -148,6 +148,7 @@ const retainItemStats = new Map<string, { timeout: NodeJS.Timeout, stats: Weapon
 export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
 
     let dStats: DetailedStats = {
+        "id": id,
         "name": characters[id].name,
         "hp": baseHP(id),
         "maxhp": 1,
@@ -273,13 +274,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add weapon stats if available
         if (inv.equipment.weapon) {
             clearTimeout(retainItemStats.get(inv.equipment.weapon)?.timeout);
-            weapon = retainItemStats.get(inv.equipment.weapon)?.stats ?? await getWeaponSchema(inv.equipment.weapon);
+            const cachedItem = retainItemStats.get(inv.equipment.weapon)?.stats;
+            weapon = cachedItem ?? await getWeaponSchema(inv.equipment.weapon);
 
             if (weapon) {
                 retainItemStats.set(inv.equipment.weapon, { stats: weapon, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.weapon), 10 * 1000) });
 
                 dStats.uniqueids.push(weapon.uniqueid.split(":")[0]);
-                weapon.level = getItemLevel(weapon.level);
+                if (cachedItem === undefined) weapon.level = getItemLevel(weapon.level);
 
                 const item = items[weapon.itemid];
                 if (item instanceof weaponInfo) {
@@ -321,13 +323,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add shield stats if available
         if (inv.equipment.shield && (inv.premium > 3 || inv.shield_slot)) {
             clearTimeout(retainItemStats.get(inv.equipment.shield)?.timeout);
-            shield = retainItemStats.get(inv.equipment.shield)?.stats ?? await getWeaponSchema(inv.equipment.shield);
+            const cachedItem = retainItemStats.get(inv.equipment.shield)?.stats;
+            shield = cachedItem ?? await getWeaponSchema(inv.equipment.shield);
 
             if (shield) {
                 retainItemStats.set(inv.equipment.shield, { stats: shield, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.shield), 10 * 1000) });
 
                 dStats.uniqueids.push(shield.uniqueid.split(":")[0]);
-                shield.level = getItemLevel(shield.level);
+                if (cachedItem === undefined) shield.level = getItemLevel(shield.level);
 
                 const item = items[shield.itemid];
                 if (item instanceof weaponInfo) {
@@ -364,13 +367,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add helmet stat if available
         if (inv.equipment.helmet) {
             clearTimeout(retainItemStats.get(inv.equipment.helmet)?.timeout);
-            helmet = retainItemStats.get(inv.equipment.helmet)?.stats ?? await getWeaponSchema(inv.equipment.helmet);
+            const cachedItem = retainItemStats.get(inv.equipment.helmet)?.stats;
+            helmet = cachedItem ?? await getWeaponSchema(inv.equipment.helmet);
 
             if (helmet) {
                 retainItemStats.set(inv.equipment.helmet, { stats: helmet, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.helmet), 10 * 1000) });
 
                 dStats.uniqueids.push(helmet.uniqueid.split(":")[0]);
-                helmet.level = getItemLevel(helmet.level);
+                if (cachedItem === undefined) helmet.level = getItemLevel(helmet.level);
 
                 const item = items[helmet.itemid];
                 if (item instanceof armorInfo) {
@@ -388,12 +392,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add cuirass stat if available
         if (inv.equipment.cuirass) {
             clearTimeout(retainItemStats.get(inv.equipment.cuirass)?.timeout);
-            cuirass = retainItemStats.get(inv.equipment.cuirass)?.stats ?? await getWeaponSchema(inv.equipment.cuirass);
+            const cachedItem = retainItemStats.get(inv.equipment.cuirass)?.stats;
+            cuirass = cachedItem ?? await getWeaponSchema(inv.equipment.cuirass);
+
             if (cuirass) {
                 retainItemStats.set(inv.equipment.cuirass, { stats: cuirass, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.cuirass), 10 * 1000) });
 
                 dStats.uniqueids.push(cuirass.uniqueid.split(":")[0]);
-                cuirass.level = getItemLevel(cuirass.level);
+                if (cachedItem === undefined) cuirass.level = getItemLevel(cuirass.level);
 
                 const item = items[cuirass.itemid];
                 if (item instanceof armorInfo) {
@@ -411,13 +417,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.gloves) {
             clearTimeout(retainItemStats.get(inv.equipment.gloves)?.timeout);
-            gloves = retainItemStats.get(inv.equipment.gloves)?.stats ?? await getWeaponSchema(inv.equipment.gloves);
+            const cachedItem = retainItemStats.get(inv.equipment.gloves)?.stats;
+            gloves = cachedItem ?? await getWeaponSchema(inv.equipment.gloves);
 
             if (gloves) {
                 retainItemStats.set(inv.equipment.gloves, { stats: gloves, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.gloves), 10 * 1000) });
 
                 dStats.uniqueids.push(gloves.uniqueid.split(":")[0]);
-                gloves.level = getItemLevel(gloves.level);
+                if (cachedItem === undefined) gloves.level = getItemLevel(gloves.level);
 
                 const item = items[gloves.itemid];
                 if (item instanceof armorInfo) {
@@ -435,13 +442,14 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         // Add gloves stat if available
         if (inv.equipment.boots) {
             clearTimeout(retainItemStats.get(inv.equipment.boots)?.timeout);
-            boots = retainItemStats.get(inv.equipment.boots)?.stats ?? await getWeaponSchema(inv.equipment.boots);
+            const cachedItem = retainItemStats.get(inv.equipment.boots)?.stats;
+            boots = cachedItem ?? await getWeaponSchema(inv.equipment.boots);
 
             if (boots) {
                 retainItemStats.set(inv.equipment.boots, { stats: boots, timeout: setTimeout(() => retainItemStats.delete(inv.equipment.boots), 10 * 1000) });
 
                 dStats.uniqueids.push(boots.uniqueid.split(":")[0]);
-                boots.level = getItemLevel(boots.level);
+                if (cachedItem === undefined) boots.level = getItemLevel(boots.level);
 
                 const item = items[boots.itemid];
                 if (item instanceof armorInfo) {
@@ -683,7 +691,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         mr: Math.max(Math.pow(0.99895, options.defMultiplier * effectiveMr), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
         crit: (isCrit ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
-        lightning: 1 + (options.isLightning ? (attacker.lightningMultiplier ?? 0) : 0),
+        lightning: 1 + (options.isLightning ? (attacker.lightningMultiplier || 0) : 0),
         rng: (1 - (0.2 * Math.random())),
     };
     if (attacker.shorekeeperUsedActive && !isCrit) options.critMultiplier * attacker.cd;
@@ -704,6 +712,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             const power = ((Math.log(damage) / Math.log(2)) - 7);
 
             damage = Math.floor(base * Math.pow(scale, power));
+            if (attacker.damageRescaling) damage = Math.floor(damage * attacker.damageRescaling);
         };
     };
 
@@ -828,9 +837,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     // if (options.selfheal && matchStats.selfhealChance > options.selfhealChance) attacker.hp += Math.floor(damage * matchStats.selfheal);
     if (options.selfheal && options.selfhealAmount) attacker.hp += Math.floor(damage * options.selfhealAmount);
     if (options.selfheal && attacker.selfheal) {
+        let selfHealedTotal = 0;
         for (let i = 0; i < attacker.selfheal.length; i++) {
-            if (attacker.selfhealChance[i] > Math.random()) attacker.hp += Math.floor(damage * attacker.selfheal[i]);
+            if (attacker.selfhealChance[i] > Math.random()) selfHealedTotal += damage * attacker.selfheal[i];
         };
+        attacker.hp += Math.floor(Math.min(selfHealedTotal, attacker.maxhp * 0.5));
     };
     if (options.selfdmg && Math.random() < matchStats.selfdmg) attacker.hp -= damage;
     if ("gintokiStacks" in attacker && isCrit) attacker.gintokiStacks = 0;
@@ -995,7 +1006,7 @@ export const search = (name: string | number, inv: number[], interaction: ChatIn
     name = name.toString().toLowerCase().split(" ").filter((e) => e).join(" ");
     if (name === "last" || name === "latest") name = inv[inv.length - 1].toString();
 
-    if (!isNaN(parseInt(name))) {
+    if (!isNaN(Number(name))) {
         if (parseInt(name) < 0) {
             if (!silent) interaction.reply("The ID can't be negative.");
             return;
@@ -1151,6 +1162,16 @@ export const userLevel = (xpr: number) => {
         level++;
     };
     return level;
+};
+
+export const userLevelToXP = (level: number): number => {
+    if (level <= 1) return 0;
+
+    let totalXP = 0;
+    for (let i = 1; i < level; i++) {
+        totalXP += Math.floor(5 * Math.log(i) ** 4 + 30);
+    };
+    return Math.floor(totalXP);
 };
 
 export const getClassLvl = (cls: number, classLevels: Record<string, number>) => {

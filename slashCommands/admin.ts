@@ -5,7 +5,6 @@ import { classLevelToXP, search, searchItem, showPage } from "../Modules/functio
 import { OfferRow, PageRow, cowSettings } from "../Modules/components";
 import { requestVerification, dungeonTempBan } from "../Modules/components";
 import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
-import * as math from 'mathjs';
 import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers } from '../Modules/queries';
 import { query } from '../postgres';
@@ -221,7 +220,7 @@ const exportCommand: SlashCommand = {
             const item = searchItem(args.join(" "), interaction, true);
             if (!item?.name) return interaction.reply({ content: `Error: Couldn't find item "${args.join(" ")}"\n\nUsage: \`/admin add weapon <name> user:@user [--id:string] [--level:number]\`\n\n**Options**\n\`name\`: Name or ID of the item to be added\n\`--id\`: Custom ID for the item\n\`--level\`: Starting level for the item`, ephemeral });
 
-            if (!(item.category === "weapon" || item.category === "armor")) return interaction.reply({ content: `Error: Item must be a weapon or armor piece`, ephemeral });
+            if (!(item.category === "weapon" || item.category === "armor" || item.category === "ring")) return interaction.reply({ content: `Error: Item must be a weapon, an armor piece or a ring`, ephemeral });
 
             // Calculate XP and required ascension if level provided
             let xp = 0;
@@ -363,7 +362,7 @@ const exportCommand: SlashCommand = {
         // Mail
         if (cmd === "mail" || cmd === "mailbox" || cmd === "gift") {
             args = args.join(" ").split("-BR-");
-            if (!args[0] || !args[1] || !args[2]) return interaction.reply({ content: "Sending Gifts\n> `/admin gift <type>-BR-<rewards>-BR-<message>`\n> `/admin cmd args[0] args[1] args.slice(2)`\n\nTypes:\n> 1 = xp\n> 2 = coins\n> 3 = ss shard|s shard|a shard|b shard|c shard|d shard\n> 4 = ss ticket|s ticket|a ticket|b ticket|c ticket|d ticket\n> 5 = lb\n> 6 = char\n> 7 = skin\n> 8 = item\n> 9 = gems\n\nExamples:\n> `/admin gift 1,2,8-BR-xp|50,coins|500,item|458|3-BR-Thank you for playing!`", ephemeral });
+            if (!args[0] || !args[1] || !args[2]) return interaction.reply({ content: "Sending Gifts\n> `/admin gift <type>-BR-<rewards>-BR-<message>`\n> `/admin cmd args[0] args[1] args.slice(2)`\n\nTypes:\n> 1 = xp\n> 2 = coins\n> 3 = ss shard|s shard|a shard|b shard|c shard|d shard\n> 4 = ss ticket|s ticket|a ticket|b ticket|c ticket|d ticket\n> 5 = lb\n> 6 = char\n> 7 = skin\n> 8 = item\n> 9 = gems\n> 10 = marks\n> 11 = skillpts\n\nExamples:\n> `/admin gift 1,2,8-BR-xp|50,coins|500,item|458|3-BR-Thank you for playing!`", ephemeral });
 
             const mail = { "type": args[0], "rewards": args[1], "message": args.slice(2).join(""), "date": new Date().getTime() };
 

@@ -179,6 +179,7 @@ type ReplaceButton = {
 };
 
 export type DetailedStats = {
+    id: number;
     name: string;
     hp: number;
     maxhp: number;
@@ -341,6 +342,7 @@ export interface UserSchema {
     guild: string | null;
     donatedtotal: number;
     genesispity: number;
+    genesisdupepity: number;
     presets: Array<{
         character?: number;
         class?: number;
@@ -396,9 +398,8 @@ export interface UserSchema {
     cow_chars: number[];
     cow_timer: number | null;
     cow_rolled_today: number;
-    rank: number;
+    // rank: number;
     rankscore: number;
-    raidxp: number;
     guild_marks: number;
     image_credits: number;
     skill_tree: Record<string, number>;
@@ -534,10 +535,15 @@ export interface RaidSchema {
     rowid: number;
     guildid: string;
     raidid: number;
+    rank_letter: RaidRank;
     enemy_hp: number;
     enemy_hpmax: number;
+    /**
+     * [damage, runs]
+     */
     participation: Record<string, [number, number]>;
     start_date: Date;
+    end_date: Date | null;
 }
 
 export type RankShopTransaction = {

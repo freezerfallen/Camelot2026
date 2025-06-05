@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, ColorResolvable, TextInputBuilder, TextInputStyle, ModalBuilder } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, ColorResolvable, TextInputBuilder, TextInputStyle, ModalBuilder, StringSelectMenuBuilder, SelectMenuComponentOptionData } from "discord.js";
 import { abilities } from "../Modules/abilities";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
@@ -7,25 +7,29 @@ import { raids } from "../Modules/raids";
 import { armorInfo, itemInfo, items, ringInfo, weaponInfo } from "../Modules/items";
 import { skills } from "../Modules/skills";
 import { characters } from "../Modules/chars";
-import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search } from "../Modules/functions";
+import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, getLetterRank, formatNumberWithQuotes } from "../Modules/functions";
 import { AbilityResponse, dungeonTempBan, raidRankIndices, raidRankLetters } from "../Modules/components";
 import delayedBuffs from "../Modules/delayedBuffs";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { CompactUserSchema, DetailedStats, GuildSchema, RaidSchema, SlashCommand } from '../types';
-import { getGuildSchema, getLatestRaid, getWeaponSchemas, updateRaidParticipation, updateUsers } from '../Modules/queries';
+import { CompactUserSchema, DetailedStats, GuildSchema, RaidRank, RaidSchema, SlashCommand } from '../types';
+import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
 
-function getRaidButtonRow(tab: string, canPlay: boolean): ActionRowBuilder<ButtonBuilder> {
+//! FOR THE BETA ONLY
+const DAILY_RAID_ATTEMPTS = 20 as const; // 4 attempts per day
+//! FOR THE BETA ONLY
+
+function getRaidButtonRow(tab: string, canPlay: boolean, raidHasEnded: boolean): ActionRowBuilder<ButtonBuilder> {
     const buttons = [
         new ButtonBuilder()
             .setCustomId('play')
-            .setLabel(`Start Battle`)
+            .setLabel(raidHasEnded ? "Raid has Ended!" : "Start Battle")
             .setStyle(ButtonStyle.Danger)
-            .setDisabled(!canPlay),
+            .setDisabled(!canPlay || raidHasEnded),
         new ButtonBuilder()
             .setCustomId('ranking')
             .setLabel(tab === "overview" ? "Show Ranking" : "Show Overview")
@@ -84,13 +88,129 @@ const timeLeft = (endDate: Date) => {
     return timeLeft;
 };
 
+async function raidSelection(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema): Promise<void> {
+
+    const members = await getUserSchemas(guild.members);
+    const atkBuff = 1 + (0.2 * guild.atkbuff);
+    const hpBuff = 1 + (0.2 * guild.hpbuff);
+    const defBuff = 1 + (0.1 * guild.defbuff);
+    const guildRankScore = Math.floor((members.reduce((acc, curr) => acc + curr.rankscore, 0) * atkBuff * hpBuff * defBuff) / 20);
+    const guildRankIndex = raidRankIndices[getLetterRank(guildRankScore)];
+
+    let options: SelectMenuComponentOptionData[] = [];
+    raids.filter((e) => e.phase === 1).sort((a, b) => a.rankValue - b.rankValue).forEach((e) => {
+        options.push({
+            label: e.name,
+            emoji: guildRankIndex > raidRankIndices[e.rank] ? "🟢" : (guildRankIndex === raidRankIndices[e.rank] ? "🟠" : ((guildRankIndex + 3) >= raidRankIndices[e.rank] ? "🔴" : "⚫")),
+            description: `Rank ${e.rank}`,
+            value: e.id + "",
+        });
+    });
+
+    const selection = new ActionRowBuilder<StringSelectMenuBuilder>()
+        .addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('raid_selection')
+                .setPlaceholder('Select a raid...')
+                .addOptions(options),
+        );
+
+    let currentlySelected: number | undefined;
+    let currentRankUp = 0;
+
+    function getButtonRow() {
+        return new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('confirm')
+                    .setLabel(`Confirm`)
+                    .setStyle(ButtonStyle.Success)
+                    .setDisabled(currentlySelected === undefined),
+            ).addComponents(
+                new ButtonBuilder()
+                    .setCustomId('rankup')
+                    .setLabel(`Increase Rank`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(currentlySelected === undefined),
+            );
+    };
+
+    function getDesc() {
+        const raidRewards = currentlySelected !== undefined ? getRaidRewardPool(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp], 20, 1) : undefined;
+        return `## Raid Selection\nPlease select a raid to tackle with your guild. You will have **5** days to complete it, with each of your members getting **4** attempts per day. Attempts can be stacked, so busy guild members can do all 20 on the last day if needed!` +
+            `\n\n**Selected Raid**: ${(currentlySelected !== undefined && raidRewards) ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}\n### Reward Pool:\n>>> -# **${formatNumberWithQuotes(raidRewards.coins)}x** <:coins:872926669055356939>\n-# **${formatNumberWithQuotes(raidRewards.guild_marks)}x** <:guild_mark:1317944450814840923>\n-# **${formatNumberWithQuotes(raidRewards.skill_points)}x** <:skill_point:1351505460301136014>\n-# **${formatNumberWithQuotes(raidRewards.glorious_chest)}x** <:glorious_chest:1069076067081539726>\n-# **${formatNumberWithQuotes(raidRewards.luxurious_chest)}x** <:luxurious_chest:1069300112364404817>\n-# **${formatNumberWithQuotes(raidRewards.royal_chest)}x** <:royal_chest:1069301128711376976>${raidRewards.deluxe_chest > 0 ? `\n-# **${formatNumberWithQuotes(raidRewards.deluxe_chest)}x** <:deluxe_chest:1069301259603026061>` : ""}\n-# **${formatNumberWithQuotes(raidRewards.featured_ring)}x** ${raids[currentlySelected ?? 0].loot.map((e) => items[e].emoji).join(" | ")}` : "`None`"}`;
+    };
+
+    const Embed = new EmbedBuilder()
+        .setColor(0xff3838)
+        .setDescription(getDesc());
+    interaction.reply({ embeds: [Embed], components: [selection, getButtonRow()] }).then((msg) => {
+
+        const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "raid_selection", componentType: ComponentType.StringSelect, time: 120000 });
+        const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 120000 });
+        const rankup = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "rankup", componentType: ComponentType.Button, time: 120000 });
+
+        collector.on('collect', async r => {
+            await r.deferUpdate().catch(() => {
+                console.log(`ERROR Interaction Failed 'deferUpdate()', command: "${interaction.commandName}"`);
+            });
+
+            currentlySelected = parseInt(r.values[0]);
+            currentRankUp = 0;
+
+            Embed
+                .setDescription(getDesc())
+                .setThumbnail(raids[currentlySelected].enemy.image[0])
+                .setColor(raids[currentlySelected].accentColor as ColorResolvable);
+            interaction.editReply({ embeds: [Embed], components: [selection, getButtonRow()] });
+        });
+
+        confirm.on('collect', async () => {
+            collector.stop(); confirm.stop(); rankup.stop();
+
+            if (currentlySelected === undefined) return interaction.followUp({ content: "Please select a raid first", ephemeral: true });
+
+            const raid = await getLatestRaid(guild.id);
+
+            if (!raid) {
+                const newRaid = await insertNewRaid(guild.id, currentlySelected, raids[currentlySelected].getRankHp(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]), raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]);
+                if (newRaid) {
+                    interaction.followUp({ content: "Raid started successfully!" });
+                } else {
+                    interaction.followUp({ content: "Failed to start raid, please try again later" });
+                };
+                interaction.editReply({ components: [] });
+            } else {
+                interaction.followUp({ content: "You already have an active raid, please finish it before attempting to start a new one.", ephemeral: true });
+            };
+        });
+
+        rankup.on('collect', async () => {
+            if (currentlySelected === undefined) return interaction.followUp({ content: "Please select a raid first", ephemeral: true });
+
+            // Check if rank is maxed
+            if ((raids[currentlySelected].rankValue + currentRankUp + 1) > raids[currentlySelected].maxRankValue) {
+                return interaction.followUp({ content: "You have already reached the maximum rank for this raid", ephemeral: true });
+            };
+
+            // Increment rank
+            currentRankUp++;
+
+            // Update embed
+            Embed.setDescription(getDesc());
+            interaction.editReply({ embeds: [Embed], components: [selection, getButtonRow()] });
+        });
+
+    });
+};
+
 function rankupOverview(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[]): Promise<number> {
     return new Promise((resolve) => {
 
         const currentRaid = raids[raid.raidid];
         if (!currentRaid) return interaction.reply("Unexpected Error: Raid not found\nPlease open a ticket in our `/support` server if you encounter this error.");
 
-        const startDate = new Date(new Date(raid.start_date).setHours(24, 0, 0, 0));
+        const startDate = new Date(raid.start_date);
         const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000);
 
         // const tips = [
@@ -100,14 +220,15 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
         let tab: "overview" | "ranking" = "overview";
 
         const attemptsUsed = raid.participation[interaction.user.id]?.[1] ?? 0;
-        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * 4;
+        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
+
         const attemptsLeft = attemptsTotal - attemptsUsed;
 
         const getDesc = (): string => {
             if (tab === "overview") {
                 return `### Raid Overview`
                     // + `\nAfter the exam you will be assigned a rank based on your performance.`
-                    + `\n**Enemy**: ${currentRaid.enemy.name} (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${raid.enemy_hp}**/${raid.enemy_hpmax} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
+                    + `\n**Enemy**: ${currentRaid.enemy.name} [${raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${formatNumberWithQuotes(Math.max(0, raid.enemy_hp))}**/${formatNumberWithQuotes(raid.enemy_hpmax)} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
                     + `\n\n**Traits**\n- ${currentRaid.enemy.ability?.list[0].join("\n- ")}`
                     // + `\n\n**Stats**\n**Current Rank**: ${stats.rank}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
                     + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}`
@@ -118,8 +239,8 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         Array(Math.max(0, getRingSlotsTotal(stats) - userItems.filter((e) => e.category === "ring").length)).fill("<:ring_empty:1034509903886299136>")
                     ).concat(["<:locked:1034511902417621002>", "<:locked:1034511902417621002>", "<:locked:1034511902417621002>"]).slice(0, 3).join("")
 
-                    + (stats.rank < raidRankIndices["B"] ? "\n**Support 1**: <:locked:1034511902417621002> (unlocks after reaching rank **B**)" : `\n**Support 1**: ${(stats.raid_supports[0] !== undefined && stats.raid_supports[0] !== null) ? characters[stats.raid_supports[0]].name : "`None`"}`)
-                    + (stats.rank < raidRankIndices["S"] ? "\n**Support 2**: <:locked:1034511902417621002> (unlocks after reaching rank **S**)" : `\n**Support 2**: ${(stats.raid_supports[1] !== undefined && stats.raid_supports[1] !== null) ? characters[stats.raid_supports[1]].name : "`None`"}`)
+                    + (raidRankIndices[getLetterRank(stats.rankscore)] < raidRankIndices["B"] ? "\n**Support 1**: <:locked:1034511902417621002> (unlocks after reaching rank **B**)" : `\n**Support 1**: ${(stats.raid_supports[0] !== undefined && stats.raid_supports[0] !== null) ? characters[stats.raid_supports[0]].name : "`None`"}`)
+                    + (raidRankIndices[getLetterRank(stats.rankscore)] < raidRankIndices["S"] ? "\n**Support 2**: <:locked:1034511902417621002> (unlocks after reaching rank **S**)" : `\n**Support 2**: ${(stats.raid_supports[1] !== undefined && stats.raid_supports[1] !== null) ? characters[stats.raid_supports[1]].name : "`None`"}`)
                     + `\n\n-# Attempts left: ${attemptsLeft}/${attemptsTotal}`;
                 // + `\n\n-# <:info:1131679799207796756> ${tips[Math.floor(Math.random() * tips.length)]}`;
             } else if (tab === "ranking") {
@@ -139,7 +260,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
             .setColor(0xff3838)
             .setThumbnail(currentRaid.enemy.image[0])
             .setDescription(getDesc());
-        interaction.reply({ embeds: [Embed], components: [getRaidButtonRow(tab, attemptsLeft > 0)] }).then((msg) => {
+        interaction.reply({ embeds: [Embed], components: [getRaidButtonRow(tab, attemptsLeft > 0, raid.enemy_hp <= 0)] }).then((msg) => {
             const play = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "play", componentType: ComponentType.Button, time: 90000 });
             const ranking = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ranking", componentType: ComponentType.Button, time: 90000 });
             const edit = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ignore_defer-edit", componentType: ComponentType.Button, time: 90000 });
@@ -156,7 +277,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
 
             ranking.on('collect', () => {
                 tab = (tab === "overview") ? "ranking" : "overview";
-                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [getRaidButtonRow(tab, attemptsLeft > 0)] });
+                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [getRaidButtonRow(tab, attemptsLeft > 0, raid.enemy_hp <= 0)] });
             });
 
             edit.on('collect', (rr) => {
@@ -172,6 +293,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         let getChar = search(support1, stats.chars, interaction, true);
                         if (getChar?.name) {
                             if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
+                            if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
                             stats.raid_supports[0] = getChar.id;
                         };
                         if (support1 === "remove") stats.raid_supports.shift();
@@ -181,6 +303,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                         let getChar = search(support2, stats.chars, interaction, true);
                         if (getChar?.name) {
                             if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
+                            if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
                             if (stats.raid_supports[0] !== 0) stats.raid_supports[1] = getChar.id;
                             else stats.raid_supports[0] = getChar.id;
                         };
@@ -206,37 +329,210 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
     });
 };
 
+type RaidRewards = {
+    coins: number;
+    guild_marks: number;
+    skill_points: number;
+    featured_ring: number;
+    glorious_chest: number;
+    luxurious_chest: number;
+    royal_chest: number;
+    deluxe_chest: number;
+};
+
+const raidRewards: Record<string, RaidRewards> = {
+    "C-": {
+        coins: 200000,       // 5% = 10000
+        guild_marks: 1000,   // 5% =    50
+        skill_points: 40,    // 5% =     2
+        featured_ring: 2,    // 5% =     0.1
+        glorious_chest: 60,  // 5% =     3
+        luxurious_chest: 20, // 5% =     1
+        royal_chest: 6,      // 5% =     0.3
+        deluxe_chest: 0,     // 5% =     0
+    },
+    "B-": {
+        coins: 300000,
+        guild_marks: 1500,
+        skill_points: 60,
+        featured_ring: 3,
+        glorious_chest: 90,
+        luxurious_chest: 30,
+        royal_chest: 9,
+        deluxe_chest: 0,
+    },
+    "A-": {
+        coins: 400000,
+        guild_marks: 2000,
+        skill_points: 80,
+        featured_ring: 4,
+        glorious_chest: 120,
+        luxurious_chest: 40,
+        royal_chest: 12,
+        deluxe_chest: 4, // 5% = 0.2
+    },
+    "S-": {
+        coins: 500000,
+        guild_marks: 2500,
+        skill_points: 100,
+        featured_ring: 5,
+        glorious_chest: 150,
+        luxurious_chest: 50,
+        royal_chest: 15,
+        deluxe_chest: 6,
+    },
+    "SS-": {
+        coins: 600000,
+        guild_marks: 3000,
+        skill_points: 120,
+        featured_ring: 6,
+        glorious_chest: 180,
+        luxurious_chest: 60,
+        royal_chest: 18,
+        deluxe_chest: 8,
+    },
+    "SSS-": {
+        coins: 700000,
+        guild_marks: 3500,
+        skill_points: 140,
+        featured_ring: 7,
+        glorious_chest: 210,
+        luxurious_chest: 70,
+        royal_chest: 21,
+        deluxe_chest: 10,
+    },
+    "EX-": {
+        coins: 800000,
+        guild_marks: 4000,
+        skill_points: 160,
+        featured_ring: 8,
+        glorious_chest: 240,
+        luxurious_chest: 80,
+        royal_chest: 24,
+        deluxe_chest: 12,
+    },
+} as const;
+
+function getRaidRewardPool(rank: RaidRank, participants: number, sumOfShares: number) {
+    const indexValue = raidRankIndices[rank];
+
+    const baseline = Math.max(9, Math.floor(indexValue / 3) * 3);
+    const offset = indexValue % 3;
+
+    // Copy the pool
+    const rewardPool = _.cloneDeep(raidRewards[raidRankLetters[baseline]]);
+
+    // Adjust the reward pool based on the number of participants
+    const multiplier = (participants / 20); // * sumOfShares; // (1 + (0.15 * offset)) * (participants / 20) * sumOfShares;
+    for (const key in rewardPool) {
+        if (Object.prototype.hasOwnProperty.call(rewardPool, key)) {
+            const rawAmount = (rewardPool[key as keyof typeof rewardPool] + (raidRewards["C-"][key as keyof typeof rewardPool] * (0.15 * offset))) * multiplier;
+            rewardPool[key as keyof typeof rewardPool] = Math.floor(rawAmount + (((rawAmount % 1) > Math.random()) ? 1 : 0));
+        };
+    };
+
+    return rewardPool;
+};
+
 const endedRaids = new Set();
 
-function endRaid(raidId: number) {
+async function endRaid(raidRowId: number) {
 
     // Make sure to only send rewards once
-    if (endedRaids.has(raidId)) return;
-    endedRaids.add(raidId);
+    if (endedRaids.has(raidRowId)) return;
+    endedRaids.add(raidRowId);
     setTimeout(() => {
-        endedRaids.delete(raidId);
+        endedRaids.delete(raidRowId);
     }, 10 * 60 * 1000);
 
+    // Fetch Raid
+    const raid = await getRaidByRaidRowId(raidRowId);
+    if (!raid) return;
 
-    // db.serialize(async () => {
-    //     const { 0: stampede } = await query(`SELECT rowid, * FROM stampedes ORDER BY rowid DESC LIMIT 1`);
-    //     stampede.participation = JSON.parse(stampede.participation);
+    // Distribute Rewards
+    const totalPoints = Object.values(raid.participation).reduce((acc, [points]) => acc + points, 0);
+    const players = Object.entries(raid.participation).map((e) => ({
+        id: e[0],
+        points: e[1][0],
+        rounds: e[1][1],
+        rank: 0,
+        /**
+         * Capped between 0.025 and 0.1
+         */
+        share: Math.min(Math.max(e[1][0] / totalPoints, 0.025), 0.1),
+        percentile: 0,
+        rewards: { coins: 0, guild_marks: 0, skill_points: 0, featured_ring: 0, glorious_chest: 0, luxurious_chest: 0, royal_chest: 0, deluxe_chest: 0 }
+    }));
 
-    //     let mailboxes = await query(`SELECT id, mailbox FROM users WHERE id IN (${Object.keys(stampede.participation).join(", ")})`);
+    // Calculate percentiles
+    players.sort((a, b) => b.points - a.points);
+    for (let i = 0; i < players.length; i++) {
+        players[i].percentile = (players[i - 1]?.percentile ?? 0) + players[i].share;
+        players[i].rank = i + 1;
+    };
 
-    //     const players = Object.entries(stampede.participation).map((e) => ({ id: e[0], points: e[1][0], rounds: e[1][1], mailbox: JSON.parse(mailboxes.find((mailbox) => mailbox.id === e[0])?.mailbox || "[]") }));
-    //     const playersWithPrizes = distributePrizes(players, prizePool);
+    // Const reward pool
+    const sumOfShares = players.reduce((acc, player) => acc + player.share, 0);
+    const rewardPool = getRaidRewardPool(raid.rank_letter, players.length, sumOfShares);
+    const remainingRewards = _.cloneDeep(rewardPool);
 
-    //     for (const player of playersWithPrizes) {
-    //         const paricipationRewards = participationPrize(stampede.participation[player.id]?.[1] ?? 0);
-    //         const mail = { "type": "2,4,8,9", "rewards": `coins|${paricipationRewards.coins + player.coins},gems|${paricipationRewards.gems + player.gems},item|458|${paricipationRewards.deluxe + player.deluxe},item|457|${paricipationRewards.royal + player.royal},item|454|${paricipationRewards.glorious + player.glorious},item|683|${paricipationRewards.kernel + player.kernel},ss ticket|${paricipationRewards.ssticket + player.ssticket},s ticket|${paricipationRewards.sticket + player.sticket},a ticket|${paricipationRewards.aticket + player.aticket}`, "message": "Stampede Rewards", "date": new Date().getTime() };
+    // Distribute rewards
+    for (const player of players) {
+        Object.entries(player.rewards).forEach(([key, value]) => {
+            const shareReward = Math.floor(player.share * (1 / sumOfShares) * rewardPool[key as keyof typeof rewardPool]);
+            if (shareReward) {
+                player.rewards[key as keyof typeof player.rewards] += shareReward;
+                remainingRewards[key as keyof typeof remainingRewards] -= shareReward;
+            };
+        });
+    };
 
-    //         player.mailbox.push(mail);
-    //         await query(`UPDATE users SET mailbox = '${JSON.stringify(player.mailbox)}' WHERE id = ${player.id}`);
-    //     };
+    // Distribute remaining rewards
+    for (let [key, value] of Object.entries(remainingRewards)) {
+        if (value >= 1) {
+            let maxIterations = players.length;
+            while (value >= 1 && maxIterations > 0) {
+                const weightedRandomNumber = Math.random() * sumOfShares;
+                const weightedRandomPlayer = players.find((player) => weightedRandomNumber <= player.percentile);
+                if (weightedRandomPlayer) {
+                    weightedRandomPlayer.rewards[key as keyof typeof weightedRandomPlayer.rewards] += 1;
+                };
+                value--;
+                maxIterations--;
+            };
+        };
+    };
 
-    //     console.log("Rewards sent successfully!");
-    // });
+    // Send mails
+    for (const player of players) {
+        const mail = {
+            "type": "2,10,11,8",
+            "rewards":
+                `coins|${player.rewards.coins}` +
+                (player.rewards.guild_marks > 0 ? `,marks|${player.rewards.guild_marks}` : "") +
+                (player.rewards.skill_points > 0 ? `,skillpts|${player.rewards.skill_points}` : "") +
+                (player.rewards.deluxe_chest > 0 ? `,item|458|${player.rewards.deluxe_chest}` : "") +
+                (player.rewards.royal_chest > 0 ? `,item|457|${player.rewards.royal_chest}` : "") +
+                (player.rewards.luxurious_chest > 0 ? `,item|456|${player.rewards.luxurious_chest}` : "") +
+                (player.rewards.glorious_chest > 0 ? `,item|454|${player.rewards.glorious_chest}` : "") +
+                (player.rewards.featured_ring > 0 ? `,item|${raids[raid.raidid].loot[Math.floor(Math.random() * raids[raid.raidid].loot.length)]}` : ""),
+            "message":
+                `## Raid Rewards\n\n` +
+                `You have ranked **#${player.rank}** out of **${players.length}** participants during this raid, dealing **${formatNumberWithQuotes(player.points)}** damage over **${player.rounds}** attempts <:Woah:928370799965003826>\n` +
+                `You have contributed **${((player.points / totalPoints) * 100).toFixed(2)}%** of the total damage to the boss, and received **${(((player.share / sumOfShares) * (players.length / 20)) * 100).toFixed(2)}%** of the rewards`,
+            "date": Date.now()
+        };
+
+        // Update users table
+        await updateUsers(player.id, {
+            mailbox: { type: "append", value: [mail] },
+        });
+
+        // // wait for 100ms
+        // await new Promise(resolve => setTimeout(resolve, 100));
+    };
+
+    // console.log(`Raid Rewards for ${raid.rowid} sent successfully!`);
 };
 
 const exportCommand: SlashCommand = {
@@ -244,6 +540,8 @@ const exportCommand: SlashCommand = {
     async execute({ interaction, author }) {
 
         const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
+
+        const cancelOption = interaction.options.getBoolean('cancel') ?? false;
 
         const stats = author.schema;
         if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
@@ -266,12 +564,26 @@ const exportCommand: SlashCommand = {
         };
 
         const raid = await getLatestRaid(guild.id);
-        if (!raid) return interaction.reply("There is no active raid at the moment. Please ask your guild master or an elder to start one!");
+        if (!raid) {
+            if ([guild.master, ...guild.elders].includes(interaction.user.id)) {
+                return raidSelection(interaction, stats, guild);
+            } else {
+                return interaction.reply("There is no active raid at the moment. Please ask your guild master or an elder to start one!");
+            };
+        };
 
-
-        //! REMOVE THIS
-        const test = interaction.options.getString("test");
-        if (test && raids[parseInt(test)]) raid.raidid = parseInt(test);
+        if (cancelOption) {
+            if ([guild.master, ...guild.elders].includes(interaction.user.id)) {
+                const result = await cancelRaid(raid.rowid);
+                if (result === "success") {
+                    return interaction.reply("Raid cancelled successfully! You may start a new one.");
+                } else {
+                    return interaction.reply("Failed to cancel raid. Please try again later.");
+                };
+            } else {
+                return interaction.reply({ content: "Only the guild master or elders can cancel a raid", ephemeral: true });
+            };
+        };
 
 
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots, stats.equipment.ring1, stats.equipment.ring2, stats.equipment.ring3]);
@@ -280,6 +592,15 @@ const exportCommand: SlashCommand = {
         // Overview
         let start = await rankupOverview(interaction, stats, guild, raid, userItems);
         if (start === -1) return;
+
+        // Return if no attempts left
+        const raidCheck = await getLatestRaid(guild.id);
+        if (!raidCheck) return interaction.followUp("An error occurred while checking your raid attempts. Please try again later.");
+
+        // Attempts left
+        const attemptsUsed = raidCheck.participation[interaction.user.id]?.[1] ?? 0;
+        const attemptsTotal = (Math.floor((Date.now() - new Date(raidCheck.start_date).getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
+        if (attemptsUsed >= attemptsTotal) return interaction.followUp(`You have already used all your available attempts (**0**/${attemptsTotal})`);
 
 
         const currentRaid = raids[raid.raidid];
@@ -301,6 +622,7 @@ const exportCommand: SlashCommand = {
         myStats.atk += Math.floor(myStats.atk * (guild.atkbuff * 0.2));
         myStats.md += Math.floor(myStats.md * (guild.atkbuff * 0.2));
         myStats.hp += Math.floor(myStats.hp * (guild.hpbuff * 0.2));
+        myStats.maxhp += Math.floor(myStats.maxhp * (guild.hpbuff * 0.2));
         const defBuff = guild.defbuff * 100;
         myStats.def += defBuff;
         myStats.mr += defBuff;
@@ -323,6 +645,7 @@ const exportCommand: SlashCommand = {
         // Battle Scale
         const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min(2192, Math.max(myStatsC.def, myStatsC.mr)));
         const enemyAtk = Math.floor((300 * enemyScale) * 1.05);
+        myStats.damageRescaling = enemyScale / 13; myStatsC.damageRescaling = enemyScale / 13;
 
         myStatsC.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats) => {
             eStats.atk *= (1 + (matchStats.round * 0.05));
@@ -333,8 +656,8 @@ const exportCommand: SlashCommand = {
 
         let eStats = {
             "name": enemy.name,
-            "hp": 1000000,
-            "maxhp": 1000000,
+            "hp": Math.floor(raid.enemy_hpmax / 100) * 10,
+            "maxhp": Math.floor(raid.enemy_hpmax / 100) * 10,
             "atk": enemyAtk * 0.2,
             "md": enemyAtk * 0.2,
             "def": 660,
@@ -381,7 +704,11 @@ const exportCommand: SlashCommand = {
 
             if (!raid) return;
 
-
+            // Revert Minion
+            if (matchStats.currentOpponent) {
+                eStatsC = { ...matchStats.eStatsCC };
+                matchStats.currentOpponent = 0;
+            };
 
             // Damage dealt
             const damageDealt = (eStats.hp - eStatsC.hp) < 0 ? 0 : (eStats.hp - eStatsC.hp);
@@ -389,19 +716,57 @@ const exportCommand: SlashCommand = {
             // Participation
             await updateRaidParticipation(raid.rowid, interaction.user.id, damageDealt);
 
+            //* LOOT DROPS
 
+            // Coins
+            const coinDrops = Math.min(Math.max(Math.floor(
+                (50 + (Math.random() * 25)) // Base: 50-75
+                * (1 + (raidRankIndices[raids[raid.raidid].rank] / 10)) // Raid Rank Buff
+                * (1 + (0.2 * (guild ? guild.lootbuff : 0))) // Guild Buff
+                * matchStats.lootm + matchStats.loot // Player Buffs
+            ), 0), 3000);
 
+            // Guild Marks
+            const guildMarks = Math.min(Math.max(Math.floor(
+                (3 + (Math.random() * 2)) // Base: 3-5
+                * (1 + (0.2 * (guild ? guild.lootbuff : 0))) // Guild Buff
+                + (3 * (raidRankIndices[raids[raid.raidid].rank] / 10)) // Raid Rank Buff
+            ), 0), 100);
+
+            // Skill Point
+            const skillPoints = (Math.random() < 0.04) ? 1 : 0;
+
+            // Update users table
+            await updateUsers(interaction.user.id, {
+                coins: { type: 'increment', value: coinDrops },
+                guild_marks: { type: 'increment', value: guildMarks },
+                skill_points: { type: 'increment', value: skillPoints }
+            });
+
+            // Check if the raid is over
+            const raidCheck = guild ? await getLatestRaid(guild.id) : undefined;
+
+            if (raidCheck && raidCheck.enemy_hp <= 0) {
+                const nextPhase = raids[raidCheck.raidid].nextPhase;
+                if (nextPhase) {
+                    await updateRaidPhase(raidCheck.rowid, nextPhase, 1240800);
+                } else {
+                    endRaid(raidCheck.rowid);
+                };
+            };
 
             return new EmbedBuilder()
                 .setColor(currentRaid.accentColor as ColorResolvable)
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Raid Results`)
-                .setDescription(`<a:arrow_green:916716811842621450> Score: \n<a:arrow_orange:916716747623641210> Empty\n<a:arrow_red:916716702618767401> Scale: ${enemyScale.toFixed(2)}`)
-                .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
+                .setDescription(`${eStatsC.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${formatNumberWithQuotes(damageDealt)}**\n<a:arrow_orange:916716747623641210> Attempts: **${attemptsTotal - (attemptsUsed + 1)}**/${attemptsTotal} left\n\n<:npbag:929428030554787892> Loot\n**${coinDrops}**x <:coins:872926669055356939>, **${guildMarks}**x <:guild_mark:1317944450814840923>${skillPoints ? `, **${skillPoints}**x <:skill_point:1351505460301136014>` : ""}`)
+                .setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
-        let matchStats = Avalon.getMatchStats(interaction);
+        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false });
         let notice = ["", "", "", ""];
+        matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined && sid !== stats.battlechar).map((sid) => characters[sid]);
+        // matchStats.partyStats = partyStatsC;
 
         // Apply skill tree
         for (const [skill, level] of Object.entries(stats.skill_tree)) {
@@ -421,7 +786,11 @@ const exportCommand: SlashCommand = {
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
         for (const sid of stats.raid_supports) {
-            if (sid !== undefined && sid !== null) await abilities[sid]?.party?.(myStatsC, myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            if (sid !== undefined && sid !== null && sid !== stats.battlechar) {
+                const myStatsP = { ...myStatsC };
+                myStatsP.name = characters[sid].name;
+                await abilities[sid]?.party?.(myStatsP, myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            };
         };
 
         const ATK_EMOJI = myStatsC.replaceButton?.atk?.emoji || '⚔️',
@@ -512,6 +881,9 @@ const exportCommand: SlashCommand = {
                         if (matchStats.currentCharacter === 0) myStatsC.atk = myStats.atk, myStatsC.md = myStats.md, myStatsC.def = myStats.def, myStatsC.mr = myStats.mr, myStatsC.cd = myStats.cd, myStatsC.cr = myStats.cr, myStatsC.dodge = myStats.dodge, myStatsC.br = myStats.br, myStatsC.mg = myStats.mg;
                         if (matchStats.currentOpponent === 0) eStatsC.atk = eStats.atk, eStatsC.md = eStats.md, eStatsC.def = eStats.def, eStatsC.mr = eStats.mr, eStatsC.cd = eStats.cd, eStatsC.cr = eStats.cr, eStatsC.dodge = eStats.dodge, eStatsC.br = eStats.br, eStatsC.mg = eStats.mg;
 
+                        // // Remove HP debuffs from boss
+                        // eBuffs.hp = eBuffs.hp.filter((buff) => (buff.type === "*" && buff.val > 1) || (buff.type === "+" && buff.val > 0));
+
                         // Apply Buffs
                         if (matchStats.currentCharacter === 0) Avalon.applyBuffs(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice);
                         if (matchStats.currentOpponent === 0) Avalon.applyBuffs(eStatsC, eStatsC, eBuffs, buffs, matchStats, notice);
@@ -538,7 +910,7 @@ const exportCommand: SlashCommand = {
                             };
                         };
 
-                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                     };
 
                     function attack() {
@@ -560,17 +932,17 @@ const exportCommand: SlashCommand = {
                                     curse.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     eStatsC.sm -= curse.cost;
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else if (matchStats.blockAbilities-- < 0 && myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.66) {
                                     eStatsC.sm -= eAbility.cost;
                                     eAbility.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else {
                                     dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `⚔️ **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     if (!(matchStats.playerPausingRounds > 0)) matchStats.turn = 1;
                                     matchStats.turn = 1;
                                     matchStats.round++;
@@ -588,7 +960,7 @@ const exportCommand: SlashCommand = {
 
                     // Write passive actions if any
                     if (notice.length > 4) {
-                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                         editEmbed();
                     };
 
@@ -604,7 +976,7 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                 if (matchStats.turn === 0) attack();
                             }
 
@@ -616,12 +988,12 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
 
                                 if (matchStats.twinshot > Math.random()) setTimeout(() => {
                                     dealDamage(eStatsC, myStatsC, eBuffs, buffs, matchStats, notice, `⚔️ **${myChar.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 }, aDelay);
 
@@ -644,7 +1016,7 @@ const exportCommand: SlashCommand = {
                                 matchStats.trigger("DEF", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                 if (matchStats.turn === 0) attack();
                             }
 
@@ -669,7 +1041,7 @@ const exportCommand: SlashCommand = {
 
                                 attack();
                                 editEmbed();
-                                Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             }
 
                         } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
@@ -690,7 +1062,7 @@ const exportCommand: SlashCommand = {
                             };
 
                             editEmbed();
-                            Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                            Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             attack();
                         }
 
@@ -712,7 +1084,7 @@ const exportCommand: SlashCommand = {
                                         };
 
                                         editEmbed();
-                                        Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                        Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                         attack();
                                     };
                                 } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
@@ -734,7 +1106,7 @@ const exportCommand: SlashCommand = {
                             };
 
                             editEmbed();
-                            Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                            Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                             if (matchStats.turn === 0) attack();
                         }
 
@@ -755,7 +1127,7 @@ const exportCommand: SlashCommand = {
                                     };
 
                                     editEmbed();
-                                    Avalon.checkIfEnded(myStatsC, eStatsC, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                    Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                             };

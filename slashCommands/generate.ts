@@ -73,7 +73,7 @@ const exportCommand: SlashCommand = {
 
         try {
             await interaction.editReply({
-                content: `**Prompt: ** ${userprompt.slice(0, 1800)}\n-# **UUID**: \`${images[0].uuid}\``,
+                content: `**Prompt**: ${userprompt.slice(0, 1800)}\n-# **UUID**: \`${images[0].uuid}\``,
                 files: images.map((img) => img.url ?? "").filter(Boolean),
                 components: type === "character" ? [] : [editRow],
             });
