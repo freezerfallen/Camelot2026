@@ -1,5 +1,5 @@
 import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
-import { ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
+import { ButtonBuilder, ButtonStyle, ActionRowBuilder, managerToFetchingStrategyOptions } from "discord.js";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
@@ -4421,12 +4421,14 @@ export const items = [
         // On turn 10/7: damageReduction += dodge rate difference
         myStats.delayedBuffs.push(new delayedBuffs([10, 7][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.damageReduction = (myStats.damageReduction ?? 0) + Math.abs(myStats.dodge - myStats.nimbleGuardian);
+            if (myStats.damageReduction > 0.7) myStats.damageReduction = 0.7;
+            notice.push(`\n<:skyward_rune:1333991494725664789> ${char.name} will take **${Math.floor(myStats.damageReduction * 100)}%** less DMG.`);
 
             return AbilityResponse.SUCCESS;
         }));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Records dodge rate upon entering battle. By turn **${[10, 7][level - 1]}**, gains **1%** damage reduction per dodge rate difference.`, "Embodying the essence of the heavens, the Skyward Rune is a breathtaking ring crafted from celestial silver, where swirling clouds of glittering filigree dance around like a tempest. Inscribed with runes of the sky, this ring is revered for its ability to amplify the wearer's connection to the air element, enhancing their spells and speed. Legends tell of heroes who wielded this ring to summon storms and control winds, bending them to their will. With it, the sky is not merely above, but a companion in adventure, guiding the brave through the troubles below.", "genesis", 701),
+    }, (level) => `Records dodge rate upon entering battle. By turn **${[10, 7][level - 1]}**, gains **1%** damage mitigation per dodge rate difference, which can stack with other sources of damage mitigation, up to **70%**.`, "Embodying the essence of the heavens, the Skyward Rune is a breathtaking ring crafted from celestial silver, where swirling clouds of glittering filigree dance around like a tempest. Inscribed with runes of the sky, this ring is revered for its ability to amplify the wearer's connection to the air element, enhancing their spells and speed. Legends tell of heroes who wielded this ring to summon storms and control winds, bending them to their will. With it, the sky is not merely above, but a companion in adventure, guiding the brave through the troubles below.", "genesis", 701),
     new ringInfo("Ceneinuica", "ring", "ring", ["raid"], "<:ceneinuica:1334123617440628736>", "https://i.ibb.co/TqKyPkMj/Ceneinuica.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Dusty
         myStats.ceneinuica = 0;
 
@@ -4718,25 +4720,55 @@ export const items = [
     }, (level) => `After dealing a critical strike, the wearer heals **${[3, 3.5, 4, 4.5, 5][level - 1]}%** of their missing HP.`, "The Reversed Vinebound ring is a striking blend of elegance and dark magic. Crafted from glossy, obsidian metal, its design includes sculpted vines that curve upwards, encasing a luminescent green gemstone at its core. Each vine is adorned with small, jagged crystals that seem to be pulling away, representing a break from natural ties. The inner band is engraved with enigmatic runes that resonate with the wearer's inner strength and resilience. This ring empowers those who seek to break free from nature's constraints, providing buffs to spellcasting while enhancing innate abilities, making it perfect for warlocks and renegade druids.", "legendary", 718),
     new ringInfo("Storm's Caress", "ring", "ring", ["guild"], "<:storms_caress:1334558474931277827>", "https://i.ibb.co/35bQdY9g/Storm-s-Caress.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        const stacksNeeded = [36, 34, 32, 30, 28, 26][level - 1];
-        const dodgeBuff = [10, 11, 12, 13, 14, 15][level - 1] / 100;
+        const atkBuff = [10, 12, 14, 16, 18, 20][level - 1] / 100;
+        const counterBuff = [10, 10, 13, 13, 15, 15][level - 1] / 100;
 
         myStats.stormsCaressStacks = 0;
+        myStats.aerial = false;
+        myStats.counter ??= 0;
 
-        // Gain +10-15% dodge after using DEF 36-26 times
-        matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
+        // 3 non-crit = Aerial. During Aerial 3 crit = exit Aerial
+        matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats && !myStats.aerial) {
                 myStats.stormsCaressStacks++;
 
-                if (myStats.stormsCaressStacks === stacksNeeded) {
-                    myStats.dodge += dodgeBuff;
-                    mybuff.dodge.push(new buffInfo("+", dodgeBuff, 9999));
+                if (myStats.stormsCaressStacks === 3) {
+                    // Aerial
+                    myStats.stormsCaressStacks = 0;
+                    myStats.aerial = true;
+                    myStats.atk += Math.floor(myStats.atk * atkBuff);
+
+                    notice.push(`\n<:storms_caress:1334558474931277827> ${char.name} turned Aerial.`);
                 };
             };
         });
 
+        matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats && myStats.aerial) {
+                myStats.stormsCaressStacks++;
+
+                if (myStats.stormsCaressStacks === 3) {
+                    // Exit Aerial
+                    myStats.aerial = false;
+                    myStats.atk -= Math.floor(myStats.atk * atkBuff);
+
+                    notice.push(`\n<:storms_caress:1334558474931277827> ${char.name} exited Aerial.`);
+                };
+            };
+        });
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // If in Aerial Mode - 10/12/14/16/18/20% chance to counter
+            if (myStats.aerial) {
+                myStats.atk += Math.floor(myStats.atk * atkBuff);
+                if (Math.random() < counterBuff) myStats.counter += 1;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
         return AbilityResponse.SUCCESS;
-    }, (level) => `After using DEF **${[36, 34, 32, 30, 28, 26][level - 1]}** times, the wearer gains **+${[10, 11, 12, 13, 14, 15][level - 1]}%** dodge chance.`, "Embodying the essence of tempestuous skies, the Storm's Caress ring features a swirling design adorned with delicate clouds and pinpointed flashes of light. Crafted from an ethereal silver alloy, the ring cradles a pulsating azure gem, resembling a stormy sea beneath turbulent skies. Tails of mist emanate from either side, whispering secrets of the winds. When worn, the bearer can summon gusts of wind to aid in travel or unleash thunderous rain, striking down foes from above, all while gaining poise and swiftness in combat.", "unique", 719),
+    }, (level) => `After striking **3** non-critical hits, the wearer turns \`Aerial\`.\n\`Aerial\`: The wearer has **+${[10, 12, 14, 16, 18, 20][level - 1]}%** ATK/MD and a **${[10, 10, 13, 13, 15, 15][level - 1]}%** chance to counter a hit. When the wearer scores **3** critical strikes, exits and resets the mode.`, "Embodying the essence of tempestuous skies, the Storm's Caress ring features a swirling design adorned with delicate clouds and pinpointed flashes of light. Crafted from an ethereal silver alloy, the ring cradles a pulsating azure gem, resembling a stormy sea beneath turbulent skies. Tails of mist emanate from either side, whispering secrets of the winds. When worn, the bearer can summon gusts of wind to aid in travel or unleash thunderous rain, striking down foes from above, all while gaining poise and swiftness in combat.", "unique", 719),
     new ringInfo("Vortex Thorn", "ring", "ring", ["guild"], "<:vortex_thorn:1334560161263521812>", "https://i.ibb.co/tpsb5j6j/Vortex-Thorn.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // Deal 10/15/20% lightning dmg every round, heal 50% of lightning damage dealt
@@ -4784,24 +4816,24 @@ export const items = [
         myStats.shadowPact = 0;
         myStats.trueShadow = false;
 
-        const cdBuff = [20, 18, 16, 14, 12, 10][level - 1] / 100;
+        const cdDebuff = [20, 18, 16, 14, 12, 10][level - 1] / 100;
         const dmgReflect = [15, 18, 21, 24, 27, 30][level - 1] / 100;
 
-        mybuff.cd.push(new buffInfo("+", cdBuff, 9999));
+        mybuff.cd.push(new buffInfo("+", -cdDebuff, 9999));
 
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === eStats && !myStats.trueShadow) {
-                // Deflects 5/10/15/20/25/30% of DMG taken
+                // Deflects 15/18/21/24/27/30% of DMG taken
                 eStats.hp -= Math.floor(options.damage * dmgReflect);
-                myStats.hp += Math.floor(options.damage * dmgReflect);
+                if (myStats.hp > 0) myStats.hp += Math.floor(options.damage * dmgReflect);
                 myStats.shadowPact++;
 
                 if (myStats.shadowPact === 5) {
                     // True Shadow Form
-                    notice.push(`\n${char.name} entered True Shadow form for **5** rounds`);
+                    notice.push(`\n<:shadows_pact:1334561570000343083> ${char.name} entered True Shadow form for **5** rounds`);
                     myStats.trueShadow = true;
-                    myStats.cd += cdBuff;
-                    mybuff.cd.push(new buffInfo("+", cdBuff, 5));
+                    myStats.cd += cdDebuff;
+                    mybuff.cd.push(new buffInfo("+", cdDebuff, 5));
                     eStats.dodge = 0;
                     ebuff.dodge.push(new buffInfo("=", 0, 5));
                     eStats.cr = 0;
@@ -4810,7 +4842,7 @@ export const items = [
                     // Reset form
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         myStats.trueShadow = false;
-                        notice.push(`\n${char.name} has returned to the Mist`);
+                        notice.push(`\n<:shadows_pact:1334561570000343083> ${char.name} has returned to the Mist`);
                         return AbilityResponse.SUCCESS;
                     }, 1));
                 };
@@ -4863,7 +4895,7 @@ export const items = [
         // HP >= 50%: +5/6/7/9/10/12% crit rate
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             if (myStats.hp < myStats.maxhp * 0.5) {
-                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.0085, 0.01, 0.0115, 0.0125, 0.014, 0.015][level - 1]));
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.02, 0.02, 0.02, 0.03, 0.03, 0.03][level - 1]));
             } else {
                 myStats.cr += [0.05, 0.06, 0.07, 0.09, 0.10, 0.12][level - 1];
                 if (myStats.cr > 1) myStats.cr = 1;
@@ -4873,7 +4905,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `While the wearer's HP is less than **50%**, heals **${[0.85, 1, 1.15, 1.25, 1.4, 1.5][level - 1]}%** of max HP per round. When the wearer's HP is greater than or equal to **50%**, increases the wearer's crit rate by **${[5, 6, 7, 9, 10, 12][level - 1]}%**.`, "The Vinebound Bond ring is a verdant wonder, showcasing a band entwined with delicate emerald leaves and tiny blossoms. At its heart is a vivid green gem that reflects the essence of nature's vitality. Each leaf appears to rustle softly, as if in conversation with the living world. This ring is a symbol of unity with the earth, allowing its wearer to foster growth and harmony. It is believed to bring good fortune in harvests and encourages empathy toward all living creatures, cementing a bond with nature that strengthens with each passing day.", "unique", 727),
+    }, (level) => `While the wearer's HP is less than **50%**, heals **${[2, 2, 2, 3, 3, 3][level - 1]}%** of max HP per round. When the wearer's HP is greater than or equal to **50%**, increases the wearer's crit rate by **${[5, 6, 7, 9, 10, 12][level - 1]}%**.`, "The Vinebound Bond ring is a verdant wonder, showcasing a band entwined with delicate emerald leaves and tiny blossoms. At its heart is a vivid green gem that reflects the essence of nature's vitality. Each leaf appears to rustle softly, as if in conversation with the living world. This ring is a symbol of unity with the earth, allowing its wearer to foster growth and harmony. It is believed to bring good fortune in harvests and encourages empathy toward all living creatures, cementing a bond with nature that strengthens with each passing day.", "unique", 727),
     new ringInfo("Shadowspire", "ring", "ring", ["raid"], "<:shadowspire:1334561562547191908>", "https://i.ibb.co/fz2PGrd1/Shadowspire.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* noHeal
 
         // On own miss: -3% max HP, +3/4/5% dodge & br (max: 5 times)
@@ -4942,7 +4974,7 @@ export const items = [
     }, (level) => `Increases the wearer's crit damage by **${[5, 7.5, 10, 12.5, 15, 17.5, 20][level - 1]}%**.`, "Delicately crafted, the Radiant Ember shimmers with a golden sheen, embodying the essence of fire. Its band encircles a magnificent, star-shaped ruby that pulses with a warm, glowing light. Tiny, scarlet flames trickle within the uroko, as if trying to escape their crystalline prison. This ring is a powerful conduit of fire magic, amplifying spells and channeling flames through its wielder. The flames are said to dance with each heartbeat, radiating warmth to the heart. Those who wear this magnificent ring can summon protective barriers of fire, keeping enemies at bay in a dazzling display of defense.", "unique", 731),
     new ringInfo("Defenders Signet", "ring", "ring", ["raid"], "<:defenders_signet:1340489145142743120>", "https://i.ibb.co/Kx1XZj1M/Defender-s-Signet.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Magma
 
-        // Reduce incoming dmg by 40/45/50% for 1 turn
+        // Reduce incoming dmg by 30/35/40% for 1 turn
         matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
                 const dmgReduction = [30, 35, 40][level - 1] / 100;
@@ -5905,32 +5937,39 @@ export const items = [
 
         myStats.radiantLightStacks = 0;
 
-        const stacksNeeded = [8, 8, 7, 7, 6, 6][level - 1];
-        const dodgeBuff = [10, 12, 14, 16, 18, 20][level - 1] / 100;
+        const stacksNeeded = [7, 7, 6, 6, 5, 5][level - 1];
+        const heal = [0.15, 0.17, 0.19, 0.21, 0.23, 0.25][level - 1] / 100;
 
         // Gain Radiant Light after ATK
         matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats && Math.random() < (0.3 + ((myStats.hp / myStats.maxhp) * 0.5))) {
+            if (caster === myStats && Math.random() < (0.5 + ((myStats.hp / myStats.maxhp) * 0.3))) {
                 myStats.radiantLightStacks++;
-
-                if (myStats.radiantLightStacks >= stacksNeeded) {
-                    myStats.radiantLightStacks = 0;
-
-                    const debuffCount = Object.keys(mybuff).reduce((count, buffName) => count + mybuff[buffName as keyof typeof mybuff].filter((buff) => buff.isDebuff).length, 0);
-
-                    if (debuffCount > 0) {
-                        Object.keys(mybuff).forEach((buffName) => {
-                            mybuff[buffName as keyof typeof mybuff] = mybuff[buffName as keyof typeof mybuff].filter((buff) => !buff.isDebuff);
-                        });
-                    } else {
-                        myStats.dodge += dodgeBuff;
-                    };
                 };
-            };
         });
+        
+        // Delayed Buff
+        myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                const debuffCount = Object.keys(mybuff).reduce((count, buffName) => count + mybuff[buffName as keyof typeof mybuff].filter((buff) => buff.isDebuff).length, 0);
+
+                // Cleanse debuff
+                if (debuffCount > 0 && myStats.radiantLightStacks >= stacksNeeded) {
+                    myStats.radiantLightStacks -= stacksNeeded;
+                    Object.keys(mybuff).forEach((buffName) => {
+                        mybuff[buffName as keyof typeof mybuff] = mybuff[buffName as keyof typeof mybuff].filter((buff) => !buff.isDebuff);
+                    });
+
+                // Heal
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * heal), {});
+                
+                notice.push(`\n<:solstice_radiance:1371787642882228295> ${char.name} cleansed debuffs and recovered HP.`)
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer has a **30-80%** chance of capturing **1x** \`Radiant Light\` after every usage of ATK, depending on the wearer's missing HP. After accumulating **${[8, 8, 7, 7, 6, 6][level - 1]}x** \`Radiant Light\`, consumes all stacks to remove debuffs on self. If none exist, instead increases own dodge chance by **+${[10, 12, 14, 16, 18, 20][level - 1]}%** for that round.`, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
+
+    }, (level) => `The wearer has a **50-80%** chance of capturing **1x** \`Radiant Light\` after every usage of ATK, depending on the wearer's missing HP. At the start of a round, if the wearer has any debuffs on self, and has at least **${[7, 7, 6, 6, 5, 5][level - 1]}x** \`Radiant Light\`, consumes the required stacks to remove debuffs on self. This also recovers **+${[15, 17, 19, 21, 23, 25][level - 1]}%** of the wearer's missing HP.`, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
     new ringInfo("Starfire Band", "ring", "ring", ["raid"], "<:starfire_band:1380248173678690487>", "https://i.ibb.co/4LRPzTx/starfire-band.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const roundThreshold = [30, 28, 26, 24, 22, 20][level - 1];
