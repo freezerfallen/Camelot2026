@@ -4716,13 +4716,27 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `After dealing a critical strike, the wearer heals **${[3, 3.5, 4, 4.5, 5][level - 1]}%** of their missing HP.`, "The Reversed Vinebound ring is a striking blend of elegance and dark magic. Crafted from glossy, obsidian metal, its design includes sculpted vines that curve upwards, encasing a luminescent green gemstone at its core. Each vine is adorned with small, jagged crystals that seem to be pulling away, representing a break from natural ties. The inner band is engraved with enigmatic runes that resonate with the wearer's inner strength and resilience. This ring empowers those who seek to break free from nature's constraints, providing buffs to spellcasting while enhancing innate abilities, making it perfect for warlocks and renegade druids.", "legendary", 718),
-    new ringInfo("Storm's Caress", "ring", "ring", ["guild"], "<:storms_caress:1334558474931277827>", "https://i.ibb.co/35bQdY9g/Storm-s-Caress.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Storm's Caress", "ring", "ring", ["guild"], "<:storms_caress:1334558474931277827>", "https://i.ibb.co/35bQdY9g/Storm-s-Caress.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        myStats.lightningMultiplier ??= 0;
-        myStats.lightningMultiplier += [20, 25, 30, 35, 40][level - 1] / 100;
+        const stacksNeeded = [36, 34, 32, 30, 28, 26][level - 1];
+        const dodgeBuff = [10, 11, 12, 13, 14, 15][level - 1] / 100;
+
+        myStats.stormsCaressStacks = 0;
+
+        // Gain +10-15% dodge after using DEF 36-26 times
+        matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats) {
+                myStats.stormsCaressStacks++;
+
+                if (myStats.stormsCaressStacks === stacksNeeded) {
+                    myStats.dodge += dodgeBuff;
+                    mybuff.dodge.push(new buffInfo("+", dodgeBuff, 9999));
+                };
+            };
+        });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Increases your lightning damage by **${[20, 25, 30, 35, 40][level - 1]}%** for the rest of battle.`, "Embodying the essence of tempestuous skies, the Storm's Caress ring features a swirling design adorned with delicate clouds and pinpointed flashes of light. Crafted from an ethereal silver alloy, the ring cradles a pulsating azure gem, resembling a stormy sea beneath turbulent skies. Tails of mist emanate from either side, whispering secrets of the winds. When worn, the bearer can summon gusts of wind to aid in travel or unleash thunderous rain, striking down foes from above, all while gaining poise and swiftness in combat.", "unique", 719),
+    }, (level) => `After using DEF **${[36, 34, 32, 30, 28, 26][level - 1]}** times, the wearer gains **+${[10, 11, 12, 13, 14, 15][level - 1]}%** dodge chance.`, "Embodying the essence of tempestuous skies, the Storm's Caress ring features a swirling design adorned with delicate clouds and pinpointed flashes of light. Crafted from an ethereal silver alloy, the ring cradles a pulsating azure gem, resembling a stormy sea beneath turbulent skies. Tails of mist emanate from either side, whispering secrets of the winds. When worn, the bearer can summon gusts of wind to aid in travel or unleash thunderous rain, striking down foes from above, all while gaining poise and swiftness in combat.", "unique", 719),
     new ringInfo("Vortex Thorn", "ring", "ring", ["guild"], "<:vortex_thorn:1334560161263521812>", "https://i.ibb.co/tpsb5j6j/Vortex-Thorn.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // Deal 10/15/20% lightning dmg every round, heal 50% of lightning damage dealt
@@ -4765,12 +4779,16 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **30** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
-    new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
         myStats.shadowPact = 0;
         myStats.trueShadow = false;
+
         const cdBuff = [0.2, 0.18, 0.16, 0.14, 0.12, 0.1][level - 1];
         const dmgReflect = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3][level - 1];
+
         mybuff.cd.push(new buffInfo("+", cdBuff, 9999));
+
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === eStats && !myStats.trueShadow) {
                 // Deflects 5/10/15/20/25/30% of DMG taken
@@ -5883,18 +5901,89 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `Every ability usage grants a stack. Upon reaching **${[5, 5, 4, 4][level - 1]}** stacks, increase the wearer's attack and magic damage by **${[20, 25, 30, 30][level - 1]}%** for **${[2, 2, 2, 3][level - 1]}** turns.`, "Vermillion Vow is a mesmerizing relic crafted from dark crimson alloys, its band sculpted into swirling, baroque patterns that seem to dance like living flame. At its heart rests a flawless blood-red gemstone, refracting light in brilliant, ominous glimmers. Legends speak of the ring as a pact sealed in the depths of forgotten catacombs, a promise of relentless power for those who persevere through hardship. Worn by warlocks and champions alike, the ring rewards unwavering resolve, amplifying strength after consistent strikes. It is said that each glow of the gem marks another step toward overwhelming dominance, a vow of crimson fury fulfilled in battle.", "legendary", 774),
-    new ringInfo("Solstice Radiance", "ring", "ring", ["raid"], "<:solstice_radiance:1371787642882228295>", "https://i.ibb.co/CfqFwQp/Solstice-Radiance.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Solstice Radiance", "ring", "ring", ["raid"], "<:solstice_radiance:1371787642882228295>", "https://i.ibb.co/CfqFwQp/Solstice-Radiance.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //! new ability
+        myStats.radiantLightStacks = 0;
+
+        const stacksNeeded = [8, 8, 7, 7, 6, 6][level - 1];
+        const dodgeBuff = [10, 12, 14, 16, 18, 20][level - 1] / 100;
+
+        // Gain Radiant Light after ATK
+        matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (caster === myStats) {
+                myStats.radiantLightStacks++;
+
+                if (myStats.radiantLightStacks >= stacksNeeded) {
+                    myStats.radiantLightStacks = 0;
+
+                    const debuffCount = Object.keys(mybuff).reduce((count, buffName) => count + mybuff[buffName as keyof typeof mybuff].filter((buff) => buff.isDebuff).length, 0);
+
+                    if (debuffCount > 0) {
+                        Object.keys(mybuff).forEach((buffName) => {
+                            mybuff[buffName as keyof typeof mybuff] = mybuff[buffName as keyof typeof mybuff].filter((buff) => !buff.isDebuff);
+                        });
+                    } else {
+                        myStats.dodge += dodgeBuff;
+                    };
+                };
+            };
+        });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
-    new ringInfo("Prismfire Band", "ring", "ring", ["raid"], "<:prismfire_band:1371789341143076935>", "https://i.ibb.co/RkK44qDW/Prismfire-Band.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    }, (level) => `The wearer has a **30-80%** chance of capturing **1x** \`Radiant Light\` after every usage of ATK, depending on the wearer's missing HP. After accumulating **${[8, 8, 7, 7, 6, 6][level - 1]}x** \`Radiant Light\`, consumes all stacks to remove debuffs on self. If none exist, instead increases own dodge chance by **+${[10, 12, 14, 16, 18, 20][level - 1]}%** for that round.`, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
+    new ringInfo("Starfire Band", "ring", "ring", ["raid"], "<:starfire_band:1380248173678690487>", "https://i.ibb.co/4LRPzTx/starfire-band.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        //! new ability
+        const roundThreshold = [30, 28, 26, 24, 22, 20][level - 1];
+
+        let numberOfBuffs = 1;
+
+        // On start, lose 5% HP
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+            // Lose 5% HP
+            myStats.hp = Math.floor(myStats.hp * 0.95);
+
+            // Increase number of buffs after reaching certain round
+            if (matchStats.round === roundThreshold) {
+                numberOfBuffs = 2;
+            };
+
+            // Apply buffs
+            for (let i = 0; i < numberOfBuffs; i++) {
+                const randomNumber = Math.floor(Math.random() * 6);
+
+                switch (randomNumber) {
+                    case 0:
+                        myStats.atk = Math.floor(myStats.atk * 1.25);
+                        myStats.md = Math.floor(myStats.md * 1.25);
+                        break;
+                    case 1:
+                        myStats.def = Math.floor(myStats.def * 1.25);
+                        myStats.mr = Math.floor(myStats.mr * 1.25);
+                        break;
+                    case 2:
+                        myStats.critRate += 0.25;
+                        break;
+                    case 3:
+                        myStats.critDamage += 0.25;
+                        break;
+                    case 4:
+                        myStats.sm += 5;
+                        break;
+                    case 5:
+                        myStats.hp += Math.floor(myStats.hp * 0.05);
+                        if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                        break;
+                    default:
+                        break;
+                };
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => ``, "The Prismfire Band is a dazzling relic forged from stardust and crystallized rainbow flames. Its radiant gemstone twists light into a mesmerizing vortex of shifting colors, representing the boundless potential of elemental harmony. Worn by ancient archmages and cosmic wanderers, it pulses with unpredictable surges of power. When its chaotic energy aligns, it floods the wearer with overwhelming strength. Many seek the Prismfire Band for its beauty, but only those daring to embrace the unknown can harness its true potential.", "legendary", 776),
+    }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects:\n> - **+25%** ATK/MD\n> - **+25%** DEF/MR\n> - **+25%** crit rate\n> - **+25%** crit damage\n> - **+5%** mana\n> - **+5%** max HP\n\nAfter reaching **${[30, 28, 26, 24, 22, 20][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
     // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
     //     //* Don't fix, it's already working as intended
