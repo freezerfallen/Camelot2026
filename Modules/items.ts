@@ -5944,24 +5944,24 @@ export const items = [
         matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && Math.random() < (0.5 + ((myStats.hp / myStats.maxhp) * 0.3))) {
                 myStats.radiantLightStacks++;
-                };
+            };
         });
-        
+
         // Delayed Buff
         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-                const debuffCount = Object.keys(mybuff).reduce((count, buffName) => count + mybuff[buffName as keyof typeof mybuff].filter((buff) => buff.isDebuff).length, 0);
+            const debuffCount = Object.keys(mybuff).reduce((count, buffName) => count + mybuff[buffName as keyof typeof mybuff].filter((buff) => buff.isDebuff).length, 0);
 
-                // Cleanse debuff
-                if (debuffCount > 0 && myStats.radiantLightStacks >= stacksNeeded) {
-                    myStats.radiantLightStacks -= stacksNeeded;
-                    Object.keys(mybuff).forEach((buffName) => {
-                        mybuff[buffName as keyof typeof mybuff] = mybuff[buffName as keyof typeof mybuff].filter((buff) => !buff.isDebuff);
-                    });
+            // Cleanse debuff
+            if (debuffCount > 0 && myStats.radiantLightStacks >= stacksNeeded) {
+                myStats.radiantLightStacks -= stacksNeeded;
+                Object.keys(mybuff).forEach((buffName) => {
+                    mybuff[buffName as keyof typeof mybuff] = mybuff[buffName as keyof typeof mybuff].filter((buff) => !buff.isDebuff);
+                });
 
                 // Heal
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * heal), {});
-                
-                notice.push(`\n<:solstice_radiance:1371787642882228295> ${char.name} cleansed debuffs and recovered HP.`)
+
+                notice.push(`\n<:solstice_radiance:1371787642882228295> ${char.name} cleansed debuffs and recovered HP.`);
             };
 
             return AbilityResponse.SUCCESS;
@@ -6010,8 +6010,7 @@ export const items = [
                         myStats.sm += 5;
                         break;
                     case 5:
-                        myStats.hp += Math.floor(myStats.hp * 0.05);
-                        if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05), {});
                         break;
                     default:
                         break;
