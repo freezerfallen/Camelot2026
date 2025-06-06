@@ -488,7 +488,7 @@ export const raidBosses: enemyInfo[] = [
             });
 
             return AbilityResponse.SUCCESS;
-        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-75%**)", "**Active**: Summons a minion with **20%** of of your current HP (**140** <:mana:1047269152957661255>)"]])
+        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-75%**)", "**Active**: Summons a minion with **20%** of your current HP (**140** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("NecroVamp", "Necromancer", "the Death Eater", "M", true, {}, {}, { mana: 120, mg: 10 }, [726, 739, 740, 741], ["https://i.ibb.co/H0sjR0p/nekrovamp.png"], [], 10,
         new skillInfo(10, 150, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -527,7 +527,7 @@ export const raidBosses: enemyInfo[] = [
             });
 
             return AbilityResponse.SUCCESS;
-        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-110%**)", "**Active**: Summons a minion with **30%** of of your current HP (**150** <:mana:1047269152957661255>)", "  - Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**"]])
+        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-110%**)", "**Active**: Summons a minion with **30%** of your current HP (**150** <:mana:1047269152957661255>)", "  - Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**"]])
     ),
 
     new enemyInfo("Rootlord Morivar", "Eldritch Forest Parasite", "Father of Decay", "M", true, {}, {}, { mana: 120, mg: 15 }, [747, 748, 769], ["https://i.ibb.co/0yFsFCbk/morivar.png"], [], 11,

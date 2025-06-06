@@ -4784,8 +4784,8 @@ export const items = [
         myStats.shadowPact = 0;
         myStats.trueShadow = false;
 
-        const cdBuff = [0.2, 0.18, 0.16, 0.14, 0.12, 0.1][level - 1];
-        const dmgReflect = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3][level - 1];
+        const cdBuff = [20, 18, 16, 14, 12, 10][level - 1] / 100;
+        const dmgReflect = [15, 18, 21, 24, 27, 30][level - 1] / 100;
 
         mybuff.cd.push(new buffInfo("+", cdBuff, 9999));
 
@@ -4818,7 +4818,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer rotates between \`Mist\` and \`True Shadow\`, entering battles with \`Mist\`. Upon being hit **5** times, changes into \`True Shadow\` for **5** rounds, before reverting back to \`Mist\`.\n\n\`Mist\`: The wearer has **- ${[0.2, 0.18, 0.16, 0.14, 0.12, 0.1][level - 1] * 100}%** crit damage, but deflects **${[0.05, 0.1, 0.15, 0.2, 0.25, 0.3][level - 1] * 100}%** of damage taken.\n\`True Shadow\`: The enemy has **0%** crit rate and dodge chance.`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
+    }, (level) => `The wearer rotates between \`Mist\` and \`True Shadow\`, entering battles with \`Mist\`. Upon being hit **5** times, changes into \`True Shadow\` for **5** rounds, before reverting back to \`Mist\`.\n\n\`Mist\`: The wearer has **-${[20, 18, 16, 14, 12, 10][level - 1]}%** crit damage, but deflects **${[15, 18, 21, 24, 27, 30][level - 1]}%** of damage taken.\n\`True Shadow\`: The enemy has **0%** crit rate and dodge chance.`, "The enigmatic Shadow's Pact ring is shaped from darkened silver, twisted into a gothic design reminiscent of intertwining shadows. Adorning the band are faint runes that glow with a dim red hue, while its centerpiece—a deep obsidian stone—seems to absorb light. Whispers of ancient pacts fill the air as the ring pulses with dark energy. It grants its bearer the ability to blend seamlessly into shadows, enhancing their stealth capabilities and allowing them to communicate with shadowy entities for guidance or power.", "mythical", 723),
     new ringInfo("Amber's Dawn", "ring", "ring", ["guild"], "<:ambers_dawn:1334561580041371668>", "https://i.ibb.co/bjZqgN9h/Amber-s-Dawn.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const increase = [8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1] / 100;
@@ -5910,7 +5910,7 @@ export const items = [
 
         // Gain Radiant Light after ATK
         matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
+            if (caster === myStats && Math.random() < (0.3 + ((myStats.hp / myStats.maxhp) * 0.5))) {
                 myStats.radiantLightStacks++;
 
                 if (myStats.radiantLightStacks >= stacksNeeded) {
