@@ -666,6 +666,8 @@ const commands = [
 							// { name: 'Timers', value: 'cdreduction' },
 						)
 				))
+			.addSubcommand((subcommand) => subcommand.setName('shop').setDescription('View the guild shop')
+				.addStringOption(option => option.setName('page').setDescription('Choose a page to jump to').setRequired(false)))
 		// .addSubcommand((subcommand) => subcommand.setName('convert').setDescription('Convert gems in your treasury into coins')
 		// 	.addIntegerOption(option => option.setName('amount').setDescription('Choose how many you want to convert').setRequired(true)))
 	}.data.toJSON(),

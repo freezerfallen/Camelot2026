@@ -1074,6 +1074,7 @@ const exportCommand: SlashCommand = {
 
             });
         } else if (subcommand === "shop") {
+            const page = interaction.options.getString('page') || "rings";
 
             // Guild Shop missing
 
