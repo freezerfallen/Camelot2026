@@ -798,10 +798,10 @@ export const raidBosses: enemyInfo[] = [
 
                 eStats.hp = eStats.minionHealth;
                 // eStats.maxhp = Math.floor(eStats.maxhp * 0.9);
-                eStats.def = Math.floor(eStats.def * 0.9);
-                eStats.mr = Math.floor(eStats.mr * 1.1);
-                eStats.atk = Math.floor(eStats.atk * 0.9);
-                eStats.md = Math.floor(eStats.md * 1.1);
+                // eStats.def = Math.floor(eStats.def * 0.9);
+                // eStats.mr = Math.floor(eStats.mr * 1.1);
+                // eStats.atk = Math.floor(eStats.atk * 0.9);
+                // eStats.md = Math.floor(eStats.md * 1.1);
                 eStats.mdChance = 1;
 
                 myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + Math.floor(105 / (eStats.mg + 5)), async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
