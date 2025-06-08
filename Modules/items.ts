@@ -4231,7 +4231,7 @@ export const items = [
             // HP < 10/12.5/15%: DEF/ MR = 0; 100/125/150%: Damage 
             if (myStats.hp < myStats.maxhp * (0.1 + 0.025 * (level - 1))) {
                 // eStats.def = 0; eStats.mr = 0;
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:eclipse:1333953559988928606> **${char.name}**`, { atkMultiplier: 1 + 0.25 * (level - 1), defMultiplier: 0, magicDamage: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:eclipse:1333953559988928606> **${char.name}**`, { atkMultiplier: 1 + 0.25 * (level - 1), defMultiplier: 0, defReductionCap: 660, magicDamage: true });
                 // @ts-ignore
                 this._used++;
             };
@@ -4240,7 +4240,7 @@ export const items = [
         }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Triggers Eclipse when your health reaches below **${[10, 12.5, 15][level - 1]}%** of your max HP, launching a calamitous strike equal to **${[100, 125, 150][level - 1]}%** of your normal damage, completely ignoring enemy DEF and MR.`, "The Eclipse is a ring of weary elegance, featuring a broad band of tarnished metal adorned with a radiant black stone at its center. The stone is set within an ornate crescent motif that tells tales of hope and despair. Subtle etchings weave stories of battles fought for hope, giving the wearer strength during times of conflict. When worn, it is believed to enhance bravery, allowing the bearer to stand firm even in the face of overwhelming odds.", "mythical", 689),
+    }, (level) => `Triggers Eclipse when your health reaches below **${[10, 12.5, 15][level - 1]}%** of your max HP, launching a calamitous strike equal to **${[100, 125, 150][level - 1]}%** of your normal damage, ignoring up to **660** enemy DEF and MR.\n\n**660** DEF|MR is equal to **50%** damage reduction.`, "The Eclipse is a ring of weary elegance, featuring a broad band of tarnished metal adorned with a radiant black stone at its center. The stone is set within an ornate crescent motif that tells tales of hope and despair. Subtle etchings weave stories of battles fought for hope, giving the wearer strength during times of conflict. When worn, it is believed to enhance bravery, allowing the bearer to stand firm even in the face of overwhelming odds.", "mythical", 689),
     new ringInfo("Astral Coronet", "ring", "ring", ["chest"], "<:astral_coronet:1333960726217363576>", "https://i.ibb.co/sdSwqNKp/Astral-Coronet.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.trusilverLoop = 0;
 
@@ -4773,8 +4773,7 @@ export const items = [
 
         // Deal 10/15/20% lightning dmg every round, heal 50% of lightning damage dealt
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            let lightningDMG = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: 0.1 + 0.05 * (level - 1) });
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, lightningDMG * 0.2);
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> **${char.name}**`, { isLightning: true, atkMultiplier: 0.1 + 0.05 * (level - 1), selfheal: true, selfhealAmount: 0.2, selfhealChance: 1 });
 
             return AbilityResponse.SUCCESS;
         }, 9999));

@@ -643,7 +643,7 @@ const exportCommand: SlashCommand = {
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
         // Battle Scale
-        const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min(2192, Math.max(myStatsC.def, myStatsC.mr)));
+        const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min((2192 + myStatsC.increase_defcap), Math.max(myStatsC.def, myStatsC.mr)));
         const enemyAtk = Math.floor((300 * enemyScale) * 1.05);
         myStats.damageRescaling = enemyScale / 13; myStatsC.damageRescaling = enemyScale / 13;
 
@@ -763,7 +763,7 @@ const exportCommand: SlashCommand = {
                 .setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
-        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false });
+        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false, allowSelfheal: false });
         let notice = ["", "", "", ""];
         matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined && sid !== stats.battlechar).map((sid) => characters[sid]);
         // matchStats.partyStats = partyStatsC;
@@ -871,6 +871,7 @@ const exportCommand: SlashCommand = {
                     };
 
                     function startNextRound() {
+                        if (matchStats.ended) return;
                         if (matchStats.round === matchStats.roundCheck) return;
                         matchStats.roundCheck = matchStats.round;
 

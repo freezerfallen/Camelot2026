@@ -184,9 +184,20 @@ export const skillTree: SkillPath[] = [
 
         return AbilityResponse.SUCCESS;
     }, 8),
-    new SkillPath("Bloodlust", "common", "Heals **+0.3%** of damage dealt.", 2, 10, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.selfhealChance.push(1);
-        myStats.selfheal.push(0.003 * level);
+    new SkillPath("Bloodlust", "common", "Drains **+0.4%** of the player's max HP every **3** rounds.", 2, 10, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        const drainPercent = 0.004 * level;
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 3 === 0) {
+                const drain = Math.floor(myStats.maxhp * drainPercent);
+                eStats.hp -= drain;
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
+                if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                if (eStats.hp < 0) eStats.hp = 0;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
     }, 9),
@@ -341,11 +352,20 @@ export const skillTree: SkillPath[] = [
     }, 22),
 
     // Health
-    new SkillPath("Vampiric Touch", "extra", "Heals **+0.6%** of damage dealt.", 3, 5, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const healPercent = 0.006 * level;
+    new SkillPath("Vampiric Touch", "extra", "Drains **+0.8%** of the player's max HP every **3** rounds.", 3, 5, "health", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        const drainPercent = 0.008 * level;
 
-        myStats.selfhealChance.push(1);
-        myStats.selfheal.push(healPercent);
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 3 === 0) {
+                const drain = Math.floor(myStats.maxhp * drainPercent);
+                eStats.hp -= drain;
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
+                if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                if (eStats.hp < 0) eStats.hp = 0;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
     }, 23),
@@ -434,3 +454,16 @@ export const skillTree: SkillPath[] = [
     }, 29),
 
 ];
+
+
+for (const skillT of ["attack", "defense", "health", "crit", "mana", "utility"]) {
+    const filteredSkills = skillTree.filter(skill => skill.category === skillT);
+
+    console.log(`${skillT[0].toUpperCase() + skillT.slice(1)} Skills`);
+
+    for (const fSkill of filteredSkills) {
+        console.log(`> - ${fSkill.name} (x${fSkill.maxLevel}): ${fSkill.description}`);
+    };
+
+    console.log("");
+};

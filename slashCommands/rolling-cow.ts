@@ -598,6 +598,7 @@ const exportCommand: SlashCommand = {
                     };
 
                     function startNextRound() {
+                        if (matchStats.ended) return;
                         if (matchStats.round === matchStats.roundCheck) return;
                         matchStats.roundCheck = matchStats.round;
 

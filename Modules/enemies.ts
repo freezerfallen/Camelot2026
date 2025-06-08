@@ -847,7 +847,7 @@ export const raidBosses: enemyInfo[] = [
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             eStats.minionHealth = Math.floor(eStats.maxhp * 0.8); //Kyntheris: 80% of max hp
 
-            const randStats = ["atk", "def", "md", "mr", "dodge", "br"];
+            const randStats = ["atk", "def", "dodge", "br"];
             matchStats.currentOpponent === 0 ? eStats.mdChance = 0 : eStats.mdChance = 1;
 
             // On Minion Death, sets minion health to 0
@@ -883,9 +883,9 @@ export const raidBosses: enemyInfo[] = [
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Velkris: Steals 5% of a random stat every 2 rounds
-                if (matchStats.round % 2 === 0 && matchStats.currentOpponent === 0) {
-                    const randStat = randStats[Math.floor(Math.random() * randStats.length)];
-                    const stealScale = 0.05, stealRounds = 3;
+                if (matchStats.round % 3 === 0 && matchStats.currentOpponent === 0) {
+                    let randStat = randStats[Math.floor(Math.random() * randStats.length)];
+                    const stealScale = 0.1, stealRounds = 9999;
 
                     if (randStat === "dodge" || randStat === "br") {
                         ebuff[randStat].push(new buffInfo("+", Math.floor(eStats[randStat] + stealScale), stealRounds));
@@ -893,10 +893,35 @@ export const raidBosses: enemyInfo[] = [
                         mybuff[randStat].push(new buffInfo("+", -Math.floor(myStats[randStat] + stealScale), stealRounds));
                         myStats[randStat] -= Math.floor(myStats[randStat] + stealScale);
                     } else {
-                        ebuff[randStat as keyof Buffs].push(new buffInfo("+", Math.floor(eStats[randStat] * stealScale), stealRounds));
-                        eStats[randStat] += Math.floor(eStats[randStat] * stealScale);
-                        mybuff[randStat as keyof Buffs].push(new buffInfo("+", -Math.floor(myStats[randStat] * stealScale), stealRounds));
-                        myStats[randStat] -= Math.floor(myStats[randStat] * stealScale);
+                        if (randStat === "atk") {
+                            // ATK
+                            ebuff[randStat as keyof Buffs].push(new buffInfo("+", Math.floor(eStats[randStat] * stealScale), stealRounds));
+                            eStats[randStat] += Math.floor(eStats[randStat] * stealScale);
+                            mybuff[randStat as keyof Buffs].push(new buffInfo("+", -Math.floor(myStats[randStat] * stealScale), stealRounds));
+                            myStats[randStat] -= Math.floor(myStats[randStat] * stealScale);
+
+                            // MD
+                            randStat = "md";
+                            ebuff[randStat as keyof Buffs].push(new buffInfo("+", Math.floor(eStats[randStat] * stealScale), stealRounds));
+                            eStats[randStat] += Math.floor(eStats[randStat] * stealScale);
+                            mybuff[randStat as keyof Buffs].push(new buffInfo("+", -Math.floor(myStats[randStat] * stealScale), stealRounds));
+                            myStats[randStat] -= Math.floor(myStats[randStat] * stealScale);
+                        };
+
+                        if (randStat === "def") {
+                            // DEF
+                            ebuff[randStat as keyof Buffs].push(new buffInfo("+", Math.floor(eStats[randStat] * stealScale), stealRounds));
+                            eStats[randStat] += Math.floor(eStats[randStat] * stealScale);
+                            mybuff[randStat as keyof Buffs].push(new buffInfo("+", -Math.floor(myStats[randStat] * stealScale), stealRounds));
+                            myStats[randStat] -= Math.floor(myStats[randStat] * stealScale);
+
+                            // MR
+                            randStat = "mr";
+                            ebuff[randStat as keyof Buffs].push(new buffInfo("+", Math.floor(eStats[randStat] * stealScale), stealRounds));
+                            eStats[randStat] += Math.floor(eStats[randStat] * stealScale);
+                            mybuff[randStat as keyof Buffs].push(new buffInfo("+", -Math.floor(myStats[randStat] * stealScale), stealRounds));
+                            myStats[randStat] -= Math.floor(myStats[randStat] * stealScale);
+                        };
                     };
                 };
 
@@ -904,13 +929,13 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Duo: Velkris, who gets stronger when the player dodges, and Kyntheris, who gets stronger when the player blocks an attack", "While Velkris is fighting, Kyntheris deals **40%** unblockable physical damage whenever the player blocks an attack", "While Kyntheris is fighting, every **3** rounds Velkris steals **5%** of a random stat for **3** rounds", "**Active**: Velkris switches with Kyntheris, Kyntheris switches with Velkris (**110** <:mana:1047269152957661255>)"]])
+        }, [["Duo: Velkris, who gets stronger when the player dodges, and Kyntheris, who gets stronger when the player blocks an attack", "While Velkris is fighting, Kyntheris deals **40%** unblockable physical damage whenever the player blocks an attack", "While Kyntheris is fighting, every **3** rounds Velkris steals **10%** of a random stat for the rest of battle", "**Active**: Velkris switches with Kyntheris, Kyntheris switches with Velkris (**110** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Hooded Hopper", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [708, 774, 775, 776], ["https://i.ibb.co/wFXPyyBx/hooded-hopper.png"], [], 19,
         new skillInfo(19, 40, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 0.8 });
+            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 1.2, magicDamage: true });
 
             if (damage > 0) {
                 mybuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.1), 9999));
@@ -946,12 +971,12 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "After every **10th** round, removes debuffs afflicting itself", "**Active**: Deals **80%** damage and applies bleeding equal to **10%** the damage caused, lasting until the end of the fight (**40** <:mana:1047269152957661255>)"]])
+        }, [["Dots applied to the Hooded Hopper are applied to the player as well", "After every **10th** round, removes debuffs afflicting itself", "**Active**: Deals **120%** damage and applies bleeding equal to **10%** the damage caused, lasting until the end of the fight (**40** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Hooded Striker", "Bunny", "the Shadow Hare", "M", true, {}, {}, { mana: 120 }, [708, 774, 775, 776], ["https://i.ibb.co/v6w1Z8g4/hooded-striker.png"], [], 20,
         new skillInfo(20, 55, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 1.5 });
+            const damage = dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:bleeding_attack:1340697423793754134> **${enemy.name}**`, { atkMultiplier: 1.5, magicDamage: true });
 
             if (damage > 0) {
                 mybuff.hp.push(new buffInfo("+", -Math.floor(damage * 0.1), 9999));

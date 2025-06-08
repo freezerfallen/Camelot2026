@@ -95,7 +95,6 @@ const event: BotEvent = {
             if (author.schema.name !== interaction.user.username) author.schema = await insertNewUser(interaction.user.id, interaction.user.username);
 
             // ADD NEW SERVERS
-
             const server = {
                 schema: await getServerSchema(interaction.guild.id) ?? await insertNewServer(interaction.guild.id, interaction.guild.name, interaction.user.id),
             };

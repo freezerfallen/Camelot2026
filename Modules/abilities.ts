@@ -5741,7 +5741,7 @@ export const abilities: Record<number, Ability> = {
             myStats.replaceButton.atk = {
                 "emoji": "<:2BATK:1373261622432501770>",
                 "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    if (myStats.duorevived) {
+                    if (!myStats.duorevived) {
                         myStats.hp -= Math.floor(myStats.hp * 0.07);
                     } else {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.hp * 0.07), {});
