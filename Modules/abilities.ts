@@ -1954,6 +1954,7 @@ export const abilities: Record<number, Ability> = {
             //     matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
             //     return AbilityResponse.FAILURE;
             // };
+            myStats.sm -= cost;
             eStats.sm -= stealMana;
             //if (eStats.sm < 0) eStats.sm = 0;
 
