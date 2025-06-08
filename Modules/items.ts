@@ -1,5 +1,5 @@
 import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
-import { ButtonBuilder, ButtonStyle, ActionRowBuilder, managerToFetchingStrategyOptions } from "discord.js";
+import { ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
@@ -6001,10 +6001,10 @@ export const items = [
                         myStats.mr = Math.floor(myStats.mr * 1.25);
                         break;
                     case 2:
-                        myStats.critRate += 0.25;
+                        myStats.cr += 0.25;
                         break;
                     case 3:
-                        myStats.critDamage += 0.25;
+                        myStats.cd += 0.25;
                         break;
                     case 4:
                         myStats.sm += 5;
@@ -6021,7 +6021,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects:\n> - **+25%** ATK/MD\n> - **+25%** DEF/MR\n> - **+25%** crit rate\n> - **+25%** crit damage\n> - **+5%** mana\n> - **+5%** max HP\n\nAfter reaching **${[30, 28, 26, 24, 22, 20][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
+    }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects:\n> - **+25%** ATK/MD\n> - **+25%** DEF/MR\n> - **+25%** crit rate\n> - **+25%** crit damage\n> - **+5** mana\n> - **+5%** max HP\n\nAfter reaching **${[30, 28, 26, 24, 22, 20][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
     // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
     //     //* Don't fix, it's already working as intended

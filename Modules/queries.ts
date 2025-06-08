@@ -16,6 +16,31 @@ function fixBigintForUser(value: Partial<UserSchema>) {
     if ("guild_marks" in value) value.guild_marks = Number(value.guild_marks);
 };
 
+function fixBigintForGuild(value: Partial<GuildSchema>) {
+    if ("treasury" in value) value.treasury = Number(value.treasury);
+    if ("treasury_gems" in value) value.treasury_gems = Number(value.treasury_gems);
+    if ("boss1" in value) value.boss1 = Number(value.boss1);
+    if ("boss2" in value) value.boss2 = Number(value.boss2);
+    if ("boss3" in value) value.boss3 = Number(value.boss3);
+    if ("boss4" in value) value.boss4 = Number(value.boss4);
+};
+
+function fixBigintForGuildDonation(value: Partial<GuildDonationSchema>) {
+    if ("amount" in value) value.amount = Number(value.amount);
+};
+
+function fixBigintForStampede(value: Partial<StampedeSchema>) {
+    if ("bosshp" in value) value.bosshp = Number(value.bosshp);
+    if ("bosshpmax" in value) value.bosshpmax = Number(value.bosshpmax);
+    if ("generalhp" in value) value.generalhp = Number(value.generalhp);
+    if ("generalhpmax" in value) value.generalhpmax = Number(value.generalhpmax);
+};
+
+function fixBigintForRaid(value: Partial<RaidSchema>) {
+    if ("enemy_hp" in value) value.enemy_hp = Number(value.enemy_hp);
+    if ("enemy_hpmax" in value) value.enemy_hpmax = Number(value.enemy_hpmax);
+};
+
 //---------------------------------//
 //           GET SCHEMAS           //
 //---------------------------------//
@@ -92,6 +117,9 @@ export const getWeaponDupeSchemas = async (itemId: number, userId: string, exclu
 
 export const getGuildSchema = async (id: string): Promise<GuildSchema | undefined> => {
     const [guild] = await query(`SELECT * FROM guilds WHERE id = $1`, [id]) as [GuildSchema];
+    if (guild) {
+        fixBigintForGuild(guild);
+    };
     return guild;
 };
 
@@ -99,15 +127,20 @@ export const getGuildSchemas = async (ids: string[] | "*", whereClause?: string)
     const query_str = `SELECT * FROM guilds ${whereClause ? whereClause : ""}`;
     if (ids === "*") {
         const guilds = await query(query_str, []) as GuildSchema[];
+        guilds.forEach(fixBigintForGuild);
         return guilds;
     } else {
         const guilds = await query(`${query_str} WHERE id = ANY($1)`, [ids]) as GuildSchema[];
+        guilds.forEach(fixBigintForGuild);
         return guilds;
     };
 };
 
 export const getGuildDonationSchema = async (rowid: string): Promise<GuildDonationSchema | undefined> => {
     const [guildDonation] = await query(`SELECT * FROM guild_donations WHERE rowid = $1`, [rowid]) as [GuildDonationSchema];
+    if (guildDonation) {
+        fixBigintForGuildDonation(guildDonation);
+    };
     return guildDonation;
 };
 
@@ -129,11 +162,15 @@ export const getGuildDonationSchemas = async (id: string, week?: number, type?: 
     };
 
     const guildDonation = await query(str, params) as GuildDonationSchema[];
+    guildDonation.forEach(fixBigintForGuildDonation);
     return guildDonation ?? [];
 };
 
 export const getStampedeSchema = async (id: string): Promise<StampedeSchema | undefined> => {
     const [stampede] = await query(`SELECT * FROM stampedes WHERE id = $1`, [id]) as [StampedeSchema];
+    if (stampede) {
+        fixBigintForStampede(stampede);
+    };
     return stampede;
 };
 
@@ -159,6 +196,9 @@ export const getFAQSchemaByName = async (name: string): Promise<FAQSchema | unde
 
 export const getRaidSchema = async (id: string): Promise<RaidSchema | undefined> => {
     const [raid] = await query(`SELECT * FROM raids WHERE id = $1`, [id]) as [RaidSchema];
+    if (raid) {
+        fixBigintForRaid(raid);
+    };
     return raid;
 };
 
@@ -192,21 +232,31 @@ export const getPremiumUsers = async (): Promise<Pick<UserSchema, "id" | "premiu
 
 export const getLatestRaid = async (guildId: string): Promise<RaidSchema | undefined> => {
     const [raid] = await query(`SELECT * FROM raids WHERE guildid = $1 AND end_date IS NULL AND start_date > NOW() - INTERVAL '7 days' ORDER BY rowid DESC LIMIT 1`, [guildId]) as [RaidSchema];
+    if (raid) {
+        fixBigintForRaid(raid);
+    };
     return raid;
 };
 
 export const getRaidByRaidRowId = async (raidRowId: number): Promise<RaidSchema | undefined> => {
     const [raid] = await query(`SELECT * FROM raids WHERE rowid = $1`, [raidRowId]) as [RaidSchema];
+    if (raid) {
+        fixBigintForRaid(raid);
+    };
     return raid;
 };
 
 export const getLatestStampede = async (): Promise<StampedeSchema | undefined> => {
     const [stampede] = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT 1`) as [StampedeSchema];
+    if (stampede) {
+        fixBigintForStampede(stampede);
+    };
     return stampede;
 };
 
 export const getPastStampedes = async (past: number): Promise<StampedeSchema[]> => {
     const stampedes = await query(`SELECT * FROM stampedes ORDER BY rowid DESC LIMIT $1`, [past]) as StampedeSchema[];
+    stampedes.forEach(fixBigintForStampede);
     return stampedes;
 };
 
@@ -466,11 +516,17 @@ export const insertNewStampede = async (): Promise<void> => {
 
 export const insertNewRaid = async (guildId: string, raidId: number, enemyHp: number, rank: string): Promise<RaidSchema> => {
     const { rows: [raid] } = await query(`INSERT INTO raids (guildid, raidid, enemy_hp, enemy_hpmax, rank_letter) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [guildId, raidId, enemyHp, enemyHp, rank]) as { rows: RaidSchema[]; };
+    if (raid) {
+        fixBigintForRaid(raid);
+    };
     return raid;
 };
 
 export const insertNewGuild = async (name: string, guildMaster: string): Promise<GuildSchema> => {
     const { rows: [guild] } = await query(`INSERT INTO guilds (name, master, members) VALUES ($1, $2, $3) RETURNING *`, [name, guildMaster, [guildMaster]]) as { rows: GuildSchema[]; };
+    if (guild) {
+        fixBigintForGuild(guild);
+    };
     return guild;
 };
 
@@ -689,6 +745,8 @@ export const updateRaidParticipation = async (raidRowId: number, userId: string,
 export const updateRaidPhase = async (raidRowId: number, newRaidId: number, newEnemyHp: number): Promise<RaidSchema | undefined> => {
     const { rows: [raid] } = await query(`UPDATE raids SET raidid = $1, enemy_hp = $2, enemy_hpmax = $2 WHERE rowid = $3 RETURNING *`, [newRaidId, newEnemyHp, raidRowId]) as { rows: RaidSchema[]; };
     if (raid.raidid === newRaidId) return undefined;
+
+    if (raid) fixBigintForRaid(raid);
     return raid;
 };
 
