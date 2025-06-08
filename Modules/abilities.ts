@@ -1607,7 +1607,7 @@ export const abilities: Record<number, Ability> = {
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             if (this.pause > matchStats.round) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}.`, ephemeral: true });
+                matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}.`, ephemeral: true });
                 this.used--;
                 return AbilityResponse.FAILURE;
             };
@@ -1933,24 +1933,35 @@ export const abilities: Record<number, Ability> = {
     "10524": {
         usage: 9999,
         used: 0,
-        cost: 30,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nRosalia is a character with an interesting balance of manipulation and damage abilities. Her passive ability inflicts a bleeding effect on the enemy, causing them to lose an amount equal to **5%** of Rosalia's max HP every round. Additionally, Rosalia drains **3** mana from the enemy every round, increasing her own mana pool and allowing her to use her abilities more frequently. Moreover, Rosalia gains a **20%** boost on class xp.\n\nRosalia doesn't simply use her own mana alone when activating her ability, instead she decreases enemy's current mana owned by **20** 💧, before dealing **125%** magic damage. If her attack hits the target, there's a **50%** chance of doubling the bleeding effect on her enemy for 2 rounds.\n\nIn a party, Rosalia extends her mana draining ability to aid her allies, draining **3** mana from the enemy every round.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧 + 20 💧 from enemy if possible`\n**Timeout**: `Yes`\n**Role**: `Support (Mana-drain, Bleed)`\n\n__**Passive**__\n- Bleed: Enemy loses **5%** of her max HP every round\n- Drains **3** 💧 from the enemy every round\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\n- Deals **125%** MD\n- The active works even when the enemy has less than 20 💧\n- If it hits: **50%** chance to inflict another instance of Bleeding, lasting for **2** rounds\n\n__**Party**__ (👥)\n- Drains **3** 💧 from the enemy every round",
+        cost: 0,
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `35-50`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nRosalia is a character with an interesting balance of manipulation and damage abilities. Her passive ability inflicts a bleeding effect on the enemy, causing them to lose an amount equal to **5%** of Rosalia's max HP every round. Additionally, Rosalia drains **3** mana from the enemy every round, increasing her own mana pool and allowing her to use her abilities more frequently. Moreover, Rosalia gains a **20%** boost on class xp.\n\nRosalia doesn't simply use her own mana alone when activating her ability, she steals up to **15** 💧 from the enemy to lower the cost to at most **35** 💧, before dealing **115%** magic damage. If her attack hits the target, there's a **50%** chance of doubling the bleeding effect on her enemy for 2 rounds.\n\nIn a party, Rosalia extends her mana draining ability to aid her allies, draining **3** mana from the enemy every round.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `35-50 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Mana-drain, Bleed)`\n\n__**Passive**__\n- Bleed: Enemy loses **5%** of her max HP every round\n- Drains **3** 💧 from the enemy every round\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\n- Deals **115%** MD\n- Steals up to **15** 💧 from the enemy to lower the cost of active\n- If it hits: **50%** chance to inflict another instance of Bleeding, lasting for **2** rounds\n\n__**Party**__ (👥)\n- Drains **3** 💧 from the enemy every round",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rosalia
+
+            // Calculate cost
+            let cost = 50;
+            const stealMana = Math.min(eStats.sm, 15);
+            cost -= stealMana;
+            if (myStats.sm < cost) {
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${cost}\\💧)`, ephemeral: true });
+                return AbilityResponse.FAILURE;
+            }
             // if (eStats.sm < 20) {
             //     matchStats.turn = matchStats.turnSkill ? 0 : 1;
             //     myStats.sm += 30;
             //     matchStats.interaction.followUp({ content: "Your enemy needs **20**💧 to activate", ephemeral: true });
             //     return AbilityResponse.FAILURE;
             // };
-            eStats.sm -= 20;
-            if (eStats.sm < 0) eStats.sm = 0;
+            myStats.sm -= cost;
+            eStats.sm -= stealMana;
+            //if (eStats.sm < 0) eStats.sm = 0;
 
-            const dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.25, magicDamage: true, mdChance: -1 });
+            const dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 1.15, magicDamage: true, mdChance: -1 });
             if (dmg && Math.random() < 0.5) {
                 ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 2));
-                notice.push(`\n⚜️ ${char.name} caused bleeding for 2 rounds`);
+                notice.push(`\n⚜️ **${char.name}** caused bleeding for 2 rounds`);
             };
 
             return AbilityResponse.SUCCESS;
@@ -3103,7 +3114,7 @@ export const abilities: Record<number, Ability> = {
             };
 
             // If not enough mana
-            matchStats.interaction.followUp({ content: `${char.name} does not have sufficient mana to use any of her active abilities`, ephemeral: true });
+            matchStats.interaction.followUp({ content: `**${char.name}** does not have sufficient mana to use any of her active abilities`, ephemeral: true });
             return AbilityResponse.FAILURE;
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
@@ -3114,7 +3125,7 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if ((myStats.hp / myStats.maxhp <= 0.33) && this.burst) {
                     const shgain = Math.min(myStats.damageTaken, myStats.maxhp);
-                    notice.push(`\n✧ Data collection is complete! ${char.name} gained **${shgain}** shield ✧`);
+                    notice.push(`\n✧ Data collection is complete! **${char.name}** gained **${shgain}** shield ✧`);
                     myStats.shield += shgain;
                     eStats.timeFrozen = true;
                     eStats.frozenMessage = "was overwhelmed ⋆.ೃ࿔";
@@ -3437,7 +3448,7 @@ export const abilities: Record<number, Ability> = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 if (myStats.heat < 0) {
                     this.used--;
-                    matchStats.interaction.followUp({ content: `${char.name} has no heat to summon a miniature sun!`, ephemeral: true });
+                    matchStats.interaction.followUp({ content: `**${char.name}** has no heat to summon a miniature sun!`, ephemeral: true });
                     return AbilityResponse.FAILURE;
                 };
                 let buffpercent = myStats.heat * 0.01;
@@ -3880,8 +3891,8 @@ export const abilities: Record<number, Ability> = {
         cost: 60,
         stacks: 1,
         pause: -5,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? every round, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to an endurance mode for **4** rounds. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **10** rounds.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **5** rounds, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds`\n**Cost**: `60 💧`\n**Timeout**: `yes`\n**Role**: `DPS/Tank (DMG-boost, Mitigation, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **4** rounds\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **10** rounds\n\n__**Party**__ (👥)\nEvery **5** rounds:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
+        desc: "**Total Usage**: `unlimited (CD: 6)`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS/Support`\n\nAh, so you want to know about my abilities, huh? Well, let me tell you, all those formal descriptions are just too dull, aren't they? I mean, who needs all that jargon when you can have a bit of fun, right? So, here's the deal with my kit, straight from the Yorozuya's mouth!\n\nFirst up, we've got my passive. You see, I'm not really into the whole training thing. I prefer just to match the level of the toughest guy around. Makes life easier, you know? Every attack, I get this itch to swing my sword a bit harder and aim a bit sharper. That's me increasing my attack and crit rate by **5%**, stacking up to **5** times. But when I'm really pushed to the edge, like under **30%** HP, I get a surge of \"I-don't-wanna-die\" energy, and suddenly I'm hitting (and getting hit) **20%** harder.\n\nNow, let's talk about my active! When things get too hot, I switch to Endurance mode for **6** rounds. It's like playing a game of chicken with the enemy. **33%** of the damage coming my way? I just shrug it off and store it as `Injuries`. And while I'm at it, there's a **25%** chance I'll just casually counter an attack. Cool, right? But here's the catch: when my endurance mode times out, those `Injuries` I shrugged off earlier come back to haunt me over the next **15** rounds.\n\nLastly, my party ability lets me share the endurance, but spare the pain. You see, I'm a team player when I feel like it. Every **3** rounds, I let my allies experience my Endurance mode for a turn, minus the annoying part where you pay for it later. It's my way of saying, \"Here, have some fun, but don't worry about the consequences.\"\n\nSo, that's me in a nutshell. A lazy samurai who somehow avoids hard work. Remember, it's not about how strong your abilities are, it's about how you use them... or avoid using them, in my case.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `6 rounds`\n**Cost**: `60 💧`\n**Timeout**: `yes`\n**Role**: `DPS/Tank (DMG-boost, DMG-delay, Counter)`\n\n__**Passive**__\n- Attacks increase his ATK, MD & critical rate by **5%** (Up to **25%**)\nWhen below **30%** HP:\n- Takes **+20%** DMG\n- Deals **+20%** DMG\n\n__**Active**__ (✨)\nEnters Endurance Mode for **6** rounds\n- Absorbs **33%** of DMG taken as `Injuries`\n- **+25%** counter chance\n- By the end of the domain: Reinflicts `Injuries` as DoT on Gintoki over **15** rounds\n\n__**Party**__ (👥)\nEvery **3** rounds:\n- Allies enter Endurance Mode (**33%** DMG mitigation + **25%** counter chance) with no side effects (injuries)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Gintoki EX
             if (this.pause > matchStats.round) {
@@ -3891,16 +3902,16 @@ export const abilities: Record<number, Ability> = {
                 this.used--;
                 return AbilityResponse.FAILURE;
             };
-            this.pause = matchStats.round + 4;
+            this.pause = matchStats.round + 6;
 
-            const domainLast = 4;
+            const domainLast = 6;
 
             // Enter Endurance Mode
             myStats.putDamageOnHold = 0.33; // 33%
-            if (Math.random() < 0.25) myStats.counter = 1;
+            if (Math.random() < 0.25) myStats.counter += 1;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 // Chance to counter
-                if (Math.random() < 0.25) myStats.counter = 1;
+                if (Math.random() < 0.25) myStats.counter += 1;
 
                 return AbilityResponse.SUCCESS;
             }, domainLast - 1));
@@ -3908,10 +3919,10 @@ export const abilities: Record<number, Ability> = {
             // When Endurance Mode Ends
             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (myStats.damageOnHold) {
-                    const dmg = Math.floor(myStats.damageOnHold / 10);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -dmg, {});
+                    const dmg = Math.floor(myStats.damageOnHold / 15);
+                    myStats.hp -= dmg;
                     if (myStats.hp < 0) myStats.hp = 0;
-                    mybuff.hp.push(new buffInfo("+", -dmg, 9));
+                    mybuff.hp.push(new buffInfo("+", -dmg, 14));
                 };
 
                 myStats.putDamageOnHold = 0;
@@ -3920,7 +3931,7 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.SUCCESS;
             }));
 
-            notice.push(`\n✨ **${char.name}** entered an endurance mode!`);
+            notice.push(`\n✨ **${char.name}** entered endurance mode for **${domainLast}** rounds!`);
 
             return AbilityResponse.SUCCESS;
         },
@@ -3928,6 +3939,7 @@ export const abilities: Record<number, Ability> = {
             myStats.gintokiStacks = 0;
             eStats.vulnerability ??= 1;
             myStats.vulnerability ??= 1;
+            myStats.counter ??= 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.atk += Math.floor(myStats.atk * (myStats.gintokiStacks * 0.05));
                 myStats.md += Math.floor(myStats.md * (myStats.gintokiStacks * 0.05));
@@ -3951,7 +3963,7 @@ export const abilities: Record<number, Ability> = {
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (matchStats.round % 5 === 0) {
+                if (matchStats.round % 3 === 0) {
 
                     // Enter Endurance Mode
                     myStats.putDamageOnHold = 0.33; // 33%
@@ -3965,7 +3977,7 @@ export const abilities: Record<number, Ability> = {
                         return AbilityResponse.SUCCESS;
                     }));
 
-                    notice.push(`\n✨ **${char.name}** entered an endurance mode!`);
+                    notice.push(`\n✨ **${char.name}** entered endurance mode!`);
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -5539,7 +5551,7 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.FAILURE;
             } else if (this.pause > matchStats.round) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
                 myStats.sm += this.cost;
                 this.used--;
                 return AbilityResponse.FAILURE;
@@ -5558,7 +5570,7 @@ export const abilities: Record<number, Ability> = {
                             // 25% chance to gain 1x Counter. Enemy ATK/MD -2% permanently
                             if (Math.random() < 0.25) {
                                 myStats.counter += 1;
-                                notice.push(`\n${char.name} prepares to counter the next attack`);
+                                notice.push(`\n⚜️ **${char.name}** prepares to counter the next attack`);
                             };
                             eStats.atk -= Math.floor(myStats.atk * 0.02);
                             ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.02), 9999));
@@ -5615,6 +5627,9 @@ export const abilities: Record<number, Ability> = {
             myStats.insight ??= 0;
             myStats.duorevived ??= false;
             myStats.counter ??= 0;
+            myStats.selfhealChance.push(1);
+            myStats.selfheal.push(0);
+            this.selfhealidx = myStats.selfheal.length - 1;
 
             let prog = myStats.proginfo;
             if (prog) {
@@ -6072,7 +6087,7 @@ export const abilities: Record<number, Ability> = {
 
     //         if (this.pause > matchStats.round) {
     //             myStats.sm += this.cost;
-    //             matchStats.interaction.followUp({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //             matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
     //             this.used--;
     //             return AbilityResponse.FAILURE;
     //         };
