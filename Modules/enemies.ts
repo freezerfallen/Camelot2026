@@ -225,7 +225,7 @@ export const raidBosses: enemyInfo[] = [
             if (myStats.usedBlockRound === matchStats.round) { // Def used last round (40% damage)
                 dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 0.4, ignoreShield: true, dodge: false, block: false });
             } else { // Def not used last round (200% damage)
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 2, ignoreShield: true, dodge: false, block: false });
+                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 4, ignoreShield: true, dodge: false, block: false });
             }
 
             return AbilityResponse.SUCCESS;
@@ -237,7 +237,7 @@ export const raidBosses: enemyInfo[] = [
             mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * 0.03), 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Receives **100%** more critical damage", "Applies a **3%** HP DoT on the player", `**Active**: Deals **200%** damage, unless the player blocked using the ${customEmojis.def} DEF action in the previous round, in which case it only deals **40%** damage (**100** <:mana:1047269152957661255>)`]])
+        }, [["Receives **100%** more critical damage", "Applies a **3%** HP DoT on the player", `**Active**: Deals **400%** damage, unless the player blocked using the ${customEmojis.def} DEF action in the previous round, in which case it only deals **40%** damage (**100** <:mana:1047269152957661255>)`]])
     ),
     new enemyInfo("Kael'theron", "Titan", "the Ashen Devourer", "M", true, {}, {}, { mana: 100 }, [689, 731, 732], ["https://i.ibb.co/drsdyGm/c.png"], [], 1,
         new skillInfo(1, 150, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -245,7 +245,7 @@ export const raidBosses: enemyInfo[] = [
             if (myStats.usedBlockRound === matchStats.round) { // Def used last round (50% damage)
                 dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 0.5, ignoreShield: true, dodge: false });
             } else { // Def not used last round (250% damage)
-                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 2.5, ignoreShield: true, dodge: false });
+                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:magma_ball:1340448973194006679> **${enemy.name}** threw scorching magma! **${enemy.name}**`, { atkMultiplier: 5, ignoreShield: true, dodge: false });
             }
 
             return AbilityResponse.SUCCESS;
@@ -268,7 +268,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Receives **100%** more critical damage", "Applies a **5%** HP DoT on the player", "Erupts at round **20**, ending the fight", `**Active**: Deals **250%** damage, unless the player blocked using the ${customEmojis.def} DEF action in the previous round, in which case it only deals **50%** damage (**150** <:mana:1047269152957661255>)`]])
+        }, [["Receives **100%** more critical damage", "Applies a **5%** HP DoT on the player", "Erupts at round **20**, ending the fight", `**Active**: Deals **500%** damage, unless the player blocked using the ${customEmojis.def} DEF action in the previous round, in which case it only deals **50%** damage (**150** <:mana:1047269152957661255>)`]])
     ),
 
     new enemyInfo("Velourith", "Doppelgänger", "the Void Harbinger", "F", true, { mg: 5 }, {}, { mana: 120 }, [714, 715, 716, 717], ["https://i.ibb.co/Gpz18Kg/c.png"], [], 2,
@@ -466,45 +466,84 @@ export const raidBosses: enemyInfo[] = [
     new enemyInfo("Nekro", "Necromancer", "the Death Caller", "M", true, {}, {}, { mana: 120, mg: 10 }, [726, 739, 740, 741], ["https://i.ibb.co/1Yt4DdYZ/nekro.png"], [], 9,
         new skillInfo(9, 140, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            notice.push(`\n<:summon:1340620694655995925> **${enemy.name}** summoned a minion`);
-            matchStats.eStatsCC = { ...eStats };
-            matchStats.currentOpponent = 1;
+            if (matchStats.currentOpponent === 0) {
+                notice.push(`\n<:summon:1340620694655995925> **${enemy.name}** summoned a minion`);
+                matchStats.eStatsCC = { ...eStats };
+                matchStats.currentOpponent = 1;
 
-            eStats.image = "https://i.ibb.co/yBQGNRCq/minion.png";
-            embed.setImage(eStats.image);
+                eStats.image = "https://i.ibb.co/yBQGNRCq/minion.png";
+                embed.setImage(eStats.image);
 
-            eStats.hp = Math.floor(myStats.hp * 0.2);
-            eStats.maxhp = Math.floor(myStats.hp * 0.2);
-            eStats.mg = 0;
+                const minionHp = Math.floor(myStats.hp * 1.5);
+
+                eStats.hp = minionHp;
+                eStats.maxhp = minionHp;
+                eStats.mg = 0;
+            } else {
+                eStats.sm += 140;
+            };
 
             return AbilityResponse.SUCCESS;
         }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (caster === myStats) {
-                    const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
-                    eStats.atk += Math.floor(eStats.atk * missingHpPercent * 0.75);
-                    eStats.md += Math.floor(eStats.md * missingHpPercent * 0.75);
-                };
-            });
+
+            // matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            //     if (caster === myStats) {
+            //         const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
+            //         eStats.atk += Math.floor(eStats.atk * missingHpPercent * 0.75);
+            //         eStats.md += Math.floor(eStats.md * missingHpPercent * 0.75);
+            //     };
+            // });
+
+            // Inversely scales the minion's ATK and MD with the player's missing HP
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
+                eStats.atk += Math.floor(eStats.atk * missingHpPercent * 0.75);
+                eStats.md += Math.floor(eStats.md * missingHpPercent * 0.75);
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-75%**)", "**Active**: Summons a minion with **20%** of your current HP (**140** <:mana:1047269152957661255>)"]])
+        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-75%**)", "**Active**: Summons a minion with **150%** of your current HP (**140** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("NecroVamp", "Necromancer", "the Death Eater", "M", true, {}, {}, { mana: 120, mg: 10 }, [726, 739, 740, 741], ["https://i.ibb.co/H0sjR0p/nekrovamp.png"], [], 10,
         new skillInfo(10, 150, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-            notice.push(`\n<:summon:1340620694655995925> **${enemy.name}** summoned a minion`);
-            matchStats.eStatsCC = { ...eStats };
-            matchStats.currentOpponent = 1;
+            if (matchStats.currentOpponent === 0) {
+                notice.push(`\n<:summon:1340620694655995925> **${enemy.name}** summoned a minion`);
+                matchStats.eStatsCC = { ...eStats };
+                matchStats.currentOpponent = 1;
 
-            eStats.image = "https://i.ibb.co/fcRvQBg/minion.png";
-            embed.setImage(eStats.image);
+                eStats.image = "https://i.ibb.co/fcRvQBg/minion.png";
+                embed.setImage(eStats.image);
 
-            eStats.hp = Math.floor(myStats.hp * 0.3);
-            eStats.maxhp = Math.floor(myStats.hp * 0.3);
-            eStats.mg = 0;
+                const minionHp = Math.floor(myStats.hp * 2);
 
-            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                eStats.hp = minionHp;
+                eStats.maxhp = minionHp;
+                eStats.mg = 0;
+            } else {
+                eStats.sm += 150;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+            // matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            //     if (caster === myStats) {
+            //         const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
+            //         eStats.atk += Math.floor(eStats.atk * missingHpPercent * 1.1);
+            //         eStats.md += Math.floor(eStats.md * missingHpPercent * 1.1);
+            //     };
+            // });
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                // Inversely scales the minion's ATK and MD with the player's missing HP
+                const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
+                eStats.atk += Math.floor(eStats.atk * missingHpPercent * 1.1);
+                eStats.md += Math.floor(eStats.md * missingHpPercent * 1.1);
+
+                // Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**
                 if (matchStats.currentOpponent === 1) {
                     ebuff.atk.push(new buffInfo("*", 0.01, 9999));
                     ebuff.md.push(new buffInfo("*", 0.01, 9999));
@@ -516,18 +555,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (caster === myStats) {
-                    const missingHpPercent = 1 - ((myStats.maxhp - myStats.hp) / myStats.maxhp);
-                    eStats.atk += Math.floor(eStats.atk * missingHpPercent * 1.1);
-                    eStats.md += Math.floor(eStats.md * missingHpPercent * 1.1);
-                };
-            });
-
-            return AbilityResponse.SUCCESS;
-        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-110%**)", "**Active**: Summons a minion with **30%** of your current HP (**150** <:mana:1047269152957661255>)", "  - Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**"]])
+        }, [["Scales its own ATK and MD inversely with the player's missing HP (**+0-110%**)", "**Active**: Summons a minion with **200%** of your current HP (**150** <:mana:1047269152957661255>)", "  - Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**"]])
     ),
 
     new enemyInfo("Rootlord Morivar", "Eldritch Forest Parasite", "Father of Decay", "M", true, {}, {}, { mana: 120, mg: 15 }, [747, 748, 769], ["https://i.ibb.co/0yFsFCbk/morivar.png"], [], 11,
