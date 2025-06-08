@@ -8,7 +8,6 @@ import buffInfo from "./buffs";
 import { Buffs, DetailedStats, IbuffInfo, IcharInfo, IentityInfo, MatchStats } from "../types";
 import { getLatestStampede, getUserSchema, getUserWeaponCount, updateUsers, getPartyMembers, getUserSchemas } from "./queries";
 import { AbilityResponse } from "./components";
-import { constant } from "lodash";
 
 export type Ability = {
     usage: number;
