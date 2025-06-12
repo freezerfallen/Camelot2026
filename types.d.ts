@@ -665,7 +665,7 @@ export type MatchStats = {
     allowSelfheal?: boolean;
     heap1: any;
     listeners: Record<TriggerEvents, ITrigger[]>;
-    on(event: TriggerEvents, options: PartialBy<TriggerOptions, "event"> | TriggerCallback): void;
+    on(event: TriggerEvents, options: PartialBy<TriggerOptions, "event"> | TriggerCallback): () => void;
     off(event: TriggerEvents, trigger: ITrigger | number): void;
     trigger(event: TriggerEvents, caster: any, target: any, casterBuff: any, targetBuff: any, options?: any): void;
 

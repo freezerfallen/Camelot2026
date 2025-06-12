@@ -1420,6 +1420,19 @@ const commands = [
 						.setMaxValue(100_000_000)
 				)
 			)
+			.addSubcommand(subcommand => subcommand
+				.setName('skill')
+				.setDescription('Set your skill points')
+				.addStringOption(option =>
+					option.setName('action')
+						.setDescription('Set skill points | max or reset')
+						.setRequired(true)
+						.addChoices(
+							{ name: 'max', value: 'max' },
+							{ name: 'reset', value: 'reset' }
+						)
+				)
+			)
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

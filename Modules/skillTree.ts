@@ -244,13 +244,13 @@ export const skillTree: SkillPath[] = [
     }, 14),
 
     // Utility
-    new SkillPath("Treasure Hunter", "common", "Increases coin drops by **+10%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        matchStats.lootm += 0.1 * level;
+    new SkillPath("Treasure Hunter", "common", "Increases coin drops by **+7.5%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.lootm += 0.075 * level;
 
         return AbilityResponse.SUCCESS;
     }, 15),
-    new SkillPath("Born to Grind", "common", "Increases class xp by **+15%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        matchStats.xpboost += 0.15 * level;
+    new SkillPath("Born to Grind", "common", "Increases class xp by **+10%** (works in the `/dungeon`).", 2, 10, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.xpboost += 0.1 * level;
 
         return AbilityResponse.SUCCESS;
     }, 16),
@@ -446,7 +446,7 @@ export const skillTree: SkillPath[] = [
 
     // Utility
     new SkillPath("Adventurer's Spirit", "extra", "Increases coin drops by **+10%** and class xp by **+10%** (works in the `/dungeon`).", 3, 5, "utility", (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        const bonusPercent = 0.10 * level;
+        const bonusPercent = 0.1 * level;
         matchStats.lootm += bonusPercent;
         matchStats.xpboost += bonusPercent;
 
@@ -454,16 +454,3 @@ export const skillTree: SkillPath[] = [
     }, 29),
 
 ];
-
-
-for (const skillT of ["attack", "defense", "health", "crit", "mana", "utility"]) {
-    const filteredSkills = skillTree.filter(skill => skill.category === skillT);
-
-    console.log(`${skillT[0].toUpperCase() + skillT.slice(1)} Skills`);
-
-    for (const fSkill of filteredSkills) {
-        console.log(`> - ${fSkill.name} (x${fSkill.maxLevel}): ${fSkill.description}`);
-    };
-
-    console.log("");
-};

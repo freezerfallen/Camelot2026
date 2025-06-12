@@ -247,10 +247,9 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                 return `### Raid Ranking`
                     + `\n${Object.keys(raid.participation).length ? Object.entries(raid.participation)
                         .sort(([, a], [, b]) => b[0] - a[0]) // Sort by damage dealt (first element in value array)
-                        .map(([userId, [damage, rounds]], i) => `-# ${i + 1}. <@${userId}> - **${damage}** damage in **${rounds}**/${attemptsTotal} attempts`)
+                        .map(([userId, [damage, rounds]], i) => `-# ${i + 1}. <@${userId}> - **${formatNumberWithQuotes(damage)}** damage in **${rounds}**/${attemptsTotal} attempts`)
                         .join('\n') : `-# No participants yet`}`
                     + `\n\n-# Attempts left: ${attemptsLeft}/${attemptsTotal}`;
-
             };
 
             return "";
@@ -267,7 +266,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
 
             play.on('collect', () => {
                 if (dungeonInProgress.has(stats.id)) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send("You already have an fight in progress, please finish it before attempting to start a new one.");
+                    if (interaction.channel?.isSendable()) interaction.channel.send("You already have a fight in progress, please finish it before attempting to start a new one.");
                     return;
                 };
 

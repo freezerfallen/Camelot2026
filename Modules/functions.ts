@@ -663,11 +663,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             buff.label = `dodgebuff: ${matchStats.dodgebuff * 100}%, ${5} rounds`;
             targetBuff.atk.push(buff);
         };
-        if (target.sjwUsedActive) {
-            const drain = Math.floor(attacker.sm * 0.12);
-            attacker.sm -= drain;
-            target.sm += drain;
-        };
+        // if (target.sjwUsedActive) {
+        //     const drain = Math.floor(attacker.sm * 0.12);
+        //     attacker.sm -= drain;
+        //     target.sm += drain;
+        // };
         if (target.stealManaOnDodge) {
             const steal = Math.min(attacker.sm, target.stealManaOnDodge);
             attacker.sm -= steal;
@@ -859,15 +859,15 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         targetBuff.hp.push(new buffInfo("+", -Math.floor(0.06 * damage), attacker.guinaifenStackLast));
         attacker.guinaifenStackRounds.push(matchStats.round);
     };
-    if (attacker.sjwUsedActive) {
-        if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
-        if (isCrit) { // Igris
-            const drain = Math.floor((target.maxhp > (2 * attacker.maxhp)) ? attacker.maxhp * 0.07 : target.maxhp * 0.035);
-            target.hp -= drain;
-            attacker.hp += drain;
-        };
+    // if (attacker.sjwUsedActive) {
+    //     if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
+    //     if (isCrit) { // Igris
+    //         const drain = Math.floor((target.maxhp > (2 * attacker.maxhp)) ? attacker.maxhp * 0.07 : target.maxhp * 0.035);
+    //         target.hp -= drain;
+    //         attacker.hp += drain;
+    //     };
 
-    };
+    // };
     if (target.hp > target.maxhp) target.hp = target.maxhp;
     if (target.hp < 0) target.hp = 0;
     if (attacker.hp > attacker.maxhp) attacker.hp = attacker.maxhp;
