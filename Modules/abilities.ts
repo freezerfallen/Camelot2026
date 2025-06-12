@@ -2214,7 +2214,7 @@ export const abilities: Record<number, Ability> = {
 
             return AbilityResponse.SUCCESS;
         },
-        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
             matchStats.xpboost += 0.25;
 
             return AbilityResponse.SUCCESS;
@@ -2491,185 +2491,112 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    //     "13314": {
-    //         usage: 9999,
-    //         used: 0,
-    //         cost: 0,
-    //         roundUsed: 0,
-    //         usedThisRound: 0,
-    //         shortdesc: "",
-    //         desc: "**Total Usage**: `unlimited`\n**Cost**: `10`\\💧\n**Timeout**: `no`\n**Role**: `DPS/Tank`\n\nSeishirou Nagi",
-    //         ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-    //             // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
-    //
-    //        },
-    //         passive: (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //
-    //         },
-    //         party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //
-    //         },
-    //     },
+    /*        "13314": {
+             usage: 9999,
+             used: 0,
+             cost: 0,
+             roundUsed: 0,
+             shortdesc: "**Uses**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\n__**Passive**__\n- Gains **5x** `Initiative` upon entering battle\n- Without `Initiative`: loses **4%** current HP every turn.\n- Dodging grants him **3x** `Initiative`\n- Dealing a critical strike: Grants **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : > Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : > At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. \n\n__Core Mechanic__: FLOW state:\n- If he already has `Initiative`: Gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn\n- Else, grants **5x** `Initiative`.\n\n__**Active**__ (:sparkles:)\nCONDITION: After every **4** times of him entering __FLOW state__:\n- Automatically followup by casting his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n- However, if you force him by using `✨` manually, it will do nothing. Twice and he'll leave the battle (considered a loss).\n\n__**Party**__ (:busts_in_silhouette:)\n- **20%** chance for the ally to counter every round (stackable)",
+             desc: "**Total Usage**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\nWith speedy reflexes and a lack of motivation to spend time for trivial matters, Nagi gains **5x** `Initiative` upon entering battle. Without `Initiative`, he becomes consumed by boredom and loses **4%** current HP every turn.\n\nDodging grants him **3x** `Initiative`, while dealing a critical strike grants him **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. If he already has `Initiative`, he gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn. Else, grants **5x** `Initiative`.\n\nAfter every **4** times of him entering __FLOW state__, he will cast his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n\nHowever, if you force him by using `✨` manually, something wrong might happen~\n-# Do it twice and he'll leave. Just don't-!\n\nIn a party, he has a **20%** chance to intervene every turn, attempting a Zero Reset Turn, allowing the ally to counter the next incoming hit.",
+             ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, ...list) {
+                 // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
+                matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                myStats.nagiQuit ??= 0;
+                myStats.nagiQuit ++;
+                if (myStats.nagiQuit === 1) notice.push(`\n🙁 Can't be bothered to think about it...`);
+                else if (myStats.nagiQuit === 2) {
+                    notice.push(`\n🚶🏻‍♂️ **Mr. Hassle Man** left the battle out of boredom...`);
+                    notice.push(`\n( •̀ - • ) Eh, that nickname sucks. Stop- `);
+                    myStats.rev = 0;
+                    myStats.maxRevivals = 0;
+                    myStats.hp = 0;
+                };
+                return AbilityResponse.SUCCESS;
+            },
+             passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) {
+                myStats.initiative ??= 0;
+                myStats.blitz ??= 0;
+                myStats.nagiCounter = 0;
+                myStats.initiative += 5;
+                myStats.flowed = 0; // Record amt of times he entered flow
+                //? const embedColor = embed.data.color ?? 0x278fd5;
+    
+                myStats.cr += 0.05 * myStats.initiative; // Increases CR by 5% for every initiative
 
+                // Delayed buff
+                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
+                if (myStats.initiative > 0) { // Loses 1 initiative every round
+                    myStats.initiative -= 1;
+                    myStats.cr += 0.05 * myStats.initiative;
 
+                    if (myStats.cr > 1) {
+                        let overflowingpercent = Math.floor((myStats.cr - 1) * 100) / 100;
+                        //Overflowing critical rate -> Restore 0.5% missing HP for every 1% overflowing CR, up to 25%.
+                        overflowingpercent = Math.min(overflowingpercent, 0.5);
+                        const heal = Math.floor((myStats.maxhp - myStats.hp) * (overflowingpercent) * 0.005);
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
+                        myStats.cr = 1; // Cap cr to 100%
+                    };
+                } else myStats.hp -= Math.floor(myStats.maxhp * 0.04);
 
-    // "13780": {
-    //     usage: 1,
-    //     used: 0,
-    //     cost: 80,
-    //     finisher: 0,
-    //     revprocced: 0,
-    //     has9S: false,
-    //     desc: "**Total Usage**: `1`\n**Cost**: `80 💧`\n**Timeout**: `No`\n**Role**: `DPS`\n\n*It always ends like this... The final screams they summoned on the edge of death... they still echo within me.*\n\n2B enters battles with her reliable POD companion, which offers various effects in battle. You may check out their effects with `/item equip programme` and proceed to equipping one!\n\nAs an executioner model, 2B is often tasked with close-quarter combat. She has a **100%** chance to revive, and can revive **2** times in battles as she uploads her data to her bunker. After the first revive, she gains **20%** ATK. After the second revive, she gains **25%** critical rate and damage.\n\nAdditionally, every **5** critical strikes from 2B grants her 1x Counter stack. Moreover, once the foe falls below **30%** HP, she will attempt a finisher move, dealing **170%** DMG to them (Up to **2** times in a battle).\n\nUsing her ability, she self-destructs, dealing **100%** of her max HP to the enemy. This hit bypasses all DEF/MR, cannot be dodged/blocked, but does not benefit from extra effects such as critical or lifesteal.\n\nFollowing the destruction, she is left at **1** HP. If the player owns the character **9S**, he steps into the fight, dealing **40%** DMG to the enemy, before granting 2B **100%** dodge rate for that turn as the foe is distracted.\n\nIn a party, **2B** has a  **7%** chance to intervene every round, raising ally's dodge rate to **100%** before granting them **1x** Counter stack. The sudden intrusion also reduces the foe's dodge rate and block rate to **0%** that turn. If the party contains **9S** or **A2**, the chance of intervention is further raised by **12%** each, up to a total of **31%**.",
-    //     ability: function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+                // Check if counter
+                if (myStats.nagiCounter > Math.random()) myStats.counter += 1;
 
-    //         notice.push("\n`👋🏻`The honor was mine, Nines.");
+                // FLOW state
+                if (myStats.blitz >= 4) {
+                    myStats.blitz -= 4;
+                    notice.push(`\n⚽ **${char.name}** entered Flow state.`);
+                    message.edit({ embeds: [embed] });
+                    //? embed.setColor(0x278fd5);
+                    if (myStats.initiative > 0) { // If already in initiative, get buffs
+                        myStats.br += 0.25;
+                        myStats.cd += 0.5;
+                        eStats.def -= Math.floor(eStats.def * 0.25);
+                        eStats.mr -= Math.floor(eStats.mr * 0.25);
+                    } else myStats.initiative += 5; // Else, grant 5 initiative
 
-    //         myStats.hp = 1;
-    //         eStats.hp -= myStats.maxhp; 
-    //         if (eStats.hp < 0) eStats.hp = 0;
+                    myStats.flowed += 1; // To record times flowed
+                    if (myStats.flowed >= 4) {
+                        myStats.flowed -= 4;
 
-    //         if (eStats.hp > 0) {
-    //             if (this.has9S) {
-    //                 myStats.dodge = 1;
-    //                 myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⊹`*You're going down.* **9S**", { atkMultiplier: 0.4 });
-    //                 }, 9999));
-    //             };
-    //         };
+                        // Autouse ACTIVE
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚽ **${char.name}** performed a Five-Shot Fake Valley Shot! He`, { atkMultiplier: 1.5 });
+                        matchStats.trigger("ABILITY", myStats, eStats, mybuff, ebuff);
+                    };
 
-    //         notice.push(`\n**${char.name}** self-destructed! She dealt **${myStats.maxhp}** damage to the opponent!`);
-    //     },
-    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-    //         // SETUP VAR
-    //         myStats.critstacks = 0;
-    //         myStats.counter ??= 0;
+                    // Reset color
+                    //? myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
+                    //?    message.edit({ embeds: [embed] });
+                    //?    embed.setColor(embedColor);
 
-    //         // Check if 9S in inventory
-    //         const { 0: stats } = await query(`SELECT chars FROM characters WHERE id = ${matchStats.interaction.user.id}`);
-    //         this.has9S = JSON.parse(stats.chars).includes(13782);
+                //?    return AbilityResponse.SUCCESS;
+                //?}));
+                };
 
-    //         // 2 chances to revive (reload from bunker)
-    //         // myStats.rev = 2;
-    //         myStats.maxRevivals = 2;
-    //         myStats.revhp = 1;
+                return AbilityResponse.SUCCESS;
+            }, 9999));
 
-    //         // Apply buffs for each pod type
-    //         let prog = myStats.proginfo;
-    //         switch (prog) {
-    //             case undefined:
-    //                 notice.push("\n`⚙️` Pod is not equipped with any programme! Please run `/item equip item:prog` to proceed with choosing one!");
-    //                 break;
-    //             case "gravity":
-    //                 // Gravity - Reduce enemy's ATK, MD, DEF, MR, BR and DG by 40% for 1 turn every 3 turns 
-    //                 notice.push("\n`⚙️` Pod has been equipped with programme : **Gravity**.");
-    //                 myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //                     if (matchStats.round % 3 === 0) {
-    //                         eStats.atk -= Math.floor(eStats.atk * 0.35);
-    //                         eStats.md -= Math.floor(eStats.md * 0.35);
-    //                         eStats.def -= Math.floor(eStats.def * 0.35);
-    //                         eStats.mr -= Math.floor(eStats.mr * 0.35);
-    //                         eStats.br -= 0.35;
-    //                         if (eStats.br < 0) { eStats.br = 0; };
-    //                         eStats.dodge -= 0.35;
-    //                         if (eStats.dodge < 0) { eStats.dodge = 0; };
-    //                         notice.push("\n`⚙️` Pod activated **Gravity** : Opponent's ATK, MD, DEF, MR, Block rate and Dodge rate have been decreased by **30%** for **1** round!");
-    //                     };
-    //                 }, 9999));
-    //                 break;
-    //             case "mirage":
-    //                 // Mirage - Increases critical rate by 50% every 3 turns, before guaranteeing 40% DMG twice
-    //                 notice.push("\n`⚙️` Pod has been equipped with programme : **Mirage**.");
-    //                 myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //                     if (matchStats.round % 3 === 0) {
-    //                         myStats.cr += 0.5;
-    //                         if (myStats.cr > 1) { myStats.cr = 1; };
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **2B**", { atkMultiplier: 0.4, dodge: 0 });
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **2B**", { atkMultiplier: 0.4, dodge: 0 });
-    //                     }
-    //                 }, 9999));
-    //                 break;
-    //             case "repair":
-    //                 // Repair - Applies a 5% max HP restoration every round for 2 turns every 3 turns
-    //                 notice.push("\n`⚙️` Pod has been equipped with programme : **Repair**.");
-    //                 myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //                     if (matchStats.round % 3 === 0) {
-    //                         notice.push(`\n⚙️ Pod initiated **Repair**!`);
-    //                         myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //                             let heal = Math.floor(myStats.maxhp * 0.05);
-    //                             addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, { }); 
-    //                             if (myStats.hp / myStats.maxhp > 1) { myStats.hp = myStats.maxhp; }
-    //                             notice.push(`\n⚙️ **Repair** in effect! ${char.name} recovered **${heal}** HP!`);
-    //                         }, 2));
-    //                     };
-    //                 }, 9999));
-    //                 break;
-    //             case "scanner":
-    //                 // Scanner - Increases loot gain in dungeons by 15%
-    //                 notice.push("\n`⚙️` Pod has been equipped with programme : **Scanner**.");
-    //                 matchStats.lootm += 0.15;
-    //                 notice.push(`\n<:coins:1287057582858436648> Ultrasonic waves released...`);
-    //                 break;
-    //             default: notice.push(`\nFailed to connect to pod...`); break;
-    //         };
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             // 5 crit stacks => consumed for 1x counter chance
-    //             if (myStats.critstacks >= 5) { myStats.critstacks -= 5; myStats.counter += 1; notice.push(`\n**2B** gained **1x** counter stack.`); }
-    //             // Apply effects after every revive
-    //             if (this.revprocced < myStats.revivedTotal) {
-    //                 switch (myStats.revivedTotal) {
-    //                     case 1:
-    //                         myStats.atk += Math.floor(myStats.atk * 0.2);
-    //                         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
-    //                         notice.push(`\n**${char.name}** reloaded data from bunker! Increased own ATK by **20%**!`);
-    //                         break;
-    //                     case 2:
-    //                         myStats.cr += 0.25;
-    //                         myStats.cd += 0.25;
-    //                         mybuff.cr.push(new buffInfo("+", 0.25, 9999));
-    //                         mybuff.cd.push(new buffInfo("+", 0.25, 9999));
-    //                         if (myStats.cr > 1) { myStats.cr = 1; };
-    //                         notice.push(`\n**${char.name}** reloaded data from bunker! Increased own critical rate and critical damage by **25%**!`);
-    //                         break;
-    //                     default: false; break;
-    //                 };
-    //                 this.revprocced = myStats.revivedTotal;
-    //             }
-    //             // If enemy below 30% HP, attempt execution move: 170% DMG (at most twice per battle)
-    //             if (eStats.hp / eStats.maxhp < 0.3) {
-    //                 if (this.finisher == 2) { return; };
-    //                 this.finisher++;
-    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `*More of yall want to die huh...* She`, { atkMultiplier: 1.7 });
-    //             }
-    //         }, 9999));
-    //     },
-    //     party: (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //         myStats.counter ||= 0;
+                // Crit = 1x Blitz & 2% counter chance permanently
+                matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) {
+                    myStats.blitz += 1;
+                    if (myStats.nagiCounter <= 0.18) myStats.nagiCounter += 0.02;
+                };
+            });
 
-    //         // Check if party has Nier allies
-    //         const nier2bintervenchance = 0.07 + matchStats.partyChars.reduce((acc, pChar) =>
-    //             ["13781", "13782"].includes(pChar.id) ? acc + 0.12 : acc, 0);
-
-    //         // Random chance to boost ally's dodge rate to 100%, grant 1x counter stack, before reducing the enemy's dodge rate and block rate to 0% for 1 turn.
-    //         if (Math.random() < nier2bintervenchance) {
-    //             myStats.counter += 1;
-    //             myStats.dodge = 1;
-    //             eStats.dodge = 0;
-    //             eStats.br = 0;
-    //         };
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             if (Math.random() < nier2bintervenchance) {
-    //                 myStats.counter += 1;
-    //                 myStats.dodge = 1;
-    //                 eStats.dodge = 0;
-    //                 eStats.br = 0;
-    //             };
-    //         }, 9999));
-    //     },
-    // },
-
-
-
+                return AbilityResponse.SUCCESS;
+            },
+             party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                myStats.counter ??= 0;
+                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    if (Math.random() < 0.2) { // 20% chance to counter
+                        myStats.counter += 1;
+                    };
+                    return AbilityResponse.SUCCESS;
+                }, 9999));
+                return AbilityResponse.SUCCESS;
+             },
+         },*/
     "14000": {
         usage: 0,
         used: 0,
@@ -3078,18 +3005,23 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 0,
         burst: true,
-        desc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** rounds.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know`: Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** rounds. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart`: Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** rounds with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 rounds)\n> - The marking effects will have **+50%** effectiveness.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** rounds, with the marking lasting for that round only.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n- Stuns the enemy for **2** turns\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** rounds, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** rounds\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 rounds)\nIf temple is active, always prioritizes using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** round every **3** rounds",
+        desc: "**Total Usage**: `Unlimited`\n**Mana**: `110`\\💧\n**Timeout**: `No/No`\n**Role**: `DPS/Support`\n\nOnce bounded in a sanctuary, the Dendro archon has been freed, purging darkness with dreams, where she finds solace in boundless bliss.\n\nWith telepathic skills, she first gathers battle data, recording all DMG taken. At the start of the turn, if she's below **33%** HP, exits the mode and gains a shield equivalent to all DMG taken, up to **100%** of her max HP, before overwhelming the enemy, stunning them for **2** rounds.\n\n*Sunlight paints the dream in a golden hue anew, as butterflies meet grass glittering with dew...*\n\nHer ability is split into **2** parts depending on mana owned.\n\n`All Schemes to Know`: Consumes **80** :droplet: allows her to aim and mark the enemy with the Seed of Skandha for **2** rounds. If used when the enemy already has the seed, extends the duration of marking.\nAttacks against marked opponents grants the following effects:\n> - **+30%** critical rate (45% when in temple)\n> - Ignore **15%** of enemy's DEF & MR (22.5% when in temple)\n> - A critical hit restores **6** :droplet:(9 when in temple)\n\n`Illusory Heart`: Consumes **110** :droplet: to summon the __Temple of Wisdom__ for **4** rounds with the following effects:\n> - The marking ability will cost **50%** less but have **+50%** effectiveness. (40 cost, mark for 4 rounds)\n> - The marking effects will have **+50%** effectiveness.\n- When having sufficient mana, immediately follows up with her marking skill.\n\nIf Temple is already active, she'll always prioritize casting `All Schemes to Know` even if she has 110 mana or more.\n\nIn a party, she marks the enemy every **3** rounds, with the marking lasting for that round only. Hitting the marked enemy will restore **9** 💧 instead of 6. The rest of the marked effects are the same as her passive.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `110 💧`\n**Timeout**: `No/No`\n**Role**: `DPS (Marking, Burst survival)`\n\n__**Passive**__\n- Records DMG taken\nAt the start of the turn, if she's below **33%** HP:\n- Gains a shield equivalent to DMG taken (Up to **100%** of max HP, usable once in battle)\n- Stuns the enemy for **2** turns\n\n__**Active**__ (✨)\n80 💧: Marks enemy with `Seed` for **2** rounds, repeated markings extend duration.\nAttacks against marked enemies have the following properties:\n- **+30%** critical rate (+45% when in temple)\n- Ignore **15%** DEF & MR (-22.5% when in temple)\n- Critical hit restores **6** 💧 (9 when in temple)\n\n110 💧: Summons temple for **4** rounds\n- Marking ability costs **50%** less but has **+50%** effectiveness (40 cost, mark for 4 rounds)\n- When having sufficient mana, immediately follows up with her marking skill.\n\nNotes: If temple is inactive, always prioritizes summoning temple before using marking\n\n__**Party**__ (👥)\n- Marks enemy for **1** round every **3** rounds.\n- Hitting marked enemy instead grants **9** 💧. The rest of the marked effects are as the same as her passive.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Nahida
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
 
+            const cheapmark = () => {
+                if (myStats.sm >= 40) {
+                    myStats.sm -= 40;
+                    eStats.marked += 4;
+                    notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
+                };
+            };
+
             // Condition: When in temple state and can mark enemy
             if (myStats.sm >= 40 && myStats.temple > 0) {
-                // Mark enemy (cheaper)
-                myStats.sm -= 40;
-                eStats.marked += 4;
-                notice.push(`\n𓇬 The enemy is now marked for ${eStats.marked} rounds!`);
+                cheapmark();
 
                 return AbilityResponse.SUCCESS;
             };
@@ -3110,6 +3042,9 @@ export const abilities: Record<number, Ability> = {
                 myStats.sm -= 110;
                 myStats.temple = 4;
                 notice.push(`\n✨ Summoned the temple of wisdom for **4** rounds!`);
+
+                // Immediately mark enemy if have sufficient mana
+                cheapmark();
 
                 return AbilityResponse.SUCCESS;
             };
@@ -3161,7 +3096,7 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.SUCCESS;
             }, 9999));
 
-            // Gain +6 mana when critting a marked enemy
+            // Gain +6/9 mana when critting a marked enemy
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (eStats.marked > 0 && caster === myStats) {
                     myStats.sm += 6;
@@ -3177,19 +3112,25 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 3 === 0) {
                     // Marked enemy
+                    eStats.marked = true;
                     myStats.cr += 0.3;
                     if (myStats.cr > 1) myStats.cr = 1;
                     eStats.def -= Math.floor(eStats.def * 0.15);
                     eStats.mr -= Math.floor(eStats.mr * 0.15);
-                };
 
+                    // Remove marked status
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        eStats.marked = false;
+                        return AbilityResponse.SUCCESS;
+                    }));
+                };
                 return AbilityResponse.SUCCESS;
             }, 9999));
 
-            // Gain +10 mana when critting a marked enemy
+            // Gain +9 mana when critting a marked enemy
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (eStats.marked > 0) {
-                    myStats.sm += 10;
+                if (eStats.marked) {
+                    myStats.sm += 9;
                 };
             });
 
@@ -3416,8 +3357,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 0,
-        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧 on first 2 usages, `80`\\💧 on 3rd usage, `0` on 4th usage\n**Timeout**: `Yes // No (on 4th usage)`\n**Role**: `DPS/Support`\n\nEscanor, known as the Lion's Sin of Pride, offers a gameplay style tied to a day-night cycle which changes every **3** rounds. Escanor's power dramatically shifts with the day-night cycle. During the day, he gains a **20%** boost to attack, magic damage, defense, and magic resistance, but loses **4%** of his max HP per round due to the strain to his body.\n\nMoreover, the last day in the cycle is regarded as Noon, where he unleashes his `The One` power, gaining double the stat boosts from normal day cycles. In addition, his DEFEND that round is altered to a Divine Attack, decreasing the enemy's dodge and block rate to **0%**, removing all of their counter attempts, before dealing **150%** DMG and granting himself 10x `Heat`. At last, after every round in Daytime, he gains 1x `Heat`.\n\nAs the night falls, he loses **20%** of attack, magic damage, defense, and magic resistance instead, but gains **20%** dodge chance as his power is so insignificant that he's barely sensable.\n\nEscanor's sunshine allows him to scorch the enemy for **2** rounds whenever they dare inflict an attack on Escanor. Scorch is a stackable DoT that deals his current HP to the enemy every round, **1%** for every 10x `Heat` owned, up to **4%**.\n\nMoving onto his active. During daytime rounds, Escanor can use `Crazy Prominence` with his first two usages, dealing additional damage based on the percentage of his remaining health (**100%** + **1%** damage for every **2%** remaining HP).\nWith his 3rd usage, Escanor unleashes `Final Prominence`, which significantly enhances his damage output based on the percentage of his missing health (**100%** + **1%** damage for every **1%** missing HP).\n\nEscanor's final usage summons a miniature Sun on the sky, raising his critical rate by **2%** for every `Heat` owned, up to 100% maximum crit rate. Any overflowing critical rate this way will be converted into **1%** Defense reduction on the enemy (up to 30%) and **1%** critical DMG for Escanor (up to 30%).",
-        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧 (first 2 usages), 80 💧 (3rd usage), 0 💧 (4th usage)`\n**Timeout**: `Yes/ No (4th usage)`\n**Role**: `DPS (Progressive, DoT, Burst, Anti-dodge/block/counter)`\n\n__**Passive**__\nWhenever receives an attack -> Inflicts Scorch for **2** rounds:\n- Deals his current HP to the enemy every round (**1%** for every **10x** `Heat` owned, up to **4%**)\n\nShifts Day and Night cycle every **3** rounds ; The last turn of Day is regarded as *Noon*\n\nDay :\n- **+20%** ATK/MD & DEF/MR\n- Lose **4%** max HP every round\n- Gain **1x** `Heat`\n\nNoon:\n- **+40%** ATK/MD & DEF/MR\n- Lose **4%** max HP\n- Gain **1x** `Heat`\n- DEFEND is altered to Divine Attack\n> Enemy dodge rate & block rate drops to **0%** for **1** round. Removes any counter attempts (Counter next hit effects), before dealing **150%** DMG and gaining **10x** `Heat`)\n\nNight:\n- **-20%** ATK/MD & DEF/MR\n- **+20%** dodge chance \n\n__**Active**__ (✨)\nFirst TWO activations: *Crazy Prominence*\nCondition: `During Day/Noon`\n- Deals **100%** MD, **+1%** MD for every **2%** HP remaining\n\nTHIRD activation: *Final Prominence*\n- Deals **100%** MD, **+1%** MD for every **1%** HP missing\n\nFOURTH activation: *Miniature Sun*\n- Increases critical rate by **2%** for every `Heat` owned, up to 100%\n\nEvery overflowing critical rate this way will be converted into:\n- Enemy DEF/MR **-1%** (max: 30%)\n- Own critical DMG **+1%** (max: 30%)",
+        desc: "**Total Usage**: `4`\n**Mana**: `50`\\💧 on first 2 usages, `80`\\💧 on 3rd usage, `0` on 4th usage\n**Timeout**: `Yes // No (on 4th usage)`\n**Role**: `DPS/Support`\n\nEscanor, known as the Lion's Sin of Pride, offers a gameplay style tied to a day-night cycle which changes every **3** rounds. Escanor's power dramatically shifts with the day-night cycle. During the day, he gains a **20%** boost to attack, magic damage, defense, and magic resistance, but loses **4%** of his max HP per round due to the strain to his body.\n\nMoreover, the last day in the cycle is regarded as Noon, where he unleashes his `The One` power, gaining double the stat boosts from normal day cycles. In addition, his DEFEND that round is altered to a Divine Attack, removing all of their counter attempts, before dealing **150%** DMG and granting himself 10x `Heat`. At last, after every round in Daytime, he gains 1x `Heat`.\n\nAs the night falls, he loses **20%** of attack, magic damage, defense, and magic resistance instead, but gains **20%** dodge chance as his power is so insignificant that he's barely sensable.\n\nEscanor's sunshine allows him to scorch the enemy for **2** rounds whenever they dare inflict an attack on Escanor. Scorch is a stackable DoT that deals his current HP to the enemy every round, **1%** for every 10x `Heat` owned, up to **4%**.\n\nMoving onto his active. During daytime rounds, Escanor can use `Crazy Prominence` with his first two usages, dealing additional damage based on the percentage of his remaining health (**100%** + **1%** damage for every **2%** remaining HP).\nWith his 3rd usage, Escanor unleashes `Final Prominence`, which significantly enhances his damage output based on the percentage of his missing health (**100%** + **1%** damage for every **1%** missing HP).\n\nEscanor's final usage summons a miniature Sun on the sky, raising his critical rate by **2%** for every `Heat` owned, up to 100% maximum crit rate. Any overflowing critical rate this way will be converted into **1%** Defense reduction on the enemy (up to 30%) and **1%** critical DMG for Escanor (up to 30%).",
+        shortdesc: "**Uses**: `4`\n**Cost**: `50 💧 (first 2 usages), 80 💧 (3rd usage), 0 💧 (4th usage)`\n**Timeout**: `Yes/ No (4th usage)`\n**Role**: `DPS (Progressive, DoT, Burst, Anti-dodge/block/counter)`\n\n__**Passive**__\nWhenever receives an attack -> Inflicts Scorch for **2** rounds:\n- Deals his current HP to the enemy every round (**1%** for every **10x** `Heat` owned, up to **4%**)\n\nShifts Day and Night cycle every **3** rounds ; The last turn of Day is regarded as *Noon*\n\nDay :\n- **+20%** ATK/MD & DEF/MR\n- Lose **4%** max HP every round\n- Gain **1x** `Heat`\n\nNoon:\n- **+40%** ATK/MD & DEF/MR\n- Lose **4%** max HP\n- Gain **1x** `Heat`\n- DEFEND is altered to Divine Attack\n> Removes any counter attempts (Counter next hit effects), before dealing **150%** DMG and gaining **10x** `Heat`)\n\nNight:\n- **-20%** ATK/MD & DEF/MR\n- **+20%** dodge chance \n\n__**Active**__ (✨)\nFirst TWO activations: *Crazy Prominence*\nCondition: `During Day/Noon`\n- Deals **100%** MD, **+1%** MD for every **2%** HP remaining\n\nTHIRD activation: *Final Prominence*\n- Deals **100%** MD, **+1%** MD for every **1%** HP missing\n\nFOURTH activation: *Miniature Sun*\n- Increases critical rate by **2%** for every `Heat` owned, up to 100%\n\nEvery overflowing critical rate this way will be converted into:\n- Enemy DEF/MR **-1%** (max: 30%)\n- Own critical DMG **+1%** (max: 30%)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Escanor EX
             let roundTime = (matchStats.round - 1) % 6; // day: [0, 1], noon: [2], night: [3, 4, 5];
@@ -3510,7 +3451,7 @@ export const abilities: Record<number, Ability> = {
                     if (myStats.hp < 0) myStats.hp = 0;
                     myStats.replaceButton.def = { // Divine Attack
                         "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                            eStats.counter ??= 0;
+                            eStats.counter = eStats.counter ?? 0;
                             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}** released his Divine Attack! He`, { atkMultiplier: 1.5, dodge: false, block: false });
                             myStats.heat += 10;
 
