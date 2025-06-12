@@ -133,8 +133,6 @@ export default class Avalon {
             tdChance: 0,
             shieldBreak: 0,
             selfdmg: 0,
-            selfheal: 0,
-            selfhealChance: 0,
             twinshot: 0,
             critbleed: false,
             critbleedlast: 0,
@@ -148,14 +146,24 @@ export default class Avalon {
             heap1: 0,
 
             listeners: {} as Record<TriggerEvents, Trigger[]>,
-            on: function (event: TriggerEvents, options: TriggerOptions | ((...args: any[]) => any)) {
+            on: function (event: TriggerEvents, options: TriggerOptions | ((...args: any[]) => any)): () => void {
                 if (this.listeners[event] === undefined) this.listeners[event] = [];
 
+                let triggerId: number;
+
                 if (typeof options === "object") {
-                    this.listeners[event]?.push(new Trigger({ ...options, event }));
+                    const trigger = new Trigger({ ...options, event });
+                    triggerId = trigger.id;
+
+                    this.listeners[event]?.push(trigger);
                 } else {
-                    this.listeners[event]?.push(new Trigger({ event, callback: options }));
+                    const trigger = new Trigger({ event, callback: options });
+                    triggerId = trigger.id;
+
+                    this.listeners[event]?.push(trigger);
                 };
+
+                return (() => this.off(event, triggerId));
             },
             off: function (event: TriggerEvents, trigger: Trigger | number) {
                 if (this.listeners[event] !== undefined) {

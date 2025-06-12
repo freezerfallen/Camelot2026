@@ -608,6 +608,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         critBuff: 0,
         critMultiplier: 1,
         defMultiplier: 1,
+        defReductionCap: 0,
         overwriteNotice: false,
         ignoreShield: attacker.ignoreShield,
         shieldBreak: false,
@@ -624,6 +625,9 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         canCounter: true,
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
+
+    // matchStat overwrites
+    if (matchStats.allowSelfheal !== undefined) options.selfheal = matchStats.allowSelfheal;
 
     // Try blocking or dodging
     if (!options.isTest && options.block && Math.random() < Math.min(target.br, target.brCap ?? target.br)) {
@@ -659,11 +663,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             buff.label = `dodgebuff: ${matchStats.dodgebuff * 100}%, ${5} rounds`;
             targetBuff.atk.push(buff);
         };
-        if (target.sjwUsedActive) {
-            const drain = Math.floor(attacker.sm * 0.12);
-            attacker.sm -= drain;
-            target.sm += drain;
-        };
+        // if (target.sjwUsedActive) {
+        //     const drain = Math.floor(attacker.sm * 0.12);
+        //     attacker.sm -= drain;
+        //     target.sm += drain;
+        // };
         if (target.stealManaOnDodge) {
             const steal = Math.min(attacker.sm, target.stealManaOnDodge);
             attacker.sm -= steal;
@@ -687,8 +691,8 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     const multipliers = {
         atk: options.atkMultiplier * attacker.atk,
         md: options.atkMultiplier * attacker.md,
-        def: Math.max(Math.pow(0.99895, options.defMultiplier * effectiveDef), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_defcap ?? 0) > 0) && ((options.defMultiplier * effectiveDef) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveDef) - 2192, options.defMultiplier * target.increase_defcap)) : 1),
-        mr: Math.max(Math.pow(0.99895, options.defMultiplier * effectiveMr), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
+        def: Math.max(Math.pow(0.99895, options.defReductionCap ? Math.max(effectiveDef - options.defReductionCap, options.defMultiplier * effectiveDef) : (options.defMultiplier * effectiveDef)), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_defcap ?? 0) > 0) && ((options.defMultiplier * effectiveDef) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveDef) - 2192, options.defMultiplier * target.increase_defcap)) : 1),
+        mr: Math.max(Math.pow(0.99895, options.defReductionCap ? Math.max(effectiveMr - options.defReductionCap, options.defMultiplier * effectiveMr) : (options.defMultiplier * effectiveMr)), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
         crit: (isCrit ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
         lightning: options.isLightning ? ((1 + (attacker.lightningMultiplier || 0)) * (1 - (target.lightningResistance || 0))) : 1,
@@ -700,7 +704,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     } else {
         damage = options.overwriteDamage || Math.floor(multipliers.atk * multipliers.def * multipliers.crit * multipliers.combo * multipliers.lightning * multipliers.rng);
     };
-    if (attacker.critbonus && (isCrit || attacker.shorekeeperUsedActive)) damage *= 1 + attacker.critbonus;
+    if (attacker.critbonus && (isCrit || attacker.shorekeeperUsedActive)) damage = Math.floor(damage * (1 + attacker.critbonus));
     attacker.crittedTotal ||= 0;
     attacker.crittedTotal++;
 
@@ -834,14 +838,20 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     if (options.combodmg && attacker.combodmg) attacker.attackStreak++;
     if (options.critbleed && isCrit) targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * 0.05), matchStats.critbleedlast));
     if (attacker.critmana && isCrit) attacker.sm = Math.min(attacker.sm + attacker.critmana, attacker.mana);
-    // if (options.selfheal && matchStats.selfhealChance > options.selfhealChance) attacker.hp += Math.floor(damage * matchStats.selfheal);
-    if (options.selfheal && options.selfhealAmount) attacker.hp += Math.floor(damage * options.selfhealAmount);
-    if (options.selfheal && attacker.selfheal) {
+    if (options.selfheal && attacker.selfheal && attacker.lastSelfHealRoundCapped !== matchStats.round) {
         let selfHealedTotal = 0;
+
+        // atk option
+        if (options.selfhealAmount) selfHealedTotal += damage * options.selfhealAmount;
+
+        // passive
         for (let i = 0; i < attacker.selfheal.length; i++) {
             if (attacker.selfhealChance[i] > Math.random()) selfHealedTotal += damage * attacker.selfheal[i];
         };
-        attacker.hp += Math.floor(Math.min(selfHealedTotal, attacker.maxhp * 0.5));
+
+        const healCap = attacker.maxhp * 0.2;
+        attacker.hp += Math.floor(Math.min(selfHealedTotal, healCap));
+        if (selfHealedTotal >= healCap) attacker.lastSelfHealRoundCapped = matchStats.round;
     };
     if (options.selfdmg && Math.random() < matchStats.selfdmg) attacker.hp -= damage;
     if ("gintokiStacks" in attacker && isCrit) attacker.gintokiStacks = 0;
@@ -849,15 +859,15 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         targetBuff.hp.push(new buffInfo("+", -Math.floor(0.06 * damage), attacker.guinaifenStackLast));
         attacker.guinaifenStackRounds.push(matchStats.round);
     };
-    if (attacker.sjwUsedActive) {
-        if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
-        if (isCrit) { // Igris
-            const drain = Math.floor((target.maxhp > (2 * attacker.maxhp)) ? attacker.maxhp * 0.07 : target.maxhp * 0.035);
-            target.hp -= drain;
-            attacker.hp += drain;
-        };
+    // if (attacker.sjwUsedActive) {
+    //     if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
+    //     if (isCrit) { // Igris
+    //         const drain = Math.floor((target.maxhp > (2 * attacker.maxhp)) ? attacker.maxhp * 0.07 : target.maxhp * 0.035);
+    //         target.hp -= drain;
+    //         attacker.hp += drain;
+    //     };
 
-    };
+    // };
     if (target.hp > target.maxhp) target.hp = target.maxhp;
     if (target.hp < 0) target.hp = 0;
     if (attacker.hp > attacker.maxhp) attacker.hp = attacker.maxhp;
@@ -885,7 +895,7 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
     if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) {
         // notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
     } else {
-        target.hp += amount;
+        target.hp += Math.floor(amount);
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
     };

@@ -354,7 +354,7 @@ export const abilities: Record<number, Ability> = {
                         myStats.yoimiyaLastTwinshot = matchStats.round;
                         myStats.replaceButton.atk?.run?.(myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list);
                     };
-                }
+                };
             });
 
             return AbilityResponse.SUCCESS;
@@ -1165,9 +1165,10 @@ export const abilities: Record<number, Ability> = {
         usage: 0,
         used: 0,
         cost: 100,
-        desc: "**Total Usage**: `0`\n**Role**: `Support/Sub-DPS`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **25%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy takes **+20%** damage from attacks. This is considered a vulnerability effect, where only the highest takes effect.\n\nMoreover, for each **S** or **SS** character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself), Vladilena's chance of intervention is increased by an additional **+25%** (up to **100%**).",
-        shortdesc: "**Uses**: `0`\n**Role**: `Support/Sub-DPS`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n\n__**Party**__ (👥)\n- Applies a **20%** vulnerability debuff to the enemy (Only the highest takes effect)\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n- **25%** chance to intervene every round and deal **120%** DMG\n  - The chance to intervene is increased by an additional **+25%** for each S or SS character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself)",
+        desc: "**Total Usage**: `0`\n**Role**: `Support/Sub-DPS`\n\nVladilena Milizé's ability is a Tactical Skill that brings the full force of mechanized artillery to aid her comrades during stampedes. Entering battle, she activates all processors and deals an undodgeable **150%** DMG hit.\n\nIn parties, she shows her strategic nature that embodies her character as a commander. During the first round, she deals an undodgeable **150%** hit to the opponent. For every round afterwards, she has a **25%** chance of comanding a devastating artillery bombardment on the enemy ranks, dealing **120%** damage.\n\nThanks to the accurate analysis and pinpointing by Vladilena, the enemy takes **+10%** damage from attacks. This is considered a vulnerability effect, where only the highest takes effect.\n\nMoreover, for each **S** or **SS** character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself), Vladilena's chance of intervention is increased by an additional **+25%** (up to **100%**).",
+        shortdesc: "**Uses**: `0`\n**Role**: `Support/Sub-DPS`\n\n__**Passive**__\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n\n__**Party**__ (👥)\n- Applies a **10%** vulnerability debuff to the enemy (Only the highest takes effect)\n- Deals **150%** undodgeable DMG to the enemy upon entering battle\n- **25%** chance to intervene every round and deal **120%** DMG\n  - The chance to intervene is increased by an additional **+25%** for each S or SS character from her anime `\"86 -Eighty Six-\"` in her party (excluding herself)",
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // Vladilena Milize
             eStats.vulnerability ??= 1;
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Don't leave me behind... **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
 
@@ -1181,7 +1182,7 @@ export const abilities: Record<number, Ability> = {
             const bombChance = 0.25 * (allyCount + 1);
 
             // Apply vulnerability
-            eStats.vulnerability = Math.max(eStats.vulnerability, 0.2);
+            eStats.vulnerability = Math.max(eStats.vulnerability, 1.1);
 
             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false });
 
@@ -2858,7 +2859,7 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (Math.random() < 0.3) {
                     let shockDMG = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 0.6, ignoreShield: true, magicDamage: true });
-                    if (Math.random() < 0.25) ebuff.hp.push(new buffInfo("+", -Math.floor(shockDMG * 0.5), 3));
+                    if (Math.random() < 0.25) ebuff.hp.push(new buffInfo("+", -Math.floor(shockDMG * 0.5 * (1 / 3)), 3));
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -3727,8 +3728,8 @@ export const abilities: Record<number, Ability> = {
         domainLastRound: 0,
         hasApollo: false,
         usedDef: 0,
-        desc: "**Total Usage**: `1`\n**Mana**: `150`\\💧, lasts 5 rounds\n**Timeout**: `no`\n**Role**: `Support`\n\nArtemis EX wields the `Domain of Sanction`, a fearsome realm where she holds dominion over the very fabric of reality. When activated, her domain lasts for **5** rounds and halts her enemy's actions, effectively stopping time. Within this domain, her opponent suffer a **25%** vulnerability debuff. Her DEF extends the duration of all debuffs on the enemy by an additional round, and her ABILITY deals **130%** damage (**145%** if **Apollo EX** is owned), and applies a bleed effect that lasts for the entire duration of the domain if **Apollo EX** is owned. Additionally she depletes the enemy's mana completely and blocks mana generation for 5 rounds upon exiting her domain.\n\nArtemis recovers **5%** of her max HP and steals **3** mana from her enemy every round. If defeated, she can revive once with **40%** of her max HP. Her normal attacks deal both physical and magic damage, **60%** of each, with a **33%** chance (**66%** if domain is active) of inflicting a debuff. The debuffs include **burn** dealing **3%** of max HP as damage (or **6%** of her own HP if enemy has twice as much HP), **impair** decreasing DEF and MR by **15%**, **poison** decreasing **ATK** and **MD** by **15%**, and **paralyse** which prevents the enemy from attacking once. Additionally, she'll gain **20%** more XP from the dungeon.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `Support/Tank (Burst, Mana-reset, Freeze, Healing, Revive)`\n\n__**Passive**__\n- every round: Restores **5%** max HP , steals **3** 💧 from enemy\n- Upon death, revives with **40%** HP\n- ATTACK is altered to deal **60%** ATK & 60% MD, each has a **33%** chance (**66%** if domain is active) of inflicting a debuff\n> List of debuffs: `Burn` dealing **3%** of max HP as damage (Caps at **6%** of Artemis' current HP) // `Impair` (**-15%** DEF & MR) // `Poison` (**-15%** ATK & MD) // `Paralyse` (Prevents enemy from attacking that round, functions as timeout false)\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\nEnters domain for **5** rounds with the following effects:\n- Enemy frozen (cannot make actions)\n- Enemy receives **+25%** DMG\n- Doubled chances of debuffing from passive ATTACK\n- DEFEND is altered to extend all debuffs on the enemy by **1** round\n- ACTIVE (✨) deals **130%** DMG with no cost. If Apollo EX is owned, deals **140%** DMG instead and applies bleed (**2%** of the enemy's current HP, up to **4%** of her current HP), lasting until the end of the domain\nUpon exiting domain:\n- Depletes all enemy mana\n- Blocks enemy's mana regeneration for **5** rounds",
+        desc: "**Total Usage**: `1`\n**Mana**: `150`\\💧, lasts 5 rounds\n**Timeout**: `no`\n**Role**: `Support`\n\nArtemis EX wields the `Domain of Sanction`, a fearsome realm where she holds dominion over the very fabric of reality. When activated, her domain lasts for **5** rounds and halts her enemy's actions, effectively stopping time. Within this domain, her opponent suffer a **20%** vulnerability debuff. Her DEF extends the duration of all debuffs on the enemy by an additional round, and her ABILITY deals **130%** damage (**145%** if **Apollo EX** is owned), and applies a bleed effect that lasts for the entire duration of the domain if **Apollo EX** is owned. Additionally she depletes the enemy's mana completely and blocks mana generation for **5** rounds upon exiting her domain.\n\nArtemis recovers **5%** of her max HP and steals **3** mana from her enemy every round. If defeated, she can revive once with **40%** of her max HP. Her normal attacks deal both physical and magic damage, **60%** of each, with a **33%** chance (**66%** if domain is active) of inflicting a debuff. The debuffs include `burn` dealing **3%** of max HP as damage (or **6%** of her own HP if enemy has twice as much HP), `impair` decreasing DEF and MR by **15%**, `poison` decreasing **ATK** and **MD** by **15%**, and `paralyse` which prevents the enemy from attacking once. Additionally, she'll gain **20%** more XP from the dungeon.",
+        shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `Support/Tank (Burst, Mana-reset, Freeze, Healing, Revive)`\n\n__**Passive**__\n- every round: Restores **5%** max HP , steals **3** 💧 from enemy\n- Upon death, revives with **40%** HP\n- ATTACK is altered to deal **60%** ATK & 60% MD, each has a **33%** chance (**66%** if domain is active) of inflicting a debuff\n> List of debuffs: `Burn` dealing **3%** of max HP as damage (Caps at **6%** of Artemis' current HP) // `Impair` (**-15%** DEF & MR) // `Poison` (**-15%** ATK & MD) // `Paralyse` (Prevents enemy from attacking that round, functions as timeout false)\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\nEnters domain for **5** rounds with the following effects:\n- Enemy frozen (cannot make actions)\n- Applies **20%** vulnerability to the enemy (20% more damage)\n- Doubled chances of debuffing from passive ATTACK\n- DEFEND is altered to extend all debuffs on the enemy by **1** round\n- ACTIVE (✨) deals **130%** DMG with no cost. If Apollo EX is owned, deals **140%** DMG instead and applies bleed (**2%** of the enemy's current HP, up to **4%** of her current HP), lasting until the end of the domain\nUpon exiting domain:\n- Depletes all enemy mana\n- Blocks enemy's mana regeneration for **5** rounds",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Artemis EX
             const domainLast = 5, mana_cost = 150;
@@ -3768,7 +3769,7 @@ export const abilities: Record<number, Ability> = {
                 this.domainLastRound = matchStats.round + domainLast;
 
                 // Apply Vulnerability, Freeze Time
-                if (eStats.vulnerability < 1.25) eStats.vulnerability = 1.25;
+                if (eStats.vulnerability < 1.2) eStats.vulnerability = 1.2;
                 eStats.timeFrozen = true;
                 eStats.frozenMessage = "is frozen in time";
 
@@ -4586,7 +4587,27 @@ export const abilities: Record<number, Ability> = {
             // Sung Jin Woo EX | SJW EX
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
 
-            myStats.sjwUsedActive = true;
+            // Shadow Soldiers: Beru & Igris
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats) {
+                    if (options.damage) targetBuff.hp.push(new buffInfo("+", Math.floor(options.damage * 0.07), 2)); // Beru
+                    if (options.isCrit) { // Igris
+                        const drain = Math.floor((target.maxhp > (2 * myStats.maxhp)) ? myStats.maxhp * 0.07 : target.maxhp * 0.035);
+                        target.hp -= drain;
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
+                    };
+                };
+            });
+
+            // Shadow Soldier: Tusk
+            matchStats.on("dodge", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (target === myStats) {
+                    const drain = Math.floor(eStats.sm * 0.12);
+                    eStats.sm -= drain;
+                    myStats.sm += drain;
+                };
+            });
+
             notice.push(`\n✨ **${char.name}** summoned his shadow army. Arise!`);
 
             return AbilityResponse.SUCCESS;
@@ -5541,7 +5562,7 @@ export const abilities: Record<number, Ability> = {
         desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+30%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To view programmes, do `item equip item:prog info`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **80%** DMG, before slamming them in a strike, dealing an additional instance of **10%** DMG, further increased by **1%** for every **1%** HP missing from the enemy (Up to 60%). If 2B has revived, no longer loses **7%** current HP but instead heals **7%** current HP.\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+3%** ATK/MD, up to **+24%** ATK\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**. Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **2%** permanently (Up to 20%). After using DEFEND, activates “Boost”, increasing dodge rate by **30%** for **2** rounds and decreases enemy’s DEF by **2%** permanently (Up to 20%). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **2%** permanently (Up to 20%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team. The effect of [ɪɴꜱɪɢʜᴛ] instead grants allies **+2%** ATK per stack, up to **+16%** ATK.",
         shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+30%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`. To reset, do `/item equip item:prog remove`.\n\nATTACK is altered:\n> - Loses **7%** current HP (*Heals* instead after the first revive)\n> - Deals **80%** DMG, before dealing another instance of **10%**, further increased by **1%** for every **1%** HP missing from the enemy (Up to 60%).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+3%** ATK. Cannot have more than **8** stacks at all time.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%**\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **25%** chance to counter the next hit (stackable)\n- **-2%** enemy's ATK permanently (Up to 20%)\n\nAfter using DEFEND:\n- **+30%** dodge rate for **2** rounds\n- **-2%** enemy's DEF permanently (Up to 20%)\n\nAfter using CLASS SKILL:\n- **+2%** DMG mitigation permanently (Up to 20%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\nWhen 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, has **+2%** ATK, up to 16%",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // 2B&9S EX
+            // 2B & 9S EX | 2B&9S EX
 
             // Enter respective flight unit for 10 rounds
 
@@ -5741,7 +5762,7 @@ export const abilities: Record<number, Ability> = {
             myStats.replaceButton.atk = {
                 "emoji": "<:2BATK:1373261622432501770>",
                 "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    if (myStats.duorevived) {
+                    if (!myStats.duorevived) {
                         myStats.hp -= Math.floor(myStats.hp * 0.07);
                     } else {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.hp * 0.07), {});
@@ -5796,7 +5817,7 @@ export const abilities: Record<number, Ability> = {
                         return AbilityResponse.SUCCESS;
                     }, matchStats.round + domainLast));
 
-                    matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                    matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                         if (caster === myStats) {
                             myStats.hp -= Math.floor(myStats.hp * 0.07);
                         };
@@ -5891,10 +5912,7 @@ export const abilities: Record<number, Ability> = {
                 };
             }
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.atk += Math.floor(myStats.atk * Math.min(0.02 * myStats.insight, 0.16));
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+            mybuff.atk.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.16));
 
             return AbilityResponse.SUCCESS;
         },

@@ -247,10 +247,9 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
                 return `### Raid Ranking`
                     + `\n${Object.keys(raid.participation).length ? Object.entries(raid.participation)
                         .sort(([, a], [, b]) => b[0] - a[0]) // Sort by damage dealt (first element in value array)
-                        .map(([userId, [damage, rounds]], i) => `-# ${i + 1}. <@${userId}> - **${damage}** damage in **${rounds}**/${attemptsTotal} attempts`)
+                        .map(([userId, [damage, rounds]], i) => `-# ${i + 1}. <@${userId}> - **${formatNumberWithQuotes(damage)}** damage in **${rounds}**/${attemptsTotal} attempts`)
                         .join('\n') : `-# No participants yet`}`
                     + `\n\n-# Attempts left: ${attemptsLeft}/${attemptsTotal}`;
-
             };
 
             return "";
@@ -267,7 +266,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
 
             play.on('collect', () => {
                 if (dungeonInProgress.has(stats.id)) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send("You already have an fight in progress, please finish it before attempting to start a new one.");
+                    if (interaction.channel?.isSendable()) interaction.channel.send("You already have a fight in progress, please finish it before attempting to start a new one.");
                     return;
                 };
 
@@ -643,7 +642,7 @@ const exportCommand: SlashCommand = {
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
         // Battle Scale
-        const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min(2192, Math.max(myStatsC.def, myStatsC.mr)));
+        const enemyScale = 0.0005 * myStatsC.hp * Math.pow((1 / 0.99895), Math.min((2192 + myStatsC.increase_defcap), Math.max(myStatsC.def, myStatsC.mr)));
         const enemyAtk = Math.floor((300 * enemyScale) * 1.05);
         myStats.damageRescaling = enemyScale / 13; myStatsC.damageRescaling = enemyScale / 13;
 
@@ -763,7 +762,7 @@ const exportCommand: SlashCommand = {
                 .setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
-        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false });
+        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false, allowSelfheal: false });
         let notice = ["", "", "", ""];
         matchStats.partyChars = stats.raid_supports.filter((sid) => sid !== null && sid !== undefined && sid !== stats.battlechar).map((sid) => characters[sid]);
         // matchStats.partyStats = partyStatsC;
@@ -871,6 +870,7 @@ const exportCommand: SlashCommand = {
                     };
 
                     function startNextRound() {
+                        if (matchStats.ended) return;
                         if (matchStats.round === matchStats.roundCheck) return;
                         matchStats.roundCheck = matchStats.round;
 

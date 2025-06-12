@@ -651,8 +651,6 @@ export type MatchStats = {
     tdChance: number;
     shieldBreak: number;
     selfdmg: number;
-    selfheal: number;
-    selfhealChance: number;
     twinshot: number;
     critbleed: boolean;
     critbleedlast: number;
@@ -664,9 +662,10 @@ export type MatchStats = {
     lightningMultiplier?: number;
     dodgebuffLast?: number;
     dodgebuff?: number;
+    allowSelfheal?: boolean;
     heap1: any;
     listeners: Record<TriggerEvents, ITrigger[]>;
-    on(event: TriggerEvents, options: PartialBy<TriggerOptions, "event"> | TriggerCallback): void;
+    on(event: TriggerEvents, options: PartialBy<TriggerOptions, "event"> | TriggerCallback): () => void;
     off(event: TriggerEvents, trigger: ITrigger | number): void;
     trigger(event: TriggerEvents, caster: any, target: any, casterBuff: any, targetBuff: any, options?: any): void;
 
