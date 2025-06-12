@@ -2214,7 +2214,7 @@ export const abilities: Record<number, Ability> = {
 
             return AbilityResponse.SUCCESS;
         },
-        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.xpboost += 0.25;
 
             return AbilityResponse.SUCCESS;
@@ -2491,112 +2491,114 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    /*        "13314": {
-             usage: 9999,
-             used: 0,
-             cost: 0,
-             roundUsed: 0,
-             shortdesc: "**Uses**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\n__**Passive**__\n- Gains **5x** `Initiative` upon entering battle\n- Without `Initiative`: loses **4%** current HP every turn.\n- Dodging grants him **3x** `Initiative`\n- Dealing a critical strike: Grants **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : > Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : > At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. \n\n__Core Mechanic__: FLOW state:\n- If he already has `Initiative`: Gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn\n- Else, grants **5x** `Initiative`.\n\n__**Active**__ (:sparkles:)\nCONDITION: After every **4** times of him entering __FLOW state__:\n- Automatically followup by casting his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n- However, if you force him by using `✨` manually, it will do nothing. Twice and he'll leave the battle (considered a loss).\n\n__**Party**__ (:busts_in_silhouette:)\n- **20%** chance for the ally to counter every round (stackable)",
-             desc: "**Total Usage**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\nWith speedy reflexes and a lack of motivation to spend time for trivial matters, Nagi gains **5x** `Initiative` upon entering battle. Without `Initiative`, he becomes consumed by boredom and loses **4%** current HP every turn.\n\nDodging grants him **3x** `Initiative`, while dealing a critical strike grants him **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. If he already has `Initiative`, he gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn. Else, grants **5x** `Initiative`.\n\nAfter every **4** times of him entering __FLOW state__, he will cast his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n\nHowever, if you force him by using `✨` manually, something wrong might happen~\n-# Do it twice and he'll leave. Just don't-!\n\nIn a party, he has a **20%** chance to intervene every turn, attempting a Zero Reset Turn, allowing the ally to counter the next incoming hit.",
-             ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, ...list) {
-                 // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
-                matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                myStats.nagiQuit ??= 0;
-                myStats.nagiQuit ++;
-                if (myStats.nagiQuit === 1) notice.push(`\n🙁 Can't be bothered to think about it...`);
-                else if (myStats.nagiQuit === 2) {
-                    notice.push(`\n🚶🏻‍♂️ **Mr. Hassle Man** left the battle out of boredom...`);
-                    notice.push(`\n( •̀ - • ) Eh, that nickname sucks. Stop- `);
-                    myStats.rev = 0;
-                    myStats.maxRevivals = 0;
-                    myStats.hp = 0;
-                };
-                return AbilityResponse.SUCCESS;
-            },
-             passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) {
-                myStats.initiative ??= 0;
-                myStats.blitz ??= 0;
-                myStats.nagiCounter = 0;
-                myStats.initiative += 5;
-                myStats.flowed = 0; // Record amt of times he entered flow
-                //? const embedColor = embed.data.color ?? 0x278fd5;
-    
-                myStats.cr += 0.05 * myStats.initiative; // Increases CR by 5% for every initiative
 
-                // Delayed buff
-                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
-                if (myStats.initiative > 0) { // Loses 1 initiative every round
-                    myStats.initiative -= 1;
-                    myStats.cr += 0.05 * myStats.initiative;
+    // "13314": {
+    //     usage: 9999,
+    //     used: 0,
+    //     cost: 0,
+    //     roundUsed: 0,
+    //     shortdesc: "**Uses**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\n__**Passive**__\n- Gains **5x** `Initiative` upon entering battle\n- Without `Initiative`: loses **4%** current HP every turn.\n- Dodging grants him **3x** `Initiative`\n- Dealing a critical strike: Grants **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : > Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : > At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. \n\n__Core Mechanic__: FLOW state:\n- If he already has `Initiative`: Gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn\n- Else, grants **5x** `Initiative`.\n\n__**Active**__ (:sparkles:)\nCONDITION: After every **4** times of him entering __FLOW state__:\n- Automatically followup by casting his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n- However, if you force him by using `✨` manually, it will do nothing. Twice and he'll leave the battle (considered a loss).\n\n__**Party**__ (:busts_in_silhouette:)\n- **20%** chance for the ally to counter every round (stackable)",
+    //     desc: "**Total Usage**: `Unlimited // 2`\n**Cost**: `Every 5 Blitz automatically // 0 💧 manually to quit` \n**Timeout**: `Automatic / No`\n**Role**: `DPS (Initiative, Blitz, Dodge+Crit)`\n\nWith speedy reflexes and a lack of motivation to spend time for trivial matters, Nagi gains **5x** `Initiative` upon entering battle. Without `Initiative`, he becomes consumed by boredom and loses **4%** current HP every turn.\n\nDodging grants him **3x** `Initiative`, while dealing a critical strike grants him **1x** `Blitz` and **+2%** counter chance, up to **20%**.\n\n`Initiative` : Decreases by **1x** after every round. The inflicted has **+5%** critical rate for every stack.\n\n`Blitz` : At the start of the round, when **4x** are available, consumes **4x** and enters the __FLOW state__ that round. If he already has `Initiative`, he gains **25%** block rate, **50%** critical DMG, and decreases the enemy's DEF/MR by **25%** for that turn. Else, grants **5x** `Initiative`.\n\nAfter every **4** times of him entering __FLOW state__, he will cast his Active -- Five-Shot Fake Valley Shot immediately, dealing **150%** DMG.\n\nHowever, if you force him by using `✨` manually, something wrong might happen~\n-# Do it twice and he'll leave. Just don't-!\n\nIn a party, he has a **20%** chance to intervene every turn, attempting a Zero Reset Turn, allowing the ally to counter the next incoming hit.",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, ...list) {
+    //         // Seishirou Nagi: https://discord.com/channels/927257132624130119/1238325252946395217
+    //         matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //         myStats.nagiQuit ??= 0;
+    //         myStats.nagiQuit++;
+    //         if (myStats.nagiQuit === 1) notice.push(`\n🙁 Can't be bothered to think about it...`);
+    //         else if (myStats.nagiQuit === 2) {
+    //             notice.push(`\n🚶🏻‍♂️ **Mr. Hassle Man** left the battle out of boredom...`);
+    //             notice.push(`\n( •̀ - • ) Eh, that nickname sucks. Stop- `);
+    //             myStats.rev = 0;
+    //             myStats.maxRevivals = 0;
+    //             myStats.hp = 0;
+    //         };
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) {
+    //         myStats.initiative ??= 0;
+    //         myStats.blitz ??= 0;
+    //         myStats.nagiCounter = 0;
+    //         myStats.initiative += 5;
+    //         myStats.flowed = 0; // Record amt of times he entered flow
+    //         //? const embedColor = embed.data.color ?? 0x278fd5;
 
-                    if (myStats.cr > 1) {
-                        let overflowingpercent = Math.floor((myStats.cr - 1) * 100) / 100;
-                        //Overflowing critical rate -> Restore 0.5% missing HP for every 1% overflowing CR, up to 25%.
-                        overflowingpercent = Math.min(overflowingpercent, 0.5);
-                        const heal = Math.floor((myStats.maxhp - myStats.hp) * (overflowingpercent) * 0.005);
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
-                        myStats.cr = 1; // Cap cr to 100%
-                    };
-                } else myStats.hp -= Math.floor(myStats.maxhp * 0.04);
+    //         myStats.cr += 0.05 * myStats.initiative; // Increases CR by 5% for every initiative
 
-                // Check if counter
-                if (myStats.nagiCounter > Math.random()) myStats.counter += 1;
+    //         // Delayed buff
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
+    //             if (myStats.initiative > 0) { // Loses 1 initiative every round
+    //                 myStats.initiative -= 1;
+    //                 myStats.cr += 0.05 * myStats.initiative;
 
-                // FLOW state
-                if (myStats.blitz >= 4) {
-                    myStats.blitz -= 4;
-                    notice.push(`\n⚽ **${char.name}** entered Flow state.`);
-                    message.edit({ embeds: [embed] });
-                    //? embed.setColor(0x278fd5);
-                    if (myStats.initiative > 0) { // If already in initiative, get buffs
-                        myStats.br += 0.25;
-                        myStats.cd += 0.5;
-                        eStats.def -= Math.floor(eStats.def * 0.25);
-                        eStats.mr -= Math.floor(eStats.mr * 0.25);
-                    } else myStats.initiative += 5; // Else, grant 5 initiative
+    //                 if (myStats.cr > 1) {
+    //                     let overflowingpercent = Math.floor((myStats.cr - 1) * 100) / 100;
+    //                     //Overflowing critical rate -> Restore 0.5% missing HP for every 1% overflowing CR, up to 25%.
+    //                     overflowingpercent = Math.min(overflowingpercent, 0.5);
+    //                     const heal = Math.floor((myStats.maxhp - myStats.hp) * (overflowingpercent) * 0.005);
+    //                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
+    //                     myStats.cr = 1; // Cap cr to 100%
+    //                 };
+    //             } else myStats.hp -= Math.floor(myStats.maxhp * 0.04);
 
-                    myStats.flowed += 1; // To record times flowed
-                    if (myStats.flowed >= 4) {
-                        myStats.flowed -= 4;
+    //             // Check if counter
+    //             if (myStats.nagiCounter > Math.random()) myStats.counter += 1;
 
-                        // Autouse ACTIVE
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚽ **${char.name}** performed a Five-Shot Fake Valley Shot! He`, { atkMultiplier: 1.5 });
-                        matchStats.trigger("ABILITY", myStats, eStats, mybuff, ebuff);
-                    };
+    //             // FLOW state
+    //             if (myStats.blitz >= 4) {
+    //                 myStats.blitz -= 4;
+    //                 notice.push(`\n⚽ **${char.name}** entered Flow state.`);
+    //                 message.edit({ embeds: [embed] });
+    //                 //? embed.setColor(0x278fd5);
+    //                 if (myStats.initiative > 0) { // If already in initiative, get buffs
+    //                     myStats.br += 0.25;
+    //                     myStats.cd += 0.5;
+    //                     eStats.def -= Math.floor(eStats.def * 0.25);
+    //                     eStats.mr -= Math.floor(eStats.mr * 0.25);
+    //                 } else myStats.initiative += 5; // Else, grant 5 initiative
 
-                    // Reset color
-                    //? myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
-                    //?    message.edit({ embeds: [embed] });
-                    //?    embed.setColor(embedColor);
+    //                 myStats.flowed += 1; // To record times flowed
+    //                 if (myStats.flowed >= 4) {
+    //                     myStats.flowed -= 4;
 
-                //?    return AbilityResponse.SUCCESS;
-                //?}));
-                };
+    //                     // Autouse ACTIVE
+    //                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚽ **${char.name}** performed a Five-Shot Fake Valley Shot! He`, { atkMultiplier: 1.5 });
+    //                     matchStats.trigger("ABILITY", myStats, eStats, mybuff, ebuff);
+    //                 };
 
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //                 // Reset color
+    //                 //? myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
+    //                 //?    message.edit({ embeds: [embed] });
+    //                 //?    embed.setColor(embedColor);
 
-                // Crit = 1x Blitz & 2% counter chance permanently
-                matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (caster === myStats) {
-                    myStats.blitz += 1;
-                    if (myStats.nagiCounter <= 0.18) myStats.nagiCounter += 0.02;
-                };
-            });
+    //                 //?    return AbilityResponse.SUCCESS;
+    //                 //?}));
+    //             };
 
-                return AbilityResponse.SUCCESS;
-            },
-             party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.counter ??= 0;
-                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    if (Math.random() < 0.2) { // 20% chance to counter
-                        myStats.counter += 1;
-                    };
-                    return AbilityResponse.SUCCESS;
-                }, 9999));
-                return AbilityResponse.SUCCESS;
-             },
-         },*/
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
+
+    //         // Crit = 1x Blitz & 2% counter chance permanently
+    //         matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+    //             if (caster === myStats) {
+    //                 myStats.blitz += 1;
+    //                 if (myStats.nagiCounter <= 0.18) myStats.nagiCounter += 0.02;
+    //             };
+    //         });
+
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.counter ??= 0;
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (Math.random() < 0.2) { // 20% chance to counter
+    //                 myStats.counter += 1;
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
+
     "14000": {
         usage: 0,
         used: 0,
