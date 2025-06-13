@@ -1,5 +1,5 @@
 
-type Currency = "coins" | "gems" | "jades" | "lilies" | "guild_marks";
+type Currency = "coins" | "gems" | "jades" | "lilies" | "guild_marks" | "stamps";
 
 type MonthlyShopItemCustomOptions = {
     tier?: number;
@@ -44,7 +44,8 @@ export default class MonthlyShopItemInfos {
             gems: "<:genesis_gems:1034179687720681492>",
             jades: "<:eternal_jade:1256124504141201428>",
             lilies: "<:lilium:974057059618291732>",
-            guild_marks: "<:guild_mark:1317944450814840923>"
+            guild_marks: "<:guild_mark:1317944450814840923>",
+            stamps: "🎟️"
         };
 
         return emojis[this.currency];
@@ -132,6 +133,19 @@ export const monthlyShopItems = [
     new MonthlyShopItemInfos("Image Credits", "Image Credits (free)", "Image Credits", 20, 0, "coins", 54, { column: "image_credits", amount: 1 }),
     new MonthlyShopItemInfos("Image Credits", "Image Credits", "Image Credits", 80, 125, "coins", 55, { column: "image_credits", amount: 1 }),
     new MonthlyShopItemInfos("Image Credits", "100 Image Credits (bundle)", "Image Credits", 10000, 100, "jades", 56, { column: "image_credits", amount: 100 }),
+
+    new MonthlyShopItemInfos("S Ticket", "<:s_ticket:927642487705722890> S Ticket", "Taskalot Tickets", 100, 2, "stamps", 57, { column: "sticket" }),
+    new MonthlyShopItemInfos("SS Ticket", "<:ss_ticket:927503239396622336> SS Ticket", "Taskalot Tickets", 100, 5, "stamps", 58, { column: "ssticket" }),
+    new MonthlyShopItemInfos("EX Pull", "<a:EXTRA:1138530846144462968> Pull", "Taskalot Pulls", 100, 15, "stamps", 59),
+
+    new MonthlyShopItemInfos("Royal Chest", "<:royal_chest:1069301128711376976> Royal Chest", "Taskalot Chests", 100, 5, "stamps", 60, { itemid: 457 }),
+    new MonthlyShopItemInfos("Deluxe Chest", "<:deluxe_chest:1069301259603026061> Deluxe Chest", "Taskalot Chests", 100, 30, "stamps", 61, { itemid: 458 }),
+
+    new MonthlyShopItemInfos("Premium Tier 3", "", "7-Day Premium", 5, 25, "stamps", 62, { tier: 3 }),
+    new MonthlyShopItemInfos("Premium Tier 4", "", "7-Day Premium", 5, 40, "stamps", 63, { tier: 4 }),
+    new MonthlyShopItemInfos("Premium Tier 5", "", "7-Day Premium", 5, 75, "stamps", 64, { tier: 5 }),
+    new MonthlyShopItemInfos("Premium Tier 6", "", "7-Day Premium", 5, 120, "stamps", 65, { tier: 6 }),
+    new MonthlyShopItemInfos("Premium Tier 7", "", "7-Day Premium", 5, 200, "stamps", 66, { tier: 7 }),
 
 ];
 

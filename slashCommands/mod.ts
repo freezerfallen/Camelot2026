@@ -82,61 +82,6 @@ const exportCommand: SlashCommand = {
             return interaction.reply({ content: "No match found", ephemeral });
         };
 
-        // Set db
-        if (cmd === "set") {
-            if (interaction.client.user.id !== "695286837568340119") return interaction.reply({ content: "This command is only available in Elder", ephemeral });
-            if (!user) return interaction.reply({ content: "Usage: `/mod set <option> <value>`\n\n**Options**\n`level`: Set the level of a user\n`clvl`: Set the character level of a user", ephemeral });
-
-            const stats = await getUserSchema(user.id);
-            if (!stats) return interaction.reply({ content: "User not found", ephemeral });
-
-            const subcmd = args[0].toLowerCase();
-            const value = args[1];
-
-            if (subcmd === "level") {
-                await updateUsers(user ? user.id : "*", {
-                    level: { type: "set", value: parseInt(value) }
-                });
-            };
-
-            if (subcmd === "clvl") {
-                let pickedClass: number | undefined = undefined;
-                if (args.slice(2).join(" ")) {
-                    const fClass = searchClass(args.slice(2).join(" "), interaction, true);
-                    if (fClass) pickedClass = fClass.id;
-                };
-                if (pickedClass === undefined) {
-                    pickedClass = stats.class ?? undefined;
-                };
-
-                if (pickedClass === undefined) return interaction.reply({ content: "Usage: `/mod set clvl <level> <class>`\n\n**Options**\n`level`: Level to set the character to\n`class`: Class name or ID", ephemeral });
-
-                // Update users table
-                stats.dungeon_classlevels[pickedClass] = classLevelToXP(parseInt(value));
-                await updateUsers(user ? user.id : "*", {
-                    dungeon_classlevels: { type: "set", value: stats.dungeon_classlevels }
-                });
-            };
-
-            if (subcmd === "coins") {
-                await updateUsers(user ? user.id : "*", {
-                    coins: { type: "set", value: parseInt(value) }
-                });
-            };
-
-            if (subcmd === "skill_points") {
-                await updateUsers(user ? user.id : "*", {
-                    skill_points: { type: "set", value: parseInt(value) }
-                });
-            };
-
-            // await updateUsers(user ? user.id : "*", {
-            //     [key]: { type: "set", value: isNaN(parseInt(value)) ? value : parseInt(value) }
-            // });
-
-            return interaction.reply({ content: "Action Successful", ephemeral });
-        };
-
         if (cmd === "faq") {
             if (!args[0]) return interaction.reply({ content: "Usage: `/mod faq <name> <text>`\n\n**Options**\n`name`: Keyword to find the faq with. Cannot include whitespace.\n`text`: Raw text to show when using `/faq <name>`. Leave empty to delete an existing one.", ephemeral });
 
