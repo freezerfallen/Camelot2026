@@ -5192,7 +5192,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After the **${[9, 10, 11, 12, 13][level - 1]}th** round, decreases the wearer's DEF & MR by **30%** but increases ATK & MD by **${[20, 22.5, 25, 27.5, 30][level - 1]}%**.`, "Nyarlathos' Bane is a ring of impossible geometries, its obsidian band adorned with writhing tendrils that cradle a gem of unknowable depth. Ancient symbols spiral along its surface, each one shifting subtly when studied too long, while tiny crystalline eyes seem to blink when unwatched. Those who wear it gain glimpses of cosmic knowledge, but at the cost of being forever watched by something that dwells beyond the veil of reality.", "mythical", 739),
+    }, (level) => `After the **${[13, 12, 11, 10, 9][level - 1]}th** round, decreases the wearer's DEF & MR by **30%** but increases ATK & MD by **${[20, 22.5, 25, 27.5, 30][level - 1]}%**.`, "Nyarlathos' Bane is a ring of impossible geometries, its obsidian band adorned with writhing tendrils that cradle a gem of unknowable depth. Ancient symbols spiral along its surface, each one shifting subtly when studied too long, while tiny crystalline eyes seem to blink when unwatched. Those who wear it gain glimpses of cosmic knowledge, but at the cost of being forever watched by something that dwells beyond the veil of reality.", "mythical", 739),
     new ringInfo("Fury of the Abyss", "ring", "ring", ["raid"], "<:fury_of_the_abyss:1336496045265522739>", "https://i.ibb.co/HTrvVGsM/Fury-of-the-Abyss.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Nekro
 
         // Every 4th round: Only ATK, 20% more damage
@@ -5881,6 +5881,8 @@ export const items = [
         // Delayed Buff
         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             if ((myStats.hp / myStats.maxhp) < 0.3) {
+                //@ts-ignore
+                this._used++;
 
                 // Check mana
                 if (myStats.sm >= manaCost) {
@@ -5893,10 +5895,10 @@ export const items = [
             };
 
             return AbilityResponse.SUCCESS;
-        }, 9999));
+        }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `When under **30%** HP, the wearer consumes **${[30, 25, 20, 15, 10][level - 1]}** mana to generate a shield equal to **${[5, 10, 15, 20, 25][level - 1]}%** of their max HP.`, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
+    }, (level) => `Once under **30%** HP, the wearer consumes **${[30, 25, 20, 15, 10][level - 1]}** mana to generate a shield equal to **${[5, 10, 15, 20, 25][level - 1]}%** of their max HP.`, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
     new ringInfo("Vermillion Vow", "ring", "ring", ["raid"], "<:vermillion_vow:1371784821281652736>", "https://i.ibb.co/Swgkb8KT/c.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.vermillionVowStacks = 0;

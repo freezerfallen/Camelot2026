@@ -321,6 +321,7 @@ export interface UserSchema {
     bticket: number;
     cticket: number;
     dticket: number;
+    stamps: number;
     votestotal: number;
     arenawins: number;
     arenalosses: number;

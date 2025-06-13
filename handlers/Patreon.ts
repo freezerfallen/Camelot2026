@@ -43,7 +43,7 @@ const handler: BotHandler = {
                                 premium: { type: "set", value: patronIDs[user.id] },
                             });
                         };
-                    } else if (premiumGift?.[user.id]?.date > (new Date().getTime() - 31 * 24 * 60 * 60 * 1000)) {
+                    } else if (premiumGift?.[user.id]?.date > (new Date().getTime() - (premiumGift?.[user.id]?.method === "shop-7day" ? (7 * 24 * 60 * 60 * 1000) : (31 * 24 * 60 * 60 * 1000)))) {
                         ; // Do nothing
                     } else {
                         lostPrem.push(user.id);

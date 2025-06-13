@@ -312,7 +312,7 @@ const exportCommand: SlashCommand = {
                         return;
                     };
 
-                    if ((fItem.section === "Premium" || fItem.section === "Freemium") && stats.premium >= (fItem.custom?.tier ?? 0)) {
+                    if ((fItem.section === "Premium" || fItem.section === "Freemium" || fItem.section === "7-Day Premium") && stats.premium >= (fItem.custom?.tier ?? 0)) {
                         if (interaction.channel?.isSendable()) interaction.channel.send(`You already have premium!`);
                         return;
                     };
@@ -325,18 +325,18 @@ const exportCommand: SlashCommand = {
                     };
 
                     // Add item
-                    if (fItem.section === "Premium" || fItem.section === "Freemium") {
+                    if (fItem.section === "Premium" || fItem.section === "Freemium" || fItem.section === "7-Day Premium") {
                         updateOptions.premium = { type: "set", value: fItem.custom.tier ?? 0 };
 
                         const premiumGift = JSON.parse(fs.readFileSync('Storage/premiumGift.json', 'utf8'));
-                        premiumGift[interaction.user.id] = { "method": "shop", "date": Date.now() };
+                        premiumGift[interaction.user.id] = { "method": fItem.section === "7-Day Premium" ? "shop-7day" : "shop", "date": Date.now() };
 
                         fs.writeFile('Storage/premiumGift.json', JSON.stringify(premiumGift), (err) => {
                             if (err) console.error(err);
                         });
 
                         replyMessage = `You have received 1 month of premium!`;
-                    } else if (fItem.section === "EX Pulls") {
+                    } else if (fItem.section === "EX Pulls" || fItem.section === "Taskalot Pulls") {
                         updateOptions.expulls = { type: "increment", value: amount };
                     } else if (fItem.section === "Kernel") {
                         updateOptions.items = { type: "merge_json", value: { [683]: amount } };
@@ -344,9 +344,9 @@ const exportCommand: SlashCommand = {
                         if (fItem.custom.itemid) updateOptions.items = { type: "merge_json", value: { [fItem.custom.itemid]: amount } };
                     } else if (fItem.section === "Shards") {
                         updateOptions[fItem.custom.column as "ssshard"] = { type: "increment", value: amount };
-                    } else if (fItem.section === "Tickets") {
+                    } else if (fItem.section === "Tickets" || fItem.section === "Taskalot Tickets") {
                         updateOptions[fItem.custom.column as "ssticket"] = { type: "increment", value: amount };
-                    } else if (fItem.section === "Chests") {
+                    } else if (fItem.section === "Chests" || fItem.section === "Taskalot Chests") {
                         if (fItem.custom.itemid) updateOptions.items = { type: "merge_json", value: { [fItem.custom.itemid]: amount } };
                     } else if (fItem.section === "Image Credits") {
                         updateOptions.image_credits = { type: "increment", value: (fItem.custom.amount ?? 1) * amount };
