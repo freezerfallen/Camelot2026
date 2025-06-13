@@ -1156,7 +1156,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('raid')
 			.setDescription('Raid overview')
-			.addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
+		// .addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -1372,68 +1372,68 @@ const commands = [
 						)
 				))
 	}.data.toJSON(),
-	{
-		data: new SlashCommandBuilder()
-			.setName('set')
-			.setDescription('Set account properties')
-			.addSubcommand(subcommand => subcommand
-				.setName('level')
-				.setDescription('Set your character level between 1 and 2000')
-				.addIntegerOption(option =>
-					option.setName('value')
-						.setDescription('The level to set | 1-2000')
-						.setRequired(true)
-						.setMinValue(1)
-						.setMaxValue(2000)
-				)
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('clvl')
-				.setDescription('Set your account level between 1 and 15000')
-				.addIntegerOption(option =>
-					option.setName('value')
-						.setDescription('The class level to set | 1-15000')
-						.setRequired(true)
-						.setMinValue(1)
-						.setMaxValue(15000)
-				)
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('acclvl')
-				.setDescription('Set your account level between 1 and 120')
-				.addIntegerOption(option =>
-					option.setName('value')
-						.setDescription('The account level to set | 1-120')
-						.setRequired(true)
-						.setMinValue(1)
-						.setMaxValue(120)
-				)
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('guildcoins')
-				.setDescription('Set your guild coins between 1 and 100\'000\'000')
-				.addIntegerOption(option =>
-					option.setName('value')
-						.setDescription('The amount of guild coins to set | 1-100\'000\'000')
-						.setRequired(true)
-						.setMinValue(1)
-						.setMaxValue(100_000_000)
-				)
-			)
-			.addSubcommand(subcommand => subcommand
-				.setName('skill')
-				.setDescription('Set your skill points')
-				.addStringOption(option =>
-					option.setName('action')
-						.setDescription('Set skill points | max or reset')
-						.setRequired(true)
-						.addChoices(
-							{ name: 'max', value: 'max' },
-							{ name: 'reset', value: 'reset' }
-						)
-				)
-			)
-	}.data.toJSON(),
+	// {
+	// 	data: new SlashCommandBuilder()
+	// 		.setName('set')
+	// 		.setDescription('Set account properties')
+	// 		.addSubcommand(subcommand => subcommand
+	// 			.setName('level')
+	// 			.setDescription('Set your character level between 1 and 2000')
+	// 			.addIntegerOption(option =>
+	// 				option.setName('value')
+	// 					.setDescription('The level to set | 1-2000')
+	// 					.setRequired(true)
+	// 					.setMinValue(1)
+	// 					.setMaxValue(2000)
+	// 			)
+	// 		)
+	// 		.addSubcommand(subcommand => subcommand
+	// 			.setName('clvl')
+	// 			.setDescription('Set your account level between 1 and 15000')
+	// 			.addIntegerOption(option =>
+	// 				option.setName('value')
+	// 					.setDescription('The class level to set | 1-15000')
+	// 					.setRequired(true)
+	// 					.setMinValue(1)
+	// 					.setMaxValue(15000)
+	// 			)
+	// 		)
+	// 		.addSubcommand(subcommand => subcommand
+	// 			.setName('acclvl')
+	// 			.setDescription('Set your account level between 1 and 120')
+	// 			.addIntegerOption(option =>
+	// 				option.setName('value')
+	// 					.setDescription('The account level to set | 1-120')
+	// 					.setRequired(true)
+	// 					.setMinValue(1)
+	// 					.setMaxValue(120)
+	// 			)
+	// 		)
+	// 		.addSubcommand(subcommand => subcommand
+	// 			.setName('guildcoins')
+	// 			.setDescription('Set your guild coins between 1 and 100\'000\'000')
+	// 			.addIntegerOption(option =>
+	// 				option.setName('value')
+	// 					.setDescription('The amount of guild coins to set | 1-100\'000\'000')
+	// 					.setRequired(true)
+	// 					.setMinValue(1)
+	// 					.setMaxValue(100_000_000)
+	// 			)
+	// 		)
+	// 		.addSubcommand(subcommand => subcommand
+	// 			.setName('skill')
+	// 			.setDescription('Set your skill points')
+	// 			.addStringOption(option =>
+	// 				option.setName('action')
+	// 					.setDescription('Set skill points | max or reset')
+	// 					.setRequired(true)
+	// 					.addChoices(
+	// 						{ name: 'max', value: 'max' },
+	// 						{ name: 'reset', value: 'reset' }
+	// 					)
+	// 			)
+	// 		)
+	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('shards')
