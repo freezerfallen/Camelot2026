@@ -2287,12 +2287,12 @@ export const items = [
     new weaponInfo("Crossbow of Zeal", "weapon", "bow", ["crafting", "chest"], "<:crossbow_of_zeal:1068643237750911156>", "https://i.imgur.com/9X8qyI3.png", "atk", 52, 812, "hp", 216, 828, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.hp / myStats.maxhp < 0.5) {
             addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp - myStats.hp, {});
-            notice.push(`\n<:crossbow_of_zeal:1068643237750911156> ${char.name} made a complete recovery!`);
+            notice.push(`\n<:crossbow_of_zeal:1068643237750911156> **${char.name}** made a complete recovery!`);
         } else {
             myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.5) {
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp - myStats.hp, {});
-                    notice.push(`\n<:crossbow_of_zeal:1068643237750911156> ${char.name} made a complete recovery!`);
+                    notice.push(`\n<:crossbow_of_zeal:1068643237750911156> **${char.name}** made a complete recovery!`);
                     //@ts-ignore
                     this._used++;
                 };
@@ -2309,7 +2309,7 @@ export const items = [
             myStats.mr += Math.floor(myStats.mr * 0.2);
             mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.2), 12));
             mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.2), 12));
-            notice.push(`\n<:draupnirs_mist:1068643241467068486> ${char.name} increased DEF and MR by **20%**!`);
+            notice.push(`\n<:draupnirs_mist:1068643241467068486> **${char.name}** increased DEF and MR by **20%**!`);
         } else {
             myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.5) {
@@ -2317,7 +2317,7 @@ export const items = [
                     myStats.mr += Math.floor(myStats.mr * 0.2);
                     mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.2), 12));
                     mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.2), 12));
-                    notice.push(`\n<:draupnirs_mist:1068643241467068486> ${char.name} increased DEF and MR by **20%**!`);
+                    notice.push(`\n<:draupnirs_mist:1068643241467068486> **${char.name}** increased DEF and MR by **20%**!`);
                     //@ts-ignore
                     this._used++;
                 };
@@ -4422,7 +4422,7 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs([10, 7][level - 1], async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.damageReduction = (myStats.damageReduction ?? 0) + Math.abs(myStats.dodge - myStats.nimbleGuardian);
             if (myStats.damageReduction > 0.7) myStats.damageReduction = 0.7;
-            notice.push(`\n<:skyward_rune:1333991494725664789> ${char.name} will take **${Math.floor(myStats.damageReduction * 100)}%** less DMG.`);
+            notice.push(`\n<:skyward_rune:1333991494725664789> **${char.name}** will take **${Math.floor(myStats.damageReduction * 100)}%** less DMG.`);
 
             return AbilityResponse.SUCCESS;
         }));
@@ -4738,7 +4738,7 @@ export const items = [
                     myStats.aerial = true;
                     myStats.atk += Math.floor(myStats.atk * atkBuff);
 
-                    notice.push(`\n<:storms_caress:1334558474931277827> ${char.name} turned Aerial.`);
+                    notice.push(`\n<:storms_caress:1334558474931277827> **${char.name}** turned Aerial.`);
                 };
             };
         });
@@ -4752,7 +4752,7 @@ export const items = [
                     myStats.aerial = false;
                     myStats.atk -= Math.floor(myStats.atk * atkBuff);
 
-                    notice.push(`\n<:storms_caress:1334558474931277827> ${char.name} exited Aerial.`);
+                    notice.push(`\n<:storms_caress:1334558474931277827> **${char.name}** exited Aerial.`);
                 };
             };
         });
@@ -4829,7 +4829,7 @@ export const items = [
 
                 if (myStats.shadowPact === 5) {
                     // True Shadow Form
-                    notice.push(`\n<:shadows_pact:1334561570000343083> ${char.name} entered True Shadow form for **5** rounds`);
+                    notice.push(`\n<:shadows_pact:1334561570000343083> **${char.name}** entered True Shadow form for **5** rounds`);
                     myStats.trueShadow = true;
                     myStats.cd += cdDebuff;
                     mybuff.cd.push(new buffInfo("+", cdDebuff, 5));
@@ -4841,7 +4841,7 @@ export const items = [
                     // Reset form
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         myStats.trueShadow = false;
-                        notice.push(`\n<:shadows_pact:1334561570000343083> ${char.name} has returned to the Mist`);
+                        notice.push(`\n<:shadows_pact:1334561570000343083> **${char.name}** has returned to the Mist`);
                         return AbilityResponse.SUCCESS;
                     }, 1));
                 };
@@ -5588,7 +5588,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After a critical hit, the wearer raises their attack and magic damage by **${[2.5, 2.75, 3, 3.25, 3.5][level - 1]}%** (up to **8** times). If a non-critical strike is dealt, fires an attack at the enemy dealing damage worth twice the amount of previously stacked buffs, before resetting them.`, "The Radiant Spike is a striking ring crafted from darkened metal, its surface sharply contoured with protruding spikes that evoke a sense of fierceness. At its center sits a vibrant, multifaceted gemstone radiating brilliant hues of blue and purple, glimmering like the evening sky. This ring is imbued with powers of protection; it boosts the wearer's defenses against magical attacks. Legends say that those who wear the Radiant Spike are shielded from harm, as its sharp edges deter malevolent forces. Adorning it grants the user a commanding presence, making them the center of attention in any realm.", "genesis", 758),
+    }, (level) => `After a critical hit, the wearer raises their attack and magic damage by **${[2.5, 2.75, 3, 3.25, 3.5][level - 1]}%** (up to **8** times). If a non-critical strike is dealt, or when the wearer misses, fires an attack at the enemy dealing damage worth twice the amount of previously stacked buffs, before resetting them.`, "The Radiant Spike is a striking ring crafted from darkened metal, its surface sharply contoured with protruding spikes that evoke a sense of fierceness. At its center sits a vibrant, multifaceted gemstone radiating brilliant hues of blue and purple, glimmering like the evening sky. This ring is imbued with powers of protection; it boosts the wearer's defenses against magical attacks. Legends say that those who wear the Radiant Spike are shielded from harm, as its sharp edges deter malevolent forces. Adorning it grants the user a commanding presence, making them the center of attention in any realm.", "genesis", 758),
     new ringInfo("Punishing Grace's Grasp", "ring", "ring", ["chest"], "<:punishing_graces_grasp:1338637021031436338>", "https://i.ibb.co/GvBnXXrh/Punishing-Grace-s-Grasp.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // Debuff on miss
@@ -5903,13 +5903,14 @@ export const items = [
 
         myStats.vermillionVowStacks = 0;
         const buffValue = [20, 25, 30, 30][level - 1] / 100;
+        const stacksReq = [4, 4, 3, 3][level - 1]
 
         // On Ability|CSkill: Gain a stack. At 5-4 stacks, +20-30% ATK/MD for 2-3 turns, then reset.
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
                 myStats.vermillionVowStacks++;
 
-                if (myStats.vermillionVowStacks >= 5) {
+                if (myStats.vermillionVowStacks >= stacksReq) {
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buffValue), 2));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * buffValue), 2));
                     myStats.atk += Math.floor(myStats.atk * buffValue);
@@ -5922,7 +5923,7 @@ export const items = [
             if (caster === myStats) {
                 myStats.vermillionVowStacks++;
 
-                if (myStats.vermillionVowStacks >= 5) {
+                if (myStats.vermillionVowStacks >= stacksReq) {
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buffValue), 2));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * buffValue), 2));
                     myStats.atk += Math.floor(myStats.atk * buffValue);
@@ -5933,7 +5934,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Every ability usage grants a stack. Upon reaching **${[5, 5, 4, 4][level - 1]}** stacks, increase the wearer's attack and magic damage by **${[20, 25, 30, 30][level - 1]}%** for **${[2, 2, 2, 3][level - 1]}** turns.`, "Vermillion Vow is a mesmerizing relic crafted from dark crimson alloys, its band sculpted into swirling, baroque patterns that seem to dance like living flame. At its heart rests a flawless blood-red gemstone, refracting light in brilliant, ominous glimmers. Legends speak of the ring as a pact sealed in the depths of forgotten catacombs, a promise of relentless power for those who persevere through hardship. Worn by warlocks and champions alike, the ring rewards unwavering resolve, amplifying strength after consistent strikes. It is said that each glow of the gem marks another step toward overwhelming dominance, a vow of crimson fury fulfilled in battle.", "legendary", 774),
+    }, (level) => `Every **${[4, 4, 3, 3][level - 1]}** uses of the ability or class skill increases the wearer's attack and magic damage by **${[20, 25, 30, 30][level - 1]}%** for **${[2, 2, 2, 3][level - 1]}** turns.`, "Vermillion Vow is a mesmerizing relic crafted from dark crimson alloys, its band sculpted into swirling, baroque patterns that seem to dance like living flame. At its heart rests a flawless blood-red gemstone, refracting light in brilliant, ominous glimmers. Legends speak of the ring as a pact sealed in the depths of forgotten catacombs, a promise of relentless power for those who persevere through hardship. Worn by warlocks and champions alike, the ring rewards unwavering resolve, amplifying strength after consistent strikes. It is said that each glow of the gem marks another step toward overwhelming dominance, a vow of crimson fury fulfilled in battle.", "legendary", 774),
     new ringInfo("Solstice Radiance", "ring", "ring", ["raid"], "<:solstice_radiance:1371787642882228295>", "https://i.ibb.co/CfqFwQp/Solstice-Radiance.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.radiantLightStacks = 0;
@@ -5962,7 +5963,7 @@ export const items = [
                 // Heal
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * heal), {});
 
-                notice.push(`\n<:solstice_radiance:1371787642882228295> ${char.name} cleansed debuffs and recovered HP.`);
+                notice.push(`\n<:solstice_radiance:1371787642882228295> **${char.name}** cleansed debuffs and recovered HP.`);
             };
 
             return AbilityResponse.SUCCESS;
@@ -5973,7 +5974,7 @@ export const items = [
     }, (level) => `The wearer has a **50-80%** chance of capturing **1x** \`Radiant Light\` after every usage of ATK, depending on the wearer's missing HP. At the start of a round, if the wearer has any debuffs on self, and has at least **${[7, 7, 6, 6, 5, 5][level - 1]}x** \`Radiant Light\`, consumes the required stacks to remove debuffs on self. This also recovers **+${[15, 17, 19, 21, 23, 25][level - 1]}%** of the wearer's missing HP.`, "Solstice Radiance blazes with the boundless energy of a captured sun, set into a band of flowing iridescent metals. Forged during the longest day under a sky ignited by auroras, it grants resilience to those who bear its light. Legend tells of heroes who wore it on journeys through perpetual night, using its glow to dispel despair and guide lost souls back to dawn.", "mythical", 775),
     new ringInfo("Starfire Band", "ring", "ring", ["raid"], "<:starfire_band:1380248173678690487>", "https://i.ibb.co/4LRPzTx/starfire-band.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        const roundThreshold = [30, 28, 26, 24, 22, 20][level - 1];
+        const roundThreshold = [40, 38, 36, 34, 32, 30][level - 1];
 
         let numberOfBuffs = 1;
 
@@ -5994,18 +5995,19 @@ export const items = [
 
                 switch (randomNumber) {
                     case 0:
-                        myStats.atk = Math.floor(myStats.atk * 1.25);
-                        myStats.md = Math.floor(myStats.md * 1.25);
+                        myStats.atk = Math.floor(myStats.atk * 1.18);
+                        myStats.md = Math.floor(myStats.md * 1.18);
                         break;
                     case 1:
-                        myStats.def = Math.floor(myStats.def * 1.25);
-                        myStats.mr = Math.floor(myStats.mr * 1.25);
+                        myStats.def = Math.floor(myStats.def * 1.18);
+                        myStats.mr = Math.floor(myStats.mr * 1.18);
                         break;
                     case 2:
-                        myStats.cr += 0.25;
+                        myStats.cr += 0.18;
+                        if (myStats.cr > 1) myStats.cr = 1;
                         break;
                     case 3:
-                        myStats.cd += 0.25;
+                        myStats.cd += 0.18;
                         break;
                     case 4:
                         myStats.sm += 5;
@@ -6022,7 +6024,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects for that round:\n> - **+25%** ATK/MD\n> - **+25%** DEF/MR\n> - **+25%** crit rate\n> - **+25%** crit damage\n> - Gain **5** mana\n> - Restore **5%** max HP\n\nAfter reaching **${[30, 28, 26, 24, 22, 20][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
+    }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects for that round:\n> - **+18%** ATK/MD\n> - **+18%** DEF/MR\n> - **+18%** crit rate\n> - **+18%** crit damage\n> - Gain **5** mana\n> - Restore **5%** max HP\n\nAfter reaching **${[40, 38, 36, 34, 32, 30][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
     // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
     //     //* Don't fix, it's already working as intended
