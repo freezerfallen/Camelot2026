@@ -8,7 +8,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('ability')
 			.setDescription('Look up characters with abilities')
-			.addStringOption(option => option.setName('character').setDescription('Get more information about a characters ability').setRequired(false))
+			.addStringOption(option => option.setName('character').setDescription('Get more information about a character\'s ability').setRequired(false))
 			.addBooleanOption(option => option.setName('compact').setDescription('Display in compact view').setRequired(false))
 			.addStringOption(option =>
 				option.setName('filter')
@@ -67,7 +67,7 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('avatar')
-			.setDescription('Display a users profile picture')
+			.setDescription('Display a user\'s profile picture')
 			.addUserOption(option => option.setName('user').setDescription('Get the profile picture of a user')),
 	}.data.toJSON(),
 	{
@@ -108,7 +108,7 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('balance')
-			.setDescription('Display a players coin balance')
+			.setDescription('Display a player\'s coin balance')
 			.addStringOption(option =>
 				option.setName('currency')
 					.setDescription('Select a currency to view')
@@ -128,7 +128,7 @@ const commands = [
 			.setName('bank')
 			.setDescription('Bank related commands')
 			.addSubcommand((subcommand) => subcommand.setName('view').setDescription('View your balance')
-				.addUserOption(option => option.setName('user').setDescription('View someones balance').setRequired(false)))
+				.addUserOption(option => option.setName('user').setDescription('View someone\'s balance').setRequired(false)))
 			.addSubcommand((subcommand) => subcommand.setName('deposit').setDescription('Deposit coins to your bank')
 				.addStringOption(option => option.setName('amount').setDescription('Choose how much you want to deposit | Keywords: max').setRequired(true)))
 			.addSubcommand((subcommand) => subcommand.setName('withdraw').setDescription('Withdraw coins from your bank')
@@ -268,7 +268,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('cd')
 			.setDescription('See all your timers at once')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses cooldown')),
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s cooldown')),
 	}.data.toJSON(),
 	{ // celebrate: Claim your daily anniversary reward! 🎂 🎉
 		// trick-or-treat: Trick, or treat? 👻 🍬
@@ -284,9 +284,9 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('changeimg')
-			.setDescription('Change a characters image (premium only)')
+			.setDescription('Change a character\'s image (premium only)')
 			.addStringOption(option => option.setName('character').setDescription('select a character').setRequired(true))
-			.addStringOption(option => option.setName('image-url').setDescription('Has to be an imgur.com or imgBB.com link | type reset to remove a characters image instead').setRequired(true))
+			.addStringOption(option => option.setName('image-url').setDescription('Has to be an imgur.com or imgBB.com link | type reset to remove a character\'s image instead').setRequired(true))
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -347,8 +347,8 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('disassemble')
 			.setDescription('Disassemble your items')
-			.addSubcommand((subcommand) => subcommand.setName('items').setDescription('Dissassemble an item').addStringOption(option => option.setName('items').setDescription('Select items to disassemble (use their IDs separated by comma ",")').setRequired(true)))
-			.addSubcommand((subcommand) => subcommand.setName('all').setDescription('Dissassemble items in mass')
+			.addSubcommand((subcommand) => subcommand.setName('items').setDescription('Disassemble an item').addStringOption(option => option.setName('items').setDescription('Select items to disassemble (use their IDs separated by comma ",")').setRequired(true)))
+			.addSubcommand((subcommand) => subcommand.setName('all').setDescription('Disassemble items en masse')
 				.addBooleanOption(option =>
 					option.setName('dupes')
 						.setDescription('Should only dupes be disassembled?')
@@ -798,7 +798,7 @@ const commands = [
 			.addSubcommand((subcommand) => subcommand.setName('lock').setDescription('Lock items so they won\'t get disassembled by accident')
 				.addStringOption(option => option.setName('items').setDescription('Choose the items to be locked').setRequired(false)))
 			.addSubcommand((subcommand) => subcommand.setName('unlock').setDescription('Unlock items so you can disassemble locked items again')
-				.addStringOption(option => option.setName('items').setDescription('Choose the items to be locked').setRequired(false)))
+				.addStringOption(option => option.setName('items').setDescription('Choose the items to be unlocked').setRequired(false)))
 			.addSubcommand((subcommand) => subcommand.setName('wishlist').setDescription('Add items to your wish list')
 				.addStringOption(option => option.setName('add').setDescription('Choose the items to be added onto your wish list').setRequired(false)))
 	}.data.toJSON(),
@@ -942,7 +942,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('lootbox')
 			.setDescription('See and open your lootboxes')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses lootboxes').setRequired(false)),
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s lootboxes').setRequired(false)),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -1020,7 +1020,7 @@ const commands = [
 			.addSubcommand((subcommand) => subcommand.setName('view').setDescription('View a party')
 				.addUserOption(option => option.setName('user').setDescription('Select a user to view their party').setRequired(false)))
 			.addSubcommand((subcommand) => subcommand.setName('join').setDescription('Join a party')
-				.addUserOption(option => option.setName('user').setDescription('Select a user to joing their party').setRequired(true)))
+				.addUserOption(option => option.setName('user').setDescription('Select a user to join their party').setRequired(true)))
 			.addSubcommand((subcommand) => subcommand.setName('invite').setDescription('Invite someone to your party')
 				.addUserOption(option => option.setName('user').setDescription('Select a user to invite them to your party').setRequired(true)))
 			.addSubcommand((subcommand) => subcommand.setName('leave').setDescription('Leave a party'))
@@ -1057,7 +1057,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('pity')
 			.setDescription('See your pity')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses pity')),
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s pity')),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -1150,7 +1150,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('quests')
 			.setDescription('See your daily quests')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses daily quests')),
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s daily quests')),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -1228,7 +1228,7 @@ const commands = [
 	// {
 	// 	data: new SlashCommandBuilder()
 	// 			.setName('reset')
-	// 			.setDescription('Reset a characters level to get some of your invested ressources back')
+	// 			.setDescription('Reset a character\'s level to get some of your invested resources back')
 	// 			.addStringOption(option => option.setName('character').setDescription('Select a character').setRequired(true))
 	// }.data.toJSON(),
 	// {
@@ -1438,7 +1438,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('shards')
 			.setDescription('See your shards')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses shards')),
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s shards')),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -1506,7 +1506,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('tickets')
 			.setDescription('See and open your tickets')
-			.addUserOption(option => option.setName('user').setDescription('See someone elses tickets'))
+			.addUserOption(option => option.setName('user').setDescription('See someone else\'s tickets'))
 			.addStringOption(option =>
 				option.setName('open')
 					.setDescription('Open a ticket')
