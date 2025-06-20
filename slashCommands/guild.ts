@@ -1076,8 +1076,7 @@ const exportCommand: SlashCommand = {
         } else if (subcommand === "shop") {
             const page = interaction.options.getString('page') || "rings";
 
-            // Guild Shop missing
-
+            return interaction.reply({ content: `If you see this message, we probably forgot to add the guild shop <:MikuHappy:1045096947876368404>` });
         };
     },
     async executeButtonInteraction({ interaction }) {

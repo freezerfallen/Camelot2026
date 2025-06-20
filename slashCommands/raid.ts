@@ -344,7 +344,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 200000,       // 5% = 10000
         guild_marks: 1000,   // 5% =    50
         skill_points: 40,    // 5% =     2
-        featured_ring: 2,    // 5% =     0.1
+        featured_ring: 3,    // 5% =     0.15
         glorious_chest: 60,  // 5% =     3
         luxurious_chest: 20, // 5% =     1
         royal_chest: 6,      // 5% =     0.3
@@ -354,7 +354,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 300000,
         guild_marks: 1500,
         skill_points: 60,
-        featured_ring: 3,
+        featured_ring: 4.5,
         glorious_chest: 90,
         luxurious_chest: 30,
         royal_chest: 9,
@@ -364,7 +364,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 400000,
         guild_marks: 2000,
         skill_points: 80,
-        featured_ring: 4,
+        featured_ring: 6,
         glorious_chest: 120,
         luxurious_chest: 40,
         royal_chest: 12,
@@ -374,7 +374,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 500000,
         guild_marks: 2500,
         skill_points: 100,
-        featured_ring: 5,
+        featured_ring: 7.5,
         glorious_chest: 150,
         luxurious_chest: 50,
         royal_chest: 15,
@@ -384,7 +384,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 600000,
         guild_marks: 3000,
         skill_points: 120,
-        featured_ring: 6,
+        featured_ring: 9,
         glorious_chest: 180,
         luxurious_chest: 60,
         royal_chest: 18,
@@ -394,7 +394,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 700000,
         guild_marks: 3500,
         skill_points: 140,
-        featured_ring: 7,
+        featured_ring: 10.5,
         glorious_chest: 210,
         luxurious_chest: 70,
         royal_chest: 21,
@@ -404,7 +404,7 @@ const raidRewards: Record<string, RaidRewards> = {
         coins: 800000,
         guild_marks: 4000,
         skill_points: 160,
-        featured_ring: 8,
+        featured_ring: 12,
         glorious_chest: 240,
         luxurious_chest: 80,
         royal_chest: 24,
