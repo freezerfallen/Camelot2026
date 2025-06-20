@@ -5903,7 +5903,7 @@ export const items = [
 
         myStats.vermillionVowStacks = 0;
         const buffValue = [20, 25, 30, 30][level - 1] / 100;
-        const stacksReq = [4, 4, 3, 3][level - 1]
+        const stacksReq = [4, 4, 3, 3][level - 1];
 
         // On Ability|CSkill: Gain a stack. At 5-4 stacks, +20-30% ATK/MD for 2-3 turns, then reset.
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -6025,15 +6025,15 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects for that round:\n> - **+18%** ATK/MD\n> - **+18%** DEF/MR\n> - **+18%** crit rate\n> - **+18%** crit damage\n> - Gain **5** mana\n> - Restore **5%** max HP\n\nAfter reaching **${[40, 38, 36, 34, 32, 30][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
-    // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-    //     //* Don't fix, it's already working as intended
+        //* Don't fix, it's already working as intended
 
-    //     matchStats.lootm += 0.24;
-    //     matchStats.xpboost += 0.24;
+        matchStats.lootm += 0.05;
+        matchStats.xpboost += 0.05;
 
-    //     return AbilityResponse.SUCCESS;
-    // }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus for a brief moment until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
+        return AbilityResponse.SUCCESS;
+    }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
 ];
 
