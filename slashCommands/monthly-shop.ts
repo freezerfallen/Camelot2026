@@ -101,7 +101,7 @@ const exportCommand: SlashCommand = {
                     `## Monthly Shop\nWelcome to the monthly shop to buy limited resources!\nUse \`/buy monthly <item>\` to buy.\n` +
                     `### Tickets & Pulls\n${formatItems("Taskalot Tickets")}\n${formatItems("Taskalot Pulls")}\n` +
                     `### Chests\n${formatItems("Taskalot Chests")}\n` +
-                    `### Premium\n${formatItems("7-Day Premium")}`
+                    `### 7-Day Premium\n${formatItems("7-Day Premium")}`
                 ),
             "other": new EmbedBuilder()
                 .setColor(0xbbffff)
