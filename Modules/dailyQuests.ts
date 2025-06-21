@@ -118,6 +118,6 @@ export const dailies = [
     new dailyQuestInfo("A Fishy Task", "Catch 5 fish", 7, (stat) => { return stat >= 5; }),
     new dailyQuestInfo("Another Fishy Task", "Catch a rare or higher fish", 8, (stat) => { return stat >= 1; }),
     new dailyQuestInfo("Fortune's Favor", "Donate 2000 coins to a guild", 9, (stat) => { return stat >= 2000; }),
-    new dailyQuestInfo("Knight's Ballot", "[Vote for Camelot](https://top.gg/bot/706183309943767112/vote)", 10, (stat) => { return stat >= 1; }),
+    new dailyQuestInfo("Knight's Ballot", "[Vote for Camelot](<https://rank.top/bot/camelot/vote>)", 10, (stat) => { return stat >= 1; }),
     new dailyQuestInfo("Parting Pieces", "Disassemble 3 items", 11, (stat) => { return stat >= 3; }),
 ];

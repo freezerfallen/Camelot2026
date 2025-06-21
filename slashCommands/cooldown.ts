@@ -25,7 +25,7 @@ const exportCommand: SlashCommand = {
         let dailymsg = `Your daily is ready! => </daily:1011371510759428136>`;
         let weeklymsg = `\`locked\` => see </premium:1011293280702578691>`;
         let dailyquest = `Your quests are ready! => </quests:1087099255652622433>`;
-        let vote = `You can [vote](<https://top.gg/bot/706183309943767112/vote>) now! => </vote:1010546185792135198>`;
+        let vote = `You can [vote](<https://rank.top/bot/camelot/vote>) now! => </vote:1010546185792135198>`;
 
         if (stats.premium) {
             // Pulls & Dungeon

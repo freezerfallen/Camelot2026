@@ -9,6 +9,7 @@ import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers } from '../Modules/queries';
 import { query } from '../postgres';
 import { createResponseGraph, getResponseData } from '../Modules/responseGraph';
+import { query as sqliteQuery } from '../db_handler';
 
 const exportCommand: SlashCommand = {
     name: 'admin',
@@ -31,6 +32,28 @@ const exportCommand: SlashCommand = {
             return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
         };
 
+        // Check refunded shard amount
+        if (action === "refunded") {
+            if (!user) return interaction.reply({ content: "missing user object", ephemeral });
+
+            const charactersFromDb = await sqliteQuery('SELECT rowid, * FROM characters');
+
+            const charData = charactersFromDb.find((c: any) => c.id === user?.id) || {
+                chars: '[]',
+                ref: '{}',
+                level: '{}',
+                class: '{}',
+                skin: '{}',
+                equipment: '{}'
+            };
+
+            const shards = Object.entries(JSON.parse(charData.ref) as Record<string, number>)
+                .filter(([key,]) => characters[key as any].rarity === "SS" || characters[key as any].rarity === "EX")
+                .filter(([, value]) => value > 2)
+                .reduce((a, [, b]) => a + (b > 3 ? 4 : 1), 0);
+
+            return interaction.reply({ content: `${shards} shards have been refunded to ${user.toString()}`, ephemeral });
+        };
 
         // Load dungeon_responsetime
         if (action === "resp") {

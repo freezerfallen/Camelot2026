@@ -278,7 +278,7 @@ const exportCommand: SlashCommand = {
                 Embed.setDescription("**Usage**: `/support`\n\nProvides a link to the official Camelot support server.");
                 break;
             case 'vote':
-                Embed.setDescription("**Usage**: </vote:1010546185792135198>\n\nVote for the bot at [Top.gg](https://top.gg/bot/706183309943767112/vote) to get rewards. A voting reminder can be set up using `/reminder set type:votes`. You can vote every **12h**.\n\n**Voting Rewards**\n1 pull reset (`/rp`)\n1 lootbox (`/lootbox`)\n3 genesis gem <:genesis_gems:1034179687720681492>");
+                Embed.setDescription("**Usage**: </vote:1010546185792135198>\n\nVote for the bot at [Rank.top](<https://rank.top/bot/camelot/vote>) to get rewards. A voting reminder can be set up using `/reminder set type:votes`. You can vote every **12h**.\n\n**Voting Rewards**\n1 pull reset (`/rp`)\n1 lootbox (`/lootbox`)\n3 genesis gem <:genesis_gems:1034179687720681492>");
                 break;
             default:
                 if (command) {

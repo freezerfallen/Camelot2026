@@ -6,7 +6,7 @@ import { Webhook } from '@top-gg/sdk';
 import { dailies } from "../Modules/dailyQuests";
 import { getUserSchema, loadVoteReminders, updateUsers } from '../Modules/queries';
 
-const reminderMessage = "You're off cooldown!\nYou can vote again at https://top.gg/bot/706183309943767112/vote\nYou are receiving this message because you enabled vote reminders. Use `/reminder` if you want to turn it off again.";
+const reminderMessage = "You're off cooldown!\nYou can vote again at <https://rank.top/bot/camelot/vote>\nYou are receiving this message because you enabled vote reminders. Use `/reminder` if you want to turn it off again.";
 
 const handler: BotHandler = {
     name: "Vote",
@@ -41,6 +41,33 @@ const handler: BotHandler = {
             dailies[10].update(undefined, 1, { id: vote.user }); // Knight's Ballot
         }));
         app.listen(3000);
+
+        // Rank.top Webhook
+        app.post('/rankvote', async (req, res) => {
+            const vote = req.body;
+            if (vote.authorization !== config.rank.auth) return;
+
+            // Send a response back to acknowledge receipt
+            res.status(200).send('received');
+
+            // Update users table
+            await updateUsers(vote.user_id, {
+                pullresets: { type: "increment", value: 1 },
+                votestotal: { type: "increment", value: 1 },
+                lootbox: { type: "increment", value: 1 },
+                gems: { type: "increment", value: 3 },
+                lastvote: { type: "set", value: new Date() },
+            });
+
+            // Send reminder
+            const stats = await getUserSchema(vote.user_id);
+            if (stats?.votereminder) {
+                setTimeout(async () => {
+                    const dmUser = await client.users.fetch(vote.user_id);
+                    if (dmUser) dmUser.send(reminderMessage);
+                }, 12 * 60 * 60 * 1000);
+            };
+        });
 
         // Reload active vote reminders after bot restart
         const stats = await loadVoteReminders();

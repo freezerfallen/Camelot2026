@@ -119,6 +119,7 @@ const commands = [
 						{ name: 'eternal jade', value: "jades" },
 						{ name: 'lilies', value: "lilies" },
 						{ name: 'guild marks', value: "guild_marks" },
+						{ name: 'stamps', value: "stamps" },
 					)
 			)
 			.addUserOption(option => option.setName('user').setDescription('Select a user').setRequired(false))
@@ -1360,7 +1361,7 @@ const commands = [
 			.addSubcommand((subcommand) => subcommand.setName('all').setDescription('Sell multiple characters')
 				.addStringOption(option =>
 					option.setName('rarity')
-						.setDescription('Select rarity of dupes | all rarities will be sold if left empty')
+						.setDescription('Select rarity of characters | all rarities will be sold if left empty')
 						.setRequired(false)
 						.addChoices(
 							{ name: 'SS', value: 'SS' },
