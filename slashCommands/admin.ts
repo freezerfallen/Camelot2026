@@ -55,6 +55,26 @@ const exportCommand: SlashCommand = {
             return interaction.reply({ content: `${shards} shards have been refunded to ${user.toString()}`, ephemeral });
         };
 
+        if (cmd === "repair") {
+
+            // Repair backgrounds
+            if (args[0] === "backgrounds" || args[0] === "bg") {
+                const stats = await query(`SELECT id, backgrounds FROM users`) as { id: string, backgrounds: string[]; }[];
+
+                for (const stat of stats) {
+                    const arr: string[] = JSON.parse(stat.backgrounds.join(",") || "[]") || [];
+
+                    // Update users table
+                    await updateUsers(stat.id, {
+                        backgrounds: { type: "set", value: arr }
+                    });
+                };
+
+                return interaction.reply({ content: "Action Successful: Repaired backgrounds", ephemeral });
+            };
+
+        };
+
         // Load dungeon_responsetime
         if (action === "resp") {
 
@@ -171,7 +191,7 @@ const exportCommand: SlashCommand = {
                 [key]: { type: "set", value: isNaN(parseInt(value)) ? value : parseInt(value) }
             });
 
-            return interaction.reply({ content: "Action Successful", ephemeral });
+            return interaction.reply({ content: `Action Successful: Set \`${key}\` to **${value}** for ${user ? user.toString() : "all users"}`, ephemeral });
         };
 
         // Add vote

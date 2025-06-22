@@ -88,6 +88,8 @@ const exportCommand: SlashCommand = {
             let amount = amountFlag.toLowerCase() === "max" ? stats.bank : (parseInt(amountFlag) || 1);
             amount = Math.min(amount, Math.max(stats.bank, 0));
 
+            if (amount < 1) return interaction.reply(`You can't withdraw negative coins.`);
+
             await updateUsers(interaction.user.id, {
                 coins: { type: 'increment', value: amount },
                 bank: { type: 'increment', value: -amount }

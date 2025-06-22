@@ -34,6 +34,9 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
             "You can take the exam as many times as you want!",
         ];
 
+        //* Use max class level
+        stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
+
         const getDesc = () => {
             return `### Rank-Up Exam`
                 + `\nAfter the exam you will be assigned a rank based on your performance.`
@@ -79,6 +82,9 @@ const exportCommand: SlashCommand = {
 
         const userItemSchemas = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots].filter((e) => e));
         const userItems = userItemSchemas.map((e) => items[e.itemid]);
+
+        //* Use max class level
+        stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
 
         // Overview
         let start = await rankupOverview(interaction, stats, userItems);
@@ -292,6 +298,12 @@ const exportCommand: SlashCommand = {
                     };
 
                     function startNextRound() {
+                        // Force end at round 100
+                        if (matchStats.round === 100) {
+                            notice.push(`\n🕗 You've reached the end`);
+                            endMatch("l");
+                        };
+
                         if (matchStats.ended) return;
                         if (matchStats.round === matchStats.roundCheck) return;
                         matchStats.roundCheck = matchStats.round;

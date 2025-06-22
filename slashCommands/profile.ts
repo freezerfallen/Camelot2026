@@ -446,7 +446,7 @@ const exportCommand: SlashCommand = {
         if (!stats) return interaction.editReply(user.id === interaction.user.id ? "You don't have any characters" : `${user.username} has no characters`);
         if (!stats.chars.length) return interaction.editReply(user.id === interaction.user.id ? "You don't have any characters" : `${user.username} has no characters`);
         if (!stats.battlechar) return interaction.editReply("You don't have a battle character selected. Please use `/select` first");
-        stats.profilecolor = color === "null" ? null : color;
+        if (color) stats.profilecolor = color === "null" ? null : color;
 
         // Set Custom Color
         if (customColor1 || customColor2) {
@@ -498,8 +498,8 @@ const exportCommand: SlashCommand = {
             guild: guild?.name,
             party: party?.name,
 
-            colorLight: stats.premium > 1 && stats.profilecolor?.includes(":") ? stats.profilecolor.split(":")[0] || (['#ffffff', '#d46600', '#8fd3e2', '#ffe036', '#00546a'][classes[stats.class ?? "-1"]?.tier] || '#ffffff') : (stats.profilecolor ? profileColors[stats.profilecolor as keyof typeof profileColors][0] : (['#ffffff', '#d46600', '#8fd3e2', '#ffe036', '#00546a'][classes[stats.class ?? "-1"]?.tier] || '#ffffff')),
-            colorDark: stats.premium > 1 && stats.profilecolor?.includes(":") ? stats.profilecolor.split(":")[1] || (['#ddd0c0', '#c63a17', '#4c9fea', '#ffa114', '#1b3d68'][classes[stats.class ?? "-1"]?.tier] || '#ddd0c0') : (stats.profilecolor ? profileColors[stats.profilecolor as keyof typeof profileColors][1] : (['#ddd0c0', '#c63a17', '#4c9fea', '#ffa114', '#1b3d68'][classes[stats.class ?? "-1"]?.tier] || '#ddd0c0')),
+            colorLight: stats.premium > 1 && stats.profilecolor?.includes(":") ? (stats.profilecolor.split(":")[0] || (['#ffffff', '#d46600', '#8fd3e2', '#ffe036', '#00546a'][classes[stats.class ?? "-1"]?.tier] || '#ffffff')) : (stats.profilecolor && !stats.profilecolor.includes(":") ? profileColors[stats.profilecolor as keyof typeof profileColors][0] : (['#ffffff', '#d46600', '#8fd3e2', '#ffe036', '#00546a'][classes[stats.class ?? "-1"]?.tier] || '#ffffff')),
+            colorDark: stats.premium > 1 && stats.profilecolor?.includes(":") ? (stats.profilecolor.split(":")[1] || (['#ddd0c0', '#c63a17', '#4c9fea', '#ffa114', '#1b3d68'][classes[stats.class ?? "-1"]?.tier] || '#ddd0c0')) : (stats.profilecolor && !stats.profilecolor.includes(":") ? profileColors[stats.profilecolor as keyof typeof profileColors][1] : (['#ddd0c0', '#c63a17', '#4c9fea', '#ffa114', '#1b3d68'][classes[stats.class ?? "-1"]?.tier] || '#ddd0c0')),
 
             profilePicture: user.displayAvatarURL(),
             classImage: stats.class === null ? undefined : classes[stats.class].image,

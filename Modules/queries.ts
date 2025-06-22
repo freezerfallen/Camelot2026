@@ -1199,3 +1199,7 @@ export const updateStampedes = async (
 export const updateGuildDonationsGuildId = async (guildId: string, newGuildId: string): Promise<void> => {
     await query(`UPDATE guild_donations SET guildid = $1 WHERE guildid = $2`, [newGuildId, guildId]);
 };
+
+export const updateRaidsGuildId = async (guildId: string, newGuildId: string): Promise<void> => {
+    await query(`UPDATE raids SET guildid = $1 WHERE guildid = $2`, [newGuildId, guildId]);
+};

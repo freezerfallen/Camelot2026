@@ -23,7 +23,6 @@ async function indexRanking() {
 
 const handler: BotHandler = {
     name: "Setup",
-    disabled: true,
     execute: async (client: Client) => {
 
         // Load Pull Resets

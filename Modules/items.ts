@@ -4491,14 +4491,14 @@ export const items = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (target === myStats) {
                     myStats.maxhp += Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.03, 0.04, 0.05, 0.05, 0.05][level - 1]));
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]));
                     return true;
                 };
             },
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After the wearer's shield breaks, raises their own max HP by **${[4, 4, 5, 5, 5][level - 1]}%** and heals **${[3, 4, 5, 5, 5][level - 1]}%** of max HP up to **${[6, 7, 8, 9, 10][level - 1]}** times.`, "The Splintered Storm is a fierce-looking ring forged from jagged steel that reflects the chaos of tempestuous skies. Its surface is marked with grotesque shards and fragments like shattered glass, each pulsating with a crackling energy that hints at dormant power. At its top peaks a gleaming lightning-blue crystal, simulating a miniature storm trapped within. Wielders of this ring can harness the fury of lightning and wind, unleashing destructive magic upon their foes. Legends caution that this power comes at a price, as the energy can consume the unwary. Only true storm callers can master its wrath without being overwhelmed.", "mythical", 705),
+    }, (level) => `After the wearer's shield breaks, raises their own max HP by **${[4, 4, 5, 5, 5][level - 1]}%** and heals **${[4, 4, 5, 5, 5][level - 1]}%** of max HP up to **${[6, 7, 8, 9, 10][level - 1]}** times.`, "The Splintered Storm is a fierce-looking ring forged from jagged steel that reflects the chaos of tempestuous skies. Its surface is marked with grotesque shards and fragments like shattered glass, each pulsating with a crackling energy that hints at dormant power. At its top peaks a gleaming lightning-blue crystal, simulating a miniature storm trapped within. Wielders of this ring can harness the fury of lightning and wind, unleashing destructive magic upon their foes. Legends caution that this power comes at a price, as the energy can consume the unwary. Only true storm callers can master its wrath without being overwhelmed.", "mythical", 705),
     new ringInfo("Runekeeper's Seal", "ring", "ring", ["raid"], "<:runekeepers_seal:1334172293655560245>", "https://i.ibb.co/0H1hKV6/Runekeeper-s-Seal.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* ShieldMan
 
         // every 7/7/7/6/6/6/5/5/5 rounds: +1/1.5/2/2/2.5/3/3/3.5/4% max HP as shield

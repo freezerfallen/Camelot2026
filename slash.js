@@ -271,17 +271,17 @@ const commands = [
 			.setDescription('See all your timers at once')
 			.addUserOption(option => option.setName('user').setDescription('See someone else\'s cooldown')),
 	}.data.toJSON(),
-	{ // celebrate: Claim your daily anniversary reward! 🎂 🎉
-		// trick-or-treat: Trick, or treat? 👻 🍬
-		// christmas-present: Unwrap a festive surprise! 🎄 🎁
-		// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
-		// egg-hunt: See what you find! 🧺 🐰
-		data: new SlashCommandBuilder()
-			.setName('christmas-present')
-			.setDescription('Unwrap a festive surprise! 🎄 🎁')
-		// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
-		// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
-	}.data.toJSON(),
+	// { // celebrate: Claim your daily anniversary reward! 🎂 🎉
+	// 	// trick-or-treat: Trick, or treat? 👻 🍬
+	// 	// christmas-present: Unwrap a festive surprise! 🎄 🎁
+	// 	// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
+	// 	// egg-hunt: See what you find! 🧺 🐰
+	// 	data: new SlashCommandBuilder()
+	// 		.setName('christmas-present')
+	// 		.setDescription('Unwrap a festive surprise! 🎄 🎁')
+	// 	// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
+	// 	// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
+	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('changeimg')
@@ -289,12 +289,12 @@ const commands = [
 			.addStringOption(option => option.setName('character').setDescription('select a character').setRequired(true))
 			.addStringOption(option => option.setName('image-url').setDescription('Has to be an imgur.com or imgBB.com link | type reset to remove a character\'s image instead').setRequired(true))
 	}.data.toJSON(),
-	{
-		data: new SlashCommandBuilder()
-			.setName('christmas')
-			.setDescription('christmas craze')
-			.addSubcommand((subcommand) => subcommand.setName('craze').setDescription('Scrap everything you knew, it\'s getting crazy'))
-	}.data.toJSON(),
+	// {
+	// 	data: new SlashCommandBuilder()
+	// 		.setName('christmas')
+	// 		.setDescription('christmas craze')
+	// 		.addSubcommand((subcommand) => subcommand.setName('craze').setDescription('Scrap everything you knew, it\'s getting crazy'))
+	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('class')
@@ -594,6 +594,7 @@ const commands = [
 						.addChoices(
 							{ name: 'Last Online', value: 'online' },
 							{ name: 'Weekly Donations', value: 'donations_weekly' },
+							{ name: 'Exam Rank', value: 'rank' },
 							{ name: 'User ID', value: 'id' },
 						)
 				)
@@ -613,6 +614,7 @@ const commands = [
 							{ name: 'Tax Rate', value: 'tax' },
 							{ name: 'Join Settings', value: 'canjoin' },
 							{ name: 'Change Join Code', value: 'changecode' },
+							{ name: 'Reset Perks', value: 'resetperks' },
 						)
 				)
 				.addStringOption(option => option.setName('input').setDescription('setting').setRequired(true)))

@@ -6,7 +6,12 @@ import { Webhook } from '@top-gg/sdk';
 import { dailies } from "../Modules/dailyQuests";
 import { getUserSchema, loadVoteReminders, updateUsers } from '../Modules/queries';
 
-const reminderMessage = "You're off cooldown!\nYou can vote again at <https://rank.top/bot/camelot/vote>\nYou are receiving this message because you enabled vote reminders. Use `/reminder` if you want to turn it off again.";
+const reminderMessage =
+    `You're off cooldown!\n` +
+    `You can vote again at <https://rank.top/bot/camelot/vote>\n` +
+    `Voting rewards include **1x** pull reset, **3x** gems <:genesis_gems:1034179687720681492> and **3x** lootboxes containing coins <:coins:872926669055356939>, shards <:ss_shard:917203009543503892> and tickets <:ss_ticket:927503239396622336>\n` +
+    `\n` +
+    `-# You can use \`/reminder\` to disable vote reminders`;
 
 const handler: BotHandler = {
     name: "Vote",
@@ -18,12 +23,13 @@ const handler: BotHandler = {
 
         const webhook = new Webhook(config.topgg.auth);
 
+        // Top.gg Webhook
         app.post('/dblwebhook', webhook.listener(async (vote) => {
             // Update users table
             await updateUsers(vote.user, {
                 pullresets: { type: "increment", value: 1 },
                 votestotal: { type: "increment", value: 1 },
-                lootbox: { type: "increment", value: 1 },
+                lootbox: { type: "increment", value: 3 },
                 gems: { type: "increment", value: 3 },
                 lastvote: { type: "set", value: new Date() },
             });
@@ -40,6 +46,8 @@ const handler: BotHandler = {
             // Daily Quest
             dailies[10].update(undefined, 1, { id: vote.user }); // Knight's Ballot
         }));
+
+        // Listen for Webhooks
         app.listen(3000);
 
         // Rank.top Webhook
@@ -54,7 +62,7 @@ const handler: BotHandler = {
             await updateUsers(vote.user_id, {
                 pullresets: { type: "increment", value: 1 },
                 votestotal: { type: "increment", value: 1 },
-                lootbox: { type: "increment", value: 1 },
+                lootbox: { type: "increment", value: 3 },
                 gems: { type: "increment", value: 3 },
                 lastvote: { type: "set", value: new Date() },
             });
@@ -67,6 +75,9 @@ const handler: BotHandler = {
                     if (dmUser) dmUser.send(reminderMessage);
                 }, 12 * 60 * 60 * 1000);
             };
+
+            // Daily Quest
+            dailies[10].update(undefined, 1, { id: vote.user_id }); // Knight's Ballot
         });
 
         // Reload active vote reminders after bot restart

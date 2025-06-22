@@ -3,7 +3,7 @@ import { dailies } from "../Modules/dailyQuests";
 import { showPage, searchGuild, getDonationsPageWeek, lastActive, formatNumberWithQuotes, customEmojis, getLetterRank } from "../Modules/functions";
 import { PageRow, OfferRow, donationWeekStart } from "../Modules/components";
 import { GuildSchema, SlashCommand } from "../types";
-import { addGuildDonation, deleteGuild, getGuildDonationSchemas, getGuildSchema, getGuildSchemas, getUserSchema, getUserSchemas, insertNewGuild, updateGuildDonationsGuildId, updateGuilds, updateUsers } from "../Modules/queries";
+import { addGuildDonation, deleteGuild, getGuildDonationSchemas, getGuildSchema, getGuildSchemas, getUserSchema, getUserSchemas, insertNewGuild, updateGuildDonationsGuildId, updateGuilds, updateRaidsGuildId, updateUsers } from "../Modules/queries";
 import { achievements } from "../Modules/achievements";
 
 function lastActiveInDays(timestamp: Date | number) {
@@ -96,6 +96,8 @@ const exportCommand: SlashCommand = {
                 };
 
                 detailsTab = { name: `Donations ${startDateString} - ${endDateString}`, value: `${members.map((e) => `__${e.donated}__ <:coins:872926669055356939>`).join("\n")}`, inline: true };
+            } else if (details === "rank") {
+                detailsTab = { name: "Exam Rank", value: `${members.map((e) => `__${getLetterRank(e.rankscore)}__`).join("\n")}`, inline: true };
             } else if (details === "id") {
                 detailsTab = { name: "User ID", value: `${members.map((e) => `__${e.id}__`).join("\n")}`, inline: true };
             } else {
@@ -295,11 +297,38 @@ const exportCommand: SlashCommand = {
                         guild: { type: "set", value: input },
                     });
 
+                    // Update raids table
+                    await updateRaidsGuildId(guild.id, input);
+
                     return interaction.reply(`Changed join code to **${input}**`);
                 } catch {
                     return interaction.reply(`The join code **${input}** already exists, please choose another one.`);
                 };
             };
+
+            if (setting === "resetperks") {
+                const gemCost = 300;
+
+                if (guild.treasury_gems < gemCost) return interaction.reply(`**${guild.name}** needs **${gemCost}**<:genesis_gems:1034179687720681492> to reset its perks.`);
+                if (input.toLowerCase() !== "confirm") return interaction.reply(`Please input "\`confirm\`" to reset your guild's perks for **${gemCost}**<:genesis_gems:1034179687720681492>`);
+
+                const sumOfTokens = guild.lootbuff + guild.xpbuff + guild.atkbuff + guild.hpbuff + guild.defbuff;
+                if (sumOfTokens === 0) return interaction.reply(`**${guild.name}** has no perks to reset.`);
+
+                // Update guilds table
+                await updateGuilds(guild.id, {
+                    treasury_gems: { type: "increment", value: -gemCost },
+                    lootbuff: { type: "set", value: 0 },
+                    xpbuff: { type: "set", value: 0 },
+                    atkbuff: { type: "set", value: 0 },
+                    hpbuff: { type: "set", value: 0 },
+                    defbuff: { type: "set", value: 0 },
+                    tokens: { type: "increment", value: sumOfTokens },
+                });
+
+                return interaction.reply(`Successfully reset your guild perks. Your guild tokens have been refunded.`);
+            };
+
         } else if (subcommand === "join") {
             const code = interaction.options.getString('code', true);
 

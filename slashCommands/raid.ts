@@ -20,7 +20,7 @@ import { skillTree } from '../Modules/skillTree';
 const dungeonInProgress = new Set();
 
 //! FOR THE BETA ONLY
-const DAILY_RAID_ATTEMPTS = 20 as const; // 4 attempts per day
+const DAILY_RAID_ATTEMPTS = 4 as const;
 //! FOR THE BETA ONLY
 
 function getRaidButtonRow(tab: string, canPlay: boolean, raidHasEnded: boolean): ActionRowBuilder<ButtonBuilder> {
@@ -138,7 +138,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
     function getDesc() {
         const raidRewards = currentlySelected !== undefined ? getRaidRewardPool(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp], 20, 1) : undefined;
         return `## Raid Selection\nPlease select a raid to tackle with your guild. You will have **5** days to complete it, with each of your members getting **4** attempts per day. Attempts can be stacked, so busy guild members can do all 20 on the last day if needed!` +
-            `\n\n**Selected Raid**: ${(currentlySelected !== undefined && raidRewards) ? `${raids[currentlySelected].name}\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}\n### Reward Pool:\n>>> -# **${formatNumberWithQuotes(raidRewards.coins)}x** <:coins:872926669055356939>\n-# **${formatNumberWithQuotes(raidRewards.guild_marks)}x** <:guild_mark:1317944450814840923>\n-# **${formatNumberWithQuotes(raidRewards.skill_points)}x** <:skill_point:1351505460301136014>\n-# **${formatNumberWithQuotes(raidRewards.glorious_chest)}x** <:glorious_chest:1069076067081539726>\n-# **${formatNumberWithQuotes(raidRewards.luxurious_chest)}x** <:luxurious_chest:1069300112364404817>\n-# **${formatNumberWithQuotes(raidRewards.royal_chest)}x** <:royal_chest:1069301128711376976>${raidRewards.deluxe_chest > 0 ? `\n-# **${formatNumberWithQuotes(raidRewards.deluxe_chest)}x** <:deluxe_chest:1069301259603026061>` : ""}\n-# **${formatNumberWithQuotes(raidRewards.featured_ring)}x** ${raids[currentlySelected ?? 0].loot.map((e) => items[e].emoji).join(" | ")}` : "`None`"}`;
+            `\n\n**Selected Raid**: ${(currentlySelected !== undefined && raidRewards) ? `${raids[currentlySelected].name} (${raids[currentlySelected].phasesTotal} ${raids[currentlySelected].phasesTotal === 1 ? "phase" : "phases"})\n**Total HP**: ${formatNumberWithQuotes(raids[currentlySelected].getTotalRankHp(raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]))} <:HP:1062043800979116143>\n**Recommended Rank**: ${raidRankLetters[raids[currentlySelected].rankValue + currentRankUp]}\n### Reward Pool:\n>>> -# **${formatNumberWithQuotes(raidRewards.coins)}x** <:coins:872926669055356939>\n-# **${formatNumberWithQuotes(raidRewards.guild_marks)}x** <:guild_mark:1317944450814840923>\n-# **${formatNumberWithQuotes(raidRewards.skill_points)}x** <:skill_point:1351505460301136014>\n-# **${formatNumberWithQuotes(raidRewards.glorious_chest)}x** <:glorious_chest:1069076067081539726>\n-# **${formatNumberWithQuotes(raidRewards.luxurious_chest)}x** <:luxurious_chest:1069300112364404817>\n-# **${formatNumberWithQuotes(raidRewards.royal_chest)}x** <:royal_chest:1069301128711376976>${raidRewards.deluxe_chest > 0 ? `\n-# **${formatNumberWithQuotes(raidRewards.deluxe_chest)}x** <:deluxe_chest:1069301259603026061>` : ""}\n-# **${formatNumberWithQuotes(raidRewards.featured_ring)}x** ${raids[currentlySelected ?? 0].loot.map((e) => items[e].emoji).join(" | ")}` : "`None`"}`;
     };
 
     const Embed = new EmbedBuilder()
@@ -220,7 +220,7 @@ function rankupOverview(interaction: ChatInputCommandInteraction, stats: Compact
         let tab: "overview" | "ranking" = "overview";
 
         const attemptsUsed = raid.participation[interaction.user.id]?.[1] ?? 0;
-        const attemptsTotal = (Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
+        const attemptsTotal = Math.min(5, Math.floor((Date.now() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1) * DAILY_RAID_ATTEMPTS;
 
         const attemptsLeft = attemptsTotal - attemptsUsed;
 
@@ -588,6 +588,9 @@ const exportCommand: SlashCommand = {
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots, stats.equipment.ring1, stats.equipment.ring2, stats.equipment.ring3]);
         const userItems = myWeapons.map((e) => items[e.itemid]);
 
+        //* Use max class level
+        stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
+
         // Overview
         let start = await rankupOverview(interaction, stats, guild, raid, userItems);
         if (start === -1) return;
@@ -748,7 +751,7 @@ const exportCommand: SlashCommand = {
             if (raidCheck && raidCheck.enemy_hp <= 0) {
                 const nextPhase = raids[raidCheck.raidid].nextPhase;
                 if (nextPhase) {
-                    await updateRaidPhase(raidCheck.rowid, nextPhase, 1240800);
+                    await updateRaidPhase(raidCheck.rowid, nextPhase, raids[nextPhase].getRankHp(raidCheck.rank_letter));
                 } else {
                     endRaid(raidCheck.rowid);
                 };
