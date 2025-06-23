@@ -25,6 +25,14 @@ const handler: BotHandler = {
 
         // Top.gg Webhook
         app.post('/dblwebhook', webhook.listener(async (vote) => {
+
+            // Get user schema
+            const stats = await getUserSchema(vote.user);
+            if (!stats) return;
+
+            // Return if lastvote has been less than 12h ago
+            if (stats.lastvote && ((Date.now() - new Date(stats.lastvote).getTime()) < 12 * 60 * 60 * 1000)) return;
+
             // Update users table
             await updateUsers(vote.user, {
                 pullresets: { type: "increment", value: 1 },
@@ -35,7 +43,6 @@ const handler: BotHandler = {
             });
 
             // Send reminder
-            const stats = await getUserSchema(vote.user);
             if (stats?.votereminder) {
                 setTimeout(async () => {
                     const dmUser = await client.users.fetch(vote.user);
@@ -58,6 +65,13 @@ const handler: BotHandler = {
             // Send a response back to acknowledge receipt
             res.status(200).send('received');
 
+            // Get user schema
+            const stats = await getUserSchema(vote.user_id);
+            if (!stats) return;
+
+            // Return if lastvote has been less than 12h ago
+            if (stats.lastvote && ((Date.now() - new Date(stats.lastvote).getTime()) < 12 * 60 * 60 * 1000)) return;
+
             // Update users table
             await updateUsers(vote.user_id, {
                 pullresets: { type: "increment", value: 1 },
@@ -68,7 +82,6 @@ const handler: BotHandler = {
             });
 
             // Send reminder
-            const stats = await getUserSchema(vote.user_id);
             if (stats?.votereminder) {
                 setTimeout(async () => {
                     const dmUser = await client.users.fetch(vote.user_id);

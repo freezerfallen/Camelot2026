@@ -1159,6 +1159,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('raid')
 			.setDescription('Raid overview')
+			.addBooleanOption(option => option.setName('test').setDescription('Do a test run').setRequired(false))
 		// .addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
 	}.data.toJSON(),
 	{

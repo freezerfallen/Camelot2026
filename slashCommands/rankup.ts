@@ -197,7 +197,7 @@ const exportCommand: SlashCommand = {
                 .setColor([0x6def83, 0xfac044, 0xff7d7d, 0x7c7c7c, 0xbbffff][threatLevel]) // Blue: 0x58b1ff
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Rank-Up Exam`)
-                .setDescription(`Results for **${myChar.name}**\n<a:arrow_green:916716811842621450> Score: ${formatNumberWithQuotes(score)}${score > stats.rankscore ? ` (New Record!)` : ""}\n<a:arrow_orange:916716747623641210> Rank: ${getLetterRank(score)}\n<a:arrow_red:916716702618767401> Damage: ${damageDealt}\n<a:arrow_red:916716702618767401> Scale: ${enemyScale.toFixed(2)}\n<a:arrow_red:916716702618767401> RF: ${roundWeight.toFixed(2)}`)
+                .setDescription(`Results for **${myChar.name}**\n<a:arrow_green:916716811842621450> Score: ${formatNumberWithQuotes(score)}${score > stats.rankscore ? ` (New Record!)` : ""}\n<a:arrow_orange:916716747623641210> Rank: ${getLetterRank(score)}\n<a:arrow_red:916716702618767401> Damage: ${damageDealt}`)
                 .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 

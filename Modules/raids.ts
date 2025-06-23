@@ -93,7 +93,7 @@ export default class RaidInfo {
 
         let nextPhase = this.nextPhase ? raids[this.nextPhase] : undefined;
         while (nextPhase) {
-            sum += nextPhase.getRankHp(nextPhase.rank);
+            sum += nextPhase.getRankHp(rank);
             nextPhase = nextPhase.nextPhase ? raids[nextPhase.nextPhase] : undefined;
         };
 

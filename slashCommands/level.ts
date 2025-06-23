@@ -2,6 +2,7 @@ import fs from 'fs';
 import { EmbedBuilder } from "discord.js";
 import { characters } from "../Modules/chars";
 import { SlashCommand } from '../types';
+import { getUserSchema } from '../Modules/queries';
 
 const exportCommand: SlashCommand = {
     name: 'level',
@@ -11,7 +12,8 @@ const exportCommand: SlashCommand = {
 
         const user = interaction.options.getUser('user') ?? interaction.user;
 
-        const stats = author.schema;
+        const stats = user.id === interaction.user.id ? author.schema : await getUserSchema(user.id);
+        if (!stats) return interaction.reply({ content: `**${user.username}** hasn't started playing yet.`, ephemeral: true });
 
         let xpr = stats.xp;
         let level = 0;
