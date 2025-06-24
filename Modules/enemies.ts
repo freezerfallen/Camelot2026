@@ -535,10 +535,10 @@ export const raidBosses: enemyInfo[] = [
 
                 // Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**
                 if (matchStats.currentOpponent === 1) {
-                    ebuff.atk.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.md.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.def.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.mr.push(new buffInfo("*", 0.01, 9999));
+                    ebuff.atk.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.md.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.def.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.mr.push(new buffInfo("*", 1.01, 9999));
                 };
 
                 return AbilityResponse.SUCCESS;
