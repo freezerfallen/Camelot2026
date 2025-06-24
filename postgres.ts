@@ -135,6 +135,7 @@ async function createTables() {
         skill_points INT DEFAULT 0 NOT NULL,
         raid_supports INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
         stamps INT DEFAULT 0 NOT NULL,
+        user_settings JSONB DEFAULT '{}' NOT NULL,
 
         -- Characters table columns
         chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
@@ -472,9 +473,11 @@ async function alterTables() {
 
     // add genesisdupepity INT DEFAULT 0 NOT NULL,
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS genesisdupepity INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS stamps INT DEFAULT 0 NOT NULL');
+    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS user_settings JSONB DEFAULT '{}' NOT NULL`);
 
     await query('ALTER TABLE users ALTER COLUMN votereminder SET DEFAULT 1');
+
+
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
     // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");

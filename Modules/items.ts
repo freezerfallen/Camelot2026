@@ -4801,15 +4801,15 @@ export const items = [
 
         // 10-40 rounds: +2% atk, +2% md, -1% br per round
         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            mybuff.atk.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.6));
-            mybuff.md.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.6));
-            mybuff.br.push(new buffInfo("*", 0.99, 9999, -0.01, "+", [0.7, 1]));
+            mybuff.atk.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.2));
+            mybuff.md.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.2));
+            mybuff.br.push(new buffInfo("*", 0.99, 9999, -0.01, "+", [0.9, 1]));
 
             return AbilityResponse.SUCCESS;
         }, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **30** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
+    }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **10** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
     new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.shadowPact = 0;

@@ -1440,6 +1440,21 @@ const commands = [
 	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('settings')
+			.setDescription('Change your settings')
+			.addStringOption(option =>
+				option.setName('setting')
+					.setDescription('Select a setting to change')
+					.setRequired(true)
+					.addChoices(
+						{ name: 'Use Compact Battle Embeds', value: 'compact_battle_embeds' },
+						{ name: 'Battle Log Length', value: 'battle_log_length' },
+					)
+			)
+			.addStringOption(option => option.setName('input').setDescription('Input value').setRequired(true))
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('shards')
 			.setDescription('See your shards')
 			.addUserOption(option => option.setName('user').setDescription('See someone else\'s shards')),
@@ -1548,7 +1563,8 @@ const commands = [
 						{ name: 'pulls', value: 'pulls' },
 						{ name: 'dungeon', value: 'dungeon' },
 						{ name: 'chars', value: 'chars' },
-						{ name: 'progress', value: 'progress' },
+						{ name: 'chars (unique)', value: 'uchars' },
+						{ name: 'chars (progress)', value: 'progress' },
 						{ name: 'anime', value: 'anime' },
 						{ name: 'lilies', value: 'lilies' },
 						{ name: 'achievements', value: 'achievements' },

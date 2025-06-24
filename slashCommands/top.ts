@@ -1,15 +1,15 @@
 import { EmbedBuilder, ComponentType, ButtonInteraction, Message } from "discord.js";
 import fs from 'fs';
-import { characters, auniq } from "../Modules/chars.js";
-import { userLevel, getClassLvl, showPage } from "../Modules/functions.js";
+import { auniq, characters } from "../Modules/chars.js";
+import { userLevel, getClassLvl, showPage, formatNumberWithQuotes } from "../Modules/functions.js";
 import { classes } from "../Modules/classes.js";
 import { PageRow } from "../Modules/components.js";
 import { SlashCommand, UserSchema } from "../types.js";
-import { getServerSchema, getUserRanking } from "../Modules/queries.js";
+import { getLatestStampede, getReferralLeaderboard, getServerSchema, getUserRanking } from "../Modules/queries.js";
 
 const exportCommand: SlashCommand = {
     name: 'top',
-    async execute({ interaction, author }) {
+    async execute({ interaction }) {
         if (!interaction.guild) return interaction.reply("Please use this command in a server!");
 
         const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
@@ -26,7 +26,7 @@ const exportCommand: SlashCommand = {
         const servers = await getServerSchema(interaction.guild.id);
         const user_ids = servers?.user_ids ?? [];
 
-        let stats: Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[] = [];
+        let stats: (Pick<UserSchema, "name" | "id" | "xp" | "coins" | "lilies" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin" | "battlechar" | "dungeon_classlevels" | "achievements" | "dungeon_floors" | "eventpts"> & { cl?: string; clvl?: number; anime?: number; stampede?: number; referral_count?: number; })[] = [];
         let count = 1, showUsers: string[] = [];
         switch (flag) {
             case "level":
@@ -45,61 +45,125 @@ const exportCommand: SlashCommand = {
                 stats = await getUserRanking(scope, user_ids, "uniqueChars");
                 stats = stats.filter((e) => !(e.id in blacklist));
                 showUsers = stats.map((e) => `${count++}) **${e.name}** - has **${[...new Set(e.chars)].length}** unique characters`); break;
-            // case "progress":
-            //     stats = await query(`SELECT users.name, users.id, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""}`);
-            //     stats.forEach((e) => e.chars = [...new Set(JSON.parse(e.chars))]);
-            //     stats.sort((a, b) => b.chars.length - a.chars.length);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - has completed **${Math.floor((e.chars.length / characters.length) * 1000) / 10}%**`); break;
-            // case "anime":
-            //     stats = await query(`SELECT users.name, users.id, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""}`);
-            //     const charsTotal = auniq.reduce((obj, e) => { return { ...obj, [e]: characters.filter((c) => c.anime === e).length }; }, {});
-            //     stats.forEach((e) => { e.chars = [...new Set(JSON.parse(e.chars))]; e.charsTotal = {}; e.chars.forEach((a) => e.charsTotal[characters[a].anime] = (e.charsTotal[characters[a].anime] || 0) + 1); e.anime = Object.keys(e.charsTotal).filter((a) => e.charsTotal[a] === charsTotal[a]).length; delete e.charsTotal; });
-            //     stats.sort((a, b) => b.anime - a.anime);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - has completed **${e.anime}** anime`); break;
-            // case "lilies":
-            //     stats = await query(`SELECT users.name, users.id, users.lilies, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""} ORDER BY users.lilies DESC`);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.lilies}** <:lilium:974057059618291732>`); break;
-            // case "achievements":
-            //     stats = await query(`SELECT users.name, users.id, users.achievements, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""}`);
-            //     stats.forEach((e) => e.achievements = JSON.parse(e.achievements).length);
-            //     stats.sort((a, b) => b.achievements - a.achievements);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - has completed **${e.achievements}** achievements`); break;
-            // case "dungeon":
-            //     stats = await query(`SELECT users.name, users.id, users.favchar, users.premium, characters.chars, characters.skin, dungeon.floors FROM users JOIN characters ON users.id = characters.id JOIN dungeon ON users.id = dungeon.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""} ORDER BY LENGTH(dungeon.floors) - LENGTH(REPLACE(dungeon.floors,',','')) DESC`);
-            //     stats.sort((a, b) => parseInt(b.floors.match(/"300":(\d+)/)?.[1], 10) - parseInt(a.floors.match(/"300":(\d+)/)?.[1], 10));
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - Floor **${e.floors.split(",").length === 300 ? `300** (${e.floors.match(/"300":(\d+)/)?.[1]} wins)` : e.floors.split(",").length + "**"}`); break;
-            // case "coins":
-            //     stats = await query(`SELECT users.name, users.id, users.coins, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""} ORDER BY users.coins DESC`);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.coins}** <:coins:872926669055356939>`); break;
-            // case "class":
-            //     stats = await query(`SELECT users.name, users.id, users.favchar, users.battlechar, users.premium, characters.chars, characters.skin, dungeon.classlevels FROM users JOIN characters ON users.id = characters.id JOIN dungeon ON users.id = dungeon.id WHERE LENGTH(dungeon.classlevels) > 2 ${scope === "server" ? `AND users.id IN (${servers.user_ids})` : ""}`);
-            //     stats.forEach((e) => [e.cl, e.clvl] = Object.entries(JSON.parse(e.classlevels)).reduce((max, curr) => curr[1] > max[1] ? curr : max, [-1, -Infinity]));
-            //     stats.sort((a, b) => b.clvl - a.clvl);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - Level **${getClassLvl(e.cl, JSON.parse(e.classlevels))}** ${classes[e.cl].emblem}`); break;
-            // case "stampede":
-            //     stats = await query(`SELECT users.name, users.id, users.coins, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id ${scope === "server" ? `WHERE users.id IN (${servers.user_ids})` : ""}`);
-            //     const { 0: stampede } = await query(`SELECT participation FROM stampedes ORDER BY rowid DESC LIMIT 1`);
-            //     stampede.participation = JSON.parse(stampede.participation);
-            //     stats.forEach((e) => e.stampede = stampede.participation[e.id]?.[0] ?? 0);
-            //     stats = stats.filter((e) => e.stampede);
-            //     stats.sort((a, b) => b.stampede - a.stampede);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.stampede}** damage`); break;
+            case "progress":
+                stats = await getUserRanking(scope, user_ids, "uniqueChars");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => {
+                    const uniqueChars = [...new Set(e.chars)].length;
+                    const progressPercentage = Math.floor((uniqueChars / characters.length) * 1000) / 10;
+                    return `${count++}) **${e.name}** - has completed **${progressPercentage}%**`;
+                });
+                break;
+            case "anime":
+                stats = await getUserRanking(scope, user_ids, "anime");
+                stats = stats.filter((e) => !(e.id in blacklist));
+
+                // Calculate completed anime count for each user
+                const charsTotal = auniq.reduce((obj, animeName) => {
+                    return { ...obj, [animeName]: characters.filter((c) => c.anime === animeName).length };
+                }, {} as Record<string, number>);
+
+                stats.forEach((user) => {
+                    const userChars = [...new Set(user.chars)]; // Get unique characters
+                    const charsPerAnime: Record<string, number> = {};
+
+                    // Count characters per anime for this user
+                    userChars.forEach((charId) => {
+                        const char = characters[charId];
+                        if (char) {
+                            charsPerAnime[char.anime] = (charsPerAnime[char.anime] || 0) + 1;
+                        }
+                    });
+
+                    // Count completed anime (user has all characters from that anime)
+                    user.anime = Object.keys(charsPerAnime).filter((animeName) =>
+                        charsPerAnime[animeName] === charsTotal[animeName]
+                    ).length;
+                });
+
+                // Sort by completed anime count
+                stats.sort((a, b) => (b.anime || 0) - (a.anime || 0));
+                stats = stats.filter((e) => e.anime && e.anime !== 0);
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - has completed **${e.anime || 0}** anime`);
+                break;
+            case "lilies":
+                stats = await getUserRanking(scope, user_ids, "lilies");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.lilies}** <:lilium:974057059618291732>`); break;
+            case "achievements":
+                stats = await getUserRanking(scope, user_ids, "achievements");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - has completed **${e.achievements.length}** achievements`); break;
+            case "dungeon":
+                stats = await getUserRanking(scope, user_ids, "dungeon");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => {
+                    const floorKeys = Object.keys(e.dungeon_floors);
+                    const maxFloor = floorKeys.length > 0 ? Math.max(...floorKeys.map(Number)) : 1;
+                    const floor300Wins = e.dungeon_floors['300'];
+
+                    if (maxFloor === 300 && floor300Wins) {
+                        return `${count++}) **${e.name}** - Floor **300** (${formatNumberWithQuotes(floor300Wins)} wins)`;
+                    } else {
+                        return `${count++}) **${e.name}** - Floor **${maxFloor}**`;
+                    };
+                });
+                break;
+            case "coins":
+                stats = await getUserRanking(scope, user_ids, "coins");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.coins}** <:coins:872926669055356939>`); break;
+            case "class":
+                stats = await getUserRanking(scope, user_ids, "class");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - Level **${getClassLvl(parseInt(e.cl!), e.dungeon_classlevels)}** ${classes[parseInt(e.cl!)].emblem}`); break;
+            case "stampede":
+                const stampedeData = await getLatestStampede();
+                if (!stampedeData) {
+                    return interaction.editReply("No stampede data available");
+                };
+
+                stats = await getUserRanking(scope, user_ids, "stampede");
+                stats.forEach((user) => {
+                    user.stampede = stampedeData.participation[user.id]?.[0] ?? 0;
+                });
+
+                // Filter out users with no stampede damage and sort by damage
+                stats = stats.filter((e) => e.stampede && e.stampede > 0);
+                stats.sort((a, b) => (b.stampede || 0) - (a.stampede || 0));
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - **${formatNumberWithQuotes(e.stampede || 0)}** damage`);
+                break;
             // case "referrals":
-            //     stats = await query(`SELECT referrers.name, referrers.id, COUNT(DISTINCT referred.id) as referral_count, referrers.favchar, referrers.premium, characters.chars, characters.skin FROM users as referrers LEFT JOIN users as referred ON referrers.id = referred.referred_by LEFT JOIN characters ON referrers.id = characters.id WHERE referred.referred_by IS NOT NULL ${scope === "server" ? `AND referred.id IN (${servers.user_ids})` : ""} GROUP BY referrers.id ORDER BY referral_count DESC`);
+            //     const referralData = await getReferralLeaderboard("alltime");
+            //     const referralMap = referralData.reduce((map, item) => {
+            //         map[item.referred_by] = parseInt(item.referral_count);
+            //         return map;
+            //     }, {} as Record<string, number>);
+
+            //     stats = await getUserRanking(scope, user_ids, "referrals");
+            //     stats.forEach((user) => {
+            //         user.referral_count = referralMap[user.id] || 0;
+            //     });
+
+            //     // Filter out users with no referrals and sort by referral count
+            //     stats = stats.filter((e) => e.referral_count && e.referral_count > 0);
+            //     stats.sort((a, b) => (b.referral_count || 0) - (a.referral_count || 0));
+
+            //     // Apply scope filtering for referrals
+            //     if (scope === "server") {
+            //         // For server scope, only count referrals where the referred user is in the server
+            //         const serverReferralData = await getReferralLeaderboard("alltime");
+            //         // This would need additional filtering logic, but for now we'll use the global data
+            //     };
+
             //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.referral_count}** referrals`); break;
-            // case "event":
-            //     stats = await query(`SELECT users.name, users.id, users.eventpts, users.favchar, users.premium, characters.chars, characters.skin FROM users JOIN characters ON users.id = characters.id WHERE${scope === "server" ? ` users.id IN (${servers.user_ids}) AND` : ""} users.eventpts > 0 ORDER BY users.eventpts DESC`);
-            //     stats = stats.filter((e) => !(e.id in blacklist));
-            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.eventpts}** 🍫`); break;
+            //     showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.referral_count || 0}** referrals`);
+            //     break;
+            case "event":
+                stats = await getUserRanking(scope, user_ids, "event");
+                stats = stats.filter((e) => !(e.id in blacklist));
+                showUsers = stats.map((e) => `${count++}) **${e.name}** - **${e.eventpts}** 🍫`); break;
             default: return interaction.editReply(`${flag} leaderboard is currently not available`);
         };
 
