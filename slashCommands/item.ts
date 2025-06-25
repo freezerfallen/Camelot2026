@@ -656,6 +656,17 @@ const exportCommand: SlashCommand = {
                     continue;
                 };
 
+                // Dalus/Kisogi's shell
+                if (["broken shell", "remove shell"].includes(itemChoice.toLowerCase())) {
+                    if (itemChoice.toLowerCase() === "remove shell") delete stats.equipment["shell"];
+                    else stats.equipment["shell"] = "broken";
+
+                    if (itemChoice.toLowerCase() === "remove shell") equipped.push("Unequipped Broken Shell");
+                    else equipped.push(`**__Broken Shell__** <:brokenshell:1387074948815781918>`);
+
+                    continue;
+                };
+
                 const item = await getWeaponSchema(`${itemChoice}:${interaction.user.id}`);
                 if (!item) {
                     const fItem = searchItem(itemChoice, interaction);
