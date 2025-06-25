@@ -1992,6 +1992,127 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
+    //"10528": {
+    //    usage: 9999,
+    //    used: 0,
+    //    cost: 0,
+    //    pause: 0,
+    //    desc: "**Total Usage**: `1 + Unlimited (CD: 5)`\n**Cost**: `50% HP, and 5% current HP per turn | 20% HP`\n**Timeout**: `No`\n**Role**: `DPS`\n\n*Knock knock~ are you seeking eternal slumber?*\nDalus has **2** states : PAST & PRIME. He may equip “Broken shell” to convert to his PAST state, else he always fights in his PRIME state. To equip the shell, do `/item equip item:broken shell`. To remove the shell, do `/item equip item:remove shell`\n\nWhen Dalus is in his PRIME state, his active has enhanced effects, but is faced by Kisogi’s intervention every **3rd** turn, reminding the target of dreams lost on their way, eager to find the way out. This strengthens them by boosting their ATK & MD by **2.5%**, and mana regen by **1** 💦.\n\n*The show… must go on. Graceful with impish glee.*\n\nHe evades the **1st** lethal hit (stackable), and afterwards, immediately gains a shield with **100%** of his max HP before setting his max HP to **1**. For the next **5** turns, his mana regeneration is boosted by **20** 💦.\n\n*A sharp blade pierces through the blossoming rose, delivering the anguish of a hunter. [Rosie], Dalus’ trusted nightmare emerges to drag the enemy into his carnival of nightmares for the rest of the fight*.\nDalus will now expend **all** mana at the start of every turn, gaining a **1**/**2%** ATK increase for every **1** 💧consumed (Up to 25 💧), lasting for that turn.\n\nFollowing the mana consumption, [Rosie] tears open the enemy’s mental lines of weakness, dealing **10%** of their max hp (capped at **20**/**30%** of Dalus ATK) as undodgeable absolute DMG (Ignores all DEF/MR). Overflowing damage exceeding cap will instead be converted into HP for Dalus, up to **9**/**15%** of his max HP.\n\nIf he is in his PRIME state, he may use his ability again with no timeout, sacrificing **20%** of his current HP before boosting his mana regeneration by **20** 💦 for the next **3** turns.\n\nWhen in a party, Dalus casts a nightmare on both the ally and the enemy, decreasing their DEF/MR by **20%** and summoning [Rosie] every turn, dealing **10%** undodgeable ATK to the enemy as absolute DMG.\n\nIf Kisogi is in the party, the nightmare is resolved, disabling the previous party effect. Now, the ally will deal **15%** ATK as absolute DMG with **100%** critical rate to the enemy every round.",
+    //    shortdesc: "Uses: `1 + Unlimited (CD: 5)`\nCost: `50% HP, 5% current hp per round | 20% HP`\nTimeout: `No`\nTags: `DPS (Mana burn, Absolute DMG, Burst survival)`\n\n__**Passive**__:\n- Dalus has **2** states : PAST & PRIME.\n- To equip the shell, do `/item equip item:broken shell` (PAST state)\n- To remove the shell, do `/item equip item:remove shell` (PRIME state)\n\nIf in PRIME state:\n- Enhances active (✨) effects\n- Faced by Kisogi’s intervention every **3rd** turn (boosting enemy’s ATK & MD by **2.5%** & mana regen by **1** 💦)\n\n”Impish Glee”:\n- Evades the **1st** lethal hit (stackable)\n- Afterwards, immediately gains a shield with **100%** of his max HP before setting his max HP to **1**\n- For the next **5** turns: Mana regeneration **+20** 💦.\n\n__**Active**__ (✨):\n- Summons [Rosie] for the rest of the fight.\n- Will now expend all mana at the start of every round\n- In return gain a **1**/**2%** ATK increase for every **1** 💧consumed (Up to 25💧), lasting for that round.\n\n- Following the mana consumption, [Rosie] deals **10%** of their max HP (capped at 20/30% of Dalus ATK) as absolute DMG (Ignores all DEF/MR).\n- Overflowing damage exceeding cap will instead be converted into HP for Dalus, up to **9**/**15%** of his max HP.\n\nIf he is in his PRIME state:\n- May use his ability again with no timeout\n- Sacrifices **20%** of his current HP\n- Mana regeneration **+20** 💦 for the next **3** rounds\n\n__**Party Ability**__ (👥):\n- **-20%** DEF & MR for both ally & enemy\n- Summons [Rosie] every turn: Deals **10%** ATK to the enemy as undodgeable absolute DMG.\n\nIf Kisogi is in the party: previous party effect disabled. Instead:\n- The ally will deal **15%** ATK to the enemy as undodgeable absolute dmg with **100%** critical rate every round.",
+    //    ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //        // Dalus
+    //        matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //
+    //        // Active (I)
+    //        if (this.used === 1) {
+    //            // Lose 50% current HP instantly & 5% current HP every round
+    //            myStats.hp -= Math.floor(myStats.hp * 0.5);
+    //            mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * 0.05), 9999));
+    //            notice.push(`\n<:dalusrose:1387007950601719908> Dalus summoned **Rosie** for the rest of the fight`);
+    //
+    //                // Permanent mana loss & dmg boost effect
+    //                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                // Gain 1/2% ATK for every 1 💧consumed
+    //                const atkScale = myStats.dalusPrime ? 0.02 : 0.01;
+    //                const atkBuff = Math.floor(myStats.atk * Math.min(myStats.sm, 25) * atkScale);
+    //                myStats.atk += atkBuff;
+    //                myStats.sm -= Math.min(myStats.sm, 25);
+    //
+    //                // Lines of weakness + Heal
+    //                const dmgLimit = myStats.dalusPrime ? 0.3 : 0.2
+    //                const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(Math.min(eStats.maxhp * 0.1, dmgLimit)) : 0;
+    //                // Overflow?
+    //                if (dmg > dmgLimit) {
+    //                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(dmg - dmgLimit, myStats.maxhp * myStats.dalusPrime ? 0.15 : 0.9)), {});
+    //                };
+    //                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:rosie:1387006066566627328> **Rosie**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+    //
+    //                return AbilityResponse.SUCCESS;
+    //            }, 9999));
+    //        } else {
+    //            // Active (II)
+    //            // 5 round cd
+    //            if (this.pause > matchStats.round) {
+    //                matchStats.interaction.followUp({ content: `**Dalus** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //                this.used--;
+    //                return AbilityResponse.FAILURE;
+    //            } else {
+    //                myStats.hp -= Math.floor(myStats.hp * 0.2);
+    //                this.pause = matchStats.round + 5;
+    //                mybuff.mg.push(new buffInfo("+", 20, 4));
+    //                notice.push("\n✨ **Dalus** further increased their mana regeneration by **20** 💦");
+    //            };
+    //        };
+    //        return AbilityResponse.SUCCESS;
+    //    },
+    //    passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //        myStats.dalusPrime = (myStats.shell === "broken") ? false : true; // false = Past, true = Prime
+    //        const msg = (myStats.shell === "broken") ? `\n<:brokenshell:1387074948815781918> **${char.name}** decides to hold onto the last bit of memories left...` : `\n<:dalusrose:1387007950601719908> The nightmare has given an impetus to **${char.name}**. Havok shall wreck.`;
+    //        notice.push(msg);
+    //        myStats.evadeDeathStrike ??= 0;
+    //        myStats.evadeDeathChance ??= 0;
+    //        
+    //        myStats.evadeDeathStrike += 1;
+    //        myStats.evadeDeathChance += 1;
+    //
+    //        // Burst shield gain and stuff upon first death evasion
+    //            matchStats.on("deathEvade", {
+    //                maxUsage: 1,
+    //                callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+    //                    if (caster == myStats) {
+    //                        const shgain = myStats.maxhp
+    //                        myStats.shield += myStats.maxhp;
+    //                            myStatsFixed.maxhp = 1;
+    //                        myStatsFixed.hp = 1;
+    //                        myStats.maxhp = 1;
+    //                        mybuff.mg.push(new buffInfo("+", 20, 5));
+    //                        notice.push(`\n<:dalusrose:1387007950601719908> The show must... go on. **Dalus** gained a **${shgain}** HP shield`);
+    //                        return AbilityResponse.SUCCESS;
+    //                    };
+    //                }
+    //            });
+    //        if (myStats.dalusPrime) {
+    //            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                if (matchStats.round % 3 === 0) {
+    //                    // Restart by Kisogi
+    //                    const buffScale = 0.025;
+    //                    eStats.atk += Math.floor(eStats.atk * buffScale);
+    //                    eStats.md += Math.floor(eStats.md * buffScale);
+    //                    ebuff.mg.push(new buffInfo("+", 1, 9999));
+    //                    ebuff.atk.push(new buffInfo("+", Math.floor(eStats.atk * buffScale), 9999));
+    //                    ebuff.md.push(new buffInfo("+", Math.floor(eStats.md * buffScale), 9999));
+    //                };
+    //               return AbilityResponse.SUCCESS;
+    //            }, 9999));
+    //        }
+    //        return AbilityResponse.SUCCESS;
+    //    },
+    //    party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //        const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
+    //           const dmgScale = names.includes("Kisogi") ? 0.15 : 0.1;
+    //        const critChance = names.includes("Kisogi") ? 1 : Math.random();
+    //        const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.atk * dmgScale) : 0;
+    //        const desc = names.includes("Kisogi") ? `<:rosie:1387006066566627328> **Rosie**` : `**✨ Kisogi**;`;
+    //        // Dalus unique effects
+    //        if (!names.includes("Kisogi")) {
+    //            eStats.def -= Math.floor(eStats.def * 0.2);
+    //            myStats.def -= Math.floor(myStats.def * 0.2);
+    //            ebuff.def.push(new buffInfo("+", -eStats.def * 0.2, 9999));
+    //            mybuff.def.push(new buffInfo("+", -myStats.def * 0.2, 9999));
+    //        };
+    //        
+    //        // Common DMG
+    //        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, desc, { overwriteDamage: dmg, magicDamage: true, dodge: false, critChance: critChance });
+    //            
+    //        // Permanent effects
+    //        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, desc, { overwriteDamage: dmg, magicDamage: true, dodge: false, critChance: critChance });
+    //            
+    //            return AbilityResponse.SUCCESS;
+    //        }, 9999));
+    //        return AbilityResponse.SUCCESS;
+    //    },
+    //},
     "12093": {
         usage: 3,
         used: 0,
