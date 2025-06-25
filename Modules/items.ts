@@ -1,5 +1,5 @@
 import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
-import { ButtonBuilder, ButtonStyle, ActionRowBuilder, managerToFetchingStrategyOptions } from "discord.js";
+import { ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
