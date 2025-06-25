@@ -75,7 +75,7 @@ const handler: BotHandler = {
                 const mail = { "type": "9", "rewards": `gems|${Math.floor(0.2 * jades)}`, "message": `Hey <@${stats.referred_by}>! <:MashaWave:928370055354400799>\nA player you have referred has bought some jades, here is your reward <:TohruPoint:928370972132782090>\nThank you for playing <:LoveHeart:928369932683595827>`, "date": Date.now() };
 
                 // Update users table
-                await updateUsers(donation.buyer_id, {
+                await updateUsers(stats.referred_by, {
                     referred_gems: { type: "increment", value: Math.floor(0.2 * jades) },
                     mailbox: { type: "append", value: [mail] },
                 });

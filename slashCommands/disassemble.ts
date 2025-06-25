@@ -10,8 +10,8 @@ const exportCommand: SlashCommand = {
     name: 'disassemble',
     async execute({ interaction, author }) {
 
-        const choice = [...new Set((interaction.options.getString('items') || "").split(",").map((e) => e.trim()))];
-        const exclude = [...new Set((interaction.options.getString('exclude') || "").split(",").map((e) => e.trim()))];
+        const choice = [...new Set((interaction.options.getString('items') || "").split(",").map((e) => e.trim()))].filter(Boolean);
+        const exclude = [...new Set((interaction.options.getString('exclude') || "").split(",").map((e) => e.trim()))].filter(Boolean);
         const sellGrade = interaction.options.getString('grade') || false;
         const sellType = interaction.options.getString('type') || false;
         const sellDupes = interaction.options.getBoolean('dupes') || false;
@@ -23,6 +23,13 @@ const exportCommand: SlashCommand = {
             userItems.sort((a, b) => items[a.itemid].name.localeCompare(items[b.itemid].name) || a.level - b.level);
             let len = userItems.length;
             while (len--) {
+                // Exclude rings
+                if (items[userItems[len - 1]?.itemid]?.category === "ring") {
+                    exclude.push(userItems[len].uniqueid.split(":")[0]);
+                    continue;
+                };
+
+                // Exclude dupes
                 if (items[userItems[len - 1]?.itemid]?.name === items[userItems[len].itemid].name) {
                     exclude.push(userItems[len--].uniqueid.split(":")[0]);
                     while (items[userItems[len - 1]?.itemid]?.name === items[userItems[len].itemid].name) len--;

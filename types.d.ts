@@ -406,6 +406,7 @@ export interface UserSchema {
     skill_tree: Record<string, number>;
     skill_points: number;
     raid_supports: number[];
+    user_settings: Record<string, any>;
     created: Date;
 
     chars: number[];

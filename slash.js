@@ -119,6 +119,7 @@ const commands = [
 						{ name: 'eternal jade', value: "jades" },
 						{ name: 'lilies', value: "lilies" },
 						{ name: 'guild marks', value: "guild_marks" },
+						{ name: 'stamps', value: "stamps" },
 					)
 			)
 			.addUserOption(option => option.setName('user').setDescription('Select a user').setRequired(false))
@@ -270,17 +271,17 @@ const commands = [
 			.setDescription('See all your timers at once')
 			.addUserOption(option => option.setName('user').setDescription('See someone else\'s cooldown')),
 	}.data.toJSON(),
-	{ // celebrate: Claim your daily anniversary reward! 🎂 🎉
-		// trick-or-treat: Trick, or treat? 👻 🍬
-		// christmas-present: Unwrap a festive surprise! 🎄 🎁
-		// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
-		// egg-hunt: See what you find! 🧺 🐰
-		data: new SlashCommandBuilder()
-			.setName('christmas-present')
-			.setDescription('Unwrap a festive surprise! 🎄 🎁')
-		// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
-		// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
-	}.data.toJSON(),
+	// { // celebrate: Claim your daily anniversary reward! 🎂 🎉
+	// 	// trick-or-treat: Trick, or treat? 👻 🍬
+	// 	// christmas-present: Unwrap a festive surprise! 🎄 🎁
+	// 	// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
+	// 	// egg-hunt: See what you find! 🧺 🐰
+	// 	data: new SlashCommandBuilder()
+	// 		.setName('christmas-present')
+	// 		.setDescription('Unwrap a festive surprise! 🎄 🎁')
+	// 	// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
+	// 	// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
+	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('changeimg')
@@ -288,12 +289,12 @@ const commands = [
 			.addStringOption(option => option.setName('character').setDescription('select a character').setRequired(true))
 			.addStringOption(option => option.setName('image-url').setDescription('Has to be an imgur.com or imgBB.com link | type reset to remove a character\'s image instead').setRequired(true))
 	}.data.toJSON(),
-	{
-		data: new SlashCommandBuilder()
-			.setName('christmas')
-			.setDescription('christmas craze')
-			.addSubcommand((subcommand) => subcommand.setName('craze').setDescription('Scrap everything you knew, it\'s getting crazy'))
-	}.data.toJSON(),
+	// {
+	// 	data: new SlashCommandBuilder()
+	// 		.setName('christmas')
+	// 		.setDescription('christmas craze')
+	// 		.addSubcommand((subcommand) => subcommand.setName('craze').setDescription('Scrap everything you knew, it\'s getting crazy'))
+	// }.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('class')
@@ -593,6 +594,7 @@ const commands = [
 						.addChoices(
 							{ name: 'Last Online', value: 'online' },
 							{ name: 'Weekly Donations', value: 'donations_weekly' },
+							{ name: 'Exam Rank', value: 'rank' },
 							{ name: 'User ID', value: 'id' },
 						)
 				)
@@ -612,6 +614,7 @@ const commands = [
 							{ name: 'Tax Rate', value: 'tax' },
 							{ name: 'Join Settings', value: 'canjoin' },
 							{ name: 'Change Join Code', value: 'changecode' },
+							{ name: 'Reset Perks', value: 'resetperks' },
 						)
 				)
 				.addStringOption(option => option.setName('input').setDescription('setting').setRequired(true)))
@@ -1156,6 +1159,7 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('raid')
 			.setDescription('Raid overview')
+			.addBooleanOption(option => option.setName('test').setDescription('Do a test run').setRequired(false))
 		// .addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
 	}.data.toJSON(),
 	{
@@ -1360,7 +1364,7 @@ const commands = [
 			.addSubcommand((subcommand) => subcommand.setName('all').setDescription('Sell multiple characters')
 				.addStringOption(option =>
 					option.setName('rarity')
-						.setDescription('Select rarity of dupes | all rarities will be sold if left empty')
+						.setDescription('Select rarity of characters | all rarities will be sold if left empty')
 						.setRequired(false)
 						.addChoices(
 							{ name: 'SS', value: 'SS' },
@@ -1434,6 +1438,21 @@ const commands = [
 	// 			)
 	// 		)
 	// }.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
+			.setName('settings')
+			.setDescription('Change your settings')
+			.addStringOption(option =>
+				option.setName('setting')
+					.setDescription('Select a setting to change')
+					.setRequired(true)
+					.addChoices(
+						{ name: 'Use Compact Battle Embeds', value: 'compact_battle_embeds' },
+						{ name: 'Battle Log Length', value: 'battle_log_length' },
+					)
+			)
+			.addStringOption(option => option.setName('input').setDescription('Input value').setRequired(true))
+	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
 			.setName('shards')
@@ -1544,7 +1563,8 @@ const commands = [
 						{ name: 'pulls', value: 'pulls' },
 						{ name: 'dungeon', value: 'dungeon' },
 						{ name: 'chars', value: 'chars' },
-						{ name: 'progress', value: 'progress' },
+						{ name: 'chars (unique)', value: 'uchars' },
+						{ name: 'chars (progress)', value: 'progress' },
 						{ name: 'anime', value: 'anime' },
 						{ name: 'lilies', value: 'lilies' },
 						{ name: 'achievements', value: 'achievements' },
@@ -1592,7 +1612,7 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('vote')
-			.setDescription('Get a free lootbox and pull reset'),
+			.setDescription('Get a free pull reset, gems and lootboxes after voting for Camelot'),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

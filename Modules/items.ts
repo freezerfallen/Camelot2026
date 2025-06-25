@@ -4224,7 +4224,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After using an ability, increases the wearer's magic damage by **${[15, 20, 25][level - 1]}%** for **3** turns. And after using a skill, increases attack by **${[20, 25, 30][level - 1]}%** for **3** turns. These can only be triggered once per round each.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
+    }, (level) => `After using a character ability, increases the wearer's magic damage by **${[15, 20, 25][level - 1]}%** for **3** turns. And after using a class skill, increases attack by **${[20, 25, 30][level - 1]}%** for **3** turns. These can only be triggered once per round each.`, "Hope's End Signet is a striking fusion of elegance and menace, forged from deep, shadowy metal embellished with intricate engravings that depict swirling celestial motifs. At its center, a large, deep violet gem captures the essence of twilight, emanating a soft, mysterious glow reminiscent of an impending eclipse. Spiked projections encircle the gemstone, adding a touch of danger and symbolizing the teeth of a predator ready to strike. Wearing the Hope's End Signet grants its bearer heightened agility and the ability to weave shadows to cloak their presence, making it a prized possession among those who thrive in the darkness.", "legendary", 688),
     new ringInfo("Eclipse", "ring", "ring", ["raid"], "<:eclipse:1333953559988928606>", "https://i.ibb.co/MD73rWtJ/Eclipse.png", 3, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Magma
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -4491,14 +4491,14 @@ export const items = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (target === myStats) {
                     myStats.maxhp += Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]);
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.03, 0.04, 0.05, 0.05, 0.05][level - 1]));
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]));
                     return true;
                 };
             },
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After the wearer's shield breaks, raises their own max HP by **${[4, 4, 5, 5, 5][level - 1]}%** and heals **${[3, 4, 5, 5, 5][level - 1]}%** of max HP up to **${[6, 7, 8, 9, 10][level - 1]}** times.`, "The Splintered Storm is a fierce-looking ring forged from jagged steel that reflects the chaos of tempestuous skies. Its surface is marked with grotesque shards and fragments like shattered glass, each pulsating with a crackling energy that hints at dormant power. At its top peaks a gleaming lightning-blue crystal, simulating a miniature storm trapped within. Wielders of this ring can harness the fury of lightning and wind, unleashing destructive magic upon their foes. Legends caution that this power comes at a price, as the energy can consume the unwary. Only true storm callers can master its wrath without being overwhelmed.", "mythical", 705),
+    }, (level) => `After the wearer's shield breaks, raises their own max HP by **${[4, 4, 5, 5, 5][level - 1]}%** and heals **${[4, 4, 5, 5, 5][level - 1]}%** of max HP up to **${[6, 7, 8, 9, 10][level - 1]}** times.`, "The Splintered Storm is a fierce-looking ring forged from jagged steel that reflects the chaos of tempestuous skies. Its surface is marked with grotesque shards and fragments like shattered glass, each pulsating with a crackling energy that hints at dormant power. At its top peaks a gleaming lightning-blue crystal, simulating a miniature storm trapped within. Wielders of this ring can harness the fury of lightning and wind, unleashing destructive magic upon their foes. Legends caution that this power comes at a price, as the energy can consume the unwary. Only true storm callers can master its wrath without being overwhelmed.", "mythical", 705),
     new ringInfo("Runekeeper's Seal", "ring", "ring", ["raid"], "<:runekeepers_seal:1334172293655560245>", "https://i.ibb.co/0H1hKV6/Runekeeper-s-Seal.png", 9, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* ShieldMan
 
         // every 7/7/7/6/6/6/5/5/5 rounds: +1/1.5/2/2/2.5/3/3/3.5/4% max HP as shield
@@ -4801,15 +4801,15 @@ export const items = [
 
         // 10-40 rounds: +2% atk, +2% md, -1% br per round
         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            mybuff.atk.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.6));
-            mybuff.md.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.6));
-            mybuff.br.push(new buffInfo("*", 0.99, 9999, -0.01, "+", [0.7, 1]));
+            mybuff.atk.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.2));
+            mybuff.md.push(new buffInfo("*", 1.02, 9999, 0.02, "+", 1.2));
+            mybuff.br.push(new buffInfo("*", 0.99, 9999, -0.01, "+", [0.9, 1]));
 
             return AbilityResponse.SUCCESS;
         }, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **30** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
+    }, (level) => `For the first **10** rounds, the wearer has **${[-30, -27.5, -25, -22.5, -20][level - 1]}%** attack and magic damage and **+30%** block rate. For the next **10** rounds after the previous debuffs wear off, the wearer gains **+2%** attack and magic damage and **-1%** block rate each round.`, "Woven from the very essence of nature, the Verdant Melody ring boasts a swirling band of golden foliage, elegantly wrapping around a bright, triangular citrine gem reminiscent of the sun. Each leaf is delicately engraved with musical notes, vibrating softly to the rhythm of nature's song. This ring is a favorite among druids and bards, enhancing their connection to the forest and empowering their songs. Those who wear it can soothe wild beasts or summon nature to their aid, harmonizing their spirit with the world around them.", "unique", 722),
     new ringInfo("Shadow's Pact", "ring", "ring", ["guild"], "<:shadows_pact:1334561570000343083>", "https://i.ibb.co/XZQ78kg4/Shadow-s-Pact.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.shadowPact = 0;
@@ -5903,7 +5903,7 @@ export const items = [
 
         myStats.vermillionVowStacks = 0;
         const buffValue = [20, 25, 30, 30][level - 1] / 100;
-        const stacksReq = [4, 4, 3, 3][level - 1]
+        const stacksReq = [4, 4, 3, 3][level - 1];
 
         // On Ability|CSkill: Gain a stack. At 5-4 stacks, +20-30% ATK/MD for 2-3 turns, then reset.
         matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
@@ -6025,15 +6025,15 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `At the start of every round, the wearer loses **5%** of current HP, but gains one of the following random effects for that round:\n> - **+18%** ATK/MD\n> - **+18%** DEF/MR\n> - **+18%** crit rate\n> - **+18%** crit damage\n> - Gain **5** mana\n> - Restore **5%** max HP\n\nAfter reaching **${[40, 38, 36, 34, 32, 30][level - 1]}** rounds, the wearer gains **2** buffs every round.`, "Forged in the heart of a collapsing star, the Starfire Band pulses with prismatic flame. Its radiant, angular gem emits streaks of cosmic light, dancing like solar flares around its molten gold band. The ring reacts to its wearer's vitality, sparking with greater brilliance when their spirit is strong.", "legendary", 776),
-    // new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new ringInfo("Intended", "ring", "ring", ["maybe"], "<:image_not_found:1371791346070716567>", "https://i.ibb.co/FLkvbYgw/image-not-found.png", 1, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-    //     //* Don't fix, it's already working as intended
+        //* Don't fix, it's already working as intended
 
-    //     matchStats.lootm += 0.24;
-    //     matchStats.xpboost += 0.24;
+        matchStats.lootm += 0.05;
+        matchStats.xpboost += 0.05;
 
-    //     return AbilityResponse.SUCCESS;
-    // }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus for a brief moment until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
+        return AbilityResponse.SUCCESS;
+    }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
 ];
 

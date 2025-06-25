@@ -1,7 +1,7 @@
 import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType, ButtonBuilder, SelectMenuComponentOptionData, ButtonStyle } from "discord.js";
 import { classes } from "../Modules/classes";
 import { skills } from "../Modules/skills";
-import { userLevel, getClassLvl, searchClass } from "../Modules/functions";
+import { userLevel, getClassLvl, searchClass, customEmojis } from "../Modules/functions";
 import { PageRow, OfferRow } from "../Modules/components";
 import { SlashCommand } from "../types";
 import { getUserSchema, updateUsers } from "../Modules/queries";
@@ -122,11 +122,11 @@ const exportCommand: SlashCommand = {
                 .setColor(0xbbffff)
                 .setTitle(fClass.name)
                 .setThumbnail(fClass.image)
-                .setDescription(`**Skill Cost**: ${skills[fClass.id].cost}\\💧\n**Grade**: ${["None", "Beginner", "Advanced", "Master", "Champion"][fClass.tier]}\n**Path**: ${formattedPath}\n**Active**: ${fClass.active}\n\n**Passive**: ${fClass.passive}\n`)
+                .setDescription(`**Skill Cost**: ${skills[fClass.id].cost}${customEmojis.mana}\n**Grade**: ${["None", "Beginner", "Advanced", "Master", "Champion"][fClass.tier]}\n**Path**: ${formattedPath}\n**Active**: ${fClass.active}\n\n**Passive**: ${fClass.passive}\n`)
                 .addFields(
-                    { name: 'Stats', value: `\\💖 **HP**: ${Math.round(fClass.stats.hp[0] * 100)}%\n\\⚔️ **ATK**: ${Math.round(fClass.stats.atk[0] * 100)}%\n\\🛡️ **DEF**: ${Math.round(fClass.stats.def[0] * 100)}%\n<:magic_dmg:948568336621527040> **Magic Dmg**: ${fClass.stats.md[0] * 100}%\n\\🔰 **Magic Resist**: ${Math.floor(fClass.stats.mr[0] * 100)}%`, inline: true },
-                    { name: '_ _', value: `\\🎯 **Crit Rate**: x${fClass.stats.cr[0]}\n\\💥 **Crit Damage**: x${fClass.stats.cd[0]}\n\\🛡️ **Block Rate**: x${fClass.stats.br[0]}\n\\💨 **Dodge**: x${fClass.stats.dodge[0]}`, inline: true },
-                    { name: '_ _', value: `\\💧 **Mana**: ${fClass.stats.mana[1] < 0 ? "" : "+"}${fClass.stats.mana[1]}\n\\💦 **Mana Gen**: ${fClass.stats.mg[1] < 0 ? "" : "+"}${fClass.stats.mg[1]}`, inline: true },
+                    { name: 'Stats', value: `${customEmojis.hp} **HP**: ${Math.round(fClass.stats.hp[0] * 100)}%\n${customEmojis.atk} **ATK**: ${Math.round(fClass.stats.atk[0] * 100)}%\n${customEmojis.def} **DEF**: ${Math.round(fClass.stats.def[0] * 100)}%\n${customEmojis.md} **Magic Dmg**: ${fClass.stats.md[0] * 100}%\n${customEmojis.mr} **Magic Resist**: ${Math.floor(fClass.stats.mr[0] * 100)}%`, inline: true },
+                    { name: '_ _', value: `${customEmojis.cr} **Crit Rate**: x${fClass.stats.cr[0]}\n${customEmojis.cd} **Crit Damage**: x${fClass.stats.cd[0]}\n${customEmojis.br} **Block Rate**: x${fClass.stats.br[0]}\n${customEmojis.dodge} **Dodge**: x${fClass.stats.dodge[0]}`, inline: true },
+                    { name: '_ _', value: `${customEmojis.mana} **Mana**: ${fClass.stats.mana[1] < 0 ? "" : "+"}${fClass.stats.mana[1]}\n${customEmojis.mg} **Mana Gen**: ${fClass.stats.mg[1] < 0 ? "" : "+"}${fClass.stats.mg[1]}`, inline: true },
                 )
                 .setFooter({ text: `ID: #${fClass.id}` });
             return interaction.reply({ embeds: [Embed] });

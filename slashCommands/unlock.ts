@@ -17,7 +17,7 @@ const exportCommand: SlashCommand = {
             choice.forEach((c) => {
                 const char = search(c, stats.chars, interaction, true);
                 if (char && !stats.charlock.includes(char.id)) isAlreadyUnlocked = true;
-                if (char?.name && stats.chars.includes(char.id) && !chars.includes(char) && stats.charlock.includes(char.id)) chars.push(char);
+                if (char?.name && !chars.includes(char) && stats.charlock.includes(char.id)) chars.push(char);
             });
 
             if (chars.length === 0) return interaction.reply(isAlreadyUnlocked ? "Your selected characters are already unlocked" : `No match found`);

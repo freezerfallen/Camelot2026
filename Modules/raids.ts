@@ -88,6 +88,17 @@ export default class RaidInfo {
 
         return Math.floor((this.minHp * mult) / 10) * 10;
     };
+    getTotalRankHp(rank: RaidRank) {
+        let sum = this.getRankHp(rank);
+
+        let nextPhase = this.nextPhase ? raids[this.nextPhase] : undefined;
+        while (nextPhase) {
+            sum += nextPhase.getRankHp(rank);
+            nextPhase = nextPhase.nextPhase ? raids[nextPhase.nextPhase] : undefined;
+        };
+
+        return Math.floor(sum);
+    };
 };
 
 export const raids: RaidInfo[] = [

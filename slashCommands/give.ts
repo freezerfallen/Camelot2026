@@ -2,7 +2,7 @@ import fs from 'fs';
 import { EmbedBuilder, ComponentType } from "discord.js";
 import { achievements } from "../Modules/achievements";
 import charInfo, { characters } from "../Modules/chars";
-import { userLevel, search } from "../Modules/functions";
+import { userLevel, search, formatNumberWithQuotes } from "../Modules/functions";
 import { OfferRow } from "../Modules/components";
 import { SlashCommand } from '../types';
 import { getUserSchema, insertNewTrade, updateUsers } from '../Modules/queries';
@@ -26,10 +26,10 @@ const exportCommand: SlashCommand = {
             if (userLevel(author.schema.xp) < 25) return interaction.reply(`You must be level 25 or higher to give coins`);
 
             if (author.schema.coins < amount) return interaction.reply(`You dont have that much coins (your balance: **${author.schema.coins}**<:coins:872926669055356939>)`);
-            if (amount < 1) return interaction.reply(`${amount} coins? <:ConfusedSmug:868988282250346558>`);
+            if (amount < 1) return interaction.reply(`${formatNumberWithQuotes(amount)} coins? <:ConfusedSmug:868988282250346558>`);
             if (amount > 10000000) return interaction.reply(`You can't send more than 10'000'000<:coins:872926669055356939> at once.`);
 
-            return interaction.reply({ content: `Are you sure you want to give **${user.username}** **${amount}**<:coins:872926669055356939>?${userLevel(_stats.xp) < 25 ? `\n⚠️ **${user.username}** is below level 25 and won't be able to use \`/give\` commands until then.` : ""}`, components: [OfferRow] }).then(msg => {
+            return interaction.reply({ content: `Are you sure you want to give **${user.username}** **${formatNumberWithQuotes(amount)}**<:coins:872926669055356939>?${userLevel(_stats.xp) < 25 ? `\n⚠️ **${user.username}** is below level 25 and won't be able to use \`/give\` commands until then.` : ""}`, components: [OfferRow] }).then(msg => {
 
                 const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 15000 });
                 const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 15000 });
@@ -40,21 +40,21 @@ const exportCommand: SlashCommand = {
                     const stats = await getUserSchema(interaction.user.id);
                     if (!stats) return;
                     if (stats.coins < amount) {
-                        if (interaction.channel?.isSendable()) interaction.channel.send(`You dont have that much coins (your balance: **${stats.coins}**<:coins:872926669055356939>)`);
+                        if (interaction.channel?.isSendable()) interaction.channel.send(`You dont have that much coins (your balance: **${formatNumberWithQuotes(stats.coins)}**<:coins:872926669055356939>)`);
                         return;
                     };
 
                     await updateUsers(interaction.user.id, { coins: { type: 'increment', value: -amount } });
                     await updateUsers(user.id, { coins: { type: 'increment', value: amount } });
 
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`${interaction.user.toString()} has sent **${amount}**<:coins:872926669055356939> to ${user.toString()}`);
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`${interaction.user.toString()} has sent **${formatNumberWithQuotes(amount)}**<:coins:872926669055356939> to ${user.toString()}`);
 
                     // Trade Log
                     await insertNewTrade(interaction.user.id, user.id, "coins", amount);
                     const chnl = interaction.client.channels.cache.find(channel => channel.id === "1042922243933622362");
                     const Embed = new EmbedBuilder()
                         .setColor(0xbbffff)
-                        .setDescription(`${interaction.user.tag} sent **${amount}**<:coins:872926669055356939> to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
+                        .setDescription(`${interaction.user.tag} sent **${formatNumberWithQuotes(amount)}**<:coins:872926669055356939> to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
                     if (chnl?.isSendable()) chnl.send({ embeds: [Embed] });
                 });
 

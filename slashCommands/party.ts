@@ -45,7 +45,7 @@ const exportCommand: SlashCommand = {
                 .setTitle(party.name)
                 .setColor(party.color as ColorResolvable || 0xbbffff)
                 .setThumbnail(party.icon ?? "https://i.imgur.com/JEvfGSR.png")
-                .setImage(party.banner)
+                .setImage(party.banner || null)
                 .setDescription(`${party.description?.replace(/\\n/g, "\n") || "_Missing description. Use `/party edit` to add one._"}\n\n**Capacity**: \`${members.length}/4\``)
                 .addFields(
                     { name: "Members", value: `${members.map((e) => e.name).join("\n")}`, inline: true },
@@ -119,7 +119,7 @@ const exportCommand: SlashCommand = {
                 const Embed = new EmbedBuilder()
                     .setColor(party.color as ColorResolvable || 0xbbffff)
                     .setThumbnail(input)
-                    .setImage(party.banner)
+                    .setImage(party.banner || null)
                     .setTitle(party.name)
                     .setDescription(`ID: \`${party.id}\`\nParty: ${party.members.join(", ")}`)
                     .setFooter({ text: `Changed by ${interaction.user.username} | ${interaction.user.id}`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });

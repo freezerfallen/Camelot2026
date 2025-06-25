@@ -64,7 +64,7 @@ export const getMinimalUserSchemas = async (ids: string[]): Promise<Pick<UserSch
 };
 
 export const getUserSchema = async (id: string): Promise<CompactUserSchema | undefined> => {
-    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, genesisdupepity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports, stamps FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
+    const [user] = await query(`SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, genesisdupepity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports, stamps, user_settings FROM users WHERE id = $1`, [id]) as [CompactUserSchema];
     if (user) {
         fixBigintForUser(user);
         return user;
@@ -72,7 +72,7 @@ export const getUserSchema = async (id: string): Promise<CompactUserSchema | und
 };
 
 export const getUserSchemas = async (ids: string[] | "*", whereClause?: string): Promise<CompactUserSchema[]> => {
-    const query_str = `SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, genesisdupepity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports, stamps FROM users ${whereClause ? whereClause : ""}`;
+    const query_str = `SELECT rowid, id, name, xp, coins, lilies, favchar, battlechar, lootbox, lastvote, weeklyclaimed, dailyclaimed, dailystreak, lastdaily, pullcount, pullstacks, pullstacksinterval, pullstotal, lastss, lasts, premium, pullresets, ssshard, sshard, ashard, bshard, cshard, dshard, ssticket, sticket, aticket, bticket, cticket, dticket, votestotal, arenawins, arenalosses, animationdelay, achievements, lastpull, pullreminder, votereminder, items, skins, eventpts, eventpts2, brbest, mailbox, eventrewreceived, gems, tutorial, dailies, guild, donatedtotal, genesispity, genesisdupepity, presets, itemlock, party, stampedechar, mailreceived, class, aboutme, profilecolor, jades, pass, passlevel, freepassclaimed, premiumpassclaimed, celebrateclaimed, expulls, level, bank, charxp, feedlimit, findoption, referred_by, referred_gems, referrals_claimed, passpurchaselimit, expity, craze_equipment, equipment, trial_equipment, craze_levels, shield_slot, lastguildjoin, valentine, bosshuntruns, bosshuntrevreceived, monthlyshop, itemwishlist, stampedeenergy, background, backgrounds, charlock, animelock, cow_participation, cow_chars, cow_timer, cow_rolled_today, rankscore, guild_marks, chars, char_ref, char_skin, dungeon_floors, dungeon_limit, dungeon_classes, dungeon_classlevels, image_credits, skill_tree, skill_points, raid_supports, stamps, user_settings FROM users ${whereClause ? whereClause : ""}`;
 
     if (ids === "*") {
         const users = await query(query_str, []) as CompactUserSchema[];
@@ -260,17 +260,74 @@ export const getPastStampedes = async (past: number): Promise<StampedeSchema[]> 
     return stampedes;
 };
 
-export const getUserRanking = async (scope: "server" | "global", user_ids: string[], orderBy: "xp" | "pullstotal" | "chars" | "uniqueChars"): Promise<Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[]> => {
-    const orderByClause = orderBy === "uniqueChars"
-        ? "COALESCE(array_length(array(select distinct unnest(chars)), 1), 0) DESC"
-        : orderBy === "chars"
-            ? "COALESCE(array_length(chars, 1), 0) DESC"
-            : `${orderBy} DESC`;
+export const getUserRanking = async (scope: "server" | "global", user_ids: string[], orderBy: "xp" | "coins" | "lilies" | "pullstotal" | "chars" | "uniqueChars" | "class" | "anime" | "achievements" | "dungeon" | "stampede" | "referrals" | "event"): Promise<(Pick<UserSchema, "name" | "id" | "xp" | "coins" | "lilies" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin" | "battlechar" | "dungeon_classlevels" | "achievements" | "dungeon_floors" | "eventpts"> & { cl?: string; clvl?: number; anime?: number; stampede?: number; referral_count?: number; })[]> => {
+    let orderByClause: string;
+    let selectClause = "name, id, xp, coins, lilies, pullstotal, favchar, premium, chars, char_skin, battlechar, dungeon_classlevels, achievements, dungeon_floors, eventpts";
+    let whereClause = "";
+
+    switch (orderBy) {
+        case "uniqueChars":
+            orderByClause = "COALESCE(array_length(array(select distinct unnest(chars)), 1), 0) DESC";
+            break;
+        case "chars":
+            orderByClause = "COALESCE(array_length(chars, 1), 0) DESC";
+            break;
+        case "class":
+            selectClause += `, (
+                SELECT key
+                FROM jsonb_each_text(dungeon_classlevels) 
+                ORDER BY value::numeric DESC 
+                LIMIT 1
+            ) as cl,
+            (
+                SELECT value::numeric
+                FROM jsonb_each_text(dungeon_classlevels) 
+                ORDER BY value::numeric DESC 
+                LIMIT 1
+            ) as clvl`;
+            whereClause = "AND dungeon_classlevels IS NOT NULL AND jsonb_typeof(dungeon_classlevels) = 'object' AND dungeon_classlevels != '{}'::jsonb";
+            orderByClause = "clvl DESC, cl ASC";
+            break;
+        case "anime":
+            // Completed anime count will be calculated in the application
+            orderByClause = "COALESCE(array_length(chars, 1), 0) DESC";
+            break;
+        case "achievements":
+            orderByClause = "COALESCE(array_length(achievements, 1), 0) DESC";
+            break;
+        case "dungeon":
+            // Sort by highest floor first, then by wins on floor 300 if applicable
+            orderByClause = `(
+                SELECT COALESCE(MAX(CAST(key AS INTEGER)), 1)
+                FROM jsonb_object_keys(dungeon_floors) key
+            ) DESC, 
+            COALESCE((dungeon_floors->>'300')::numeric, 0) DESC`;
+            break;
+        case "stampede":
+            // For stampede ranking, we'll calculate damage in the application
+            orderByClause = "xp DESC"; // Temporary sort, will be overridden
+            break;
+        case "referrals":
+            // For referrals ranking, we'll calculate referral count in the application
+            orderByClause = "xp DESC"; // Temporary sort, will be overridden
+            break;
+        case "event":
+            whereClause = "AND eventpts > 0";
+            orderByClause = "eventpts DESC";
+            break;
+        default:
+            orderByClause = `${orderBy} DESC`;
+            break;
+    };
+
+    //! Possible Bug:
+    // If some users are missing from the leaderboard,
+    // It's because of the way it's sorted and the limit of 1500 users
 
     const result = await query(
-        `SELECT name, id, xp, pullstotal, favchar, premium, chars, char_skin FROM users ${scope === "server" ? `WHERE id = ANY($1)` : ""} ORDER BY ${orderByClause} LIMIT 1501`,
+        `SELECT ${selectClause} FROM users ${scope === "server" ? `WHERE id = ANY($1)` : "WHERE 1=1"} ${whereClause} ORDER BY ${orderByClause} LIMIT 1501`,
         scope === "server" ? [user_ids] : []
-    ) as Pick<UserSchema, "name" | "id" | "xp" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin">[];
+    ) as (Pick<UserSchema, "name" | "id" | "xp" | "coins" | "lilies" | "pullstotal" | "favchar" | "premium" | "chars" | "char_skin" | "battlechar" | "dungeon_classlevels" | "achievements" | "dungeon_floors" | "eventpts"> & { cl?: string; clvl?: number; anime?: number; stampede?: number; referral_count?: number; })[];
     return result ?? [];
 };
 
@@ -1198,4 +1255,8 @@ export const updateStampedes = async (
 
 export const updateGuildDonationsGuildId = async (guildId: string, newGuildId: string): Promise<void> => {
     await query(`UPDATE guild_donations SET guildid = $1 WHERE guildid = $2`, [newGuildId, guildId]);
+};
+
+export const updateRaidsGuildId = async (guildId: string, newGuildId: string): Promise<void> => {
+    await query(`UPDATE raids SET guildid = $1 WHERE guildid = $2`, [newGuildId, guildId]);
 };

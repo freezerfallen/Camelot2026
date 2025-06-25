@@ -294,9 +294,7 @@ export const raidBosses: enemyInfo[] = [
     ),
     new enemyInfo("Veloura", "Doppelgänger", "the Void Harbinger", "F", true, { mg: 0 }, {}, { mana: 120 }, [714, 715, 716, 717], ["https://i.ibb.co/DCDzxsp/n.png"], [], 3,
         new skillInfo(3, 70, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
             eStats.retaliationDamage += 0.15;
-
             notice.push(`\n<:retaliation:1340455881736716359> **${enemy.name}** increases her retaliation damage by **15%**`);
 
             return AbilityResponse.SUCCESS;
@@ -312,20 +310,12 @@ export const raidBosses: enemyInfo[] = [
                 };
             });
 
-            // -0.3% cHP + retaliationDamage * 0.1
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                eStats.hp -= Math.floor(eStats.hp * (0.003 + eStats.retaliationDamage * 0.1));
-
-                return AbilityResponse.SUCCESS;
-            }, 9999));
-
             return AbilityResponse.SUCCESS;
-        }, [["Immune to lightning damage", "Applies DoT proportional to her retaliation damage to herself", "Has a **40%** chance to retaliate after taking a hit, dealing **66%** damage", "**Active**: Increases her retaliation damage by **15%** (**70** <:mana:1047269152957661255>)"]])
+        }, [["Immune to lightning damage", "Has a **40%** chance to retaliate after taking a hit, dealing **66%** damage", "**Active**: Increases her retaliation damage by **15%** (**70** <:mana:1047269152957661255>)"]])
     ),
     new enemyInfo("Velia", "Doppelgänger", "the Void Harbinger", "F", true, { mg: 0 }, {}, { mana: 120 }, [714, 715, 716, 717], ["https://i.ibb.co/Js46cdL/l.png"], [], 4,
         new skillInfo(4, 100, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             eStats.retaliationDamage += 0.25;
-
             notice.push(`\n<:retaliation:1340455881736716359> **${enemy.name}** increases her retaliation damage by **25%**`);
 
             return AbilityResponse.SUCCESS;
@@ -341,15 +331,8 @@ export const raidBosses: enemyInfo[] = [
                 };
             });
 
-            // -0.3% cHP + retaliationDamage * 0.1
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                eStats.hp -= Math.floor(eStats.hp * (0.003 + eStats.retaliationDamage * 0.1));
-
-                return AbilityResponse.SUCCESS;
-            }, 9999));
-
             return AbilityResponse.SUCCESS;
-        }, [["Immune to lightning damage", "Applies DoT proportional to her retaliation damage to herself", "Has a **40%** chance to retaliate after taking a hit, dealing **80%** damage", "**Active**: Increases her retaliation damage by **25%** (**100** <:mana:1047269152957661255>)"]])
+        }, [["Immune to lightning damage", "Has a **40%** chance to retaliate after taking a hit, dealing **80%** damage", "**Active**: Increases her retaliation damage by **25%** (**100** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Zerthrax", "Titan", "the Storm Devourer", "M", true, {}, {}, { mana: 120 }, [693, 699, 767, 773], ["https://i.ibb.co/C0BtZzW/c.png"], [], 5,
@@ -552,10 +535,10 @@ export const raidBosses: enemyInfo[] = [
 
                 // Every round the minion is alive, the Necromancer increases his ATK, MD, DEF and MR by **1%**
                 if (matchStats.currentOpponent === 1) {
-                    ebuff.atk.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.md.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.def.push(new buffInfo("*", 0.01, 9999));
-                    ebuff.mr.push(new buffInfo("*", 0.01, 9999));
+                    ebuff.atk.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.md.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.def.push(new buffInfo("*", 1.01, 9999));
+                    ebuff.mr.push(new buffInfo("*", 1.01, 9999));
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -1195,7 +1178,7 @@ export const raidBosses: enemyInfo[] = [
             }, 9999));
 
             return AbilityResponse.SUCCESS;
-        }, [["Sends a mail every **3** rounds, then presents an option: The green button decreases the damage dealt, the red button incrases it", "Increases its damage every time the player uses their active ability", "**Active**: Decreases the player's DEF and MR by **15%** for **3** rounds, and adds **2** more red buttons, only one is the real red button (**55** <:mana:1047269152957661255>)"]])
+        }, [["Sends a mail every **3** rounds, then presents an option: The green button decreases the damage dealt, the red button increases it", "Increases its damage every time the player uses their active ability", "**Active**: Decreases the player's DEF and MR by **15%** for **3** rounds, and adds **2** more red buttons, only one is the real red button (**55** <:mana:1047269152957661255>)"]])
     ),
 
     new enemyInfo("Valkorath", "Dark Paladin", "the Dark Sentinel", "M", true, {}, {}, { mana: 120 }, [691, 692, 700, 706], ["https://i.ibb.co/nqzkvYBR/valkorath.png"], [], 22,

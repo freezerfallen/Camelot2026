@@ -8,9 +8,6 @@ const handler: BotHandler = {
     once: true,
     execute: async (client: Client) => {
 
-        // Only run if bot is the main bot
-        if (client.user?.id !== "706183309943767112") return;
-
         const app = express();
         app.use(express.json());
 
@@ -32,6 +29,8 @@ const handler: BotHandler = {
 
         // Endpoint to receive stamps from external app
         app.post('/stamps', async (req, res): Promise<any> => {
+            if (client.user?.id !== "706183309943767112") return;
+
             try {
                 const { userId, stamps } = req.body;
 
