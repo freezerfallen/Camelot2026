@@ -1612,7 +1612,7 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('vote')
-			.setDescription('Get a free lootbox and pull reset'),
+			.setDescription('Get a free pull reset, gems and lootboxes after voting for Camelot'),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()

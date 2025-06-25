@@ -204,7 +204,7 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
     });
 };
 
-function rankupOverview(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[], isTestRun: boolean): Promise<number> {
+function raidOverview(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[], isTestRun: boolean): Promise<number> {
     return new Promise((resolve) => {
 
         const currentRaid = raids[raid.raidid];
@@ -593,8 +593,27 @@ const exportCommand: SlashCommand = {
         stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
 
         // Overview
-        let start = await rankupOverview(interaction, stats, guild, raid, userItems, isTestRun);
+        let start = await raidOverview(interaction, stats, guild, raid, userItems, isTestRun);
         if (start === -1) return;
+
+        // User must've been a member for at least 7 days
+        if (stats.lastguildjoin) {
+            const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+            const timeSinceLastJoin = Date.now() - new Date(stats.lastguildjoin).getTime();
+            if (timeSinceLastJoin < sevenDaysInMs) {
+                const timeLeft = sevenDaysInMs - timeSinceLastJoin;
+                const daysLeft = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+                const hoursLeft = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+
+                let timeString = "";
+                if (daysLeft > 0) timeString += `**${daysLeft}** days`;
+                if (hoursLeft > 0) timeString += `${timeString ? " " : ""}**${hoursLeft}** hours`;
+                if (minutesLeft > 0) timeString += `${timeString ? " " : ""}**${minutesLeft}** minutes`;
+
+                return interaction.followUp(`You have to wait **7** days before you can join a raid again.\nTime left: ${timeString}`);
+            };
+        };
 
         // Return if no attempts left
         const raidCheck = await getLatestRaid(guild.id);
@@ -782,7 +801,6 @@ const exportCommand: SlashCommand = {
         if (myStats.weapon !== -1) await (items[myStats.weapon] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items[myStats.helmet] as armorInfo).setname === (items[myStats.cuirass] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.gloves] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.boots] as armorInfo)?.setname) await (items[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
-        await eAbility?.passive(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user, interaction.commandName);
 
         if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
@@ -795,6 +813,8 @@ const exportCommand: SlashCommand = {
                 await abilities[sid]?.party?.(myStatsP, myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
             };
         };
+
+        await eAbility?.passive(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user, interaction.commandName);
 
         const ATK_EMOJI = myStatsC.replaceButton?.atk?.emoji || '⚔️',
             DEF_EMOJI = myStatsC.replaceButton?.def?.emoji || '🛡️',
