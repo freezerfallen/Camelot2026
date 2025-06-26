@@ -3138,7 +3138,7 @@ export const items = [
             mybuff.hp = mybuff.hp.filter((buff) => !buff.isDebuff);
 
             // 14% chance to counter
-            if (Math.random() > 0.14) myStats.counter += 1;
+            if (Math.random() < 0.14) myStats.counter += 1;
             return AbilityResponse.SUCCESS;
         }, 9999));
         return AbilityResponse.SUCCESS;
