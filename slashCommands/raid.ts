@@ -533,7 +533,7 @@ async function endRaid(raidRowId: number) {
 
     // Update guild treasury
     await updateGuilds(raid.guildid, {
-        treasury: { type: "increment", value: rewardPool.coins },
+        treasury: { type: "increment", value: Math.floor(3 * rewardPool.coins) },
     });
 
     // console.log(`Raid Rewards for ${raid.rowid} sent successfully!`);
