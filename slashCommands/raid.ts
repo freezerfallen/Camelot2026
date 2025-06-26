@@ -14,7 +14,7 @@ import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { CompactUserSchema, DetailedStats, GuildSchema, RaidRank, RaidSchema, SlashCommand } from '../types';
-import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
+import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateGuilds, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
@@ -531,6 +531,11 @@ async function endRaid(raidRowId: number) {
         // await new Promise(resolve => setTimeout(resolve, 100));
     };
 
+    // Update guild treasury
+    await updateGuilds(raid.guildid, {
+        treasury: { type: "increment", value: Math.floor(3 * rewardPool.coins) },
+    });
+
     // console.log(`Raid Rewards for ${raid.rowid} sent successfully!`);
 };
 
@@ -597,7 +602,7 @@ const exportCommand: SlashCommand = {
         if (start === -1) return;
 
         // User must've been a member for at least 7 days
-        if (stats.lastguildjoin) {
+        if (!isTestRun && stats.lastguildjoin) {
             const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
             const timeSinceLastJoin = Date.now() - new Date(stats.lastguildjoin).getTime();
             if (timeSinceLastJoin < sevenDaysInMs) {
@@ -611,7 +616,7 @@ const exportCommand: SlashCommand = {
                 if (hoursLeft > 0) timeString += `${timeString ? " " : ""}**${hoursLeft}** hours`;
                 if (minutesLeft > 0) timeString += `${timeString ? " " : ""}**${minutesLeft}** minutes`;
 
-                return interaction.followUp(`You have to wait **7** days before you can join a raid again.\nTime left: ${timeString}`);
+                return interaction.followUp(`You have to wait **7** days after joining a guild before you can participate in a raid.\nTime left: ${timeString}`);
             };
         };
 
