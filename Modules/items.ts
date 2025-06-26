@@ -3133,6 +3133,8 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "The first time the wielders HP falls below **50%** of max HP, increases crit damage by **40%** and heals all missing HP.", "The Divine Retribution is a lance wielded by the celestial warriors of the divine realm. It is imbued with the power of the gods themselves, and strikes with the force of a thousand thunderbolts. Those who dare to face its wrath are met with swift and unyielding punishment. Those who wield the Divine Retribution are chosen by the gods for their strength and righteousness, and are tasked with upholding justice and righteousness in the mortal world.", "mythical", 417),
     new weaponInfo("Roe Eile", "weapon", "lance", ["chest"], "<:roe_eile:1069018088760168488>", "https://i.imgur.com/ag00os7.png", "atk", 96, 1032, "dodge", 0.07, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.counter ??= 0;
+        if (Math.random() < 0.14) myStats.counter += 1;
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // HP debuff immunity / Remove HP debuffs on self 
             mybuff.hp = mybuff.hp.filter((buff) => !buff.isDebuff);
