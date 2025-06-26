@@ -417,6 +417,9 @@ const exportCommand: SlashCommand = {
             } else stats.equipment[item.type] = `${item.id}:706183309943767112`;
         };
 
+        // Fixed refinements to base
+        stats.char_ref = {};
+
         // User stats
         let myChar = characters[stats.battlechar];
         let myStats = await getDetailedStats(myChar.id, stats, stats.dungeon_classlevels);
