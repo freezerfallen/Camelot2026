@@ -2423,13 +2423,13 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "Decreases enemy magic resistance by **20%**. The wielder deals magic damage by default.", "The Arcane Spike is a lance imbued with powerful magic, said to have been crafted by a powerful wizard. Its shimmering, blue-hued metal is cool to the touch, and runes of ancient power adorn its length. Those who wield it in battle report feeling a surge of energy coursing through their veins, granting them increased strength and speed.", "legendary", 347),
-    new weaponInfo("Avalon's Asp", "weapon", "lance", ["chest"], "<:avalons_asp:1068648972882821191>", "https://i.imgur.com/7APxDUG.png", "atk", 50, 817, "md%", 0.05, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.md += Math.floor(myStats.md * 0.28);
-        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.28), 12));
+    new weaponInfo("Avalon's Asp", "weapon", "lance", ["chest"], "<:avalons_asp:1068648972882821191>", "https://i.imgur.com/7APxDUG.png", "md", 50, 817, "md%", 0.05, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.md += Math.floor(myStats.md * 0.24);
+        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.24), 12));
         myStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
-    }, "Increases the wielders magic damage by **28%** during the first 12 rounds. The wielder deals magic damage by default.", "Avalon's Asp is a spear of legend, steeped in the magic of the ancient isle of Avalon. Its slender, graceful shaft is made of a shimmering, silver-like metal that is said to never dull or rust. The spearhead is sharp as a serpent's fang, and seems to pulsate with a faint, otherworldly glow. It is said that this weapon was once wielded by the great King Arthur himself, and that it holds the power to fell even the mightiest of foes with a single strike.", "legendary", 348),
+    }, "Increases the wielders magic damage by **24%** during the first 12 rounds. The wielder deals magic damage by default.", "Avalon's Asp is a spear of legend, steeped in the magic of the ancient isle of Avalon. Its slender, graceful shaft is made of a shimmering, silver-like metal that is said to never dull or rust. The spearhead is sharp as a serpent's fang, and seems to pulsate with a faint, otherworldly glow. It is said that this weapon was once wielded by the great King Arthur himself, and that it holds the power to fell even the mightiest of foes with a single strike.", "legendary", 348),
     new weaponInfo("Cleaver of Titans", "weapon", "lance", ["crafting", "chest"], "<:cleaver_of_titans:1068648976322154506>", "https://i.imgur.com/ssQR35e.png", "atk", 53, 838, "def", 32, 143, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.def -= Math.floor(eStats.def * 0.1);
         ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.1), 9999));
