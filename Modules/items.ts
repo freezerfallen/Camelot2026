@@ -1124,12 +1124,6 @@ export const items = [
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 9999));
-        myStats.def += Math.floor(myStats.def * 0.3);
-        myStats.mr += Math.floor(myStats.mr * 0.3);
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 5));
-        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "The Promise of the Lone Victor is a staff that radiates with the determination and strength of a single, triumphant hero. As it is wielded, the staff imbues its wielder with the unbreakable will to overcome any obstacle and emerge victorious. Those who wield this staff are said to be destined to be the last one standing in any battle, no matter the odds.", "unique", 196),
@@ -1673,18 +1667,11 @@ export const items = [
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        myStats.def += Math.floor(myStats.def * 0.3);
-        myStats.mr += Math.floor(myStats.mr * 0.3);
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 5));
-        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "Forged from the armor of vanquished knights, Knightfall is a weapon of revenge. Its sharp edge thirsts for the blood of those who dare oppose its master, striking with precision and malice. In the hands of a skilled wielder, Knightfall becomes a deadly instrument of retribution, delivering swift and unforgiving justice.", "unique", 254),
     new weaponInfo("Lacerat", "weapon", "dagger", ["crafting", "chest"], "<:lacerat:1067235847348424815>", "https://i.imgur.com/I5ONTHi.png", "atk", 31, 569, "cd", 0.04, 0.3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.def = Math.floor(eStats.def * 0.8);
-        ebuff.def.push(new buffInfo("*", 0.8, 10));
         ebuff.def.push(new buffInfo("*", 0.8, 10));
 
         return AbilityResponse.SUCCESS;
