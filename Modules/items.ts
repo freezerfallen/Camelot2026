@@ -939,7 +939,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "The wielder increases magical damage by **3%** every round, up to **15%**. Moreover, they have a **50%** chance to restore **5%** missing HP every round", "A light purple enshrouds the blade, as the gem's edges reflected the shimmer. Every aim responds with a faint mark, every strike resounds with a  fervent wish, the wish to seek the truth. It is said that before the sword, none can make plans afoot. Ever so often a member of the jury would tremble, as the guilty utter their true intentions before the radiance, as if self-willingly submitting into judgement... Mari closes the short piece of descriptive paper, What if the blade was twisting the truth? And who shall pay for the price of the death of the innocent?", "unique", 173),
-    }, "The wielder increases magical damage by **3%** every round, up to **15%**. Moreover, they have a **50%** chance to restore **5%** missing HP every round", "A light purple enshrouds the blade, as the gem's edges reflected the shimmer. Every aim responds with a faint mark, every strike resounds with a  fervent wish, the wish to seek the truth. It is said that before the sword, none can make plans afoot. Ever so often a member of the jury would tremble, as the guilty utter their true intentions before the radiance, as if self-willingly submitting into judgement... Mari closes the short piece of descriptive paper, What if the blade was twisting the truth? And who shall pay for the price of the death of the innocent?", "unique", 173),
     new weaponInfo("Hyumilis", "weapon", "sword", ["crafting", "chest"], "<:hyumilis:1066859975474942123>", "https://i.imgur.com/h3mPqBr.png", "atk", 36, 573, "mr", 22, 92, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.cr -= 0.4;
         if (eStats.cr < 0) eStats.cr = 0;
@@ -969,7 +968,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **20%** increased attack during the first 8 rounds.", "The Marauder sword is a formidable weapon, crafted from the finest steel. Its sharp blade slices through enemies with ease, leaving a trail of destruction in its wake. With each swing, the Marauder's bloodthirsty howl fills the air, striking fear into the hearts of all who dare to stand in its path. This is a weapon worthy of only the most skilled and ruthless warriors.", "unique", 177),
-    }, "The wielder has **20%** increased attack during the first 8 rounds.", "The Marauder sword is a formidable weapon, crafted from the finest steel. Its sharp blade slices through enemies with ease, leaving a trail of destruction in its wake. With each swing, the Marauder's bloodthirsty howl fills the air, striking fear into the hearts of all who dare to stand in its path. This is a weapon worthy of only the most skilled and ruthless warriors.", "unique", 177),
     new weaponInfo("Mournblade", "weapon", "sword", ["crafting", "chest"], "<:mournblade:1066861429841461329>", "https://i.imgur.com/PJ0UiwC.png", "atk", 34, 570, "mr", 18, 96, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.mr * 0.7), 9999));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.mr * 0.3), 9999));
@@ -993,7 +991,6 @@ export const items = [
         ebuff.dodge.push(new buffInfo("+", -0.12, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Increases the wielders dodge chance by **8%**, and also decreases the opponents dodge rate by **12%**.", "Nethersbane was forged in the fiery depths of the underworld, its shimmering steel imbued with the power to banish the denizens of the nether realm. Its edge is sharp enough to cut through even the toughest of demonic hides, and its hilt is carved with ancient wards to protect its wielder from the corrupting influence of the nether. Those who wield Nethersbane are feared by the forces of darkness, for it is the bane of their existence.", "unique", 179),
     }, "Increases the wielders dodge chance by **8%**, and also decreases the opponents dodge rate by **12%**.", "Nethersbane was forged in the fiery depths of the underworld, its shimmering steel imbued with the power to banish the denizens of the nether realm. Its edge is sharp enough to cut through even the toughest of demonic hides, and its hilt is carved with ancient wards to protect its wielder from the corrupting influence of the nether. Those who wield Nethersbane are feared by the forces of darkness, for it is the bane of their existence.", "unique", 179),
     new weaponInfo("Radiant Dawn", "weapon", "sword", ["chest"], "<:radiant_dawn:1066861440176238592>", "https://i.imgur.com/kliCxRG.png", "atk", 34, 577, "hp", 80, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.hp.push(new buffInfo("*", 1.03, 9999));
@@ -1109,7 +1106,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "The wielders magic damage is increased by **16%** for the entire battle. There is an additional **50%** chance for an additional **+10%** every round, lasting for that round only.", "Together we can make it! Together we are stronger!!!! The cries of many leak out from the nostalgic note. Sweats rain as the farmers give their best to throw tools against the endless stampede of goblins. Heavy steps crush the weeds underneath, turning land barren. Long past the merciless raid, the wandering wizard Eldrida stares at the deserted land, feeling every moment of desperation and sorrow. With a soft sigh, life is breathed into the land of death, where the deadwood before him regrow. Such is later named as the enchanted of Eldrida, where wood collected from which contains magical healing abilities, and the will of the past to move the future onwards.", "unique", 192),
-    }, "The wielders magic damage is increased by **16%** for the entire battle. There is an additional **50%** chance for an additional **+10%** every round, lasting for that round only.", "Together we can make it! Together we are stronger!!!! The cries of many leak out from the nostalgic note. Sweats rain as the farmers give their best to throw tools against the endless stampede of goblins. Heavy steps crush the weeds underneath, turning land barren. Long past the merciless raid, the wandering wizard Eldrida stares at the deserted land, feeling every moment of desperation and sorrow. With a soft sigh, life is breathed into the land of death, where the deadwood before him regrow. Such is later named as the enchanted of Eldrida, where wood collected from which contains magical healing abilities, and the will of the past to move the future onwards.", "unique", 192),
     new weaponInfo("Golden Serpent's Staff", "weapon", "staff", ["crafting", "chest"], "<:golden_serpents_staff:1066863583532679199>", "https://i.imgur.com/gGU8vWj.png", "md", 60, 732, "cr", 0.07, 0.23, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         // NO BUFF
 
@@ -1145,7 +1141,6 @@ export const items = [
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "The Promise of the Lone Victor is a staff that radiates with the determination and strength of a single, triumphant hero. As it is wielded, the staff imbues its wielder with the unbreakable will to overcome any obstacle and emerge victorious. Those who wield this staff are said to be destined to be the last one standing in any battle, no matter the odds.", "unique", 196),
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "The Promise of the Lone Victor is a staff that radiates with the determination and strength of a single, triumphant hero. As it is wielded, the staff imbues its wielder with the unbreakable will to overcome any obstacle and emerge victorious. Those who wield this staff are said to be destined to be the last one standing in any battle, no matter the odds.", "unique", 196),
     new weaponInfo("Ragin Pole of Chaos", "weapon", "staff", ["crafting", "chest"], "<:ragin_pole_of_chaos:1066864271121715231>", "https://i.imgur.com/t68LcTE.png", "md", 32, 552, "md", 8, 168, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1261,7 +1256,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "When the wielder's HP is below **50%**, has **12.5%** increased attack and **20%** increased defense.", "The Labrys is a formidable weapon, its double-headed axe design capable of delivering devastating blows to even the toughest of foes. Its name, taken from the ancient Greek word for double axe, signifies its power and strength. Those who wield it are said to be relentless, their strikes swift and deadly. With the Labrys in hand, victory is all but assured.", "unique", 210),
-    }, "When the wielder's HP is below **50%**, has **12.5%** increased attack and **20%** increased defense.", "The Labrys is a formidable weapon, its double-headed axe design capable of delivering devastating blows to even the toughest of foes. Its name, taken from the ancient Greek word for double axe, signifies its power and strength. Those who wield it are said to be relentless, their strikes swift and deadly. With the Labrys in hand, victory is all but assured.", "unique", 210),
     new weaponInfo("Lethargic Hatchet", "weapon", "axe", ["crafting", "chest"], "<:lethargic_hatchet:1067186863351283753>", "https://i.imgur.com/XApj4cI.png", "atk", 37, 587, "def", 26, 118, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.hp / myStats.maxhp < 0.4) {
             myStats.def += Math.floor(myStats.def * 0.15);
@@ -1292,7 +1286,6 @@ export const items = [
         matchStats.critbleedlast = 2;
 
         return AbilityResponse.SUCCESS;
-    }, "Critical hits cause bleeding, leading the enemy to lose **2.5%** of their max HP for 2 rounds. If the enemy has more than double the HP of the wielder, they lose **5%** of the wielder's max HP instead.", "As the storm rages on, the Paltry Monsoon battle axe glimmers with anticipation. The fury of a monsoon is contained within its blades, ready to unleash its devastating power upon any who dare to cross its path. Wield the Paltry Monsoon with caution, for its might is not to be underestimated.", "unique", 212),
     }, "Critical hits cause bleeding, leading the enemy to lose **2.5%** of their max HP for 2 rounds. If the enemy has more than double the HP of the wielder, they lose **5%** of the wielder's max HP instead.", "As the storm rages on, the Paltry Monsoon battle axe glimmers with anticipation. The fury of a monsoon is contained within its blades, ready to unleash its devastating power upon any who dare to cross its path. Wield the Paltry Monsoon with caution, for its might is not to be underestimated.", "unique", 212),
     new weaponInfo("Ragnar's Verity", "weapon", "axe", ["crafting", "chest"], "<:ragnars_verity:1067187161524342886>", "https://i.imgur.com/cBDfoNB.png", "atk", 34, 577, "hp", 40, 282, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const bleed = Math.floor(eStats.hp > 2 * myStats.hp ? myStats.hp * 0.2 : eStats.hp * 0.1);
@@ -1701,14 +1694,12 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "Forged from the armor of vanquished knights, Knightfall is a weapon of revenge. Its sharp edge thirsts for the blood of those who dare oppose its master, striking with precision and malice. In the hands of a skilled wielder, Knightfall becomes a deadly instrument of retribution, delivering swift and unforgiving justice.", "unique", 254),
-    }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "Forged from the armor of vanquished knights, Knightfall is a weapon of revenge. Its sharp edge thirsts for the blood of those who dare oppose its master, striking with precision and malice. In the hands of a skilled wielder, Knightfall becomes a deadly instrument of retribution, delivering swift and unforgiving justice.", "unique", 254),
     new weaponInfo("Lacerat", "weapon", "dagger", ["crafting", "chest"], "<:lacerat:1067235847348424815>", "https://i.imgur.com/I5ONTHi.png", "atk", 31, 569, "cd", 0.04, 0.3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.def = Math.floor(eStats.def * 0.8);
         ebuff.def.push(new buffInfo("*", 0.8, 10));
         ebuff.def.push(new buffInfo("*", 0.8, 10));
 
         return AbilityResponse.SUCCESS;
-    }, "Decreases enemy defense by **20%** for the first 10 rounds.", "The Lacerat is a weapon of precision and speed. Its razor-sharp edge slices through flesh with ease, leaving behind deep, jagged wounds that take time to heal. Its handle is made of cold, hard steel that feels comfortable in the hand, allowing for quick and efficient strikes. Some say it is cursed, as those who wield it often find themselves becoming more and more ruthless and bloodthirsty over time. Beware the Lacerat, for it will only bring pain and suffering to those it touches.", "unique", 255),
     }, "Decreases enemy defense by **20%** for the first 10 rounds.", "The Lacerat is a weapon of precision and speed. Its razor-sharp edge slices through flesh with ease, leaving behind deep, jagged wounds that take time to heal. Its handle is made of cold, hard steel that feels comfortable in the hand, allowing for quick and efficient strikes. Some say it is cursed, as those who wield it often find themselves becoming more and more ruthless and bloodthirsty over time. Beware the Lacerat, for it will only bring pain and suffering to those it touches.", "unique", 255),
     new weaponInfo("Lament", "weapon", "dagger", ["crafting", "chest"], "<:lament:1067235852293513246>", "https://i.imgur.com/ttHE1vy.png", "atk", 33, 571, "mg", 1, 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.mg -= 2;
@@ -1729,7 +1720,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **+50%** defense, but the buff decreases by **10%** every 4 rounds, down to **+10%**", "Forged from the ancient stones of the earth, the Lithic Blade is a weapon of unmatched sharpness and durability. With its crooked edges and piercing point, this dagger is a good choice for any adventurer setting foot into the dungeon.", "unique", 257),
-    }, "The wielder has **+50%** defense, but the buff decreases by **10%** every 4 rounds, down to **+10%**", "Forged from the ancient stones of the earth, the Lithic Blade is a weapon of unmatched sharpness and durability. With its crooked edges and piercing point, this dagger is a good choice for any adventurer setting foot into the dungeon.", "unique", 257),
     new weaponInfo("Nightfall Knife", "weapon", "dagger", ["chest"], "<:nightfall_knife:1067235931251298374>", "https://i.imgur.com/t2MrMa5.png", "md", 36, 580, "cd", 0.05, 0.3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.br -= 0.18;
         eStats.dodge -= 0.18;
@@ -1743,7 +1733,6 @@ export const items = [
         ebuff.dodge.push(new buffInfo("+", -0.18, 8));
 
         return AbilityResponse.SUCCESS;
-    }, "The enemy has **18%** decreased block rate and dodge chance during the first 8 rounds.", "As the sun sets and the darkness of night envelops the land, the Nightfall Knife awakens, thirsting for the blood of its enemies. Its sleek, black blade glints in the moonlight, promising swift and deadly retribution to those who dare to cross its path. With a single strike, it can end a life, leaving no trace except for a pool of crimson on the ground.", "unique", 258),
     }, "The enemy has **18%** decreased block rate and dodge chance during the first 8 rounds.", "As the sun sets and the darkness of night envelops the land, the Nightfall Knife awakens, thirsting for the blood of its enemies. Its sleek, black blade glints in the moonlight, promising swift and deadly retribution to those who dare to cross its path. With a single strike, it can end a life, leaving no trace except for a pool of crimson on the ground.", "unique", 258),
     new weaponInfo("Nightshade", "weapon", "dagger", ["chest"], "<:nightshade:1067235936330600528>", "https://i.imgur.com/ub6Y8Ja.png", "atk", 36, 577, "cr", 0.04, 0.16, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         matchStats.critbleed = true;
@@ -2201,7 +2190,6 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "Every 3 rounds, the wielder gets **5%** magic damage (max 30%).", "The Voice of Infinite Trials is a powerful staff that allows its wielder to summon the voices of ancient trials and hardships. Those who have survived the most grueling challenges of the past speak through this staff, offering wisdom and guidance to those who seek it. With the Voice of Infinite Trials, one can overcome any obstacle and emerge victorious.", "legendary", 315),
-    }, "Every 3 rounds, the wielder gets **5%** magic damage (max 30%).", "The Voice of Infinite Trials is a powerful staff that allows its wielder to summon the voices of ancient trials and hardships. Those who have survived the most grueling challenges of the past speak through this staff, offering wisdom and guidance to those who seek it. With the Voice of Infinite Trials, one can overcome any obstacle and emerge victorious.", "legendary", 315),
     new weaponInfo("Vainglorious Staff", "weapon", "staff", ["chest"], "<:vainglorious_staff:1068528521116401674>", "https://i.imgur.com/c9wTPEn.png", "md", 53, 837, "atk", 44, 726, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.atk -= Math.floor(eStats.atk * 0.15);
         eStats.md -= Math.floor(eStats.md * 0.15);
@@ -2316,7 +2304,6 @@ export const items = [
         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.14), 10));
 
         return AbilityResponse.SUCCESS;
-    }, "Executes the enemy when below **15%** HP. Increases the wielders attack by **14%** during the first 10 rounds.", "The Warbringer is a fearsome weapon, forged in the heat of battle and tempered in the fires of war. Its sharp, double-edged blade is capable of cleaving through armor and bone with ease, and its sturdy haft allows for powerful, crushing blows. In the hands of a skilled warrior, the Warbringer becomes a force to be reckoned with, striking fear into the hearts of enemies and bringing swift victory to its wielder.", "legendary", 330),
     }, "Executes the enemy when below **15%** HP. Increases the wielders attack by **14%** during the first 10 rounds.", "The Warbringer is a fearsome weapon, forged in the heat of battle and tempered in the fires of war. Its sharp, double-edged blade is capable of cleaving through armor and bone with ease, and its sturdy haft allows for powerful, crushing blows. In the hands of a skilled warrior, the Warbringer becomes a force to be reckoned with, striking fear into the hearts of enemies and bringing swift victory to its wielder.", "legendary", 330),
     new weaponInfo("Whisper of Woe", "weapon", "axe", ["crafting", "chest"], "<:whisper_of_woe:1068531160126332928>", "https://i.imgur.com/TO09o0Z.png", "atk", 55, 865, "mana", 10, 30, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += Math.floor(eStats.sm * 0.5);
@@ -2480,13 +2467,8 @@ export const items = [
     new weaponInfo("Avalon's Asp", "weapon", "lance", ["chest"], "<:avalons_asp:1068648972882821191>", "https://i.imgur.com/7APxDUG.png", "md", 50, 817, "md%", 0.05, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.md += Math.floor(myStats.md * 0.24);
         mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.24), 12));
-    new weaponInfo("Avalon's Asp", "weapon", "lance", ["chest"], "<:avalons_asp:1068648972882821191>", "https://i.imgur.com/7APxDUG.png", "md", 50, 817, "md%", 0.05, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.md += Math.floor(myStats.md * 0.24);
-        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.24), 12));
-        myStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
-    }, "Increases the wielders magic damage by **24%** during the first 12 rounds. The wielder deals magic damage by default.", "Avalon's Asp is a spear of legend, steeped in the magic of the ancient isle of Avalon. Its slender, graceful shaft is made of a shimmering, silver-like metal that is said to never dull or rust. The spearhead is sharp as a serpent's fang, and seems to pulsate with a faint, otherworldly glow. It is said that this weapon was once wielded by the great King Arthur himself, and that it holds the power to fell even the mightiest of foes with a single strike.", "legendary", 348),
     }, "Increases the wielders magic damage by **24%** during the first 12 rounds. The wielder deals magic damage by default.", "Avalon's Asp is a spear of legend, steeped in the magic of the ancient isle of Avalon. Its slender, graceful shaft is made of a shimmering, silver-like metal that is said to never dull or rust. The spearhead is sharp as a serpent's fang, and seems to pulsate with a faint, otherworldly glow. It is said that this weapon was once wielded by the great King Arthur himself, and that it holds the power to fell even the mightiest of foes with a single strike.", "legendary", 348),
     new weaponInfo("Cleaver of Titans", "weapon", "lance", ["crafting", "chest"], "<:cleaver_of_titans:1068648976322154506>", "https://i.imgur.com/ssQR35e.png", "atk", 53, 838, "def", 32, 143, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.def -= Math.floor(eStats.def * 0.1);
@@ -2509,7 +2491,6 @@ export const items = [
         myStats.cd += cdbuff;
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has twice as much crit damage during the first 8 rounds (max +40%).", "The Life Subtractor is a weapon of death and destruction, crafted with the sole purpose of draining the life force from its victims. With a single strike, this lance can leave even the strongest of warriors on the brink of death, their life essence siphoned away by its dark power. Wield it with caution, for the Life Subtractor has a thirst for blood that can never be quenched.", "legendary", 351),
     }, "The wielder has twice as much crit damage during the first 8 rounds (max +40%).", "The Life Subtractor is a weapon of death and destruction, crafted with the sole purpose of draining the life force from its victims. With a single strike, this lance can leave even the strongest of warriors on the brink of death, their life essence siphoned away by its dark power. Wield it with caution, for the Life Subtractor has a thirst for blood that can never be quenched.", "legendary", 351),
     new weaponInfo("Ignis Aureus", "weapon", "lance", ["chest"], "<:ignis_aureus:1068648981925728407>", "https://i.imgur.com/KHXDQ6i.png", "atk", 52, 837, "sm", 2, 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         const burn = Math.floor(Math.min(eStats.maxhp, myStats.maxhp * 2) * 0.04);
