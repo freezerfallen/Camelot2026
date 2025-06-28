@@ -1160,6 +1160,7 @@ const commands = [
 			.setName('raid')
 			.setDescription('Raid overview')
 			.addBooleanOption(option => option.setName('test').setDescription('Do a test run').setRequired(false))
+			.addStringOption(option => option.setName('boss').setDescription('Select a boss for test runs').setRequired(false).setAutocomplete(true))
 		// .addBooleanOption(option => option.setName('cancel').setDescription('Cancel the raid').setRequired(false))
 	}.data.toJSON(),
 	{

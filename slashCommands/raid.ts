@@ -19,9 +19,9 @@ import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
 
-//! FOR THE BETA ONLY
+//! FOR THE BETA ONLY: 20
 const DAILY_RAID_ATTEMPTS = 4 as const;
-//! FOR THE BETA ONLY
+//! FOR THE BETA ONLY: 20
 
 function getRaidButtonRow(tab: string, canPlay: boolean, raidHasEnded: boolean, isTestRun: boolean): ActionRowBuilder<ButtonBuilder> {
     const buttons = [
@@ -547,6 +547,7 @@ const exportCommand: SlashCommand = {
 
         const cancelOption = interaction.options.getBoolean('cancel') ?? false;
         const isTestRun = interaction.options.getBoolean('test') ?? false;
+        const boss = interaction.options.getString('boss') ?? null;
 
         const stats = author.schema;
         if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
@@ -1195,6 +1196,10 @@ const exportCommand: SlashCommand = {
         };
 
         newFight();
+    },
+    async autocomplete({ interaction }) {
+        // Raid boss selection for test runs
+        return raids.map((e) => ({ name: `${e.name}`, value: e.id.toString() })).filter((e) => e.name.toLowerCase().includes(interaction.options.getFocused().toLowerCase()));
     },
 };
 
