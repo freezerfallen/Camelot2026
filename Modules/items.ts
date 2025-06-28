@@ -926,11 +926,8 @@ export const items = [
     new weaponInfo("Fragarach", "weapon", "sword", ["crafting", "chest"], "<:fragarach:1066858374337138769>", "https://i.imgur.com/StBvtMZ.png", "atk", 36, 592, "mr", 20, 83, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.atk += Math.floor(myStats.atk * 0.03);
         if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
-        myStats.atk += Math.floor(myStats.atk * 0.03);
-        if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.atk += Math.floor(myStats.atk * Math.min(0.03 * Math.floor(matchStats.round - 1), 0.15));
-            if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
             myStats.atk += Math.floor(myStats.atk * Math.min(0.03 * Math.floor(matchStats.round - 1), 0.15));
             if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
             
@@ -963,7 +960,6 @@ export const items = [
     }, "This sword turns all attacks of the wielder into magic damage. Increases dodge chance by **+6%**.", "Kilineiram, also known as the \"Shining Blade of the Sky,\" was crafted by the greatest dwarven smiths of the mountains. Its razor-sharp edge is imbued with the power of the thundering storms, allowing it to strike with the force of a tempest. In the hands of a skilled warrior, Kilineiram is a weapon to be feared on the battlefield.", "unique", 176),
     new weaponInfo("Marauder", "weapon", "sword", ["crafting", "chest"], "<:marauder:1066859971427446874>", "https://i.imgur.com/EHNdA8N.png", "atk", 30, 500, "atk", 20, 160, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 8));
-        mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 8));
         myStats.atk = Math.floor(myStats.atk * 1.2);
 
         return AbilityResponse.SUCCESS;
@@ -979,11 +975,6 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Converts **70%** of the wielders magic resistance into attack, **30%** into defense. The wielder has no magic resistance.", "The Mournblade cuts through the air with a sorrowful whisper, as if it mourns the destruction it brings. Those who wield it speak of a heaviness in their hands, as if the sword itself carries the weight of all the lives it has taken. Those who face it in battle are said to feel a chill down their spine, as if the Mournblade feeds on their fear and grief. Forged in the depths of despair, the Mournblade is a weapon of death and mourning.", "unique", 178),
     new weaponInfo("Nethersbane", "weapon", "sword", ["chest"], "<:nethersbane:1066861436191658016>", "https://i.imgur.com/aDW3yPR.png", "atk", 35, 622, "br", 0.03, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.dodge += 0.08;
-        mybuff.dodge.push(new buffInfo("+", +0.08, 9999));
-        eStats.dodge -= 0.12;
-        if (eStats.dodge < 0) eStats.dodge = 0;
-        ebuff.dodge.push(new buffInfo("+", -0.12, 9999));
         myStats.dodge += 0.08;
         mybuff.dodge.push(new buffInfo("+", +0.08, 9999));
         eStats.dodge -= 0.12;
@@ -1132,13 +1123,13 @@ export const items = [
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 5));
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
+        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 9999));
         myStats.def += Math.floor(myStats.def * 0.3);
         myStats.mr += Math.floor(myStats.mr * 0.3);
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 5));
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
+        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "The Promise of the Lone Victor is a staff that radiates with the determination and strength of a single, triumphant hero. As it is wielded, the staff imbues its wielder with the unbreakable will to overcome any obstacle and emerge victorious. Those who wield this staff are said to be destined to be the last one standing in any battle, no matter the odds.", "unique", 196),
@@ -1243,11 +1234,8 @@ export const items = [
     new weaponInfo("Labrys", "weapon", "axe", ["chest"], "<:labrys:1067187104905449582>", "https://i.imgur.com/B2TiAe4.png", "atk", 34, 567, "atk%", 0.03, 0.12, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
         if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
-        if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
-        if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
-            if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
             if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
             if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
 
@@ -1483,7 +1471,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Every 4 rounds, the wielder gets **5%** defense (max 30%).", "Once wielded by a band of ruthless outlaws, the Warbow of the Wretched strikes fear into the hearts of its enemies. It has been stained with the blood of countless battles, and its strings hum with the cries of the vanquished. In the hands of a skilled archer, this weapon unleashes a barrage of deadly arrows, raining destruction upon the battlefield. But beware, for those who wield it are said to be cursed, doomed to a life of violence and misery.", "unique", 233),
+    }, "The wielder has **+50%** defense, but the buff decreases by **10%** every 4 rounds, down to **+10%**.", "Once wielded by a band of ruthless outlaws, the Warbow of the Wretched strikes fear into the hearts of its enemies. It has been stained with the blood of countless battles, and its strings hum with the cries of the vanquished. In the hands of a skilled archer, this weapon unleashes a barrage of deadly arrows, raining destruction upon the battlefield. But beware, for those who wield it are said to be cursed, doomed to a life of violence and misery.", "unique", 233),
     new weaponInfo("Wyrmwood", "weapon", "bow", ["crafting", "chest"], "<:wyrmwood:1067194031597170711>", "https://i.imgur.com/H70gEHL.png", "atk", 43, 596, "atk", 22, 312, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         // NO BUFF
 
@@ -1713,7 +1701,6 @@ export const items = [
     new weaponInfo("Lithic Blade", "weapon", "dagger", ["crafting", "chest"], "<:lithic_blade:1067235926524305498>", "https://i.imgur.com/2HDILiO.png", "atk", 35, 577, "def", 23, 116, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.def += Math.floor(myStats.def * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
-            myStats.def += Math.floor(myStats.def * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
 
             return AbilityResponse.SUCCESS;
         }, 9999));
@@ -1723,12 +1710,8 @@ export const items = [
     new weaponInfo("Nightfall Knife", "weapon", "dagger", ["chest"], "<:nightfall_knife:1067235931251298374>", "https://i.imgur.com/t2MrMa5.png", "md", 36, 580, "cd", 0.05, 0.3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.br -= 0.18;
         eStats.dodge -= 0.18;
-        eStats.br -= 0.18;
-        eStats.dodge -= 0.18;
         if (eStats.br < 0) eStats.br = 0;
         if (eStats.dodge < 0) eStats.dodge = 0;
-        ebuff.br.push(new buffInfo("+", -0.18, 8));
-        ebuff.dodge.push(new buffInfo("+", -0.18, 8));
         ebuff.br.push(new buffInfo("+", -0.18, 8));
         ebuff.dodge.push(new buffInfo("+", -0.18, 8));
 
@@ -1798,13 +1781,13 @@ export const items = [
     }, "The first time the wielder's HP falls below **25%** of max HP, gains **5%** max HP heal for every round after.", "With a sleek, curved blade and a dark, ominous handle, the Sinister Quickblade is a weapon to be feared. Its razor-sharp edge glints menacingly in the light, promising swift and deadly strikes. Those who wield it are known for their lightning-fast reflexes and deadly precision. Beware the Sinister Quickblade, for it may be the last thing you see.", "unique", 264),
     new weaponInfo("Stiletto of Desecration", "weapon", "dagger", ["crafting", "chest"], "<:stiletto_of_desecration:1067236090139914271>", "https://i.imgur.com/BHGCYBm.png", "atk", 33, 572, "mr", 26, 128, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.def += Math.floor(myStats.def * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
+            myStats.mr += Math.floor(myStats.mr * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Every 4 rounds, the wielder gets **5%** magic resistance (max 30%).", "The Stiletto of Desecration was once used by a cult of worshippers to sacrifice their victims to their dark gods. It is said that the blade thirsts for the blood of the righteous and brings death and destruction wherever it strikes. With each kill, the Stiletto grows stronger and its power more corrupt. Those who wield it are consumed by its dark energy, becoming pawns in its never-ending quest for more death and destruction.", "unique", 265),
+    }, "The wielder has **+50%** magical resistance, but the buff decreases by **10%** every 4 rounds, down to **+10%**.", "The Stiletto of Desecration was once used by a cult of worshippers to sacrifice their victims to their dark gods. It is said that the blade thirsts for the blood of the righteous and brings death and destruction wherever it strikes. With each kill, the Stiletto grows stronger and its power more corrupt. Those who wield it are consumed by its dark energy, becoming pawns in its never-ending quest for more death and destruction.", "unique", 265),
     new weaponInfo("Tyrhung", "weapon", "dagger", ["crafting", "chest"], "<:tyrhung:1067236208549314590>", "https://i.imgur.com/0xTinsg.png", "atk", 37, 582, "dodge", 0.03, 0.12, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.dodgeHeal += 0.04;
 
@@ -2300,8 +2283,6 @@ export const items = [
         myStats.executeHP = Math.max(0.15, myStats.executeHP);
         myStats.atk += Math.floor(myStats.atk * 0.14);
         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.14), 10));
-        myStats.atk += Math.floor(myStats.atk * 0.14);
-        mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.14), 10));
 
         return AbilityResponse.SUCCESS;
     }, "Executes the enemy when below **15%** HP. Increases the wielders attack by **14%** during the first 10 rounds.", "The Warbringer is a fearsome weapon, forged in the heat of battle and tempered in the fires of war. Its sharp, double-edged blade is capable of cleaving through armor and bone with ease, and its sturdy haft allows for powerful, crushing blows. In the hands of a skilled warrior, the Warbringer becomes a force to be reckoned with, striking fear into the hearts of enemies and bringing swift victory to its wielder.", "legendary", 330),
@@ -2467,6 +2448,7 @@ export const items = [
     new weaponInfo("Avalon's Asp", "weapon", "lance", ["chest"], "<:avalons_asp:1068648972882821191>", "https://i.imgur.com/7APxDUG.png", "md", 50, 817, "md%", 0.05, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.md += Math.floor(myStats.md * 0.24);
         mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.24), 12));
+        myStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders magic damage by **24%** during the first 12 rounds. The wielder deals magic damage by default.", "Avalon's Asp is a spear of legend, steeped in the magic of the ancient isle of Avalon. Its slender, graceful shaft is made of a shimmering, silver-like metal that is said to never dull or rust. The spearhead is sharp as a serpent's fang, and seems to pulsate with a faint, otherworldly glow. It is said that this weapon was once wielded by the great King Arthur himself, and that it holds the power to fell even the mightiest of foes with a single strike.", "legendary", 348),
@@ -3176,14 +3158,12 @@ export const items = [
     new weaponInfo("Roe Eile", "weapon", "lance", ["chest"], "<:roe_eile:1069018088760168488>", "https://i.imgur.com/ag00os7.png", "atk", 96, 1032, "dodge", 0.07, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.counter ??= 0;
         if (Math.random() < 0.14) myStats.counter += 1;
-        myStats.counter ??= 0;
-        if (Math.random() < 0.14) myStats.counter += 1;
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // HP debuff immunity / Remove HP debuffs on self 
             mybuff.hp = mybuff.hp.filter((buff) => !buff.isDebuff);
 
             // 14% chance to counter
-            if (Math.random() < 0.14) myStats.counter += 1;
             if (Math.random() < 0.14) myStats.counter += 1;
             return AbilityResponse.SUCCESS;
         }, 9999));
