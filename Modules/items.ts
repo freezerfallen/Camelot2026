@@ -874,13 +874,13 @@ export const items = [
 
     // Weapons - Unique Sword
     new weaponInfo("Anglachel", "weapon", "sword", ["crafting", "chest"], "<:anglachel:1066855443290411048>", "https://i.imgur.com/op2Vwm0.png", "atk", 36, 592, "def", 20, 83, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.def *= 1.1;
-        mybuff.def.push(new buffInfo("*", 1.1, 9999));
-        myStats.mg += 5;
-        mybuff.mg.push(new buffInfo("+", 5, 4));
+        myStats.def *= 1.12;
+        mybuff.def.push(new buffInfo("*", 1.12, 9999));
+        myStats.mg += 12;
+        mybuff.mg.push(new buffInfo("+", 12, 4));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **10%** increased defense. Get **+5** mana per round during the first 4 rounds.", "Anglachel was a blade of unmatched power and beauty, crafted by the great elven smith Eöl in the days of old. Its blade was forged from a single piece of black meteoric iron, and was said to be unbreakable and sharp enough to cut through even the strongest armor. In the hands of the right warrior, it was said to be able to fell even the mightiest of foes. Legend has it that the great warrior Beowulf wielded Anglachel in his final battle against the demon Grendel, and that its power was so great that it was able to strike down the beast with a single, mighty blow.", "unique", 166),
+    }, "The wielder has **12%** increased defense. Get **+12** mana per round during the first 4 rounds.", "Anglachel was a blade of unmatched power and beauty, crafted by the great elven smith Eöl in the days of old. Its blade was forged from a single piece of black meteoric iron, and was said to be unbreakable and sharp enough to cut through even the strongest armor. In the hands of the right warrior, it was said to be able to fell even the mightiest of foes. Legend has it that the great warrior Beowulf wielded Anglachel in his final battle against the demon Grendel, and that its power was so great that it was able to strike down the beast with a single, mighty blow.", "unique", 166),
     new weaponInfo("Ascalon", "weapon", "sword", ["crafting", "chest"], "<:ascalon:1066855448210329751>", "https://i.imgur.com/0mZOIu8.png", "atk", 30, 547, "atk%", 0.04, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.cr += 0.2;
         if (myStats.cr > 1) myStats.cr = 1;
@@ -926,6 +926,7 @@ export const items = [
     new weaponInfo("Fragarach", "weapon", "sword", ["crafting", "chest"], "<:fragarach:1066858374337138769>", "https://i.imgur.com/StBvtMZ.png", "atk", 36, 592, "mr", 20, 83, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.atk += Math.floor(myStats.atk * 0.03);
         if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.atk += Math.floor(myStats.atk * Math.min(0.03 * Math.floor(matchStats.round - 1), 0.15));
             if (Math.random() > 0.5) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
@@ -1122,7 +1123,7 @@ export const items = [
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 5));
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 5));
         mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
-        mybuff.def.push(new buffInfo("+", Math.floor(myStats.def * 0.15), 9999));
+        mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.15), 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The wielder has **15%** increased defense and magic resistance. This effect is doubled for the first 5 rounds.", "The Promise of the Lone Victor is a staff that radiates with the determination and strength of a single, triumphant hero. As it is wielded, the staff imbues its wielder with the unbreakable will to overcome any obstacle and emerge victorious. Those who wield this staff are said to be destined to be the last one standing in any battle, no matter the odds.", "unique", 196),
@@ -1161,16 +1162,24 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Every 3 rounds the wielder is healed by **20%** of their missing HP.", "The Soulkeeper staff is a powerful and ancient relic, imbued with the essence of the great spirits of the land. Its shimmering crystal handle holds the very essence of life, and its glowing tip can harness the power of the soul itself. With this staff in hand, the wielder has the ability to both protect and manipulate the very essence of life itself. But be warned, for the power of the Soulkeeper comes at a great cost, and those who wield it must be cautious not to lose themselves to its dark temptations.", "unique", 200),
     new weaponInfo("Tribute of Illumination", "weapon", "staff", ["crafting", "chest"], "<:tribute_of_illumination:1066864560423850034>", "https://i.imgur.com/HnUdOz6.png", "md", 32, 568, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.hp = Math.floor(myStats.hp * 0.9);
-        myStats.sm += 20;
+        myStats.hp = Math.floor(myStats.hp * 0.5);
+        myStats.sm += 30;
+        myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "In exchange for starting with **10%** less HP, the wielder gains 20 mana at the start of battle.", "The Tribute of Illumination is a powerful staff imbued with the energy of the sun. Its golden glow illuminates the darkest of caves and sheds light on even the most hidden secrets. Those who wield it are granted the ability to see truth and knowledge previously hidden from them. It is said that only those who are pure of heart and intention can harness its full potential.", "unique", 201),
-    new weaponInfo("Wand of Visions", "weapon", "staff", ["chest"], "<:wand_of_visions:1066864564538441739>", "https://i.imgur.com/VTCmTHr.png", "md", 34, 570, "br", 0.03, 0.16, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        ebuff.br.push(new buffInfo("+", -0.1, 9999));
+    }, "In exchange for starting with **50%** less HP, the wielder gains **30** mana immediately, and **1%** magic damage for every **2%** missing HP, up to 25%.", "The Tribute of Illumination is a powerful staff imbued with the energy of the sun. Its golden glow illuminates the darkest of caves and sheds light on even the most hidden secrets. Those who wield it are granted the ability to see truth and knowledge previously hidden from them. It is said that only those who are pure of heart and intention can harness its full potential.", "unique", 201),
+    new weaponInfo("Wand of Visions", "weapon", "staff", ["chest"], "<:wand_of_visions:1066864564538441739>", "https://i.imgur.com/VTCmTHr.png", "md", 34, 570, "hp", 121, 367, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.dodge -= 0.14;
+        if (eStats.dodge < 0) eStats.dodge = 0;
+        ebuff.dodge.push(new buffInfo("+", -0.14, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder decreases enemy block rate by **10%** for the rest of battle.", "This delicate wand known as the Wand of Visions was created by the seer Alia and is said to grant its wielder the ability to see into the future. Those who possess the Wand of Visions are said to be able to predict the outcome of events before they happen.", "unique", 202),
+    }, "The wielder decreases enemy dodge rate by **14%** for the rest of battle.", "This delicate wand known as the Wand of Visions was created by the seer Alia and is said to grant its wielder the ability to see into the future. Those who possess the Wand of Visions are said to be able to predict the outcome of events before they happen.", "unique", 202),
 
     // Weapons - Unique Axe
     new weaponInfo("Betrayer of Broken Bones", "weapon", "axe", ["crafting", "chest"], "<:betrayer_of_broken_bones:1067186662360231956>", "https://i.imgur.com/I5XFNnJ.png", "atk", 34, 572, "md", 20, 386, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -1211,14 +1220,15 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "The wielder deals **25%** increased crit damage during the first 8 rounds.", "With each mighty swing of the Guileless Remorse, the battlefield echoes with the cries of those who dare to stand in its path. Forged in the fires of regret and sorrow, this battle axe is a weapon of pure, unbridled fury. Those who wield the Guileless Remorse are consumed by a burning desire for retribution, striking down their foes without mercy. In their hands, this weapon becomes a symbol of their unbridled rage, a reminder of the wounds they have suffered and the enemies they have vanquished.", "unique", 208),
     new weaponInfo("Howling Remorse", "weapon", "axe", ["crafting", "chest"], "<:howling_remorse:1067186851418472498>", "https://i.imgur.com/KWbp6j5.png", "atk", 36, 566, "mr", 26, 123, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.dodge += 0.24;
-        mybuff.dodge.push(new buffInfo("+", 0.24, 8));
+        myStats.dodge += 0.2;
+        mybuff.dodge.push(new buffInfo("+", 0.2, 8));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **24%** increased dodge chance during the first 8 rounds.", "The Howling Remorse is a deadly weapon wielded by those who have committed great sins and seek redemption in battle. As it cleaves through flesh and bone, a haunting howl echoes from its blade, the cries of the fallen serving as a constant reminder of the wielder's past transgressions. It is a tool of retribution, punishing the wicked and absolving the wielder of their guilt with every swing.", "unique", 209),
+    }, "The wielder has **20%** increased dodge chance during the first 8 rounds.", "The Howling Remorse is a deadly weapon wielded by those who have committed great sins and seek redemption in battle. As it cleaves through flesh and bone, a haunting howl echoes from its blade, the cries of the fallen serving as a constant reminder of the wielder's past transgressions. It is a tool of retribution, punishing the wicked and absolving the wielder of their guilt with every swing.", "unique", 209),
     new weaponInfo("Labrys", "weapon", "axe", ["chest"], "<:labrys:1067187104905449582>", "https://i.imgur.com/B2TiAe4.png", "atk", 34, 567, "atk%", 0.03, 0.12, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
         if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             if (myStats.hp / myStats.maxhp < 0.5) myStats.atk += Math.floor(myStats.atk * 0.125);
             if (myStats.hp / myStats.maxhp < 0.5) myStats.def += Math.floor(myStats.def * 0.2);
@@ -1278,15 +1288,15 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Heals the wielder by **5%** of the damage dealt.", "As Sorrow's Strike descends upon its foes, a dark energy radiates from the blade. Its sharp, jagged edges are a reminder of the pain and suffering endured by those who have fallen before it. Those who dare to face its wrath are met with a swift and devastating blow, leaving a trail of despair in its wake. This battle axe has claimed countless lives, earning its name as the harbinger of sorrow.", "unique", 215),
     new weaponInfo("Vindicator's Earthshaker", "weapon", "axe", ["crafting", "chest"], "<:vindicators_earthshaker:1067187177945042974>", "https://i.imgur.com/ZFyDUJn.png", "atk", 35, 580, "mana", 3, 15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        if (myStats.sm / myStats.mana >= 0.9) myStats.atk += Math.floor(myStats.atk * 0.2);
+        if (myStats.sm / myStats.mana >= 0.8) myStats.atk += Math.floor(myStats.atk * 0.24);
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.sm / myStats.mana >= 0.9) myStats.atk += Math.floor(myStats.atk * 0.2);
+            if (myStats.sm / myStats.mana >= 0.8) myStats.atk += Math.floor(myStats.atk * 0.24);
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder gains an additional **20%** attack buff when their mana bar is at least **90%** full.", "With a mighty swing, the Vindicator's Earthshaker cracks the very earth beneath your feet. Its devastating power will leave your enemies quaking in fear, knowing that their fate has been sealed by the wrath of the Vindicator.", "unique", 216),
+    }, "The wielder gains an additional **24%** attack buff when their mana bar is at least **80%** full.", "With a mighty swing, the Vindicator's Earthshaker cracks the very earth beneath your feet. Its devastating power will leave your enemies quaking in fear, knowing that their fate has been sealed by the wrath of the Vindicator.", "unique", 216),
     new weaponInfo("Warblade of Widows", "weapon", "axe", ["crafting", "chest"], "<:warblade_of_widows:1067187155937529866>", "https://i.imgur.com/GxFf15V.png", "atk", 41, 604, "shield", 30, 212, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (eStats.ep > myStats.ep) {
             myStats.cd += 0.16;
@@ -1448,15 +1458,14 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Every 3rd round, the wielder has **33%** increased attack and magic damage.", "Tweak is a masterfully crafted weapon, imbued with the power to bend and twist reality itself. With each precise shot, the archer can manipulate their surroundings, creating small changes in the world that can make all the difference in battle. As they draw back the string and take aim, the possibilities are endless - and the power of Tweak is truly awe-inspiring.", "unique", 232),
     new weaponInfo("Warbow of the Wretched", "weapon", "bow", ["crafting", "chest"], "<:warbow_of_the_wretched:1067194025821622342>", "https://i.imgur.com/PqtAAD4.png", "atk", 36, 580, "def", 26, 124, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        // Not sure if this would work - I assume not // mybuff.def.push(new buffInfo("+", myStats.def*Math.min(0.05*Math.floor(matchStats.round/4), 0.3), 9999));
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.def += Math.floor(myStats.def * Math.min(0.05 * Math.floor(matchStats.round / 4), 0.3));
+            myStats.def += Math.floor(myStats.def * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Every 4 rounds, the wielder gets **5%** defense (max 30%).", "Once wielded by a band of ruthless outlaws, the Warbow of the Wretched strikes fear into the hearts of its enemies. It has been stained with the blood of countless battles, and its strings hum with the cries of the vanquished. In the hands of a skilled archer, this weapon unleashes a barrage of deadly arrows, raining destruction upon the battlefield. But beware, for those who wield it are said to be cursed, doomed to a life of violence and misery.", "unique", 233),
+    }, "The wielder has **+50%** defense, but the buff decreases by **10%** every 4 rounds, down to **+10%**.", "Once wielded by a band of ruthless outlaws, the Warbow of the Wretched strikes fear into the hearts of its enemies. It has been stained with the blood of countless battles, and its strings hum with the cries of the vanquished. In the hands of a skilled archer, this weapon unleashes a barrage of deadly arrows, raining destruction upon the battlefield. But beware, for those who wield it are said to be cursed, doomed to a life of violence and misery.", "unique", 233),
     new weaponInfo("Wyrmwood", "weapon", "bow", ["crafting", "chest"], "<:wyrmwood:1067194031597170711>", "https://i.imgur.com/H70gEHL.png", "atk", 43, 596, "atk", 22, 312, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         // NO BUFF
 
@@ -1540,13 +1549,13 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "During the very first round, the wielder has **30%** increased attack and magic damage which the enemy can't dodge, nor block. After that, the wielder gets a **10%** attack and magic damage boost for the rest of battle.", "The Marrowstrike lance is a weapon of unmatched power and precision. Forged from the finest metals and imbued with dark magic, this lance has the ability to strike at the very core of its enemies, shattering bone and shredding flesh with each devastating blow. Those who wield the Marrowstrike are feared on the battlefield, their attacks striking fear into the hearts of their foes and inspiring awe in their allies.", "unique", 240),
     new weaponInfo("Rhongomyniad", "weapon", "lance", ["chest"], "<:rhongomyniad:1067200765132808222>", "https://i.imgur.com/FlKjtP2.png", "atk", 36, 577, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.def *= 1.1;
-        mybuff.def.push(new buffInfo("*", 1.1, 9999));
-        myStats.mg += 5;
-        mybuff.mg.push(new buffInfo("+", 5, 4));
+        myStats.def *= 1.12;
+        mybuff.def.push(new buffInfo("*", 1.12, 9999));
+        myStats.mg += 12;
+        mybuff.mg.push(new buffInfo("+", 12, 4));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **10%** increased defense. Get **+5** mana per round during the first 4 rounds.", "The Rhongomyniad is a spear unlike any other. Crafted by the gods themselves, its sharp, shimmering blade is capable of piercing through even the toughest of armor. With its divine power, the wielder of the Rhongomyniad can strike fear into the hearts of their enemies and claim victory in battle. Hold it high and let its majesty guide your way to victory.", "unique", 241),
+    }, "The wielder has **12%** increased defense. Get **+12** mana per round during the first 4 rounds.", "The Rhongomyniad is a spear unlike any other. Crafted by the gods themselves, its sharp, shimmering blade is capable of piercing through even the toughest of armor. With its divine power, the wielder of the Rhongomyniad can strike fear into the hearts of their enemies and claim victory in battle. Hold it high and let its majesty guide your way to victory.", "unique", 241),
     new weaponInfo("Skiver of the Ancients", "weapon", "lance", ["crafting", "chest"], "<:skiver_of_the_ancients:1067200751249657947>", "https://i.imgur.com/kvhqs2V.png", "atk", 34, 567, "md", 28, 426, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.hp.push(new buffInfo("*", 1.03, 9999));
         mybuff.mg.push(new buffInfo("+", 2, 9999));
@@ -1555,38 +1564,38 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "The wielder heals **3%** HP and gets **+2** mana after every round.", "Forged in the ancient ruins of a long-forgotten civilization, the Skiver of the Ancients is imbued with the power and wisdom of the old. Its enchanted shaft allows the wielder to outmaneuver their foes on the battlefield. Those who possess this weapon are said to be favored by the spirits of the past, and are feared by their enemies.", "unique", 242),
     new weaponInfo("Skyreaver", "weapon", "lance", ["crafting", "chest"], "<:skyreaver:1067200863665397882>", "https://i.imgur.com/ULbnDHz.png", "md", 35, 572, "mr", 27, 124, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        if (myStats.sm / myStats.mana >= 0.9) myStats.md += Math.floor(myStats.md * 0.2);
+        if (myStats.sm / myStats.mana >= 0.9) myStats.md += Math.floor(myStats.md * 0.24);
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.sm / myStats.mana >= 0.9) myStats.md += Math.floor(myStats.md * 0.2);
+            if (myStats.sm / myStats.mana >= 0.9) myStats.md += Math.floor(myStats.md * 0.24);
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder gains an additional **20%** magic damage buff when their mana bar is at least **90%** full.", "Skyreaver is a spear forged from the very essence of the sky. Its shimmering, azure blade is said to be as sharp as a bolt of lightning. Legend has it that the spear was once wielded by the great sky gods themselves, and that it still holds a piece of their divine power within its ancient blade.", "unique", 243),
-    new weaponInfo("Taranis", "weapon", "lance", ["crafting", "chest"], "<:taranis:1067200866949546014>", "https://i.imgur.com/Hismntr.png", "md", 34, 574, "br", 0.04, 0.13, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        if (myStats.sm / myStats.mana < 0.2) myStats.md += Math.floor(myStats.md * 0.2);
+    }, "The wielder gains an additional **24%** magic damage buff when their mana bar is at least **90%** full.", "Skyreaver is a spear forged from the very essence of the sky. Its shimmering, azure blade is said to be as sharp as a bolt of lightning. Legend has it that the spear was once wielded by the great sky gods themselves, and that it still holds a piece of their divine power within its ancient blade.", "unique", 243),
+    new weaponInfo("Taranis", "weapon", "lance", ["crafting", "chest"], "<:taranis:1067200866949546014>", "https://i.imgur.com/Hismntr.png", "md", 34, 574, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        if (myStats.sm / myStats.mana < 0.2) myStats.md += Math.floor(myStats.md * 0.24);
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.sm / myStats.mana < 0.2) myStats.md += Math.floor(myStats.md * 0.2);
+            if (myStats.sm / myStats.mana < 0.2) myStats.md += Math.floor(myStats.md * 0.24);
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **20%** increased magic damage when their mana bar is less than **20%** full.", "The sky darkens and the air crackles with electricity as Taranis pierces through the battlefield, striking fear into the hearts of all who dare to stand in its path. This mighty lance, named after the Celtic god of thunder, channels the power of the heavens to unleash devastating blows upon its foes. Wielded by only the bravest of warriors, Taranis brings swift and merciless justice to all who oppose it.", "unique", 244),
+    }, "The wielder has **24%** increased magic damage when their mana bar is less than **20%** full.", "The sky darkens and the air crackles with electricity as Taranis pierces through the battlefield, striking fear into the hearts of all who dare to stand in its path. This mighty lance, named after the Celtic god of thunder, channels the power of the heavens to unleash devastating blows upon its foes. Wielded by only the bravest of warriors, Taranis brings swift and merciless justice to all who oppose it.", "unique", 244),
     new weaponInfo("Trickster's Tip", "weapon", "lance", ["crafting", "chest"], "<:tricksters_tip:1067200871169015838>", "https://i.imgur.com/KzxZlOA.png", "atk", 31, 569, "dodge", 0.03, 0.11, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.dodge > eStats.dodge) {
-            eStats.dodge -= 0.1;
+            eStats.dodge -= 0.16;
             if (eStats.dodge < 0) eStats.dodge = 0;
-            ebuff.dodge.push(new buffInfo("+", -0.1, 8));
+            ebuff.dodge.push(new buffInfo("+", -0.16, 8));
         } else {
-            myStats.dodge += 0.1;
+            myStats.dodge += 0.16;
             if (myStats.dodge > 1) myStats.dodge = 1;
-            mybuff.dodge.push(new buffInfo("+", 0.1, 8));
+            mybuff.dodge.push(new buffInfo("+", 0.16, 8));
         };
 
         return AbilityResponse.SUCCESS;
-    }, "If the wielder has more dodge chance than the enemy, decreases enemy dodge chance by **10%**. Otherwise increases own dodge chance by **10%**. This lasts for 8 rounds.", "The Trickster's Tip is a mischievous lance, imbued with the spirit of chaos and deception. Its slender, curved blade is designed to catch enemies off guard, darting and weaving with a mind of its own. Those who wield it are said to possess a certain cunning, able to turn the tide of battle with a flick of the wrist and a sly grin. But be warned: the Trickster's Tip is a fickle weapon, and those who seek to control it may soon find themselves on the receiving end of its trickery.", "unique", 245),
+    }, "If the wielder has more dodge chance than the enemy, decreases enemy dodge chance by **16%**. Otherwise increases own dodge chance by **16%**. This lasts for 8 rounds.", "The Trickster's Tip is a mischievous lance, imbued with the spirit of chaos and deception. Its slender, curved blade is designed to catch enemies off guard, darting and weaving with a mind of its own. Those who wield it are said to possess a certain cunning, able to turn the tide of battle with a flick of the wrist and a sly grin. But be warned: the Trickster's Tip is a fickle weapon, and those who seek to control it may soon find themselves on the receiving end of its trickery.", "unique", 245),
     new weaponInfo("Tristan's Trance", "weapon", "lance", ["chest"], "<:tristans_trance:1067200876197969973>", "https://i.imgur.com/iYaqRAr.png", "atk", 37, 580, "mg", 1, 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 40;
         myStats.sm += 10;
@@ -1605,13 +1614,13 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders attack by **5%** every 3 rounds (up to **30%**).", "With its sleek and graceful design, Victor is a weapon of undeniable beauty. But do not be fooled by its appearance - this lance is a formidable force on the battlefield, capable of delivering devastating blows to even the most powerful of foes. In the hands of a skilled warrior, Victor becomes a weapon of victory, striking fear into the hearts of all who stand in its way.", "unique", 247),
     new weaponInfo("Viresco", "weapon", "lance", ["crafting", "chest"], "<:viresco:1067200967306649790>", "https://i.imgur.com/IcgHxdh.png", "atk", 36, 585, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        eStats.sm += 40;
-        myStats.sm += 40;
+        eStats.sm += 90;
+        myStats.sm += 45;
         if (eStats.sm > eStats.mana) eStats.sm = eStats.mana;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder starts with **+40** mana, but so does your enemy.", "The Viresco lance is crafted from the finest elven steel and infused with the essence of life itself. Its polished surface glows with a vibrant green hue. Those who wield it in battle are imbued with strength and vitality, as if the lance itself has become a source of nourishment. With every thrust and parry, the Viresco lance seems to grow stronger, radiating an aura of vitality that can revitalize even the most weary of warriors.", "unique", 248),
+    }, "The wielder starts with **+90** mana, but your enemy also has half of that.", "The Viresco lance is crafted from the finest elven steel and infused with the essence of life itself. Its polished surface glows with a vibrant green hue. Those who wield it in battle are imbued with strength and vitality, as if the lance itself has become a source of nourishment. With every thrust and parry, the Viresco lance seems to grow stronger, radiating an aura of vitality that can revitalize even the most weary of warriors.", "unique", 248),
     new weaponInfo("Vortex Vanquisher", "weapon", "lance", ["crafting", "chest"], "<:vortex_vanquisher:1067200972021047439>", "https://i.imgur.com/FmqrPwU.png", "atk", 38, 582, "cd", 0.05, 0.34, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.1), 9999));
         myStats.atk += Math.floor(myStats.atk * 0.5);
@@ -1718,12 +1727,12 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "The wielder starts with **80%** HP but has **20%** increased attack and magic damage. Additionally, each round the wielder loses **2%** of max HP and **2** mana, but gains **2%** attack and magic damage.", "The Satanic Stiletto is a weapon of darkness, forged in the depths of the underworld by a powerful devil. Its demonic handle channels the power of the underworld, giving its wielder strength and speed beyond that of mere mortals. But be warned - those who dare to wield the Satanic Stiletto will be consumed by its thirst for power and destruction, their souls doomed to be dragged down into the depths of hell.", "unique", 260),
     new weaponInfo("Serenity Thorns", "weapon", "dagger", ["chest"], "<:serenity_thorns:1067235943695785984>", "https://i.imgur.com/yT8d0aO.png", "atk", 36, 578, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.02), 9999));
-        myStats.mg += 4;
-        mybuff.mg.push(new buffInfo("+", 4, 9999));
+        mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * 0.02), 9999));
+        myStats.mg += 6;
+        mybuff.mg.push(new buffInfo("+", 6, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "This dagger drains **2%** of max HP from the wielder each round to increase mana gain by **+4**.", "The Serenity Thorns dagger is a weapon of deadly beauty. Its sharp blade was forged from a rare metal that glows with a serene light, as if it were imbued with the essence of nature itself. But make no mistake, this dagger is not for the faint of heart. Its thorns are designed to inflict maximum damage, and its wielder must be skilled and precise in their strikes to fully harness its power. Those who master the Serenity Thorns will find their enemies falling before them with ease, as the dagger's light guides their hand to true and swift victory.", "unique", 261),
+    }, "This dagger drains **2%** of current HP from the wielder each round to increase mana gain by **+6**.", "The Serenity Thorns dagger is a weapon of deadly beauty. Its sharp blade was forged from a rare metal that glows with a serene light, as if it were imbued with the essence of nature itself. But make no mistake, this dagger is not for the faint of heart. Its thorns are designed to inflict maximum damage, and its wielder must be skilled and precise in their strikes to fully harness its power. Those who master the Serenity Thorns will find their enemies falling before them with ease, as the dagger's light guides their hand to true and swift victory.", "unique", 261),
     new weaponInfo("Silent Hurl", "weapon", "dagger", ["crafting", "chest"], "<:silent_hurl:1067236075833151600>", "https://i.imgur.com/9joiSSF.png", "atk", 31, 567, "dodge", 0.03, 0.11, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         ebuff.hp.push(new buffInfo("+", -Math.floor(Math.min(eStats.maxhp, myStats.maxhp * 2) * 0.03), 9999));
 
@@ -1756,27 +1765,27 @@ export const items = [
         };
 
         return AbilityResponse.SUCCESS;
-    }, "The first time the wielder's HP falls below **25%** of max HP, gains **5%** heal for every round after.", "With a sleek, curved blade and a dark, ominous handle, the Sinister Quickblade is a weapon to be feared. Its razor-sharp edge glints menacingly in the light, promising swift and deadly strikes. Those who wield it are known for their lightning-fast reflexes and deadly precision. Beware the Sinister Quickblade, for it may be the last thing you see.", "unique", 264),
+    }, "The first time the wielder's HP falls below **25%** of max HP, gains **5%** max HP heal for every round after.", "With a sleek, curved blade and a dark, ominous handle, the Sinister Quickblade is a weapon to be feared. Its razor-sharp edge glints menacingly in the light, promising swift and deadly strikes. Those who wield it are known for their lightning-fast reflexes and deadly precision. Beware the Sinister Quickblade, for it may be the last thing you see.", "unique", 264),
     new weaponInfo("Stiletto of Desecration", "weapon", "dagger", ["crafting", "chest"], "<:stiletto_of_desecration:1067236090139914271>", "https://i.imgur.com/BHGCYBm.png", "atk", 33, 572, "mr", 26, 128, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.mr += Math.floor(myStats.mr * Math.min(0.05 * Math.floor(matchStats.round / 4), 0.3));
+            myStats.mr += Math.floor(myStats.mr * Math.max(0.5 - (0.1 * Math.floor(matchStats.round / 4)), 0.1));
 
             return AbilityResponse.SUCCESS;
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Every 4 rounds, the wielder gets **5%** magic resistance (max 30%).", "The Stiletto of Desecration was once used by a cult of worshippers to sacrifice their victims to their dark gods. It is said that the blade thirsts for the blood of the righteous and brings death and destruction wherever it strikes. With each kill, the Stiletto grows stronger and its power more corrupt. Those who wield it are consumed by its dark energy, becoming pawns in its never-ending quest for more death and destruction.", "unique", 265),
+    }, "The wielder has **+50%** magical resistance, but the buff decreases by **10%** every 4 rounds, down to **+10%**.", "The Stiletto of Desecration was once used by a cult of worshippers to sacrifice their victims to their dark gods. It is said that the blade thirsts for the blood of the righteous and brings death and destruction wherever it strikes. With each kill, the Stiletto grows stronger and its power more corrupt. Those who wield it are consumed by its dark energy, becoming pawns in its never-ending quest for more death and destruction.", "unique", 265),
     new weaponInfo("Tyrhung", "weapon", "dagger", ["crafting", "chest"], "<:tyrhung:1067236208549314590>", "https://i.imgur.com/0xTinsg.png", "atk", 37, 582, "dodge", 0.03, 0.12, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.dodgeHeal += 0.04;
 
         return AbilityResponse.SUCCESS;
     }, "The wielder heals **4%** of max HP after successfully dodging an attack.", "The Tyrhung is a wickedly sharp dagger, said to have been crafted by the god Tyr himself. Its blade is imbued with the power of justice and is feared by evildoers. Those who wield the Tyrhung are known to strike with deadly precision and can deliver swift justice to any who dare to cross them.", "unique", 266),
     new weaponInfo("Vengeful Fang", "weapon", "dagger", ["chest"], "<:vengeful_fang:1067236213154660372>", "https://i.imgur.com/bphR5w8.png", "atk", 36, 579, "br", 0.04, 0.17, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.dodge += 0.12;
-        mybuff.dodge.push(new buffInfo("+", 0.12, 8));
+        myStats.dodge += 0.2;
+        mybuff.dodge.push(new buffInfo("+", 0.2, 8));
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder has **12%** increased dodge chance during the first 8 rounds.", "Forged from the sharpened tooth of a fallen enemy, the Vengeful Fang is a weapon of retribution and justice. Its razor-sharp edge has tasted the blood of countless foes. In the hands of a skilled assassin, this deadly dagger is a force to be reckoned with.", "unique", 267),
+    }, "The wielder has **20%** increased dodge chance during the first 8 rounds.", "Forged from the sharpened tooth of a fallen enemy, the Vengeful Fang is a weapon of retribution and justice. Its razor-sharp edge has tasted the blood of countless foes. In the hands of a skilled assassin, this deadly dagger is a force to be reckoned with.", "unique", 267),
     new weaponInfo("Vicinity Blade", "weapon", "dagger", ["crafting", "chest"], "<:vicinity_blade:1067236219823607869>", "https://i.imgur.com/aG3cWPb.png", "atk", 42, 633, "atk", 26, 226, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         // NO BUFF
 
@@ -3055,6 +3064,7 @@ export const items = [
                         ebuff.dodge.push(new buffInfo("+", -0.16, 9999));
                         eStats.def -= Math.floor(eStats.def * 0.4);
                         ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.4), 9999));
+                        notice.push(`\n<:mystic_moon:1069016606199533578> The full moon is in effect.`);
                         return true;
                     };       
             },
@@ -3081,7 +3091,7 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, "Normal attacks additionally burn the enemy, dealing **12.5%** true damage for 3 rounds.\n\n_true damage = ignores shield_", "The Sagitta Solis, also known as the Arrow of the Sun, is a weapon of great power and beauty. Crafted by powerful spirits of light, its gleaming golden bowstring is imbued with the warmth and radiance of the sun itself. As it flies true and swift, it brings forth a blazing trail of light, illuminating the battlefield and striking fear into the hearts of the enemy. In the hands of a skilled archer, the Sagitta Solis is a weapon of unparalleled precision and might.", "mythical", 414),
-    new weaponInfo("Tundral", "weapon", "bow", ["chest"], "<:tundral:1069017127874461810>", "https://i.imgur.com/Pt7OKU8.png", "atk", 86, 948, "mana", 10, 50, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new weaponInfo("Tundral", "weapon", "bow", ["chest"], "<:tundral:1069017127874461810>", "https://i.imgur.com/Pt7OKU8.png", "atk", 86, 948, "mg", 1, 6, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.sm >= (myStats.mana * 0.6)) {
             myStats.atk += Math.floor(myStats.atk * 0.33);
             myStats.md += Math.floor(myStats.md * 0.33);
@@ -3135,6 +3145,7 @@ export const items = [
     new weaponInfo("Roe Eile", "weapon", "lance", ["chest"], "<:roe_eile:1069018088760168488>", "https://i.imgur.com/ag00os7.png", "atk", 96, 1032, "dodge", 0.07, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.counter ??= 0;
         if (Math.random() < 0.14) myStats.counter += 1;
+
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // HP debuff immunity / Remove HP debuffs on self 
             mybuff.hp = mybuff.hp.filter((buff) => !buff.isDebuff);
@@ -3487,7 +3498,7 @@ export const items = [
         myStats.mdChance += 1;
 
         return AbilityResponse.SUCCESS;
-    }, "Every even round the wielder sacrifices **7%** current HP to have **100%** crit rate. Even odd round the wielder instead restores **1%** missing HP for every **5%** crit. rate away from **100%**, up to **12%** missing HP. The wielder deals magic damage by default.", "The only pair of wings that could endure the testament of time, and soar limitlessly... The Celestial Wing was crafted by a group of elven smiths who were tasked with creating a weapon fit for the gods. Despite using the finest materials and imbuing it with powerful magic, the weapon before them lacked a divine aura. Angered, they were dismissed and had their roles stripped. Having had been discharged, the elven smiths disappointly hold their failed product, forced to step away from their usual living place. Viewed as a disgrace, they wander around the world, as far as possible from the \"pure\". As the road gets increasingly muddy and disorganized, the view widened as the breeze of soft wind lifted their spirits. Experiencing awakening, realization and appreciation, as true beauty of nature laid freely in front of them. At a campfire, a smith decides to unwrap the celestial wing for a moment of nostalgia... There it lights up, radiating an unfathomable aura, as it soars into the sky, leaving behind a trial of sparkles. The scent of purity returns as the celestial wing landed back at the smith's hands... Mari gently taps on the celestial wing, as if feeling the feathers of freedom, as if calling for countless explorations and journeys ahead.", "genesis", 445),
+    }, "Every even round the wielder sacrifices **7%** current HP to have **100%** crit rate. Every odd round the wielder instead restores **1%** missing HP for every **5%** crit rate away from **100%**, up to **12%** missing HP. The wielder deals magic damage by default.", "The only pair of wings that could endure the testament of time, and soar limitlessly... The Celestial Wing was crafted by a group of elven smiths who were tasked with creating a weapon fit for the gods. Despite using the finest materials and imbuing it with powerful magic, the weapon before them lacked a divine aura. Angered, they were dismissed and had their roles stripped. Having had been discharged, the elven smiths disappointly hold their failed product, forced to step away from their usual living place. Viewed as a disgrace, they wander around the world, as far as possible from the \"pure\". As the road gets increasingly muddy and disorganized, the view widened as the breeze of soft wind lifted their spirits. Experiencing awakening, realization and appreciation, as true beauty of nature laid freely in front of them. At a campfire, a smith decides to unwrap the celestial wing for a moment of nostalgia... There it lights up, radiating an unfathomable aura, as it soars into the sky, leaving behind a trial of sparkles. The scent of purity returns as the celestial wing landed back at the smith's hands... Mari gently taps on the celestial wing, as if feeling the feathers of freedom, as if calling for countless explorations and journeys ahead.", "genesis", 445),
 
     // Weapons - Genesis Dagger
     new weaponInfo("Astral Cutlass", "weapon", "dagger", ["chest"], "<:astral_cutlass:1069033520523137064>", "https://i.imgur.com/LLK5ovB.png", "atk", 196, 1215, "dodge", 0.07, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

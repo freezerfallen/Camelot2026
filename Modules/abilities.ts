@@ -3801,10 +3801,10 @@ export const abilities: Record<number, Ability> = {
         shortdesc: "**Uses**: `1`\n**Cost**: `150 💧`\n**Timeout**: `No`\n**Role**: `Support/Tank (Burst, Mana-reset, Freeze, Healing, Revive)`\n\n__**Passive**__\n- Every round: Restores **5%** max HP , steals **3** 💧 from enemy\n- Upon death, revives with **40%** HP\n- ATTACK is altered to deal **60%** ATK & **60%** MD, each has a **33%** chance (**66%** if domain is active) of inflicting a debuff\n> List of debuffs: `Burn` dealing **3%** of max HP as damage (Caps at **6%** of Artemis' current HP) // `Impair` (**-15%** DEF & MR) // `Poison` (**-15%** ATK & MD) // `Paralyse` (Prevents enemy from attacking that round, functions as timeout false)\n- Gains **+20%** class XP\n\n__**Active**__ (✨)\nEnters domain for **5** rounds with the following effects:\n- Enemy frozen (cannot make actions)\n- Applies **20%** vulnerability to the enemy (20% more damage)\n- Doubled chances of debuffing from passive ATTACK\n- DEFEND is altered to extend all debuffs on the enemy by **1** round\n- ACTIVE (✨) deals **130%** DMG with no cost. If Apollo EX is owned, deals **140%** DMG instead and applies bleed (**2%** of the enemy's current HP, up to **4%** of her current HP), lasting until the end of the domain\nUpon exiting domain:\n- Depletes all enemy mana\n- Blocks enemy's mana regeneration for **5** rounds",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Artemis EX
-            const domainLast = 5, mana_cost = 150;
+            const domainLast = 5, mana_cost = (this.used === 1) ? 150 : 0;
 
             // Check if enough mana
-            if (mana_cost > myStats.sm && this.used < 1) {
+            if (mana_cost > myStats.sm) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 matchStats.interaction.followUp({ content: `You don't have enough mana! (**${myStats.sm}**/${mana_cost}<:mana:1047269152957661255>)`, ephemeral: true });
                 this.used--;
