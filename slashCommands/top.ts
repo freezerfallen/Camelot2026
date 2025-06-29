@@ -1,11 +1,11 @@
 import { EmbedBuilder, ComponentType, ButtonInteraction, Message } from "discord.js";
 import fs from 'fs';
-import { auniq, characters } from "../Modules/chars.js";
-import { userLevel, getClassLvl, showPage, formatNumberWithQuotes } from "../Modules/functions.js";
-import { classes } from "../Modules/classes.js";
-import { PageRow } from "../Modules/components.js";
-import { SlashCommand, UserSchema } from "../types.js";
-import { getLatestStampede, getReferralLeaderboard, getServerSchema, getUserRanking } from "../Modules/queries.js";
+import { auniq, characters } from "../Modules/chars";
+import { userLevel, getClassLvl, showPage, formatNumberWithQuotes } from "../Modules/functions";
+import { classes } from "../Modules/classes";
+import { PageRow } from "../Modules/components";
+import { SlashCommand, UserSchema } from "../types";
+import { getLatestStampede, getReferralLeaderboard, getServerSchema, getUserRanking } from "../Modules/queries";
 
 const exportCommand: SlashCommand = {
     name: 'top',

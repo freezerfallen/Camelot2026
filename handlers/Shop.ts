@@ -47,7 +47,7 @@ const handler: BotHandler = {
             };
 
             const product = products[donation.product_id];
-            const jades = product.jades + (donation.first_purchase ? product.bonus : 0);
+            const jades = (product.jades * (donation.amount || 1)) + (donation.first_purchase ? product.bonus : 0);
 
             // Update users table
             const userUpdates: UpdateUserOptions = {
