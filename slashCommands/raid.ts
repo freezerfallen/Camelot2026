@@ -27,9 +27,9 @@ function getRaidButtonRow(tab: string, canPlay: boolean, raidHasEnded: boolean, 
     const buttons = [
         new ButtonBuilder()
             .setCustomId('play')
-            .setLabel(raidHasEnded ? "Raid has Ended!" : (isTestRun ? "Test Run" : "Start Battle"))
+            .setLabel(isTestRun ? "Test Run" : (raidHasEnded ? "Raid has Ended!" : "Start Battle"))
             .setStyle(ButtonStyle.Danger)
-            .setDisabled(!canPlay || raidHasEnded),
+            .setDisabled(isTestRun === false && (!canPlay || raidHasEnded)),
         new ButtonBuilder()
             .setCustomId('ranking')
             .setLabel(tab === "overview" ? "Show Ranking" : "Show Overview")
@@ -204,10 +204,12 @@ async function raidSelection(interaction: ChatInputCommandInteraction, stats: Co
     });
 };
 
-function raidOverview(interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[], isTestRun: boolean): Promise<number> {
+function raidOverview({ interaction, stats, guild, raid, userItems, isTestRun, testBoss }: { interaction: ChatInputCommandInteraction, stats: CompactUserSchema, guild: GuildSchema, raid: RaidSchema, userItems: itemInfo[], isTestRun: boolean, testBoss: string | null; }): Promise<number> {
     return new Promise((resolve) => {
 
-        const currentRaid = raids[raid.raidid];
+        const isTestBoss = isTestRun && testBoss !== null;
+
+        const currentRaid = isTestBoss ? raids[parseInt(testBoss)] : raids[raid.raidid];
         if (!currentRaid) return interaction.reply("Unexpected Error: Raid not found\nPlease open a ticket in our `/support` server if you encounter this error.");
 
         const startDate = new Date(raid.start_date);
@@ -228,7 +230,7 @@ function raidOverview(interaction: ChatInputCommandInteraction, stats: CompactUs
             if (tab === "overview") {
                 return `### Raid Overview`
                     // + `\nAfter the exam you will be assigned a rank based on your performance.`
-                    + `\n**Enemy**: ${currentRaid.enemy.name} [${raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${formatNumberWithQuotes(Math.max(0, raid.enemy_hp))}**/${formatNumberWithQuotes(raid.enemy_hpmax)} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
+                    + `\n**Enemy**: ${currentRaid.enemy.name} [${isTestBoss ? "EX+" : raid.rank_letter}] (phase ${currentRaid.phase}/${currentRaid.phasesTotal})\n**Progress**: **${formatNumberWithQuotes(Math.max(0, isTestBoss ? currentRaid.getRankHp("EX+") : raid.enemy_hp))}**/${formatNumberWithQuotes(isTestBoss ? currentRaid.getRankHp("EX+") : raid.enemy_hpmax)} <:HP:1062043800979116143> (${timeLeft(endDate)} left)`
                     + `\n\n**Traits**\n- ${currentRaid.enemy.ability?.list[0].join("\n- ")}`
                     // + `\n\n**Stats**\n**Current Rank**: ${stats.rank}\n**Highest Score**: ${stats.rankscore ? formatNumberWithQuotes(stats.rankscore) : "--"}`
                     + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}`
@@ -546,8 +548,9 @@ const exportCommand: SlashCommand = {
         const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
 
         const cancelOption = interaction.options.getBoolean('cancel') ?? false;
-        const isTestRun = interaction.options.getBoolean('test') ?? false;
-        const boss = interaction.options.getString('boss') ?? null;
+        const testBoss = interaction.options.getString('boss') ?? null;
+        const isTestRun = (testBoss !== null) || (interaction.options.getBoolean('test') ?? false);
+        const isTestBoss = isTestRun && testBoss !== null;
 
         const stats = author.schema;
         if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
@@ -578,6 +581,13 @@ const exportCommand: SlashCommand = {
             };
         };
 
+        if (isTestBoss) {
+            raid.raidid = parseInt(testBoss);
+            raid.enemy_hp = raids[raid.raidid].getRankHp("EX+");
+            raid.enemy_hpmax = raids[raid.raidid].getRankHp("EX+");
+            raid.rank_letter = "EX+";
+        };
+
         if (cancelOption) {
             if ([guild.master, ...guild.elders].includes(interaction.user.id)) {
                 const result = await cancelRaid(raid.rowid);
@@ -599,7 +609,7 @@ const exportCommand: SlashCommand = {
         stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
 
         // Overview
-        let start = await raidOverview(interaction, stats, guild, raid, userItems, isTestRun);
+        let start = await raidOverview({ interaction, stats, guild, raid, userItems, isTestRun, testBoss });
         if (start === -1) return;
 
         // User must've been a member for at least 7 days
