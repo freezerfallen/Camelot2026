@@ -27,7 +27,10 @@ const handler: BotHandler = {
             const donation = req.body as RankShopTransaction;
 
             // Check if authorization is valid
-            if (donation.authorization !== config.rank.auth) return;
+            if (req.headers.authorization !== config.rank.auth && donation.authorization !== config.rank.auth) {
+                return res.status(401).send('Unauthorized');
+            };
+
             delete donation.authorization;
 
             // Send a response back to acknowledge receipt
