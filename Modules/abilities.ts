@@ -5741,7 +5741,7 @@ export const abilities: Record<number, Ability> = {
                         case "a120":
                             notice.push("\n`⚙️` Pod has been equipped with programme : **Repair**.");
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                if (matchStats.round % 3 === 0) {
+                                if (matchStats.round % 4 === 0) {
                                     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                                         const heal = Math.floor(myStats.maxhp * 0.05);
                                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
@@ -5756,7 +5756,7 @@ export const abilities: Record<number, Ability> = {
                         case "a140":
                             notice.push("\n`⚙️` Pod has been equipped with programme : **Gravity**.");
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                if (matchStats.round % 3 === 0) {
+                                if (matchStats.round % 4 === 0) {
                                     eStats.atk -= Math.floor(eStats.atk * 0.25);
                                     eStats.md -= Math.floor(eStats.md * 0.25);
                                     eStats.def -= Math.floor(eStats.def * 0.25);
@@ -5781,7 +5781,7 @@ export const abilities: Record<number, Ability> = {
                         case "r020":
                             notice.push("\n`⚙️` Pod has been equipped with programme : **Mirage**.");
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                if (matchStats.round % 3 === 0) {
+                                if (matchStats.round % 4 === 0) {
                                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **Pod**", { atkMultiplier: 0.2, dodge: 0 });
                                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, "`⚙️` Pod analyzed the foe! **Pod**", { atkMultiplier: 0.2, dodge: 0 });
                                 };
