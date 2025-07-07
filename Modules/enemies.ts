@@ -283,8 +283,8 @@ export const raidBosses: enemyInfo[] = [
 
             const retaliationChance = 0.4;
 
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
-                if (caster === myStats && Math.random() < retaliationChance && matchStats.round % 2 === 0) {
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && !options.preventRetaliation && Math.random() < retaliationChance && matchStats.round % 2 === 0) {
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
@@ -304,8 +304,8 @@ export const raidBosses: enemyInfo[] = [
 
             const retaliationChance = 0.4;
 
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
-                if (caster === myStats && Math.random() < retaliationChance) {
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && !options.preventRetaliation && Math.random() < retaliationChance) {
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
@@ -325,8 +325,8 @@ export const raidBosses: enemyInfo[] = [
 
             const retaliationChance = 0.4;
 
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats }) => {
-                if (caster === myStats && Math.random() < retaliationChance) {
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && !options.preventRetaliation && Math.random() < retaliationChance) {
                     dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:retaliation_attack:1340455894701576213> **${enemy.name}** retaliates! She`, { atkMultiplier: eStats.retaliationDamage });
                 };
             });
