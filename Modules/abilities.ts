@@ -3793,14 +3793,14 @@ export const abilities: Record<number, Ability> = {
             myStats.heat ??= 0;
             notice.push(`\n⛅ It's Daytime!`);
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                // Scorch Effect
-                matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                    if (caster === eStats) {
-                        ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * Math.min(0.075 * Math.floor(myStats.heat / 10), 0.03)), 2));
-                    };
-                });
+            // Scorch Effect
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === eStats) {
+                    ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * Math.min(0.075 * Math.floor(myStats.heat / 10), 0.03)), 2));
+                };
+            });
 
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 let roundTime = (matchStats.round - 1) % 6; // day: [0, 1], noon: [2], night: [3, 4, 5];
                 if (roundTime == 2) { // Noon : The One
                     notice.push(`\n☀️ It's Noon!`);
@@ -4480,7 +4480,7 @@ export const abilities: Record<number, Ability> = {
 
                 myStats.selfhealChance.push(1);
                 myStats.selfheal.push(0.1);
-                notice.push(`\n✨ Equipped buffs from __Phantasmal Mask__.`+ names.includes("Artemis EX") ? ` Additional effects from Artemis EX applied`:``);
+                notice.push(`\n✨ Equipped buffs from __Phantasmal Mask__.` + names.includes("Artemis EX") ? ` Additional effects from Artemis EX applied` : ``);
             } else if (mask === "verdant") { // Verdant Guardian Mask
                 const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (names.includes("Apollo EX")) {
@@ -4495,7 +4495,7 @@ export const abilities: Record<number, Ability> = {
                 myStats.def += Math.floor(myStats.def * 0.2);
                 mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.2), 3));
                 myStats.mr += Math.floor(myStats.mr * 0.2);
-                notice.push(`\n✨ Equipped buffs from __Verdant Mask__.`+ names.includes("Apollo EX") ? ` Additional effects from Apollo EX applied`:``);
+                notice.push(`\n✨ Equipped buffs from __Verdant Mask__.` + names.includes("Apollo EX") ? ` Additional effects from Apollo EX applied` : ``);
             } else if (mask === "valkyrie") { // Valkyrie's Battle Mask
                 const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
                 if (!names.includes("Apollo EX") && !names.includes("Artemis EX")) {
@@ -4508,7 +4508,7 @@ export const abilities: Record<number, Ability> = {
 
                 mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.25), 9999));
                 myStats.atk += Math.floor(myStats.atk * 0.25);
-                notice.push(`\n✨ Equipped buffs from __Valkyrie Mask__.`+ (!names.includes("Apollo EX") && !names.includes("Artemis EX")) ? ` Additional effects from the absence of Apollo EX & Artemis EX applied`:``);
+                notice.push(`\n✨ Equipped buffs from __Valkyrie Mask__.` + (!names.includes("Apollo EX") && !names.includes("Artemis EX")) ? ` Additional effects from the absence of Apollo EX & Artemis EX applied` : ``);
             };
 
             return AbilityResponse.SUCCESS;
@@ -6134,10 +6134,10 @@ export const abilities: Record<number, Ability> = {
             }, 9999));
 
             matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                        if (caster === myStats && myStats.hacking === true) { // Lose 7% current HP when non-crit during hacking
-                            myStats.hp -= Math.floor(myStats.hp * 0.07);
-                        };
-                    });
+                if (caster === myStats && myStats.hacking === true) { // Lose 7% current HP when non-crit during hacking
+                    myStats.hp -= Math.floor(myStats.hp * 0.07);
+                };
+            });
 
             return AbilityResponse.SUCCESS;
         },
