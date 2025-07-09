@@ -1574,6 +1574,7 @@ const commands = [
 						{ name: 'stampede', value: 'stampede' },
 						{ name: 'referrals', value: 'referrals' },
 						{ name: 'event', value: 'event' },
+						{ name: 'rolling cow', value: 'cow' },
 					)
 			)
 			.addIntegerOption(option => option.setName('page').setDescription('Choose a page to jump to').setRequired(false))
