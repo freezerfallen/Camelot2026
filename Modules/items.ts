@@ -4719,7 +4719,7 @@ export const items = [
         const hpBuff = [15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1] / 100;
         myStats.myStatsFixed += Math.floor(myStats.myStatsFixed * hpBuff);
         myStats.maxhp += Math.floor(myStats.maxhp * hpBuff);
-        myStats.hp += Math.floor(myStats.maxhp * hpBuff);
+        if (myStats.hp > 0) myStats.hp += Math.floor(myStats.maxhp * hpBuff);
 
         // 0% Dodge
         mybuff.dodge.push(new buffInfo("=", 0, 9999));
@@ -4940,7 +4940,7 @@ export const items = [
         // +8/9/10/11/12/13/14/15/16% max HP, 0% Dodge
         myStatsFixed.maxhp += Math.floor(myStatsFixed.maxhp * increase);
         myStats.maxhp += Math.floor(myStats.maxhp * increase);
-        myStats.hp += Math.floor(myStats.maxhp * increase);
+        if (myStats.hp > 0) myStats.hp += Math.floor(myStats.maxhp * increase);
 
         myStats.dodge = 0;
         mybuff.dodge.push(new buffInfo("=", 0, 9999));
