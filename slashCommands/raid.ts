@@ -822,7 +822,7 @@ const exportCommand: SlashCommand = {
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        for (const sid of stats.raid_supports) {
+        for (const sid of new Set(stats.raid_supports)) {
             if (sid !== undefined && sid !== null && sid !== stats.battlechar) {
                 const myStatsP = { ...myStatsC };
                 myStatsP.name = characters[sid].name;
