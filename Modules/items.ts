@@ -4574,6 +4574,7 @@ export const items = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (target === myStats) {
                     myStats.maxhp += Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]);
+                    myStatsFixed.maxhp += Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]);
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * [0.04, 0.04, 0.05, 0.05, 0.05][level - 1]));
                     return true;
                 };
