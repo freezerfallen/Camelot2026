@@ -192,8 +192,8 @@ export const abilities: Record<number, Ability> = {
                     myStats.sm -= 35;
                     let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.4, magicDamage: true });
                     if (dmg) {
-                        mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.02), 9999));
-                        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.02), 9999));
+                        mybuff.atk.push(new buffInfo("*", 1.02, 9999));
+                        mybuff.md.push(new buffInfo("*", 1.02, 9999));
                     };
                 };
 
@@ -2161,10 +2161,10 @@ export const abilities: Record<number, Ability> = {
     //                 this.used++
     //                 return AbilityResponse.SUCCESS;
     //             }));
-                
+
     //             notice.push(`\n💤 ${char.name} entered a __Light Dream__`);
     //         };
-            
+
     //         // Active (II)
     //         if (this.used === 2) {
     //             myStats.hp -= Math.floor(myStats.hp * 0.18);
@@ -2242,7 +2242,7 @@ export const abilities: Record<number, Ability> = {
     //             emoji: "🪄",
     //             run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🪄 **${char.name}**`, { atkMultiplier: fantasyDamage, magicDamage: true, combodmg: true, mdChance: -1 });
-                    
+
     //                 if (Math.random() <= 0.5 + 0.25 * myStats.dreamState) {
     //                     for (let i = 0; i < fantasyBuff; i++) {
     //                         // Trick
@@ -2325,7 +2325,7 @@ export const abilities: Record<number, Ability> = {
     //             mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.1), 9999));
     //             mybuff.mg.push(new buffInfo("+", 7, 9999));
     //         }; 
-            
+
     //         // Permanent effects
     //         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 6, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //             const effectIndex = Math.floor(Math.random() * 5);
@@ -2333,31 +2333,31 @@ export const abilities: Record<number, Ability> = {
     //                 case 1:
     //                     myStats.atk += Math.floor(myStats.atk * 0.12);
     //                     myStats.md += Math.floor(myStats.md * 0.12);
-//                        break;
-//                    case 2:
-//                        myStats.def += Math.floor(myStats.def * 0.12);
-//                        myStats.mr += Math.floor(myStats.mr * 0.12);
-//                        break;
-//                    case 3:
-//                        myStats.cr += 0.25;
-//                        if (myStats.cr > 1) myStats.cr = 1;
-//                        break;
-//                    case 4:
-//                        eStats.sm -= 10;
-//                        if (eStats.sm < 0) eStats.sm = 0;
-//                        myStats.sm += 10;
-//                        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-//                        break;
-//                    case 5:
-//                        const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
-//                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
-//                        break;
-//                };                
-//                return AbilityResponse.SUCCESS;
-//            }, 9999));
-//            return AbilityResponse.SUCCESS;
-//        },
-//    },
+    //                        break;
+    //                    case 2:
+    //                        myStats.def += Math.floor(myStats.def * 0.12);
+    //                        myStats.mr += Math.floor(myStats.mr * 0.12);
+    //                        break;
+    //                    case 3:
+    //                        myStats.cr += 0.25;
+    //                        if (myStats.cr > 1) myStats.cr = 1;
+    //                        break;
+    //                    case 4:
+    //                        eStats.sm -= 10;
+    //                        if (eStats.sm < 0) eStats.sm = 0;
+    //                        myStats.sm += 10;
+    //                        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+    //                        break;
+    //                    case 5:
+    //                        const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
+    //                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
+    //                        break;
+    //                };                
+    //                return AbilityResponse.SUCCESS;
+    //            }, 9999));
+    //            return AbilityResponse.SUCCESS;
+    //        },
+    //    },
     "12093": {
         usage: 3,
         used: 0,
@@ -6560,7 +6560,7 @@ export const abilities: Record<number, Ability> = {
     //                    }
     //                }
     //            });
-                // Removed party ability after discussion with Taskalot:
+    // Removed party ability after discussion with Taskalot:
     //         // Allies cannot fall below 0% dodge rate. Increases dodge rate by 2% for every 5% missing HP, up to 20%
     //         // if (myStats.dodge < 0) myStats.dodge = 0;
     //         // const dodgebuff = 0.02 * Math.floor((myStats.maxhp - myStats.hp) / myStats.maxhp);
