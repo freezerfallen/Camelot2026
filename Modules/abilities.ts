@@ -3368,6 +3368,122 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
+    // "16195": {
+    //     usage: 9999,
+    //     used: 0,
+    //     cost: 40,
+    //     pause: -6,
+    //     desc: "**Total Usage**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧 [✨] // All the “BoL” currently stacked [⚜️]`\n**Timeout**: `No / Yes` \n**Role**: `DPS`\n\nArlecchino replaces the class active button with her elemental burst: “Balemoon Rising”, while her ability functions around “Bond of Life”, shortened to `BoL`\n\nBond of Life (BoL): `BoL` is a mechanic that prevents healing from other sources. Every **1%** max HP is equivalent to **1%** BoL. Maximum **200%** `BoL` (200% max HP) can be stacked at any given moment.\n\nArlecchino’s ATTACK is altered, empowering it with bloodlust to deal extra damage, specifically **+1%** DMG for every **5%** `BoL` owned. Up to **5%** of `BoL` is consumed afterwards.\n\nHer active (✨) – All Is Ash, summons forth Balemoon Bloodfire, granting her `BoL` equal to **75%** of her max HP, before inflicting *Blood-Debt Directive* on the opponent for **6** rounds.\n\nBlood-Debt Directive: When inflicted, the opponent cannot heal. At the start of every round, takes **7.5%** of `BoL` on Arlecchino as DMG, while also spending **5%** `BoL` in the process.\n\nUpon using her Class skill (❌) : Balemoon Rising, the great wing of Balemoon Bloodfire beats as she gathers and clears *Blood-Debt Directives* around her if any. The Directive gathered this way grants her `BoL` equivalent to **125%** of her Max HP. She then deals unamplified absolute undodgeable DMG (ignores DEF/MR) equal to all `BoL` owned, and resets `BoL` owned.\n\nArlecchino has two side passives to her arsenal.\n\nFirstly, Arlecchino gains **1%** DMG mitigation for every **10%** `BoL` she has. Secondly, The Balemoon Alone May Know: Only Arlecchino can heal herself, heals equal to the amount of `BoL` consumed/lost, up to **50%** of max HP can be healed this way at once.",
+    //     shortdesc: "**Uses**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧[✨] // All the “BoL” currently stacked [⚜️]`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Bond of Life, Burst heal)`\n\n__**Core Mechanic**__:\n- Bond of Life (`BoL`) prevents healing from other sources\n- Every **1%** `BoL` is equal to **1%** of your max HP\n- You can have **200%** `BoL` at most anytime\n- Consuming any `BoL` allows you heal the equivalent, up to **50%** max HP\n- For every **10%** `BoL`, you have **+1%** DMG mitigation\n\n__**Active**__ (✨)\n- Gain `BoL` equivalent to **75%** of max HP\n- Inflict Blood-Debt Directive* on the enemy for **6** rounds\n\n*Blood-Debt Directive* : The inflicted cannot heal. At the start of every round, they take **7.5%** of her `BoL` as unamplified absolute undodgeable DMG (ignores DEF/MR). This also consumes **5%** `BoL` in the process.\n\n__**Passive**__\nHer ATTACK (🚫) is altered:\n- Deals **100%** damage, scaling increased by **1%** for every **5%** `BoL` owned. Afterwards, consumes up to **5%** `BoL`.\n\nHer class skill (❌) is altered:\n- Clears any *Blood-Debt Directive*. If there was one cleared, gains `BoL` equal to **125%** max HP\n- Then, deals unamplified absolute undodgeable DMG (ignores DEF/MR) equal to all of her `BoL`\n- Alas, resets all `BoL` owned",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //         // Arlecchino
+    //         matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //         if (this.pause > matchStats.round) {
+    //             matchStats.interaction.followUp({ content: `Arlecchino needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //             this.used--;
+    //             myStats.sm += this.cost;
+    //             return AbilityResponse.FAILURE;
+    //         };
+
+    //         this.pause = matchStats.round + 6;
+    //         // Gain BoL equivalent to 75% max HP
+    //         const boLgain = Math.floor(myStats.maxhp * 0.75);
+    //         myStats.bondOfLife += boLgain;
+    //         notice.push(`\n✨ **${char.name}** gained **${boLgain}** Bond of Life and inflicted Blood-Debt Directive`);
+    //         if (myStats.bondOfLife > myStats.maxhp * 2) myStats.bondOfLife = myStats.maxhp * 2;
+
+    //         // Blood debt directive
+    //         this.bloodDirective = true;
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (this.bolLastCleared >= matchStats.round) {
+    //                 this.bloodDirective = true;
+    //                 // Cannot heal for 6 rounds
+    //                 eStats.negateHeal = 1;
+
+    //                 // Take DMG equivalent to 7.5% of BoL
+    //                 eStats.hp -= Math.floor(myStats.bondOfLife * 0.075);
+    //                 if (eStats.hp < 0) eStats.hp = 0;
+
+    //                 // Consumes 5% of BoL at most
+    //                 const consumableBOL = Math.floor(Math.min(myStats.bondOfLife, myStats.maxhp * 0.05));
+    //                 myStats.bondOfLife -= consumableBOL
+    //                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, consumableBOL, {});
+    //                 if (myStats.bondOfLife < 0) myStats.bondOfLife = 0;
+    //             };
+    //                 return AbilityResponse.SUCCESS;
+    //         }, 6));
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //         myStats.bondOfLife = 0;
+    //         this.bolLastCleared = -6;
+    //         this.bloodDirective = false;
+
+    //         // Long Term effects
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             // Cap BoL at 200% max HP
+    //             if (myStats.bondOfLife > myStats.maxhp * 2) myStats.bondOfLife = myStats.maxhp * 2;
+                
+    //             // Reset bloodDirective status
+    //             this.bloodDirective = false;
+
+    //             // 1% DMG mitigation for every 10% BoL
+    //             if (myStats.bondOfLife > 0) {
+    //                 myStats.putDamageOnHold += 0.01 * Math.floor((myStats.bondOfLife / myStats.maxhp) / 0.1);
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
+            
+    //         myStats.replaceButton.atk = {
+    //             "emoji": "🚫",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 // Every 5% BoL = +1% DMG
+    //                 let extraDMG = 0.01 * Math.floor((myStats.bondOfLife / myStats.maxhp) / 0.05);
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚫 **${char.name}**`, { atkMultiplier: 1+extraDMG });
+                    
+    //                 // Consumes 5% of BoL at most
+    //                 const consumableBOL = Math.floor(Math.min(myStats.bondOfLife, myStats.maxhp * 0.05));
+    //                 myStats.bondOfLife -= consumableBOL
+    //                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, consumableBOL, {bypassBoL: true});
+    //                 if (myStats.bondOfLife < 0) myStats.bondOfLife = 0;
+
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
+
+    //         myStats.replaceButton.cskill = {
+    //             "emoji": "❌",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 let cd = this.bolLastCleared + 6 - matchStats.round;
+    //                 if (cd > 0) {
+    //                     matchStats.turn = matchStats.turnSkill ? 0 : 1
+    //                     matchStats.interaction.followUp({ content: `**${char.name}** can only use her class ability after **${cd}** ${(cd === 1) ? `round` : `rounds`}`, ephemeral: true });
+    //                     return AbilityResponse.FAILURE;
+    //                 } else {
+    //                     this.bolLastCleared = matchStats.round;
+
+    //                     if (this.bloodDirective) {
+    //                         myStats.bondOfLife += myStats.maxhp * 1.25;
+    //                         notice.push(`\n⚜️ **${char.name}** cleared Blood-Debt Directive`)
+    //                     };
+    //                     if (myStats.bondOfLife > myStats.maxhp * 2) myStats.bondOfLife = myStats.maxhp * 2;
+    //                     // Heal up to 50% of max HP
+    //                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(myStats.maxhp * 0.5, myStats.bondOfLife)), {bypassBoL: true});
+
+    //                     // Deals BoL as direct unamplified DMG
+    //                     eStats.hp -= Math.floor(myStats.bondOfLife);
+    //                     if (eStats.hp < 0) eStats.hp = 0;
+    //                     notice.push(`\n❌ **${char.name}** consumed all Bond of Life and dealt **${Math.floor(myStats.bondOfLife)}** damage.`)
+
+    //                     // Reset BoL
+    //                     myStats.bondOfLife = 0;
+
+    //                     return AbilityResponse.SUCCESS;
+    //                 };
+    //             }};
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     "16199": {
         usage: 9999,
         used: 0,
