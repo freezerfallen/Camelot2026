@@ -3366,12 +3366,12 @@ export const items = [
 
     // Weapons - Genesis Staff
     new weaponInfo("Sacred Lifemender", "weapon", "staff", ["chest"], "<:sacred_lifemender:1069025798440362084>", "https://i.imgur.com/1nemsJt.png", "md", 171, 970, "md", 86, 594, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        eStats.mr -= Math.min(eStats.mr * Math.min(myStats.cr / 2, 0.45), 1055);
+        eStats.mr -= Math.floor(Math.min(eStats.mr * Math.min(myStats.cr / 2, 0.45), 1055));
         myStats.selfhealChance.push(1);
         myStats.selfheal.push(0.08);
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.mr -= Math.min(eStats.mr * Math.min(myStats.cr / 2, 0.45), 1055);
+            eStats.mr -= Math.floor(Math.min(eStats.mr * Math.min(myStats.cr / 2, 0.45), 1055));
             return AbilityResponse.SUCCESS;
         }, 9999));
 
@@ -5723,7 +5723,7 @@ export const items = [
             callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats) {
                     const cdBuff = [15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1] / 100;
-                    myStats.cd += cdBuff
+                    myStats.cd += cdBuff;
                     mybuff.cd.push(new buffInfo("+", cdBuff, 9999));
                     return true;
                 };
@@ -5742,7 +5742,7 @@ export const items = [
                     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         if (myStats.atk < myStats.md) {
                             myStats.atk = myStats.md;
-                            
+
                         } else {
                             myStats.md = myStats.atk;
                         };
