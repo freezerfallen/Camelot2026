@@ -6114,20 +6114,20 @@ export const abilities: Record<number, Ability> = {
                     notice.push(`\n<:9SHack:1373261619924172940> 9S initiated hacking for **4** rounds`);
                     myStats.insight -= 8;
                     myStats.hacking = true;
-                    if (eStats.hp / eStats.maxhp > 0.5) {
-                        let bonus = Math.floor(Math.abs(myStats.hp / myStats.maxhp - eStats.hp / eStats.maxhp) * 100) / 100;
+                    if ((eStats.hp / eStats.maxhp) > 0.5) {
+                        let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
                         myStats.critbonus = Math.max(myStats.critbonus, bonus);
                     } else {
-                        eStats.def *= 0.75;
+                        eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
                     };
 
                     // Hacking long term effects
                     myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-                        if (eStats.hp / eStats.maxhp > 0.5) {
-                            let bonus = Math.floor(Math.abs(myStats.hp / myStats.maxhp - eStats.hp / eStats.maxhp) * 100) / 100;
+                        if ((eStats.hp / eStats.maxhp) > 0.5) {
+                            let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
                             myStats.critbonus = Math.max(myStats.critbonus, bonus);
                         } else {
-                            eStats.def *= 0.75;
+                            eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
                         };
 
                         return AbilityResponse.SUCCESS;
