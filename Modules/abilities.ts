@@ -6131,7 +6131,7 @@ export const abilities: Record<number, Ability> = {
                         };
 
                         return AbilityResponse.SUCCESS;
-                    }, matchStats.round + domainLast));
+                    }, domainLast));
 
                     // Exit HACKING mode
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
@@ -6193,8 +6193,8 @@ export const abilities: Record<number, Ability> = {
                                 if (matchStats.round % 4 === 0) {
                                     eStats.atk -= Math.floor(eStats.atk * 0.25);
                                     eStats.md -= Math.floor(eStats.md * 0.25);
-                                    eStats.def -= Math.floor(eStats.def * 0.25);
-                                    eStats.mr -= Math.floor(eStats.mr * 0.25);
+                                    eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
+                                    eStats.mr -= Math.floor(Math.min(eStats.mr * 0.25, 660));
                                 };
 
                                 return AbilityResponse.SUCCESS;

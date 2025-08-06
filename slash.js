@@ -1506,7 +1506,8 @@ const commands = [
 	{
 		data: new SlashCommandBuilder()
 			.setName('stampede')
-			.setDescription('A recurring special battle event'),
+			.setDescription('A recurring special battle event')
+			.addBooleanOption(option => option.setName('skip-overview').setDescription('Skip the stampede overview and go directly into battle').setRequired(false))
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
