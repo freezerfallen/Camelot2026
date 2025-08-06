@@ -929,6 +929,12 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('liminal')
+			.setDescription('liminal descent')
+			.addSubcommand((subcommand) => subcommand.setName('descent').setDescription('Challenge yourself against bosses with increasing difficulty!'))
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('lock')
 			.setDescription('Lock characters')
 			.addSubcommand((subcommand) => subcommand.setName('characters').setDescription('Lock characters')
