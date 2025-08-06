@@ -898,17 +898,14 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
 
 export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, amount: number, flags = {}) => {
     const options = { // true = enabled, false = disabled
-        bypassBoL: false
+
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
     if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) {
         // notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
     } else {
-        // Check for any heal reduction
-        // 1: Bond of Life
-        if (!options.bypassBoL && target.bondOfLife > 0) amount -= target.bondOfLife
-        if (amount > 0) target.hp += Math.floor(amount);
+        target.hp += Math.floor(amount);
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
     };
