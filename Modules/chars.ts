@@ -24900,6 +24900,7 @@ export const characters: charInfo[] = [
     new charInfo("Mishima (Masamune-kun)", [], anime[648], "F", "https://i.ibb.co/fzNdHq2v/c.png", 24795, "D"),
     new charInfo("Yuriko", [], anime[648], "F", "https://i.ibb.co/0pqfVxTk/c.png", 24796, "D"),
     new charInfo("Sumire Gasou", [], anime[648], "F", "https://i.ibb.co/fztSSxG9/c.png", 24797, "D"),
+    new charInfo("Shorekeeper EX", ["Shore EX"], anime[560], "F", "https://i.ibb.co/Ps7gDBG8/Shorekeper-EX.gif", 24798, "EX"),
 
 
 

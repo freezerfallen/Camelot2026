@@ -6606,7 +6606,7 @@ export const abilities: Record<number, Ability> = {
     //         return AbilityResponse.SUCCESS;
     //     },
     // },
-    "1": {
+    "24798": {
         usage: 9999,
         used: 0,
         cost: 100,
