@@ -6320,6 +6320,22 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Sends a chilling hum into the abyss every **8** non-critical hits, enhancing `« Abyssal Echo »` level by **1** (Up to **4** times, upgrading its effect)\n\n`« Abyssal Echo »` : Decreases the enemy's MR by **1**/**1.5**/**1.5**/**2**/**2%** for every **1x** `:cut_of_meat:` owned (Up to **1.5**/**1.5**/**2**/**2.5**/**3x** damage). This is defaulted to level 1.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shrimpsong is an eerie dagger integrated with a beastly shrimp, which was rumored to be near the shores with the power to call upon tides and unite creatures of the abyss. The wielders of the dagger mysteriously vanish after a few decades of use, leaving the histories and past of the dagger a blur. Whenever the dagger touches the shoreline, it glitters with an otherwordly shimmer, as it resounds with the vibrations of the wuthering tides.", "mythical", 779),
 
+    new weaponInfo("Glassteeth", "weapon", "shield", ["chest"], "<:glass_teeth:1403409733662150818>", "https://i.ibb.co/Y4rQ7vG5/i.png", "shield", 1, 1200, "cd", 0.1, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.4), 9999));
+        mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.4), 9999));
+
+        myStats.md += Math.floor(myStats.md * 0.4);
+        myStats.atk += Math.floor(myStats.atk * 0.4);
+        myStats.def -= Math.floor(myStats.def * 0.6);
+        myStats.mr -= Math.floor(myStats.mr * 0.6);
+		
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.def -= Math.floor(myStats.def * 0.5);
+            myStats.mr -= Math.floor(myStats.mr * 0.5);
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+        return AbilityResponse.SUCCESS;
+    }, "Reduces the wielders **DEF|MR by 50%**, but increases the wielders attack and magic damage by **40%**.", "*\"To wield it is to bleed for strength.\"* Forged from the remains of a shattered mirror said to reflect the soul’s hunger, Glassteeth was never meant to protect. Its jagged surface bites into the bearer’s aura, splintering their defenses in exchange for raw, unbridled aggression. It does not guard. It goads.", "genesis", 780),    
 ];
 
 export const fishing = items.filter((e) => e.obtain.includes("fishing"));
