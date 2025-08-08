@@ -23,12 +23,12 @@ const exportCommand: SlashCommand = {
         const cmd = args.shift()?.toLowerCase();
 
         // Return if not owner
-        if (!(interaction.user.id == "489490486734880774")) {
+        if (!(interaction.user.id === "489490486734880774")) {
             return interaction.reply({ content: "You're not allowed to use this command", ephemeral });
         };
 
         // List all actions
-        if (action === "list") {
+        if (action === "list"  || action === "ls") {
             return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
         };
 
