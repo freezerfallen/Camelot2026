@@ -842,7 +842,10 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     // Passives
     target.damageTaken += damage;
     if (options.combodmg && attacker.combodmg) attacker.attackStreak++;
-    if (options.critbleed && isCrit) targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * 0.05), matchStats.critbleedlast));
+    if (options.critbleed && isCrit) {
+        const bleedPercentage = attacker.critbleedAmount ?? 0.05;
+        targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * bleedPercentage), matchStats.critbleedlast));
+    };
     if (attacker.critmana && isCrit) attacker.sm = Math.min(attacker.sm + attacker.critmana, attacker.mana);
     if (options.selfheal && attacker.selfheal && attacker.lastSelfHealRoundCapped !== matchStats.round) {
         let selfHealedTotal = 0;
@@ -1252,8 +1255,8 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     if (accLevel >= 100) total++;
 
     // Beat floor 300
-    //if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
-    total++
+    if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
+
     return total;
 };
 
@@ -1598,22 +1601,22 @@ export const numberToRoman = (n: number): string => {
 };
 
 export const customEmojis: Record<PrimaryStat, string> = {
-    "hp": "💖",//"<:HP:1062043800979116143>",
-    "hp%": "💖",//"<:HP:1062043800979116143>",
-    "atk": "⚔️",//"<:ATK:1063214925528440832>",
-    "atk%": "⚔️",//"<:ATK:1063214925528440832>",
-    "def": "🛡️",//"<:DEF:1047269141662417037>",
-    "def%": "🛡️",//"<:DEF:1047269141662417037>",
-    "md": "🪄",//"<:magic_dmg:948568336621527040>",
-    "md%": "🪄",//"<:magic_dmg:948568336621527040>",
-    "mr": "🎽",//"<:magic_resistance:1047269149237334086>",
-    "cr": "🎯",//"<:crit_rate:1047269144195776512>",
-    "cd": "💥",//"<:crit_damage:1047269146511016046>",
-    "dodge": "💨",//"<:dodge_chance:1047269150948606063>",
-    "br": "🤜🏻",//"<:block_rate:1217949026281066599>",
-    "mana": "💧",//"<:mana:1047269152957661255>",
-    "sm": "💧",//"<:mana:1047269152957661255>",
-    "mg": "💦",//"<:mana_generation:1063215562349629570>",
+    "hp": "<:HP:1062043800979116143>",
+    "hp%": "<:HP:1062043800979116143>",
+    "atk": "<:ATK:1063214925528440832>",
+    "atk%": "<:ATK:1063214925528440832>",
+    "def": "<:DEF:1047269141662417037>",
+    "def%": "<:DEF:1047269141662417037>",
+    "md": "<:magic_dmg:948568336621527040>",
+    "md%": "<:magic_dmg:948568336621527040>",
+    "mr": "<:magic_resistance:1047269149237334086>",
+    "cr": "<:crit_rate:1047269144195776512>",
+    "cd": "<:crit_damage:1047269146511016046>",
+    "dodge": "<:dodge_chance:1047269150948606063>",
+    "br": "<:block_rate:1217949026281066599>",
+    "mana": "<:mana:1047269152957661255>",
+    "sm": "<:mana:1047269152957661255>",
+    "mg": "<:mana_generation:1063215562349629570>",
     "shield": "<:shield:1062050038211166310>",
 
     // "coins": "<:coins:872926669055356939>",
