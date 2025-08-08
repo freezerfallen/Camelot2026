@@ -901,7 +901,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
 
 export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, amount: number, flags = {}) => {
     const options = { // true = enabled, false = disabled
-
+        bypassBoL: false,
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
