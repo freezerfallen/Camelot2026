@@ -623,6 +623,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         canTwinshot: false,
         isLightning: false,
         canCounter: true,
+        normalATK: false,
 
         preventRetaliation: false,
     };
@@ -695,12 +696,12 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         md: options.atkMultiplier * attacker.md,
         def: Math.max(Math.pow(0.99895, options.defReductionCap ? Math.max(effectiveDef - options.defReductionCap, options.defMultiplier * effectiveDef) : (options.defMultiplier * effectiveDef)), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_defcap ?? 0) > 0) && ((options.defMultiplier * effectiveDef) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveDef) - 2192, options.defMultiplier * target.increase_defcap)) : 1),
         mr: Math.max(Math.pow(0.99895, options.defReductionCap ? Math.max(effectiveMr - options.defReductionCap, options.defMultiplier * effectiveMr) : (options.defMultiplier * effectiveMr)), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
-        crit: (isCrit ? (options.critMultiplier * attacker.cd) : 1),
+        crit: ((isCrit || attacker.shorekeeperUsedActive) ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
         lightning: options.isLightning ? ((1 + (attacker.lightningMultiplier || 0)) * (1 - (target.lightningResistance || 0))) : 1,
         rng: (1 - (0.2 * Math.random())),
     };
-    if (attacker.shorekeeperUsedActive && !isCrit) options.critMultiplier * attacker.cd;
+    // Removed redundant line: crit scaling now handled in multipliers.crit
     if (options.magicDamage && options.mdChance < attacker.mdChance) {
         damage = options.overwriteDamage || Math.floor(multipliers.md * multipliers.mr * multipliers.crit * multipliers.combo * multipliers.lightning * multipliers.rng);
     } else {
@@ -841,10 +842,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     // Passives
     target.damageTaken += damage;
     if (options.combodmg && attacker.combodmg) attacker.attackStreak++;
-    if (options.critbleed && isCrit) {
-        const bleedPercentage = attacker.critbleedAmount ?? 0.05;
-        targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * bleedPercentage), matchStats.critbleedlast));
-    };
+    if (options.critbleed && isCrit) targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * 0.05), matchStats.critbleedlast));
     if (attacker.critmana && isCrit) attacker.sm = Math.min(attacker.sm + attacker.critmana, attacker.mana);
     if (options.selfheal && attacker.selfheal && attacker.lastSelfHealRoundCapped !== matchStats.round) {
         let selfHealedTotal = 0;
@@ -894,7 +892,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         preventRetaliation: options.preventRetaliation,
     });
     if (isCrit) matchStats.trigger("crit", attacker, target, attackerBuff, targetBuff, { damage });
-    else matchStats.trigger("noncrit", attacker, target, attackerBuff, targetBuff, { damage });
+    else matchStats.trigger("noncrit", attacker, target, attackerBuff, targetBuff, { damage , normalATK: options.normalATK });
 
     return damage;
 };
@@ -916,7 +914,7 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
                 if (amount < 0) amount = 0;
             };
         };
-
+        
         // 2: General Heal reduction
         if (attacker.reduceHealing) amount * (1 - attacker.reduceHealing);
         if (amount > 0) target.hp += Math.floor(amount);
@@ -1254,8 +1252,8 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     if (accLevel >= 100) total++;
 
     // Beat floor 300
-    if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
-
+    //if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
+    total++
     return total;
 };
 
@@ -1600,22 +1598,22 @@ export const numberToRoman = (n: number): string => {
 };
 
 export const customEmojis: Record<PrimaryStat, string> = {
-    "hp": "<:HP:1062043800979116143>",
-    "hp%": "<:HP:1062043800979116143>",
-    "atk": "<:ATK:1063214925528440832>",
-    "atk%": "<:ATK:1063214925528440832>",
-    "def": "<:DEF:1047269141662417037>",
-    "def%": "<:DEF:1047269141662417037>",
-    "md": "<:magic_dmg:948568336621527040>",
-    "md%": "<:magic_dmg:948568336621527040>",
-    "mr": "<:magic_resistance:1047269149237334086>",
-    "cr": "<:crit_rate:1047269144195776512>",
-    "cd": "<:crit_damage:1047269146511016046>",
-    "dodge": "<:dodge_chance:1047269150948606063>",
-    "br": "<:block_rate:1217949026281066599>",
-    "mana": "<:mana:1047269152957661255>",
-    "sm": "<:mana:1047269152957661255>",
-    "mg": "<:mana_generation:1063215562349629570>",
+    "hp": "💖",//"<:HP:1062043800979116143>",
+    "hp%": "💖",//"<:HP:1062043800979116143>",
+    "atk": "⚔️",//"<:ATK:1063214925528440832>",
+    "atk%": "⚔️",//"<:ATK:1063214925528440832>",
+    "def": "🛡️",//"<:DEF:1047269141662417037>",
+    "def%": "🛡️",//"<:DEF:1047269141662417037>",
+    "md": "🪄",//"<:magic_dmg:948568336621527040>",
+    "md%": "🪄",//"<:magic_dmg:948568336621527040>",
+    "mr": "🎽",//"<:magic_resistance:1047269149237334086>",
+    "cr": "🎯",//"<:crit_rate:1047269144195776512>",
+    "cd": "💥",//"<:crit_damage:1047269146511016046>",
+    "dodge": "💨",//"<:dodge_chance:1047269150948606063>",
+    "br": "🤜🏻",//"<:block_rate:1217949026281066599>",
+    "mana": "💧",//"<:mana:1047269152957661255>",
+    "sm": "💧",//"<:mana:1047269152957661255>",
+    "mg": "💦",//"<:mana_generation:1063215562349629570>",
     "shield": "<:shield:1062050038211166310>",
 
     // "coins": "<:coins:872926669055356939>",
