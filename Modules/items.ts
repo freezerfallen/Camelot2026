@@ -6300,7 +6300,7 @@ export const items = [
         myStats.shrimpsong = 0;
         myStats.abyssalEcho ??= 0;
         const mrShred = [0.01,0.015,0.015,0.02,0.02];
-        const mrShredCap = [495,495,495,660,660]; // 1.5x, 1.5x, 2x, 2.5x, 3x
+        const mrShredCap = [495,495,660,872,1055]; // 1.5x, 1.5x, 2x, 2.5x, 3x
 
         matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
@@ -6318,7 +6318,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Sends a chilling hum into the abyss every **8** non-critical hits, enhancing `« Abyssal Echo »` level by **1** (Up to **4** times, upgrading its effect)\n\n`« Abyssal Echo »` : Decreases the enemy's MR by **1**/**1.5**/**1.5**/**2**/**2%** for every **1x** `:cut_of_meat:` owned (Up to **1.5**/**1.5**/**2**/**2.5**/**3x** damage). This is defaulted to level 1.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shrimpsong is an eerie dagger integrated with a beastly shrimp, which was rumored to be near the shores with the power to call upon tides and unite creatures of the abyss. The wielders of the dagger mysteriously vanish after a few decades of use, leaving the histories and past of the dagger a blur. Whenever the dagger touches the shoreline, it glitters with an otherwordly shimmer, as it resounds with the vibrations of the wuthering tides.", "mythical", 779),
+    }, "Sends a chilling hum into the abyss every **8** non-critical hits, enhancing `« Abyssal Echo »` level by **1** (Up to **4** times, upgrading its effect)\n\n`« Abyssal Echo »` : Decreases the enemy's MR by **1**/**1.5**/**1.5**/**2**/**2%** for every **1x** `🥩` owned (Up to **1.5**/**1.5**/**2**/**2.5**/**3x** damage). This is defaulted to level 1.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shrimpsong is an eerie dagger integrated with a beastly shrimp, which was rumored to be near the shores with the power to call upon tides and unite creatures of the abyss. The wielders of the dagger mysteriously vanish after a few decades of use, leaving the histories and past of the dagger a blur. Whenever the dagger touches the shoreline, it glitters with an otherwordly shimmer, as it resounds with the vibrations of the wuthering tides.", "mythical", 779),
 
     new weaponInfo("Glassteeth", "weapon", "shield", ["chest"], "<:glass_teeth:1403409733662150818>", "https://i.ibb.co/Y4rQ7vG5/i.png", "shield", 1, 1200, "cd", 0.1, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.4), 9999));
