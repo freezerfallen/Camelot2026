@@ -84,9 +84,9 @@ export class itemInfo {
             case "special": return "<:bars:994957077787197450>";
             case "rare": return "<:barr:994957080073076867>";
             case "unique": return "<:baru:994958335558303744>";
-            case "legendary": return "<:barl:1398660873521725520>";
-            case "mythical": return "<:barm:1398660875740647464>";
-            case "genesis": return "<:barg:1398660877741199541>";
+            case "legendary": return "<:barl:994958337449938954>";
+            case "mythical": return "<:barm:994958339278647346>";
+            case "genesis": return "<:barg:994958341128339536>";
             default: return "<:blank:917804200363171860>";
         };
     };
@@ -6283,59 +6283,59 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
-    new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.boneCap ??= 30;
-        myStats.flesh ??= 0;
-        myStats.bone ??= 0;
+    // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //     myStats.boneCap ??= 30;
+    //     myStats.flesh ??= 0;
+    //     myStats.bone ??= 0;
 
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.def -= Math.min(Math.floor(eStats.def * (0.1 + 0.01 * myStats.bone)), 872);
-            return AbilityResponse.SUCCESS;
-        }, 9999));
+    //     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         eStats.def -= Math.min(Math.floor(eStats.def * (0.1 + 0.01 * myStats.bone)), 872);
+    //         return AbilityResponse.SUCCESS;
+    //     }, 9999));
 
-        return AbilityResponse.SUCCESS;
-    }, "The fish's endless hunger raises the `🦴` owning limits to **30**. At the start of every round, the enemy has  **-10%** DEF, and a further **-1%** for every `🦴`, up to **-40%** (Max 2.5x damage)\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal cleaver is a chilling axe forged from the body of a beast, where a brave fishermen once fought with courage and tenacity against the rise of the lurking fish of siren eyes in the abyss beyond known seas, threatening fisheries for generations. From its colossal bones and bioluminescent organs, they crafted the Deep Cleaver – a weapon of terrible power, its teeth grazing and tearing through flesh and bone with every swing. Whispers tainted by something from beyond soon spread, where the fisherman was bringing upon curses to the land by disturbing the ancient beasts. The fisherman was not hailed, but brutalized by hailing rocks. The Deep Cleaver was abandoned since, becoming a symbol of the irony of both salvation and blinded fear.", "mythical", 778),
+    //     return AbilityResponse.SUCCESS;
+    // }, "The fish's endless hunger raises the `🦴` owning limits to **30**. At the start of every round, the enemy has  **-10%** DEF, and a further **-1%** for every `🦴`, up to **-40%** (Max 2.5x damage)\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal cleaver is a chilling axe forged from the body of a beast, where a brave fishermen once fought with courage and tenacity against the rise of the lurking fish of siren eyes in the abyss beyond known seas, threatening fisheries for generations. From its colossal bones and bioluminescent organs, they crafted the Deep Cleaver – a weapon of terrible power, its teeth grazing and tearing through flesh and bone with every swing. Whispers tainted by something from beyond soon spread, where the fisherman was bringing upon curses to the land by disturbing the ancient beasts. The fisherman was not hailed, but brutalized by hailing rocks. The Deep Cleaver was abandoned since, becoming a symbol of the irony of both salvation and blinded fear.", "mythical", 778),
 
-    new weaponInfo("Abyssal Shrimpsong", "weapon", "dagger", ["chest"], "<:abyssal_shrimpsong:1403303109429694475>", "https://i.ibb.co/ymy96MrZ/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.shrimpsong = 0;
-        myStats.abyssalEcho ??= 0;
-        const mrShred = [0.01,0.015,0.015,0.02,0.02];
-        const mrShredCap = [495,495,660,872,1055]; // 1.5x, 1.5x, 2x, 2.5x, 3x
+    // new weaponInfo("Abyssal Shrimpsong", "weapon", "dagger", ["chest"], "<:abyssal_shrimpsong:1403303109429694475>", "https://i.ibb.co/ymy96MrZ/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //     myStats.shrimpsong = 0;
+    //     myStats.abyssalEcho ??= 0;
+    //     const mrShred = [0.01,0.015,0.015,0.02,0.02];
+    //     const mrShredCap = [495,495,660,872,1055]; // 1.5x, 1.5x, 2x, 2.5x, 3x
 
-        matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
-                myStats.shrimpsong++
-                if (myStats.shrimpsong % 8 === 0 && myStats.abyssalEcho < 4) {
-                    myStats.abyssalEcho++
-                    notice.push(`\n<:abyssal_shrimpsong:1403303109429694475> The « Abyssal Echo » is now level **${myStats.abyssalEcho + 1}**`)
-                };
-            };
-        });
+    //     matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+    //         if (caster === myStats) {
+    //             myStats.shrimpsong++
+    //             if (myStats.shrimpsong % 8 === 0 && myStats.abyssalEcho < 4) {
+    //                 myStats.abyssalEcho++
+    //                 notice.push(`\n<:abyssal_shrimpsong:1403303109429694475> The « Abyssal Echo » is now level **${myStats.abyssalEcho + 1}**`)
+    //             };
+    //         };
+    //     });
 
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.mr -= Math.min(Math.floor(eStats.mr * mrShred[myStats.abyssalEcho]), mrShredCap[myStats.abyssalEcho]);
-            return AbilityResponse.SUCCESS;
-        }, 9999));
+    //     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         eStats.mr -= Math.min(Math.floor(eStats.mr * mrShred[myStats.abyssalEcho]), mrShredCap[myStats.abyssalEcho]);
+    //         return AbilityResponse.SUCCESS;
+    //     }, 9999));
 
-        return AbilityResponse.SUCCESS;
-    }, "Sends a chilling hum into the abyss every **8** non-critical hits, enhancing `« Abyssal Echo »` level by **1** (Up to **4** times, upgrading its effect)\n\n`« Abyssal Echo »` : Decreases the enemy's MR by **1**/**1.5**/**1.5**/**2**/**2%** for every **1x** `🥩` owned (Up to **1.5**/**1.5**/**2**/**2.5**/**3x** damage). This is defaulted to level 1.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shrimpsong is an eerie dagger integrated with a beastly shrimp, which was rumored to be near the shores with the power to call upon tides and unite creatures of the abyss. The wielders of the dagger mysteriously vanish after a few decades of use, leaving the histories and past of the dagger a blur. Whenever the dagger touches the shoreline, it glitters with an otherwordly shimmer, as it resounds with the vibrations of the wuthering tides.", "mythical", 779),
+    //     return AbilityResponse.SUCCESS;
+    // }, "Sends a chilling hum into the abyss every **8** non-critical hits, enhancing `« Abyssal Echo »` level by **1** (Up to **4** times, upgrading its effect)\n\n`« Abyssal Echo »` : Decreases the enemy's MR by **1**/**1.5**/**1.5**/**2**/**2%** for every **1x** `🥩` owned (Up to **1.5**/**1.5**/**2**/**2.5**/**3x** damage). This is defaulted to level 1.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shrimpsong is an eerie dagger integrated with a beastly shrimp, which was rumored to be near the shores with the power to call upon tides and unite creatures of the abyss. The wielders of the dagger mysteriously vanish after a few decades of use, leaving the histories and past of the dagger a blur. Whenever the dagger touches the shoreline, it glitters with an otherwordly shimmer, as it resounds with the vibrations of the wuthering tides.", "mythical", 779),
 
-    new weaponInfo("Glassteeth", "weapon", "shield", ["chest"], "<:glass_teeth:1403409733662150818>", "https://i.ibb.co/Y4rQ7vG5/i.png", "shield", 1, 1200, "cd", 0.1, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.4), 9999));
-        mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.4), 9999));
+    // new weaponInfo("Glassteeth", "weapon", "shield", ["chest"], "<:glass_teeth:1403409733662150818>", "https://i.ibb.co/Y4rQ7vG5/i.png", "shield", 1, 1200, "cd", 0.1, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.4), 9999));
+    //     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.4), 9999));
 
-        myStats.md += Math.floor(myStats.md * 0.4);
-        myStats.atk += Math.floor(myStats.atk * 0.4);
-        myStats.def -= Math.floor(myStats.def * 0.6);
-        myStats.mr -= Math.floor(myStats.mr * 0.6);
+    //     myStats.md += Math.floor(myStats.md * 0.4);
+    //     myStats.atk += Math.floor(myStats.atk * 0.4);
+    //     myStats.def -= Math.floor(myStats.def * 0.6);
+    //     myStats.mr -= Math.floor(myStats.mr * 0.6);
 		
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.def -= Math.floor(myStats.def * 0.5);
-            myStats.mr -= Math.floor(myStats.mr * 0.5);
-            return AbilityResponse.SUCCESS;
-        }, 9999));
-        return AbilityResponse.SUCCESS;
-    }, "Reduces the wielders **DEF|MR by 50%**, but increases the wielders attack and magic damage by **40%**.", "*\"To wield it is to bleed for strength.\"* Forged from the remains of a shattered mirror said to reflect the soul’s hunger, Glassteeth was never meant to protect. Its jagged surface bites into the bearer’s aura, splintering their defenses in exchange for raw, unbridled aggression. It does not guard. It goads.", "genesis", 780),    
+    //     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.def -= Math.floor(myStats.def * 0.5);
+    //         myStats.mr -= Math.floor(myStats.mr * 0.5);
+    //         return AbilityResponse.SUCCESS;
+    //     }, 9999));
+    //     return AbilityResponse.SUCCESS;
+    // }, "Reduces the wielders **DEF|MR by 50%**, but increases the wielders attack and magic damage by **40%**.", "*\"To wield it is to bleed for strength.\"* Forged from the remains of a shattered mirror said to reflect the soul’s hunger, Glassteeth was never meant to protect. Its jagged surface bites into the bearer’s aura, splintering their defenses in exchange for raw, unbridled aggression. It does not guard. It goads.", "genesis", 780),    
 ];
 
 export const fishing = items.filter((e) => e.obtain.includes("fishing"));

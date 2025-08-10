@@ -23,12 +23,12 @@ const exportCommand: SlashCommand = {
         const cmd = args.shift()?.toLowerCase();
 
         // Return if not owner
-        if (!(interaction.user.id === "489490486734880774")) {
+        if (interaction.user.id !== "489490486734880774") {
             return interaction.reply({ content: "You're not allowed to use this command", ephemeral });
         };
 
         // List all actions
-        if (action === "list"  || action === "ls") {
+        if (action === "list" || action === "ls") {
             return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
         };
 
@@ -204,34 +204,19 @@ const exportCommand: SlashCommand = {
 
         // Add char
         if (action.startsWith("add char")) {
-        if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/admin add char <name>[, <name2> ...] user:@user\`\n\n**Options**\n\`name\`: Name or ID(s) of the character(s) to be added`, ephemeral });
+            if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/admin add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
 
-        args.shift();
-        // Join args, split by comma, and trim whitespace
-        const charNames = args.join(" ").split(",").map(s => s.trim()).filter(Boolean);
+            args.shift();
+            const char = search(args.join(" "), [0], interaction, true);
+            if (!char) return interaction.reply({ content: `Error: Couldn't find character "${args.join(" ")}"\n\nUsage: \`/admin add char <name> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the character to be added`, ephemeral });
 
-        if (charNames.length === 0) return interaction.reply({ content: `Error: No character names provided.`, ephemeral });
+            // Update users table
+            await updateUsers(user.id, {
+                chars: { type: "append", value: [char.id] },
+            });
 
-        const foundChars = [];
-        const notFound = [];
-
-        for (const name of charNames) {
-            const char = search(name, [0], interaction, true);
-            if (char) { foundChars.push(char) } else { notFound.push(name) };
+            return interaction.reply({ content: `Action Successful: Added **${char.name}** to ${user.toString()}`, ephemeral });
         };
-
-        if (foundChars.length === 0) return interaction.reply({ content: `Error: Couldn't find any of the specified characters.`, ephemeral });
-
-        // Update users table with all found char IDs
-        await updateUsers(user.id, {
-            chars: { type: "append", value: foundChars.map(c => c.id) },
-        });
-
-        let reply = `Action Successful: Added ${foundChars.map(c => `**${c.name}**`).join(", ")} to ${user.toString()}`;
-        if (notFound.length > 0) reply += `\n\nNot found: ${notFound.join(", ")}`;
-
-        return interaction.reply({ content: reply, ephemeral });
-    };
 
         // Remove char
         if (action.startsWith("remove char")) {
