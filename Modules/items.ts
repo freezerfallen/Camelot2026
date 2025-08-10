@@ -95,10 +95,10 @@ export class itemInfo {
             case "normal": return "<:normal1:1041732429397889054><:normal2:1041732425379762268><:normal3:1041732422145953892><:normal4:1041732419591622686>";
             case "special": return "<:special1:1041731419963150397><:special2:1041731418008600717><:special3:1041731415919833149><:special4:1041731414032392202>";
             case "rare": return "<:rare1:1041731092031492106><:rare2:1041731088357281802><:rare3:1041731083965825096>";
-            case "unique": return "<:unique1:1398505217644822671><:unique2:1398505215119986838><:unique3:1398505212934885406>";
-            case "legendary": return "<:legendary1:1398504583289896980><:legendary2:1398504580525850715><:legendary3:1398504578042822716><:legendary4:1398504575744348160>";
-            case "mythical": return "<:mythical1:1398504165457793095><:mythical2:1398504162592948335><:mythical3:1398504160500121600><:mythical4:1398504157694005259>";
-            case "genesis": return "<:genesis1:1398503631371763813><:genesis2:1398503629270552667><:genesis3:1398503626221293619><:genesis4:1398503623561838603>";
+            case "unique": return "<:unique1:1041730066272493578><:unique2:1041730063940468828><:unique3:1041730061163831437><:unique4:1041730057380573386>";
+            case "legendary": return "<:legendary1:1041726519082491964><:legendary2:1041726517153112094><:legendary3:1041726515475382322><:legendary4:1041726512992366605>";
+            case "mythical": return "<:mythical1:1041726768530329690><:mythical2:1041726767188168724><:mythical3:1041726765577556039><:mythical4:1041726763862065162>";
+            case "genesis": return "<:genesis1:1041725784546619502><:genesis2:1041725782176825485><:genesis3:1041725778611675237><:genesis4:1041725780218093629>";
             default: return "undefined";
         };
     };
@@ -3800,7 +3800,7 @@ export const items = [
     new armorInfo("Dragonborn Gloves", "armor", "gloves", "Dragonborn Set", ["chest"], "<:dragonborn_gloves:1081366781320515625>", "https://i.imgur.com/rRlr7EA.png", "def", 12, 125, "unique", 517),
     new armorInfo("Dragonborn Boots", "armor", "boots", "Dragonborn Set", ["chest"], "<:dragonborn_boots:1081367330124218489>", "https://i.imgur.com/WP9sU8O.png", "hp", 30, 1184, "unique", 518, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         if (myStats.hp / myStats.maxhp < 0.4) {
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.24), {});
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.2), {});
             myStats.atk += Math.floor(myStats.atk * 0.2);
             myStats.md += Math.floor(myStats.md * 0.2);
             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
@@ -3809,7 +3809,7 @@ export const items = [
         } else {
             myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                 if (myStats.hp / myStats.maxhp < 0.4) {
-                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.24), {});
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.2), {});
                     myStats.atk += Math.floor(myStats.atk * 0.2);
                     myStats.md += Math.floor(myStats.md * 0.2);
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 9999));
@@ -3824,7 +3824,7 @@ export const items = [
         };
 
         return AbilityResponse.SUCCESS;
-    }, "The first time the wielders HP falls below **40%** of max HP, restore **24%** max HP and increases attack and magic damage by **24%**."),
+    }, "The first time the wielders HP falls below **40%** of max HP, restore **20%** max HP and increases attack and magic damage by **20%**."),
     new armorInfo("Golem's Resilient Helmet", "armor", "helmet", "Golem's Resilient Set", ["crafting", "chest"], "<:golems_resilient_helmet:1081365185924694047>", "https://i.imgur.com/BWUv88i.png", "mr", 10, 102, "unique", 519),
     new armorInfo("Golem's Resilient Chestplate", "armor", "cuirass", "Golem's Resilient Set", ["crafting", "chest"], "<:golems_resilient_chestplate:1081365949153808405>", "https://i.imgur.com/sO60d0i.png", "def", 14, 130, "unique", 520),
     new armorInfo("Golem's Resilient Vambrace", "armor", "gloves", "Golem's Resilient Set", ["crafting", "chest"], "<:golems_resilient_vambrace:1081366783459598397>", "https://i.imgur.com/AcdVNv8.png", "hp", 31, 1183, "unique", 521),

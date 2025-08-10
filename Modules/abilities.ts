@@ -856,94 +856,94 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "4334": {
-        usage: 9999,
-        used: 0,
-        cost: 0,
-        pause: 0,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `40 (Can be substituted with 10% max HP)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, he enters battles with **+25%** critical DMG and **+10%** chance to counter attacks. Upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **20%**, lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **10%** of his max HP to elevate his arms. If his HP is above **1** after the consumption, he slams the shot, dealing **130%** DMG and boosting his ATK by **15%** for the next **2** turns. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **300%** DMG and boosting his ATK by **30%** for the next **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `40 💧 (Can be substituted with 10% max HP)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\n- **+25%** critical DMG\n- **+10%** chance to counter attacks (stackable)\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **20%** permanently\n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **10%** max HP instead as substitute.\n\nIf he is at **1** HP or more:\n- Deals **130%** DMG\n- Increases ATK by **15%** for the next **2** turns\n\nElse:\n- Remains at **1** HP\n- Deals **300%** DMG\n- Increases ATK by **30%** for the next **2** turns\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
-        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Taiga Kagami
+    // "4334": {
+    //     usage: 9999,
+    //     used: 0,
+    //     cost: 0,
+    //     pause: 0,
+    //     desc: "**Total Usage**: `unlimited`\n**Mana**: `40 (Can be substituted with 10% max HP)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, he enters battles with **+25%** critical DMG and **+10%** chance to counter attacks. Upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **20%**, lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **10%** of his max HP to elevate his arms. If his HP is above **1** after the consumption, he slams the shot, dealing **130%** DMG and boosting his ATK by **15%** for the next **2** turns. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **300%** DMG and boosting his ATK by **30%** for the next **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
+    //     shortdesc: "**Uses**: `Unlimited`\n**Cost**: `40 💧 (Can be substituted with 10% max HP)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\n- **+25%** critical DMG\n- **+10%** chance to counter attacks (stackable)\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **20%** permanently\n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **10%** max HP instead as substitute.\n\nIf he is at **1** HP or more:\n- Deals **130%** DMG\n- Increases ATK by **15%** for the next **2** turns\n\nElse:\n- Remains at **1** HP\n- Deals **300%** DMG\n- Increases ATK by **30%** for the next **2** turns\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //         // Taiga Kagami
 
-            // Active cost
-            if (myStats.sm < 40) {
-                myStats.hp -= myStats.maxhp * 0.1;
-            } else {
-                myStats.sm -= 40;
-            };
+    //         // Active cost
+    //         if (myStats.sm < 40) {
+    //             myStats.hp -= myStats.maxhp * 0.1;
+    //         } else {
+    //             myStats.sm -= 40;
+    //         };
 
-            // Meteor Jam
-            if (myStats.hp <= 0) {
-                myStats.hp = 1;
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🌠 **${char.name}** used Meteor Jam! He`, { atkMultiplier: 3 });
-                // ATK buffs (Doubled effectiveness)
-                mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.3), 2));
-            } else {
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **${char.name}** slammed the shot! He`, { atkMultiplier: 1.3 });
-                // ATK buffs
-                mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.15), 2));
-            };
+    //         // Meteor Jam
+    //         if (myStats.hp <= 0) {
+    //             myStats.hp = 1;
+    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🌠 **${char.name}** used Meteor Jam! He`, { atkMultiplier: 3 });
+    //             // ATK buffs (Doubled effectiveness)
+    //             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.3), 2));
+    //         } else {
+    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **${char.name}** slammed the shot! He`, { atkMultiplier: 1.3 });
+    //             // ATK buffs
+    //             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.15), 2));
+    //         };
 
-            return AbilityResponse.SUCCESS;
-        },
-        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.zone = false;
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.zone = false;
 
-            // Crit DMG Buff
-            mybuff.cd.push(new buffInfo("+", 0.25, 9999));
-            myStats.cd += 0.25;
+    //         // Crit DMG Buff
+    //         mybuff.cd.push(new buffInfo("+", 0.25, 9999));
+    //         myStats.cd += 0.25;
 
-            // Counter Chance
-            myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-                if (Math.random() < 0.1) myStats.counter += 1;
+    //         // Counter Chance
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //             if (Math.random() < 0.1) myStats.counter += 1;
 
-                // Zone (One-time)
-                if ((myStats.hp / myStats.maxhp < 0.4) && !myStats.zone) {
-                    notice.push(`\n💢 We have to win... **${char.name}** entered ZONE.`);
-                    let def_debuff = 0.2;
-                    myStats.zone = true;
+    //             // Zone (One-time)
+    //             if ((myStats.hp / myStats.maxhp < 0.4) && !myStats.zone) {
+    //                 notice.push(`\n💢 We have to win... **${char.name}** entered ZONE.`);
+    //                 let def_debuff = 0.2;
+    //                 myStats.zone = true;
 
-                    eStats.dodge -= 0.15;
-                    if (eStats.dodge < 0) eStats.dodge = 0;
-                    myStats.dodge += 0.15;
-                    if (myStats.dodge > 1) myStats.dodge = 1;
-                    eStats.def -= Math.floor(eStats.def * def_debuff);
-                    eStats.mr -= Math.floor(eStats.mr * def_debuff);
+    //                 eStats.dodge -= 0.15;
+    //                 if (eStats.dodge < 0) eStats.dodge = 0;
+    //                 myStats.dodge += 0.15;
+    //                 if (myStats.dodge > 1) myStats.dodge = 1;
+    //                 eStats.def -= Math.floor(eStats.def * def_debuff);
+    //                 eStats.mr -= Math.floor(eStats.mr * def_debuff);
 
-                    ebuff.dodge.push(new buffInfo("=", Math.min(eStats.dodge - 0.15, 0), 9999));
-                    mybuff.dodge.push(new buffInfo("=", Math.min(myStats.dodge + 0.15, 1), 9999));
-                    ebuff.def.push(new buffInfo("+", Math.floor(eStats.def * def_debuff), 9999));
-                    ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * def_debuff), 9999));
-                };
+    //                 ebuff.dodge.push(new buffInfo("=", Math.min(eStats.dodge - 0.15, 0), 9999));
+    //                 mybuff.dodge.push(new buffInfo("=", Math.min(myStats.dodge + 0.15, 1), 9999));
+    //                 ebuff.def.push(new buffInfo("+", Math.floor(eStats.def * def_debuff), 9999));
+    //                 ebuff.mr.push(new buffInfo("+", Math.floor(eStats.mr * def_debuff), 9999));
+    //             };
 
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
 
-            return AbilityResponse.SUCCESS;
-        },
-        party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            let buff_multiplier = 1;
-            // Kuroko synergy
-            if (myStats.name == "Tetsuya Kuroko") {
-                buff_multiplier = 2;
-                notice.push(`\n✨ I won't let your ray of hope go out this time.`);
-            };
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //         let buff_multiplier = 1;
+    //         // Kuroko synergy
+    //         if (myStats.name == "Tetsuya Kuroko") {
+    //             buff_multiplier = 2;
+    //             notice.push(`\n✨ I won't let your ray of hope go out this time.`);
+    //         };
 
-            // General DMG buff
-            myStats.atk += Math.floor(myStats.atk * 0.1 * buff_multiplier);
-            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buff_multiplier), 9999));
+    //         // General DMG buff
+    //         myStats.atk += Math.floor(myStats.atk * 0.1 * buff_multiplier);
+    //         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buff_multiplier), 9999));
 
-            // Upon ally counter, follows up with additional hit
-            matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (target == myStats) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${char.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
-                }
-            });
+    //         // Upon ally counter, follows up with additional hit
+    //         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+    //             if (target == myStats) {
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${char.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
+    //             }
+    //         });
 
-            return AbilityResponse.SUCCESS;
-        },
-    },
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     "4767": {
         usage: 0,
         used: 0,
