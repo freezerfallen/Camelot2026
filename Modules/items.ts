@@ -3862,19 +3862,19 @@ export const items = [
 
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (target === myStats && myStats.ravagerHP > 0) {
-                if (dmgRedirect + target.hp > 0) {
-                    myStats.hp += dmgRedirect;
+                if (myStats.hp > 0) {
+                    myStats.hp += Math.floor(options.damage * dmgRedirect);
                     if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
-                    myStats.ravagerHP -= dmgRedirect;
+                    myStats.ravagerHP -= Math.floor(options.damage * dmgRedirect);
                     if (myStats.ravagerHP <= 0) {
-                        eStats.ravagerHP = 0;
+                        myStats.ravagerHP = 0;
+                        notice.push(`\n<:ravager_helmet:1081365191876427857> **${char.name}**'s ravager has fallen and is no longer active.`);
                         const heal = Math.floor(myStats.maxhp * 0.1);
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, heal, {});
                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:ravager_helmet:1081365191876427857> **The dying beast** dealt`, { atkMultiplier: 0.5, magicDamage: true });
                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:ravager_helmet:1081365191876427857> **The dying beast** dealt`, { atkMultiplier: 0.5, magicDamage: true });
                     };
-                    notice.push(`\n**${char.name}**'s ravager has fallen and is no longer active.`);
                 };
             };
         });
@@ -3890,7 +3890,7 @@ export const items = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "The ravaging beasts fights alongside the wearer, its HP equivalent to that of the wearer's starting HP. **20%** of damage received is redirected to the ravaging beast. Every **5** rounds, the beast turns berserk, dealing **50%** damage and restoring **10%** max HP for both the wearer and itself. When the beast receives a fatal blow, re-triggers the berserk effects twice before dying."),
+    }, "The ravaging beasts fights alongside the wearer, its HP equivalent to that of the wearer's starting HP. **20%** of non-lethal damage received is redirected to the ravaging beast. Every **5** rounds, the beast turns berserk, dealing **50%** damage and restoring **10%** max HP for both the wearer and itself. When the beast receives a fatal blow, re-triggers the berserk effects twice before dying."),
     new armorInfo("Reef's Bane Helmet", "armor", "helmet", "Reef's Bane Set", ["crafting", "chest"], "<:reefs_bane_helmet:1081365447406014614>", "https://i.imgur.com/iCfJ4kg.png", "hp", 37, 1218, "unique", 531),
     new armorInfo("Reef's Bane Cuirass", "armor", "cuirass", "Reef's Bane Set", ["crafting", "chest"], "<:reefs_bane_cuirass:1081366206914764872>", "https://i.imgur.com/MOYQSpO.png", "def", 12, 124, "unique", 532),
     new armorInfo("Reef's Bane Gloves", "armor", "gloves", "Reef's Bane Set", ["crafting", "chest"], "<:reefs_bane_gloves:1081366792368295997>", "https://i.imgur.com/4m8GX1q.png", "mr", 12, 125, "unique", 533),
@@ -5906,8 +5906,7 @@ export const items = [
                 if (caster === myStats) {
                     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         if (myStats.atk < myStats.md) {
-                            myStats.atk = myStats.md;
-
+                            myStats.atk = myStats.md;             
                         } else {
                             myStats.md = myStats.atk;
                         };
