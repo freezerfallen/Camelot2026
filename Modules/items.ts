@@ -3905,21 +3905,23 @@ export const items = [
     new armorInfo("Sirenscale Vest", "armor", "cuirass", "Sirenscale Set", ["crafting", "chest"], "<:sirenscale_vest:1081366210823860276>", "https://i.imgur.com/zNveflv.png", "mr", 12, 125, "unique", 536),
     new armorInfo("Sirenscale Gloves", "armor", "gloves", "Sirenscale Set", ["crafting", "chest"], "<:sirenscale_gloves:1081366796063490139>", "https://i.imgur.com/RCngOYR.png", "def", 11, 114, "unique", 537),
     new armorInfo("Sirenscale Boots", "armor", "boots", "Sirenscale Set", ["crafting", "chest"], "<:sirenscale_boots:1081367344913326160>", "https://i.imgur.com/RtUw1la.png", "hp", 34, 1207, "unique", 538, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.sirenScale = 0;
+        
         eStats.sm = 0;
         eStats.mg -= 3;
         if (eStats.mg < 0) eStats.mg = 0;
         ebuff.mg.push(new buffInfo("+", -3, 9999));
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (eStats.sm / eStats.mana > 0.5) {
+            if (eStats.sm / eStats.mana > 0.5 && myStats.sirenScale < 3) {
                 const hpLoss = Math.floor(myStats.hp * 0.18);
                 myStats.hp -= hpLoss;
                 eStats.sm = 0;
-                // @ts-ignore
-                this.used++;
+                myStats.sirenScale++;
+                notice.push(`\n<:sirenscale_hood:1081365450446884904> Sirenscale sacrificed **18%** HP and lowered ${enemy.name}'s mana to **0**`);
             };
             return AbilityResponse.SUCCESS;
-        }, 9999, 3));
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The enemy starts with **0** mana, and gains **3** mana less every round. At the start of the round, if the enemy has more than half of their mana pool filled, consumes **18%** current HP to lower it to **0** (can be activated thrice)"),
@@ -3939,22 +3941,20 @@ export const items = [
     new armorInfo("Vindicator Robe", "armor", "cuirass", "Vindicator Set", ["chest"], "<:vindicator_robe:1081366216389701712>", "https://i.imgur.com/j5pavmp.png", "mr", 13, 124, "unique", 544),
     new armorInfo("Vindicator Gloves", "armor", "gloves", "Vindicator Set", ["chest"], "<:vindicator_gloves:1081366801922932787>", "https://i.imgur.com/0x4jfpD.png", "hp", 36, 1220, "unique", 545),
     new armorInfo("Vindicator Boots", "armor", "boots", "Vindicator Set", ["chest"], "<:vindicator_boots:1081367351062175875>", "https://i.imgur.com/l4i0H4s.png", "hp", 34, 1209, "unique", 546, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.vindicator = 0;
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            // @ts-ignore
-            if (myStats.hp / myStats.maxhp < 0.5 && this.used < 4) {
-                // @ts-ignore
-                this.used++;
+            if (myStats.hp / myStats.maxhp < 0.5 && myStats.vindicator < 3) {
+                myStats.vindicator++;
                 notice.push(`\n<:vindicator_hood:1081365456897712129> **The vindicator** sows their seed...`);
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15), {});
                 if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
-            } else {
-                // @ts-ignore
-                this.used++;
+            } else if (myStats.vindicator === 3) {
+                myStats.vindicator++;
                 const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * 0.3) : 0;
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:vindicator_hood:1081365456897712129> **The vindicator** reaps their harvest... They`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
             };
             return AbilityResponse.SUCCESS;
-        }, 9999, 4));
+        }, 9999));
 
         return AbilityResponse.SUCCESS;
     }, "The vindicator sows every time the wearer falls below **50%** HP, healing them for **15%** max HP (3 uses). When all 3 uses are consumed, the vindicator reaps, dealing **30%** of max HP to the enemy (1 use)"),
@@ -6285,6 +6285,9 @@ export const items = [
 
         return AbilityResponse.SUCCESS;
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
+
+    // New loot - Liminal Descent (Summer2025)
+    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "The mermaid yearns, breaking from its fused creation, returning into dust. As your familiars surround you, you burst in tears, gripping onto their hands, panting in relief. Perhaps through the time of isolation, the uncertainty lingering in your heart found a place to rest.\n\n~ Liminal Descent ‖ Summer 2025"),
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;
