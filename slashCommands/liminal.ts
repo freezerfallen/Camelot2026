@@ -463,7 +463,7 @@ function nightmareOverview(interaction: ChatInputCommandInteraction, stats: Comp
                 return `### ${currentNightmare.name}'s Story\n${nightmareStory["summer2025"]?.[currentNightmare.name as keyof typeof nightmareStory["summer2025"]]?.join("\n")}`;
             } else if (tab === "tutorial") {
                 return `### 🎓 Tutorial\n\n` +
-                    `**<:target1:1402578880291930154> Objective:** Progress as far as possible without losing to maximize your rewards!\n\n` +
+                    `**<:target:1403330155186749450> Objective:** Progress as far as possible without losing to maximize your rewards!\n\n` +
 
                     `**How to Play:**\n` +
                     `<:one:1403330141672964217> **Select a Stage** - Choose from unlocked liminal stages (1 new stage unlocks daily)\n` +
@@ -764,7 +764,7 @@ const exportCommand: SlashCommand = {
                 .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
-        let matchStats = Avalon.getMatchStats(interaction);
+        let matchStats = Avalon.getMatchStats(interaction, { allowExecution: false });
         matchStats.actionSequence = [];
         let notice = ["", "", "", ""];
 
@@ -1102,7 +1102,7 @@ const exportCommand: SlashCommand = {
                                 } else if ((eStatsC.forceUseSkillOnRound === matchStats.round && forcedSkillUse++ === 0) || ("forceUseSkillOnRound" in eStatsC ? false : (matchStats.blockAbilities-- < 0 && myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.5))) {
                                     if (eAbility) {
                                         eAbility.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
-                                        eStatsC.sm -= eAbility.cost
+                                        eStatsC.sm -= eAbility.cost;
                                     };
                                     editEmbed();
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);

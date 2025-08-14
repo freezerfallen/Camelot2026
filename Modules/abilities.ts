@@ -2127,7 +2127,7 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.dalusPrime = (myStats.shell === "broken") ? false : true; // false = Past, true = Prime
-            const msg = (!myStats.dalusPrime) ? `\n<:brokenshell:1387074948815781918> **${char.name}** decides to hold onto the last bit of memories left...` : `\n<:dalusrose:1387007950601719908> The nightmare has given an impetus to **${char.name}**. Havoc shall wreck.`;
+            const msg = (!myStats.dalusPrime) ? `\n<:brokenshell:1405524630520987771> **${char.name}** decides to hold onto the last bit of memories left...` : `\n<:dalusrose:1387007950601719908> The nightmare has given an impetus to **${char.name}**. Havoc shall wreck.`;
             notice.push(msg);
             myStats.evadeDeathStrike ??= 0;
             myStats.evadeDeathChance ??= 0;
@@ -2295,7 +2295,7 @@ export const abilities: Record<number, Ability> = {
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.dreamState = -1;
             myStats.kisogiPrime = (myStats.shell === "broken") ? false : true; // false = Past, true = Prime
-            const msg = (!myStats.kisogiPrime) ? `\n<:brokenshell:1387074948815781918> **${char.name}** decides to hold onto the last bit of memories left...` : `\n✨ The fantasy has given an impetus to **${char.name}**. It shall reach faraway.`;
+            const msg = (!myStats.kisogiPrime) ? `\n<:brokenshell:1405524630520987771> **${char.name}** decides to hold onto the last bit of memories left...` : `\n✨ The fantasy has given an impetus to **${char.name}**. It shall reach faraway.`;
             notice.push(msg);
 
             if (myStats.kisogiPrime) {
