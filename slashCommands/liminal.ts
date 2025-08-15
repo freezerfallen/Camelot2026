@@ -17,7 +17,7 @@ import { nightmares } from '../Modules/liminal';
 import delayedBuffs from "../Modules/delayedBuffs";
 
 const dungeonInProgress = new Map<string, number>();
-const nightmareSelected = new Map();
+const nightmareSelected = new Map<string, number>();
 const embedColor = 0x034f20;
 
 interface BuffInfo {
@@ -691,20 +691,16 @@ const exportCommand: SlashCommand = {
             if (resolved) return;
             resolved = true;
 
-
             const Embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`🌙 Liminal Stage ${level + 1} (Level ${runData ? runData.level + 1 : 1})`)
-                .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
+                .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 256 }) });
 
             if (r === "l") {
                 // Calculate score
                 let finalScore = 0;
-                if (runData && runData.appliedBuffs.length > 0) finalScore = runData.appliedBuffs.length ** 2;
-
-                // Clear restrictions
-                dungeonInProgress.delete(stats.id);
+                if (runData && runData.appliedBuffs.length > 0) finalScore = Math.pow(runData.appliedBuffs.length, 2);
 
                 // Reset run on loss
                 if (runData) {
@@ -713,8 +709,7 @@ const exportCommand: SlashCommand = {
                     runData.appliedBuffs = [];
                     runData.totalPoints = 0;
                     userRuns.set(lvlKey, runData);
-                }
-
+                };
 
                 // Update craze_levels for tracking
                 if (!(level in stats.craze_levels)) {
@@ -722,15 +717,17 @@ const exportCommand: SlashCommand = {
                     await updateUsers(interaction.user.id, {
                         craze_levels: { type: "set", value: stats.craze_levels },
                     });
-                }
+                };
+
+                // Clear restrictions
+                dungeonInProgress.delete(stats.id);
 
                 return Embed.setDescription(
-                    `💀 **${myChar.name}** got lost in Liminality... 💀\n\n` +
+                    `💀 **${myChar.name}** got lost in liminality... 💀\n\n` +
                     `<:tally:1403331476916801566> **Final Score: ${finalScore} points**\n\n` +
                     `<:repeat1:1403331474572185600> **Run Reset** - Starting over at Level 1\n\n`
                 );
             };
-
 
             stats.craze_levels[level] ||= 0;
             stats.craze_levels[level]++;
@@ -754,7 +751,6 @@ const exportCommand: SlashCommand = {
             // if (stats.craze_levels[level] === 1) newUpdates.expulls = { type: "increment", value: 1 };
             // if (loot) newUpdates.coins = { type: "increment", value: loot };
             await updateUsers(interaction.user.id, newUpdates);
-
 
 
             await buffSelection(interaction, level);
@@ -782,7 +778,6 @@ const exportCommand: SlashCommand = {
 
         if (runData && runData.appliedBuffs.length > 0) {
             runData.appliedBuffs.forEach(buff => {
-
 
                 switch (buff.id) {
                     //+20% enemy's ATK & MD
@@ -938,9 +933,9 @@ const exportCommand: SlashCommand = {
                         break;
                     default:
                         break;
-                }
+                };
             });
-        }
+        };
 
         let ATK_EMOJI = myStatsC.replaceButton?.atk?.emoji || '⚔️',
             DEF_EMOJI = myStatsC.replaceButton?.def?.emoji || '🛡️',

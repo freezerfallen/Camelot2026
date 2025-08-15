@@ -1348,7 +1348,7 @@ export const raidBosses: enemyInfo[] = [
     ),
 ];
 export const nightmareMobs: enemyInfo[] = [
-    new enemyInfo("Fish of the Tidal", "Tidal Fish", "the Tidecaller", "F", true, { hp: 30_000, atk: 10_000, md: 10_000, def: 1_000, mr: 1_000, mana: 160 }, {}, {}, [], ["https://i.ibb.co/5Wvm217f/c.gif"], [], 25,
+    new enemyInfo("Fish of the Tidal", "Tidal Fish", "the Tidecaller", "F", true, { hp: 30_000, atk: 10_000, md: 10_000, def: 1_000, mr: 1_000, mana: 160 }, {}, {}, [], ["https://i.ibb.co/3ywY2yX7/c.gif"], [], 25,
         new skillInfo(25, 80, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             eStats.tidalMeter += 50;
             notice.push(`\n✨ Heed my call! **${enemy.name}** raised Tidal Meter to **${eStats.tidalMeter}**`);
