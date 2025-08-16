@@ -3,6 +3,7 @@ import Package from '../package.json';
 import { auniq } from "../Modules/chars";
 import { items } from "../Modules/items";
 import { SlashCommand } from '../types';
+import { ongoingEvent, isEventOngoing } from '../Modules/components';
 
 const exportCommand: SlashCommand = {
     name: 'help',
@@ -10,23 +11,35 @@ const exportCommand: SlashCommand = {
 
         let helpCommand = interaction.options.getString('command') ?? "";
 
+        const embedColor = isEventOngoing()
+            ? {
+                anniversary: 0x2aad9d,
+                halloween: 0xff8733,
+                christmas: 0x034f20,
+                valentines: 0xf8c8dc,
+                easter: 0x69ffb9,
+            }[ongoingEvent]
+            : 0xbbffff;
+
         // Main help page
         if (!helpCommand) {
             const Embed = new EmbedBuilder()
                 .setTitle('Command List')
-                .setColor(0xbbffff) // Default: 0xbbffff, Anniversary: 0x2aad9d, Halloween: 0xff8733, Christmas: 0x034f20, Valentine's: 0xf8c8dc, Easter: 0x69ffb9
+                .setColor(embedColor)
                 .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
-                .setDescription("Use `/help <command name>` for more information")
-                .addFields(
-                    // { name: "🌙 Anniversary Event", value: "`/celebrate` `/boss hunt` `/event pass` `/ex pull`\n`/event rewards`" },
-                    { name: "<:SSTier:869316489931546644> Card Game", value: "`/pull` `/cd` `/pity` `/reminder` `/ability` `/anime` `/search`\n`/find` `/info` `/inventory` `/shards` `/refine` `/list`\n`/lock [anime|character]` `/unlock [anime|characters]` `/locked` `/vote` `/lootbox` `/rp` `/tickets` `/open` `/stats` `/fav`" },
-                    { name: "<:coins:872926669055356939> Balance & Trading", value: "`/balance` `/premium` `/bank [view|deposit|withdraw]` `/shop` `/monthly shop` `/convert jades`\n `/buy [character|chest|exchange|monthly]`\n`/give [characters|coins|premium|pass]`\n`/sell [all|characters|dupes]` `/trade`" },
-                    { name: "<:sword:941687282585468958> Dungeon & Progress", value: "`/dungeon` `/select` `/level` `/levelup` `/quests` `/class [info|level|pick|select|switch|transfer|upgrade]`\n`/convert [scrolls|shards]` `/achievements`\n`/curse [info|list]` `/daily` `/weekly` `/disassemble [all|items]` `/merge` `/forge` `/rank` `/ep`\n`/fish` `/feed` `/items [loot|armor|weapon|ring]`\n`/preset [edit|select|view]` `/item [info|equip|unequip|levelup|list|lock|unlock|rename|wishlist]`" },
-                    { name: "🎉 Game Modes & Events", value: "`/trial` `/arena` `/top` `/party [create|view|edit|invite|join|kick|leave|dissolve]`\nRecurrent: `/stampede` `/rolling cow`\nSeasonal: `/event pass` `/ex pull` `/boss hunt` `/boss rush` `/christmas craze` `/liminal descent`" },
-                    { name: "🏰 Guilds & Raids", value: "`/raid` `/rankup exam` `/skill [upgrade|view]` `/guild [create|claim|top|find|view|invite|join|edit|donate|donations|levelup|upgrade|promote|demote|kick|leave|ban|unban]` `/guild shop`" },
-                    { name: "🎭 Fun & Cosmetics", value: "`/profile` `/skins` `/backgrounds` `/background search` `/background select` `/changeimg` `/guess character` `/recommend` `/ruin`" },
-                    { name: "🎐 Utility & Other", value: "`/support` `/terms` `/settings` `/camelot` `/referral` `/avatar` `/delay` `/faq` `/math`" }
-                )
+                .setDescription("Use `/help <command name>` for more information");
+            if (isEventOngoing()) Embed.addFields(
+                { name: "🌙 Anniversary Event", value: "`/liminal descent` `/celebrate` `/event pass` `/ex pull`" },
+            );
+            Embed.addFields(
+                { name: "<:SSTier:869316489931546644> Card Game", value: "`/pull` `/cd` `/pity` `/reminder` `/ability` `/anime` `/search`\n`/find` `/info` `/inventory` `/shards` `/refine` `/list`\n`/lock [anime|character]` `/unlock [anime|characters]` `/locked` `/vote` `/lootbox` `/rp` `/tickets` `/open` `/stats` `/fav`" },
+                { name: "<:coins:872926669055356939> Balance & Trading", value: "`/balance` `/premium` `/bank [view|deposit|withdraw]` `/shop` `/monthly shop` `/convert jades`\n `/buy [character|chest|exchange|monthly]`\n`/give [characters|coins|premium|pass]`\n`/sell [all|characters|dupes]` `/trade`" },
+                { name: "<:sword:941687282585468958> Dungeon & Progress", value: "`/dungeon` `/select` `/level` `/levelup` `/quests` `/class [info|level|pick|select|switch|transfer|upgrade]`\n`/convert [scrolls|shards]` `/achievements`\n`/curse [info|list]` `/daily` `/weekly` `/disassemble [all|items]` `/merge` `/forge` `/rank` `/ep`\n`/fish` `/feed` `/items [loot|armor|weapon|ring]`\n`/preset [edit|select|view]` `/item [info|equip|unequip|levelup|list|lock|unlock|rename|wishlist]`" },
+                { name: "🎉 Game Modes & Events", value: "`/trial` `/arena` `/top` `/party [create|view|edit|invite|join|kick|leave|dissolve]`\nRecurrent: `/stampede` `/rolling cow`\nSeasonal: `/boss hunt` `/boss rush` `/christmas craze` `/liminal descent`" },
+                { name: "🏰 Guilds & Raids", value: "`/raid` `/rankup exam` `/skill [upgrade|view]` `/guild [create|claim|top|find|view|invite|join|edit|donate|donations|levelup|upgrade|promote|demote|kick|leave|ban|unban]` `/guild shop`" },
+                { name: "🎭 Fun & Cosmetics", value: "`/profile` `/skins` `/backgrounds` `/background search` `/background select` `/changeimg` `/guess character` `/recommend` `/ruin`" },
+                { name: "🎐 Utility & Other", value: "`/support` `/terms` `/settings` `/camelot` `/referral` `/avatar` `/delay` `/faq` `/math`" }
+            )
                 .setFooter({ text: `Camelot ${Package.version} • Made by Apollo24 & PokeLinker`, iconURL: "https://i.imgur.com/RbLjdQ4.png" });
             return interaction.reply({ embeds: [Embed] });
         };
@@ -45,7 +58,7 @@ const exportCommand: SlashCommand = {
         const command = interaction.client.slashCommands.get(helpCommand);
         const Embed = new EmbedBuilder()
             .setTitle(`Help: ${command ? "/" : ""}${helpCommand}`)
-            .setColor(0xbbffff)
+            .setColor(embedColor)
             .setThumbnail("https://i.imgur.com/Ta2YDBN.png")
             .setFooter({ text: `Camelot ${Package.version} • Made by Apollo24 & PokeLinker`, iconURL: "https://i.imgur.com/RbLjdQ4.png" });
 

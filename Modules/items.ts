@@ -3906,7 +3906,7 @@ export const items = [
     new armorInfo("Sirenscale Gloves", "armor", "gloves", "Sirenscale Set", ["crafting", "chest"], "<:sirenscale_gloves:1081366796063490139>", "https://i.imgur.com/RCngOYR.png", "def", 11, 114, "unique", 537),
     new armorInfo("Sirenscale Boots", "armor", "boots", "Sirenscale Set", ["crafting", "chest"], "<:sirenscale_boots:1081367344913326160>", "https://i.imgur.com/RtUw1la.png", "hp", 34, 1207, "unique", 538, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sirenScale = 0;
-        
+
         eStats.sm = 0;
         eStats.mg -= 3;
         if (eStats.mg < 0) eStats.mg = 0;
@@ -5906,7 +5906,7 @@ export const items = [
                 if (caster === myStats) {
                     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                         if (myStats.atk < myStats.md) {
-                            myStats.atk = myStats.md;             
+                            myStats.atk = myStats.md;
                         } else {
                             myStats.md = myStats.atk;
                         };
@@ -6287,7 +6287,7 @@ export const items = [
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
     // New loot - Liminal Descent (Summer2025)
-    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "The mermaid yearns, breaking from its fused creation, returning into dust. As your familiars surround you, you burst in tears, gripping onto their hands, panting in relief. Perhaps through the time of isolation, the uncertainty lingering in your heart found a place to rest.\n\n~ Liminal Descent ‖ Summer 2025"),
+    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "The mermaid yearns, breaking from its fused creation, returning into dust. As your familiars surround you, you burst in tears, gripping onto their hands, panting in relief. Perhaps through the time of isolation, the uncertainty lingering in your heart found a place to rest.\n\n~ Liminal Descent | Summer 2025"),
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;

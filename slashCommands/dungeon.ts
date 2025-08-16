@@ -307,8 +307,8 @@ const exportCommand: SlashCommand = {
             if (loot > 1_000_000) loot = 42187;
 
             // Guild Tax
+            const tax = Math.max(0, Math.floor(loot * ((guild?.tax ?? 0) / 100)));
             if (loot > 0 && guild && guild.tax) {
-                const tax = Math.floor(loot * (guild.tax / 100));
                 loot = Math.floor(loot - tax);
                 await addGuildDonation(guild.id, interaction.user.id, "coins", tax);
             };
@@ -418,6 +418,7 @@ const exportCommand: SlashCommand = {
                 dungeon_floors: { type: 'set', value: stats.dungeon_floors },
                 dungeon_classlevels: { type: 'set', value: stats.dungeon_classlevels },
                 tutorial: { type: 'append_unique', value: [9] },
+                donatedtotal: { type: "increment", value: tax },
             });
 
             // Tutorial
@@ -464,6 +465,9 @@ const exportCommand: SlashCommand = {
             };
 
             //* Achievements
+            // Guild donation achievement
+            achievements[59].check(interaction, interaction.user), achievements[60].check(interaction, interaction.user), achievements[61].check(interaction, interaction.user), achievements[62].check(interaction, interaction.user), achievements[63].check(interaction, interaction.user);
+
             // Ascension material achievement
             achievements[67].check(interaction, interaction.user), achievements[68].check(interaction, interaction.user), achievements[69].check(interaction, interaction.user), achievements[70].check(interaction, interaction.user);
 
