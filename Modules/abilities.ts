@@ -2102,8 +2102,8 @@ export const abilities: Record<number, Ability> = {
                     const dmgLimit = myStats.dalusPrime ? 0.3 : 0.2;
                     const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(Math.min(eStats.maxhp * 0.05, dmgLimit)) : 0;
                     // Overflow?
-                    if (dmg > dmgLimit) {
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(dmg - dmgLimit, myStats.maxhp * myStats.dalusPrime ? 0.15 : 0.9)), {});
+                    if (eStats.maxhp * 0.05 > myStats.atk * dmgLimit) {
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(eStats.maxhp * 0.05 - myStats.atk * dmgLimit, myStats.maxhp * myStats.dalusPrime ? 0.15 : 0.09)), {});
                     };
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:rosie:1387006066566627328> **Rosie**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
 
@@ -2227,6 +2227,11 @@ export const abilities: Record<number, Ability> = {
                     // Forcibly enter Wild Dream
                     if (myStats.dreamState === 0) {
                         myStats.dreamState = 1;
+                        const defShred = myStats.kisogiPrime ? 0.3 : 0.15, dmgScale = myStats.kisogiPrime ? 7 : 5 * (1 - myStats.sm / myStats.mana);
+                        eStats.mr -= Math.min(Math.floor(eStats.mr * defShred), 660);
+                        ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * defShred), 660), 9999));
+                        notice.push(`\n💤 ${char.name} entered a __Wild Dream__`);
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `💦 **Kisogi**`, { atkMultiplier: dmgScale, magicDamage: true, dodge: false });
                         this.used++;
                     };
                     return AbilityResponse.SUCCESS;
@@ -6631,7 +6636,7 @@ export const abilities: Record<number, Ability> = {
                 this.used--;
                 return AbilityResponse.FAILURE;
             };
-            this.pause = matchStats.round + 9;
+            this.pause = matchStats.round + 10;
 
             const domainLast = 10;
 
