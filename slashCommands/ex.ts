@@ -35,13 +35,15 @@ const newex: { [key: string]: number; } = {
     "24798": 0.01, // Shorekeeper EX
     "23185": 0.008, // 2B EX
     "23390": 0.012, // Garou EX
-}; // sum = 0.03
 
-const oldex: { [key: string]: number; } = {
     "17688": 0.004, // Apollo EX
     "21928": 0.005, // Boa Hancock EX
     "19050": 0.009, // Baal EX
-    "19049": 0.012, // Ruminas Valentine EX
+    "19049": 0.011, // Ruminas Valentine EX
+}; // sum = 0.03
+
+const oldex: { [key: string]: number; } = {
+    "19049": 0.001, // Ruminas Valentine EX
 }; // sum = 0.03
 
 const expool: { [key: string]: number; } = {
@@ -108,7 +110,7 @@ const exportCommand: SlashCommand = {
                 // `${Object.keys(newex).map((e) => `**${characters[e as any].name}**`).join(", ")}, ${Object.keys(oldex).map((e) => `**${characters[e as any].name}**`).join(", ")}\n\n` +
                 `**Shorekeeper EX**, **Apollo EX**, **2B & 9S EX**, **Boa Hancock EX**, **Raiden Shogun EX**, **Ruminas Valentine EX**, **Garou EX**\n\n` +
                 `**Drop Rates**:\n<a:EXTRA:1138530846144462968> Tier ➜ **${exDropRate}**% | Pity: **${stats.expity}**/${expity}\n<:SSTier:869316489931546644> Tier ➜ **${50 - exDropRate}**%\n<:STier:869316518675095552> Tier ➜ **50**%\n\n` +
-                `-# Tip: Pity only includes new EX characters!`;
+                `-# Tip: Use up your <a:EXTRA:1138530846144462968> pulls before the next event starts, you'll lose them otherwise!`;
         };
 
         const Embed = new EmbedBuilder()
