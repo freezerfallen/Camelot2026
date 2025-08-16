@@ -18,7 +18,9 @@ import delayedBuffs from "../Modules/delayedBuffs";
 
 const dungeonInProgress = new Map<string, number>();
 const nightmareSelected = new Map<string, number>();
+
 const embedColor = 0x034f20;
+const startDate = new Date('2025-08-13 00:00:00');
 
 interface BuffInfo {
     id: string;
@@ -35,7 +37,6 @@ interface UserRunInfo {
 }
 
 const userRuns = new Map<string, UserRunInfo>();
-const startDate = new Date('2025-07-20T00:00:00');
 
 
 const nightmareStory = {
@@ -729,34 +730,42 @@ const exportCommand: SlashCommand = {
                 );
             };
 
-            stats.craze_levels[level] ||= 0;
-            stats.craze_levels[level]++;
 
             // Update run data
+            let reachedNewMaxLevel = false;
             if (runData) {
                 runData.level++;
                 userRuns.set(lvlKey, runData);
+
+                stats.craze_levels[level] ||= 0;
+                if (runData.level > stats.craze_levels[level]) {
+                    reachedNewMaxLevel = true;
+                    stats.craze_levels[level] = runData.level;
+                };
             };
 
             // Coins
-            // let loot = 0;
-            // if (stats.craze_levels[level] < 30) {
-            //     loot = 40 + Math.floor(Math.random() * 30) + (lootFloor < 100 ? lootFloor * 3 : 300 + (lootFloor * 1.5));
-            // }
+            let loot = 0;
+            if (reachedNewMaxLevel && stats.craze_levels[level] <= 10) {
+                loot = 400 + Math.floor(Math.random() * 200) + (level * 100);
+            };
+
+            const receivedFirstExPullReward = reachedNewMaxLevel && stats.craze_levels[level] === 1;
+            const receivedSecondExPullReward = reachedNewMaxLevel && stats.craze_levels[level] === 8;
 
             // Update users table
             const newUpdates: UpdateUserOptions = {
                 craze_levels: { type: "set", value: stats.craze_levels },
             };
-            // if (stats.craze_levels[level] === 1) newUpdates.expulls = { type: "increment", value: 1 };
-            // if (loot) newUpdates.coins = { type: "increment", value: loot };
+            if (receivedFirstExPullReward) newUpdates.expulls = { type: "increment", value: 1 };
+            if (receivedSecondExPullReward) newUpdates.expulls = { type: "increment", value: 1 };
+            if (loot) newUpdates.coins = { type: "increment", value: loot };
             await updateUsers(interaction.user.id, newUpdates);
-
 
             await buffSelection(interaction, level);
 
             return Embed
-                .setDescription(`<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>\n<a:arrow_green:916716811842621450> Level ${level + 1} progress: **${stats.craze_levels[level]}**/${1}`)
+                .setDescription(`<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>\n<a:arrow_green:916716811842621450> Level ${level + 1} progress: **${stats.craze_levels[level]}**/${1}${loot ? `\n<a:arrow_orange:916716747623641210> **${loot}** coins <:coins:872926669055356939>` : ""}${receivedFirstExPullReward || receivedSecondExPullReward ? `\n<a:arrow_blue:1179933798016745623> **1x** <a:EXTRA:1138530846144462968>` : ""}`)
                 .setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
