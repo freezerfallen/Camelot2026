@@ -3208,11 +3208,11 @@ export const items = [
         myStats.bone += 10;
 
         myStats.delayedBuffs.push(new delayedBuffs(9, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            let mdBuff = Math.floor(myStats.md * 0.1 * myStats.flesh);
+            let mdBuff = Math.floor(myStats.md * 0.06 * myStats.flesh);
             myStats.md += mdBuff; // Boost according to flesh
             myStats.cd += 0.1 * myStats.bone; // Boost according to bone
             mybuff.md.push(new buffInfo("+", mdBuff, 2));
-            mybuff.cd.push(new buffInfo("+", 0.1 * myStats.bone, 2));
+            mybuff.cd.push(new buffInfo("+", 0.08 * myStats.bone, 2));
             notice.push(`\n<:abyssal_shard:1069019809993461872> The abyss yields the flesh and bone. **${char.name}** gained **${mdBuff}** MD and **${myStats.bone * 10}%** critical damage.`);
             // Reset
             myStats.flesh = 0;
@@ -3221,11 +3221,11 @@ export const items = [
             // Every 10 rounds = abyss engulf
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if ((matchStats.round - 9) % 10 === 0) {
-                    let mdBuff = Math.floor(myStats.md * 0.1 * myStats.flesh);
+                    let mdBuff = Math.floor(myStats.md * 0.06 * myStats.flesh);
                     myStats.md += mdBuff; // Boost according to flesh
                     myStats.cd += 0.1 * myStats.bone; // Boost according to bone
                     mybuff.md.push(new buffInfo("+", mdBuff, 2));
-                    mybuff.cd.push(new buffInfo("+", 0.1 * myStats.bone, 2));
+                    mybuff.cd.push(new buffInfo("+", 0.08 * myStats.bone, 2));
                     notice.push(`\n<:abyssal_shard:1069019809993461872> The abyss yields the flesh and bone. **${char.name}** gained **${mdBuff}** MD and **${myStats.bone * 10}%** critical damage.`);
                     // Reset
                     myStats.flesh = 0;
@@ -3240,29 +3240,31 @@ export const items = [
         //Object.keys(ebuff).forEach((e) => ebuff[e as keyof Buffs] = []);
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder begins battles with **10x** `🥩` and `🦴`.\nOn the **9th** round, the abyss consumes all `🥩` and `🦴`. For every `🥩` consumed, raises own MD by **10%** for **2** rounds. For every `🦴`, raises own critical damage by **10%** for **2** rounds. After that, the abyss rests for **10** rounds before engulfing again. The wielder deals magic damage by default.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shard is a weapon of pure darkness, forged in the depths of the underworld by a powerful demon. Its jagged edge glints with malevolent intent, and those who wield it are said to be consumed by a thirst for destruction and power. Those who face the Abyssal Shard in combat are often struck with fear, knowing that they are facing the wrath of the abyss itself.", "mythical", 422),
+    }, "The wielder begins battles with **10x** `🥩` and `🦴`.\nOn the **9th** round, the abyss consumes all `🥩` and `🦴`. For every `🥩` consumed, raises own MD by **6%** for **2** rounds. For every `🦴`, raises own critical damage by **8%** for **2** rounds. After that, the abyss rests for **10** rounds before engulfing again. The wielder deals magic damage by default.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shard is a weapon of pure darkness, forged in the depths of the underworld by a powerful demon. Its jagged edge glints with malevolent intent, and those who wield it are said to be consumed by a thirst for destruction and power. Those who face the Abyssal Shard in combat are often struck with fear, knowing that they are facing the wrath of the abyss itself.", "mythical", 422),
     new weaponInfo("Arcane Slicer", "weapon", "dagger", ["chest"], "<:arcane_slicer:1069019806881284137>", "https://i.imgur.com/MbSEzOA.png", "md", 96, 1085, "cd", 0.12, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-
         myStats.arcaneSlice = 0;
-
+        myStats.arcaneSliceUsed = -1;
         matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
                 if (myStats.arcaneSlice < 10) myStats.arcaneSlice++;
-                if (myStats.arcaneSlice === 10) {
+                if (myStats.arcaneSlice === 10 && myStats.arcaneSliceUsed !== matchStats.round) {
+                    myStats.arcaneSliceUsed = matchStats.round;
                     myStats.arcaneSlice -= 5;
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:arcane_slicer:1069019806881284137> **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, dodge: false, combodmg: true });
                 };
             };
         });
 
-        // Increase MD by 3% for every Slice
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // Increase MD by 3% for every Slice
             myStats.md += Math.floor(myStats.md * 0.03 * myStats.arcaneSlice);
             return AbilityResponse.SUCCESS;
         }, 9999));
+        //myStats.md += Math.floor(myStats.md * 0.25);
+        //mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.25), 9999));
 
         return AbilityResponse.SUCCESS;
-    }, "Non-critical hits grant **1x** `Slice` (Up to **10**). Every `Slice` raises MD by **3%**. After any non-critical hit, if the wielder has **10x** `Slice`, consumes **5x** to unleash mystic arcane power, dealing **150%** undodgeable MD. This attack will not break combos.", "The Arcane Slicer is a dagger imbued with ancient magic, capable of slicing through even the toughest of defenses. Its razor-sharp blade glows with a faint, otherworldly light, making it a formidable weapon in the hands of those skilled in the arcane arts.", "mythical", 423),
+    }, "Non-critical hits grant **1x** `Slice` (Up to **10**, can be triggered once every round). Every `Slice` raises MD by **3%**. After any non-critical hit, if the wielder has **10x** `Slice`, consumes **5x** to unleash mystic arcane power, dealing **150%** undodgeable MD. This attack will not break combos.", "The Arcane Slicer is a dagger imbued with ancient magic, capable of slicing through even the toughest of defenses. Its razor-sharp blade glows with a faint, otherworldly light, making it a formidable weapon in the hands of those skilled in the arcane arts.", "mythical", 423),
     new weaponInfo("Flaming Fomor", "weapon", "dagger", ["chest"], "<:flaming_fomor:1069020248398897202>", "https://i.imgur.com/7sryILJ.png", "atk", 108, 1137, "cd", 0.12, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.replaceButton.atk = {
             "emoji": "<:flaming_fomor:1069020248398897202>",
@@ -6287,7 +6289,7 @@ export const items = [
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
     // New loot - Liminal Descent (Summer2025)
-    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "The mermaid yearns, breaking from its fused creation, returning into dust. As your familiars surround you, you burst in tears, gripping onto their hands, panting in relief. Perhaps through the time of isolation, the uncertainty lingering in your heart found a place to rest.\n\n~ Liminal Descent | Summer 2025"),
+    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "As Juliette's strength begins to fade, the pendant at her chest glows — not with power, but with longing.\n\nUrashima’s presence stirs within, answering the silent call of the one he once cherished. The pendant cracks, and stardust flows into her — a quiet promise, a final embrace.\n\nThe sea accepts the stars.\nShe rises again, reborn as Twilight Juliette —\nnot alone, but fused with the will of Urashima, her guardian and guide.\n\nOcean and cosmos move as one.\nAnd together, they will not fall.\n\n~ Liminal Descent | Summer 2025"),
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;
