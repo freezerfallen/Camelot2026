@@ -14,7 +14,7 @@ import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { CompactUserSchema, DetailedStats, GuildSchema, RaidRank, RaidSchema, SlashCommand } from '../types';
-import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateGuilds, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
+import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateGuilds, updateRaidEnded, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 
 const dungeonInProgress = new Set();
@@ -453,6 +453,10 @@ async function endRaid(raidRowId: number) {
     // Fetch Raid
     const raid = await getRaidByRaidRowId(raidRowId);
     if (!raid) return;
+    if (raid.end_date) return;
+
+    // End raid
+    await updateRaidEnded(raidRowId);
 
     // Distribute Rewards
     const totalPoints = Object.values(raid.participation).reduce((acc, [points]) => acc + points, 0);
