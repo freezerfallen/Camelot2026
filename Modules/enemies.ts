@@ -694,6 +694,7 @@ export const raidBosses: enemyInfo[] = [
 
             if (myStats.shield > 0) {
                 myStats.shield = 0;
+                matchStats.trigger("shieldBreak", eStats, myStats, ebuff, mybuff);
                 notice.push(`\n<:steal_shield:1340630053695918100> **${enemy.name}** has broken your shield!`);
             };
 
