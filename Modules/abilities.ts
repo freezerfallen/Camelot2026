@@ -2103,7 +2103,7 @@ export const abilities: Record<number, Ability> = {
                     const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(Math.min(eStats.maxhp * 0.05, dmgLimit)) : 0;
                     // Overflow?
                     if (eStats.maxhp * 0.05 > myStats.atk * dmgLimit) {
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(eStats.maxhp * 0.05 - myStats.atk * dmgLimit, myStats.maxhp * myStats.dalusPrime ? 0.15 : 0.09)), {});
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(eStats.maxhp * 0.05 - myStats.atk * dmgLimit, myStats.maxhp * (myStats.dalusPrime ? 0.15 : 0.09))), {});
                     };
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:rosie:1387006066566627328> **Rosie**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
 
@@ -2227,7 +2227,8 @@ export const abilities: Record<number, Ability> = {
                     // Forcibly enter Wild Dream
                     if (myStats.dreamState === 0) {
                         myStats.dreamState = 1;
-                        const defShred = myStats.kisogiPrime ? 0.3 : 0.15, dmgScale = myStats.kisogiPrime ? 7 : 5 * (1 - myStats.sm / myStats.mana);
+                        const manaPoolMissing = myStats.sm <= 0 ? 1 : (1 - myStats.sm / myStats.mana);
+                        const defShred = myStats.kisogiPrime ? 0.3 : 0.15, dmgScale = myStats.kisogiPrime ? 7 : 5 * manaPoolMissing;
                         eStats.mr -= Math.min(Math.floor(eStats.mr * defShred), 660);
                         ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * defShred), 660), 9999));
                         notice.push(`\n💤 ${char.name} entered a __Wild Dream__`);
@@ -2244,7 +2245,8 @@ export const abilities: Record<number, Ability> = {
             if (this.used === 2) {
                 myStats.hp -= Math.floor(myStats.hp * 0.18);
                 myStats.dreamState = 1;
-                const defShred = myStats.kisogiPrime ? 0.3 : 0.15, dmgScale = myStats.kisogiPrime ? 7 : 5 * (1 - myStats.sm / myStats.mana);
+                const manaPoolMissing = myStats.sm <= 0 ? 1 : (1 - myStats.sm / myStats.mana);
+                const defShred = myStats.kisogiPrime ? 0.3 : 0.15, dmgScale = myStats.kisogiPrime ? 7 : 5 * manaPoolMissing;
                 eStats.mr -= Math.min(Math.floor(eStats.mr * defShred), 660);
                 ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * defShred), 660), 9999));
                 notice.push(`\n💤 ${char.name} entered a __Wild Dream__`);
