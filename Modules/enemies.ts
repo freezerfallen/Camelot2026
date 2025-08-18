@@ -721,6 +721,7 @@ export const raidBosses: enemyInfo[] = [
             const steal = Math.floor(myStats.shield * 0.5);
             eStats.shield += steal;
             myStats.shield = steal;
+            matchStats.trigger("shieldBreak", eStats, myStats, ebuff, mybuff);
 
             dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:steal_shield:1340630053695918100> **${enemy.name}**`, { overwriteDamage: eStats.shield, ignoreShield: true, dodge: false, block: false });
 
