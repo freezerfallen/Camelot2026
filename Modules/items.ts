@@ -3222,12 +3222,14 @@ export const items = [
             // Every 10 rounds = abyss engulf
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if ((matchStats.round - 9) % 10 === 0) {
-                    let mdBuff = Math.floor(myStats.md * 0.1 * myStats.flesh);
+                    let mdBuff = Math.floor(myStats.md * 0.02 * myStats.flesh);
+
                     myStats.md += mdBuff; // Boost according to flesh
                     myStats.cd += 0.04 * myStats.bone; // Boost according to bone
                     mybuff.md.push(new buffInfo("+", mdBuff, 2));
-                    mybuff.cd.push(new buffInfo("+", 0.1 * myStats.bone, 2));
-                    notice.push(`\n<:abyssal_shard:1069019809993461872> The abyss yields the flesh and bone. **${char.name}** gained **${mdBuff}** MD and **${myStats.bone * 10}%** critical damage.`);
+                    mybuff.cd.push(new buffInfo("+", 0.04 * myStats.bone, 2));
+                    notice.push(`\n<:abyssal_shard:1069019809993461872> The abyss yields the flesh and bone. **${char.name}** gained **${mdBuff}** MD and **${myStats.bone * 4}%** critical damage.`);
+
                     // Reset
                     myStats.flesh = 0;
                     myStats.bone = 0;
@@ -3241,9 +3243,9 @@ export const items = [
         //Object.keys(ebuff).forEach((e) => ebuff[e as keyof Buffs] = []);
 
         return AbilityResponse.SUCCESS;
-    }, "The wielder begins battles with **10x** `🥩` and `🦴`.\nOn the **9th** round, the abyss consumes all `🥩` and `🦴`. For every `🥩` consumed, raises own MD by **10%** for **2** rounds. For every `🦴`, raises own critical damage by **10%** for **2** rounds. After that, the abyss rests for **10** rounds before engulfing again. The wielder deals magic damage by default.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shard is a weapon of pure darkness, forged in the depths of the underworld by a powerful demon. Its jagged edge glints with malevolent intent, and those who wield it are said to be consumed by a thirst for destruction and power. Those who face the Abyssal Shard in combat are often struck with fear, knowing that they are facing the wrath of the abyss itself.", "mythical", 422),
-    new weaponInfo("Arcane Slicer", "weapon", "dagger", ["chest"], "<:arcane_slicer:1069019806881284137>", "https://i.imgur.com/MbSEzOA.png", "md", 96, 1085, "cd", 0.12, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    }, "The wielder begins battles with **10x** `🥩` and `🦴`.\nOn the **9th** round, the abyss consumes all `🥩` and `🦴`. For every `🥩` consumed, raises own MD by **2%** for **2** rounds. For every `🦴`, raises own critical damage by **4%** for **2** rounds. After that, the abyss rests for **10** rounds before engulfing again. The wielder deals magic damage by default.\n\n_This item is synergistic with other `Flesh and Bone` items._", "The Abyssal Shard is a weapon of pure darkness, forged in the depths of the underworld by a powerful demon. Its jagged edge glints with malevolent intent, and those who wield it are said to be consumed by a thirst for destruction and power. Those who face the Abyssal Shard in combat are often struck with fear, knowing that they are facing the wrath of the abyss itself.", "mythical", 422),
 
+    new weaponInfo("Arcane Slicer", "weapon", "dagger", ["chest"], "<:arcane_slicer:1069019806881284137>", "https://i.imgur.com/MbSEzOA.png", "md", 96, 1085, "cd", 0.12, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.arcaneSlice = 0;
         myStats.arcaneSliceUsed = -1;
         matchStats.on("noncrit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
