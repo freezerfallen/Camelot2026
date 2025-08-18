@@ -582,7 +582,7 @@ const exportCommand: SlashCommand = {
 
         // Safety constants
         const MAX_SEQUENCE_LENGTH = 5000;    // Maximum total actions allowed
-        const MAX_REPEAT_COUNT = 100;        // Maximum repeat count for any single pattern
+        const MAX_REPEAT_COUNT = 200;        // Maximum repeat count for any single pattern
         const MAX_NESTING_DEPTH = 5;         // Maximum parentheses nesting depth
         const MAX_EXPANSION_ITERATIONS = 50; // Maximum iterations to prevent infinite loops
 
@@ -703,7 +703,7 @@ const exportCommand: SlashCommand = {
         };
 
         const actionSequence = parseActionSequence(sequence);
-        if (actionSequence.includes(null)) return interaction.reply("Error in action sequence. Please use the format `atk:3,def,ability,skill,skip` or `(atk,def):3` for patterns.\n**Restrictions**: Max 5000 actions, max 100 repeats, max 5 nesting levels, max 50 iterations");
+        if (actionSequence.includes(null)) return interaction.reply("Error in action sequence. Please use the format `atk:3,def,ability,skill,skip` or `(atk,def):3` for patterns.\n**Restrictions**: Max 5000 actions, max 200 repeats, max 5 nesting levels, max 50 iterations");
 
         // Skip by default if action sequence is used
         if (actionSequence.length > 0 && interaction.options.getBoolean('skip-overview') !== false) skipOverview = true;
@@ -805,6 +805,9 @@ const exportCommand: SlashCommand = {
         // Return if no attempts left
         const raidCheck = await getLatestRaid(guild.id);
         if (!raidCheck) return interaction.followUp("An error occurred while checking your raid attempts. Please try again later.");
+
+        // Return if ended and no test run
+        if (raidCheck.end_date && !isTestRun) return interaction.reply("The raid has ended. You can start a new one with `/raid` or use the test flag");
 
         // Attempts left
         const attemptsUsed = raidCheck.participation[interaction.user.id]?.[1] ?? 0;
