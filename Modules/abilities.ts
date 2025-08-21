@@ -5425,6 +5425,7 @@ export const abilities: Record<number, Ability> = {
                             myStats.cr += 0.02;
                             if (myStats.cr > 1) myStats.cr = 1;
                             myStats.cd += 0.03;
+                            return true;
                         }
                     }
                 });
@@ -6160,6 +6161,7 @@ export const abilities: Record<number, Ability> = {
                         if (caster === myStats) {
                             myStats.damageReduction += 0.015;
                             if (myStats.damageReduction > 1) myStats.damageReduction = 1;
+                            return true;
                         };
                     },
                 });
@@ -6782,6 +6784,7 @@ export const abilities: Record<number, Ability> = {
                         myStats.dodge += 0.015;
                         mybuff.dodge.push(new buffInfo("+", 0.015, 9999));
                         if (myStats.dodge > 1) myStats.dodge = 1;
+                        return true;
                     }
                 }
             });
