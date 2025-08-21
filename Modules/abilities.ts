@@ -1845,7 +1845,7 @@ export const abilities: Record<number, Ability> = {
     //                        eStats.mr -= Math.min(Math.floor(eStats.mr * 0.25), 660);
     //                        ebuff.def.push(new buffInfo("+", -Math.min(Math.floor(eStats.def * 0.25), 660), 9999));
     //                        ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * 0.25), 660), 9999));
-    //                        return AbilityResponse.SUCCESS;
+    //                        return true;
     //                    };
     //                }
     //            });
@@ -2148,9 +2148,9 @@ export const abilities: Record<number, Ability> = {
                         myStats.maxhp = 1;
                         mybuff.mg.push(new buffInfo("+", 20, 5));
                         notice.push(`\n<:dalusrose:1387007950601719908> The show must... go on. **Dalus** gained a **${shgain}** HP shield`);
-                        return AbilityResponse.SUCCESS;
+                        return true;
                     };
-                }
+                },
             });
             if (myStats.dalusPrime) {
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -5425,8 +5425,9 @@ export const abilities: Record<number, Ability> = {
                             myStats.cr += 0.02;
                             if (myStats.cr > 1) myStats.cr = 1;
                             myStats.cd += 0.03;
-                        }
-                    }
+                            return true;
+                        };
+                    },
                 });
             } /* else if (this.rolledWisp === 4) {
                 // Centauri
@@ -6160,6 +6161,7 @@ export const abilities: Record<number, Ability> = {
                         if (caster === myStats) {
                             myStats.damageReduction += 0.015;
                             if (myStats.damageReduction > 1) myStats.damageReduction = 1;
+                            return true;
                         };
                     },
                 });
@@ -6782,8 +6784,9 @@ export const abilities: Record<number, Ability> = {
                         myStats.dodge += 0.015;
                         mybuff.dodge.push(new buffInfo("+", 0.015, 9999));
                         if (myStats.dodge > 1) myStats.dodge = 1;
-                    }
-                }
+                        return true;
+                    };
+                },
             });
             // Removed party ability after discussion with Taskalot:
             // Allies cannot fall below 0% dodge rate. Increases dodge rate by 2% for every 5% missing HP, up to 20%

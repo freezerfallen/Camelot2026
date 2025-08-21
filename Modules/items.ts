@@ -3975,7 +3975,7 @@ export const items = [
                     myStats.md += Math.floor(myStats.md * 0.15);
                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.15), 9999));
                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.15), 9999));
-                    return AbilityResponse.SUCCESS;
+                    return true;
                 };
             }
         });
