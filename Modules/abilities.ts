@@ -3259,8 +3259,8 @@ export const abilities: Record<number, Ability> = {
         cost: 80,
         pause: 0,
         bladeUsedActive: false,
-        desc: "**Total Usage**: `10 (CD: 4)`\n**Cost**: `80`\\💧\n**Timeout**: `Yes`\n**Role**: `DPS`\n\nCursed with self-healing immortality, Blade works with Kafka and Silverwolf as a stellaron hunter, while seeking to end his own suffering by eternal death. When he is below **50%** HP in battle, he takes **40%** less DMG from damage instances. This is unstackable with other damage mitigation effects, where only the strongest one takes effect.\n\nUpon taking damage from damage instances or countering a hit, gains **1x** `Charge`. Upon having **4x** or more `Charge`, consumes **4x** to unleash Shuhu's Gift. This increases his ATK by **15%** of recorded DMG taken (Up to 50%) for that turn, and recovers his HP by **15%** of recorded DMG taken (Up to 50%), before dealing **80%** undodgeable DMG.\n\nUsing his active deals **30%** missing HP to the enemy, before lowering max HP by **50%** for **4** turns. Moreover, he will also self-inflict **5%** DMG to himself for the next **4** rounds.\n\nIn a party, he intervenes every **4** rounds, dealing **60%** DMG to the enemy before lowering their DEF & MR by **20%** for that round (Max 2x damage). However, if the ally is Dan Heng, or the fight reaches round **40**, he becomes marastruck, additionally dealing **15%** DMG to the ally every **4th** turn. This marastruck effect however can be completely nullified if Kafka is in the team.",
-        shortdesc: "**Uses**: `10`\n**Cooldown**: `4 rounds`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Charge, Burst survival)`\n\n__**Passive**__\nWhen below **50%** HP:\n- **+40%** DMG mitigation (Unstackable : Only the strongest one takes effect) \n- Upon receiving a damage instance or countering a hit, gains **1x** `Charge`\n\nUpon reaching **4x** or more `Charge`, consumes **4x** to activate Shuhu's Gift:\n- Increases ATK by **15%** of recorded DMG taken for that turn (Up to **50%**)\n- Recovers HP by **15%** of recorded DMG taken (Up to **50%** max HP)\n- Deals **80%** undodgeable DMG\n\n__**Active**__ (✨)\n- Deals **30%** missing HP\nFor **4** turns:\n- Decreases max HP by **50%**\n- Self-inflicts **5%** undodgeable DMG (counts as a damage instance)\n\n__**Party**__ (👥)\nIntervenes every **4** rounds\n- Deals **60%** DMG to the enemy\n- Decreases their DEF & MR by **20%** for that round (Max 2x damage)\n\nIf ally is Dan Heng, or the fight reaches round **40**:\n- Becomes Mara struck: additionally deals **15%** DMG to the ally every **4th** round\n- This marastruck effect can be nullified when Kafka is in the team",
+        desc: "**Total Usage**: `10 (CD: 4)`\n**Cost**: `80`\\💧\n**Timeout**: `Yes`\n**Role**: `DPS`\n\nCursed with self-healing immortality, Blade works with Kafka and Silverwolf as a stellaron hunter, while seeking to end his own suffering by eternal death. When he is below **50%** HP in battle, he takes **40%** less DMG from damage instances. This is unstackable with other damage mitigation effects, where only the strongest one takes effect.\n\nUpon taking damage from damage instances or countering a hit, gains **1x** `Charge`. Upon having **4x** or more `Charge`, consumes **4x** to unleash Shuhu's Gift. This increases his ATK by **15%** of recorded DMG taken (Up to 50%) for that turn, and recovers his HP by **15%** of recorded DMG taken (Up to 50%), before dealing **80%** undodgeable DMG. (Up to once every round)\n\nUsing his active deals **30%** missing HP to the enemy, before lowering max HP by **50%** for **4** turns. Moreover, he will also self-inflict **5%** DMG to himself for the next **4** rounds.\n\nIn a party, he intervenes every **4** rounds, dealing **60%** DMG to the enemy before lowering their DEF & MR by **20%** for that round (Max 2x damage). However, if the ally is Dan Heng, or the fight reaches round **40**, he becomes marastruck, additionally dealing **15%** DMG to the ally every **4th** turn. This marastruck effect however can be completely nullified if Kafka is in the team.",
+        shortdesc: "**Uses**: `10`\n**Cooldown**: `4 rounds`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Charge, Burst survival)`\n\n__**Passive**__\nWhen below **50%** HP:\n- **+40%** DMG mitigation (Unstackable : Only the strongest one takes effect) \n- Upon receiving a damage instance or countering a hit, gains **1x** `Charge`\n\nUpon reaching **4x** or more `Charge`, consumes **4x** to activate Shuhu's Gift (Up to once every round):\n- Increases ATK by **15%** of recorded DMG taken for that turn (Up to **50%**)\n- Recovers HP by **15%** of recorded DMG taken (Up to **50%** max HP)\n- Deals **80%** undodgeable DMG\n\n__**Active**__ (✨)\n- Deals **30%** missing HP\nFor **4** turns:\n- Decreases max HP by **50%**\n- Self-inflicts **5%** undodgeable DMG (counts as a damage instance)\n\n__**Party**__ (👥)\nIntervenes every **4** rounds\n- Deals **60%** DMG to the enemy\n- Decreases their DEF & MR by **20%** for that round (Max 2x damage)\n\nIf ally is Dan Heng, or the fight reaches round **40**:\n- Becomes Mara struck: additionally deals **15%** DMG to the ally every **4th** round\n- This marastruck effect can be nullified when Kafka is in the team",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Blade (HSR)
             if (this.pause > matchStats.round) {
@@ -3299,6 +3299,7 @@ export const abilities: Record<number, Ability> = {
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.charge ??= 0;
             myStats.damageTaken ??= 0;
+            myStats.vengeanceLastRound = 0;
 
             matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (target === myStats) {
@@ -3306,7 +3307,8 @@ export const abilities: Record<number, Ability> = {
                 };
 
                 // Shuhu's Gift
-                if (myStats.charge >= 4) {
+                if (myStats.charge >= 4 && myStats.vengeanceLastRound !== matchStats.round) {
+                    myStats.vengeanceLastRound = matchStats.round;
                     myStats.charge -= 4;
                     const bonus = Math.floor(myStats.damageTaken * 0.15);
                     myStats.atk += Math.min(Math.floor(myStats.atk * 0.5), bonus);
@@ -3322,7 +3324,8 @@ export const abilities: Record<number, Ability> = {
                 };
 
                 // Shuhu's Gift
-                if (myStats.charge >= 4) {
+                if (myStats.charge >= 4 && myStats.vengeanceLastRound !== matchStats.round) {
+                    myStats.vengeanceLastRound = matchStats.round;
                     myStats.charge -= 4;
                     const bonus = Math.floor(myStats.damageTaken * 0.15);
                     myStats.atk += Math.min(Math.floor(myStats.atk * 0.5), bonus);
@@ -3334,7 +3337,8 @@ export const abilities: Record<number, Ability> = {
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if ((myStats.hp / myStats.maxhp < 0.5 || this.bladeUsedActive) && myStats.damageReduction < 0.4) myStats.damageReduction = 0.4;
-                if (myStats.charge >= 4) {
+                if (myStats.charge >= 4 && myStats.vengeanceLastRound !== matchStats.round) {
+                    myStats.vengeanceLastRound = matchStats.round;
                     myStats.charge -= 4;
                     const bonus = Math.floor(myStats.damageTaken * 0.15);
                     myStats.atk += Math.min(Math.floor(myStats.atk * 0.5), bonus);
