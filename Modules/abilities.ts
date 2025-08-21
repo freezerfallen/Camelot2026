@@ -1621,6 +1621,7 @@ export const abilities: Record<number, Ability> = {
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             if (this.pause > matchStats.round) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
+                myStats.sm += this.cost;
                 matchStats.sendWarning({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}.`, ephemeral: true });
                 this.used--;
                 return AbilityResponse.FAILURE;
