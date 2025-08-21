@@ -3514,49 +3514,19 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "Fires a burning shot at the start of the battle, immediately dealing **200%** damage and burns the enemy dealing **40%** true damage each round for 15 rounds.\n\n_true damage = ignores shield_", "The Flames of Valyria is a bow of legends forged in the fiery pits of the ancient city of Valyria. It is said that the bow was crafted by the greatest blacksmiths of the Valyrian Freehold, imbuing it with the power of dragonfire. The bow is made of Valyrian steel, a rare and highly sought-after metal known for its strength and ability to hold a sharp edge. The bowstring of the Flames of Valyria is made from the sinew of a dragon, giving it the ability to launch arrows with incredible speed and accuracy.\nIn the days of the Valyrian Freehold, the Flames of Valyria was wielded by the greatest dragonriders, who used it to hunt the fearsome beasts of the land. But with the downfall of Valyria, the bow was lost to the ages, its whereabouts and true power unknown. Adventurers and warriors from all over the realm have set out to find the Flames of Valyria, seeking to wield its power for themselves and become the greatest archer the world has ever known.", "genesis", 441),
     new weaponInfo("Heartseeker", "weapon", "bow", ["chest"], "<:heartseeker:1069028625019576320>", "https://i.imgur.com/UoZXFTQ.png", "atk", 777, 1333, "hp", 77, 777, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.heartseeker = 0;
-        myStats.heartseekerState = 0; // 0 = Default ; 1 = Observation ; 2 = Whispers of Celestia
-        const seekerStates = ["Default", "Observation", "Whispers of Celestia"];
         myStats.replaceButton.atk = {
             "emoji": "<:heartseeker:1069028625019576320>",
             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (myStats.heartseekerState !== 0) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.07), {});
-                //if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:heartseeker:1069028625019576320> **${char.name}**`, { atkMultiplier: (myStats.heartseekerState === 1) ? 1.3 : 1.1, magicDamage: true });
+                addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.07), {});
+                if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:heartseeker:1069028625019576320> **${char.name}**`, { atkMultiplier: 1.2, magicDamage: true });
 
                 return AbilityResponse.SUCCESS;
             },
         };
-        matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-            if (caster === myStats) {
-                myStats.heartseeker++;
-                if (myStats.heartseeker >= 7) {
-                    // Progress the state
-                    myStats.heartseekerState++;
-
-                    // Reset to default if the progressed round is 3
-                    if (myStats.heartseekerState === 3) myStats.heartseekerState = 0;
-
-                    notice.push(`\n**${char.name}** entered mode: \`${seekerStates[myStats.heartseekerState]}\``);
-                    myStats.heartseeker = 0; // Reset ATKcount
-
-                    // Activate timeout false ATK effect if the progressed round is 2
-                    if (myStats.heartseekerState === 2) {
-                        // Whispers of Celestia
-                        matchStats.on("ATK", {
-                            maxUsage: 3,
-                            callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                                matchStats.turn = matchStats.turnSkill ? 0 : 1;
-                                return true;
-                            },
-                        });
-                    };
-                };
-            };
-        });
 
         return AbilityResponse.SUCCESS;
-    }, "Normal attack is defaulted to deal **110%** damage. After **7** uses of ATK, the wielder to enter `Observation`, where the normal attack is defaulted to deal **130%** damage and restore **7%** max HP for the wielder. After another **7** uses of ATK, the wielder enters `Whispers of Celestia`, where the next **3** uses of ATK don't progress the round (timeout false). After another **7** uses of ATK, resets mode to default.", "The Heartseeker is a bow of immense beauty and power, said to be crafted by the gods of celestia. This bow is said to be imbued with the very essence of the heavens, granting its wielder unparalleled accuracy and power. Its limbs are crafted from the finest celestial gold and the bowstring is woven from the purest of celestial silk. Its arrows fly true and straight, guided by the hands of the gods themselves.", "genesis", 442),
+    }, "Normal attacks deal **120%** damage and heal **7%** of the wielders max HP.", "The Heartseeker is a bow of immense beauty and power, said to be crafted by the gods of celestia. This bow is said to be imbued with the very essence of the heavens, granting its wielder unparalleled accuracy and power. Its limbs are crafted from the finest celestial gold and the bowstring is woven from the purest of celestial silk. Its arrows fly true and straight, guided by the hands of the gods themselves.", "genesis", 442),
     new weaponInfo("Moonlit Shadow", "weapon", "bow", ["chest"], "<:moonlit_shadow:1069028628630872125>", "https://i.imgur.com/tZ9pgya.png", "atk", 194, 1136, "dodge", 0.08, 0.16, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         ebuff.def.push(new buffInfo("+", -Math.min(eStats.def * 0.66, 1055), 9999));
         ebuff.mr.push(new buffInfo("+", -Math.min(eStats.mr * 0.66, 1055), 9999));
