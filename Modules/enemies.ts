@@ -706,8 +706,8 @@ export const raidBosses: enemyInfo[] = [
             // +0.025% of shield as atk and md (max 250%) //* 10k shield = 250% atk
             const buffMax = 2.0, buffScale = 0.00025;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.atk += Math.floor(myStats.atk * Math.min(myStats.shield * buffScale, buffMax));
-                myStats.md += Math.floor(myStats.md * Math.min(myStats.shield * buffScale, buffMax));
+                myStats.atk += Math.floor(myStats.batk * Math.min(myStats.shield * buffScale, buffMax));
+                myStats.md += Math.floor(myStats.bmd * Math.min(myStats.shield * buffScale, buffMax));
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
@@ -733,8 +733,8 @@ export const raidBosses: enemyInfo[] = [
             // +0.025% of shield as atk and md (max 250%) //* 10k shield = 250% atk
             const buffMax = 2.0, buffScale = 0.00025;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.atk += Math.floor(myStats.atk * Math.min(myStats.shield * buffScale, buffMax));
-                myStats.md += Math.floor(myStats.md * Math.min(myStats.shield * buffScale, buffMax));
+                myStats.atk += Math.floor(myStats.batk * Math.min(myStats.shield * buffScale, buffMax));
+                myStats.md += Math.floor(myStats.bmd * Math.min(myStats.shield * buffScale, buffMax));
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
