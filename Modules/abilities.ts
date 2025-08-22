@@ -6778,7 +6778,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("deathEvade", {
                 maxUsage: 2,
                 callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster === myStats) {
+                    if (target === myStats) {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15), {});
                         return true;
                     }
