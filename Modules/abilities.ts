@@ -6098,8 +6098,8 @@ export const abilities: Record<number, Ability> = {
         cost: 20,
         pause: 0,
         selfhealidx: 0,
-        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+15%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To view programmes, do `item equip item:prog info`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **80%** DMG, before slamming them in a strike, dealing an additional instance of **10%** DMG, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total). If 2B has revived, no longer loses **7%** current HP but instead heals **7%** current HP.\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+2%** ATK/MD, up to **+16%** ATK\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy's DEF by **25%** (up to **2x** damage). Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **1.5%** permanently (Up to 15%). After using DEFEND, activates “Boost”, increasing dodge rate by **20%** for **2** rounds and decreases enemy’s DEF by **1.5%** permanently (Up to 15%, max 2x damage). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **1.5%** permanently (Up to 15%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team. The effect of [ɪɴꜱɪɢʜᴛ] instead grants allies **+2%** ATK per stack, up to **+16%** ATK.",
-        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+15%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`. To reset, do `/item equip item:prog remove`.\n\nATTACK is altered:\n> - Loses **7%** current HP (*Heals* instead after the first revive)\n> - Deals **80%** DMG, before dealing another instance of **10%**, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+2%** ATK, up to 16%\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- If the enemy has less than **50%** HP, the effect is changed to decreasing the enemy’s DEF by **25%** (up to **2x** damage)\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **20%** chance to counter the next hit (stackable)\n- **-1.5%** enemy's ATK permanently (Up to 15%)\n\nAfter using DEFEND:\n- **+20%** dodge rate for **2** rounds\n- **-1.5%** enemy's DEF permanently (Up to 15%)\n\nAfter using CLASS SKILL:\n- **+1.5%** DMG mitigation permanently (Up to 15%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\nWhen 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, has **+2%** ATK, up to 16%",
+        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\nBeing YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+15%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death. Lastly, programmed to derive pleasure from enticing combat, when under **50%** HP, they have **+7%** lifesteal.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To view programmes, do `item equip item:prog info`. To reset progreammes, do `/item equip item:prog remove` instead.\n\nIn combat, 2B takes the mainstay of attacks. Using ATTACK allows 2B to spring into the air, losing **7%** current HP before clashing the enemy, dealing **80%** DMG, before slamming them in a strike, dealing an additional instance of **10%** DMG, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total). If 2B has revived, no longer loses **7%** current HP but instead heals **7%** current HP.\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **4** rounds.\n\n[ɪɴꜱɪɢʜᴛ]: For every stack present, both 9S and the enemy has **+2%** ATK/MD, up to **+16%** ATK\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%. Moreover, non-critical hits cause him to lose **7%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit for **10** rounds, granting additional effects after certain actions. After using ATTACK, activates “Forward slash”, which has a **20%** chance to counter the next hit (stackable) and decreases enemy’s ATK by **1.5%** permanently (Up to 15%). After using DEFEND, activates “Boost”, increasing dodge rate by **20%** for **2** rounds and decreases enemy’s DEF by **1.5%** permanently (Up to 15%, max 2x damage). After using CLASS SKILL, activates “Subjugation”, increasing DMG mitigation by **1.5%** permanently (Up to 15%).\n\n The Second use causes 2B to self-destruct, dealing **70%** max HP as a non-critical hit to the enemy, before lowering HP to **1**. However, when 9S is not in HACKING, they instead collide their black boxes, the source of energy. This deals **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team. The effect of [ɪɴꜱɪɢʜᴛ] instead grants allies **+2%** ATK per stack, up to **+16%** ATK.",
+        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+15%** max HP\n- When at **50%** HP or below, has **+7%** lifesteal.\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`. To reset, do `/item equip item:prog remove`.\n\nATTACK is altered:\n> - Loses **7%** current HP (*Heals* instead after the first revive)\n> - Deals **80%** DMG, before dealing another instance of **10%**, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **4** rounds.\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, the duo has **+2%** ATK, up to 16%\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +30%.\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: 2B & 9S enter their respective flight unit for **10** rounds. During this period:\n\nAfter using ATTACK:\n- **20%** chance to counter the next hit (stackable)\n- **-1.5%** enemy's ATK permanently (Up to 15%)\n\nAfter using DEFEND:\n- **+20%** dodge rate for **2** rounds\n- **-1.5%** enemy's DEF permanently (Up to 15%)\n\nAfter using CLASS SKILL:\n- **+1.5%** DMG mitigation permanently (Up to 15%)\n\n__Second use__:\n- Deals **70%** max HP as an undodgeable hit to the enemy, before lowering HP to **1**.\nWhen 9S is not in *HACKING*:\n- Instead deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party\n- [ɪɴꜱɪɢʜᴛ]: For every stack present, has **+2%** ATK, up to 16%",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // 2B & 9S EX | 2B&9S EX
 
@@ -6226,10 +6226,10 @@ export const abilities: Record<number, Ability> = {
                             notice.push("\n`⚙️` Pod has been equipped with programme : **Gravity**.");
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                                 if (matchStats.round % 4 === 0) {
-                                    eStats.atk -= Math.floor(eStats.atk * 0.25);
-                                    eStats.md -= Math.floor(eStats.md * 0.25);
-                                    eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
-                                    eStats.mr -= Math.floor(Math.min(eStats.mr * 0.25, 660));
+                                    eStats.atk -= Math.floor(eStats.atk * 0.2);
+                                    eStats.md -= Math.floor(eStats.md * 0.2);
+                                    eStats.def -= Math.floor(Math.min(eStats.def * 0.1, 212));
+                                    eStats.mr -= Math.floor(Math.min(eStats.mr * 0.1, 212));
                                 };
 
                                 return AbilityResponse.SUCCESS;
@@ -6264,6 +6264,7 @@ export const abilities: Record<number, Ability> = {
             } else {
                 notice.push("\n`⚙️` Pod is not equipped with any programme! Please run `/item equip item:prog` to proceed with choosing one!");
             };
+
             myStats.hacking = false;
             const domainLast = 4;
             const atklist = ["Nuissance.", "Reorganizing...", "Destroy."];
@@ -6338,21 +6339,26 @@ export const abilities: Record<number, Ability> = {
                     notice.push(`\n<:9SHack:1373261619924172940> 9S initiated hacking for **4** rounds`);
                     myStats.insight -= 8;
                     myStats.hacking = true;
-                    if ((eStats.hp / eStats.maxhp) > 0.5) {
-                        let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
-                        myStats.critbonus = Math.max(myStats.critbonus, bonus);
-                    } else {
-                        eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
-                    };
+
+                    let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
+                    myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                    // if ((eStats.hp / eStats.maxhp) > 0.5) {
+                    //     let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
+                    //     myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                    // } else {
+                    //     eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
+                    // };
 
                     // Hacking long term effects
                     myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-                        if ((eStats.hp / eStats.maxhp) > 0.5) {
-                            let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
-                            myStats.critbonus = Math.max(myStats.critbonus, bonus);
-                        } else {
-                            eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
-                        };
+                        let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
+                        myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                        // if ((eStats.hp / eStats.maxhp) > 0.5) {
+                        //     let bonus = Math.min(0.3, Math.abs((myStats.hp / myStats.maxhp) - (eStats.hp / eStats.maxhp)));
+                        //     myStats.critbonus = Math.max(myStats.critbonus, bonus);
+                        // } else {
+                        //     eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
+                        // };
 
                         return AbilityResponse.SUCCESS;
                     }, domainLast));
@@ -6415,10 +6421,10 @@ export const abilities: Record<number, Ability> = {
                             notice.push("\n`⚙️` Pod has been equipped with programme : **Gravity**.");
                             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                                 if (matchStats.round % 4 === 0) {
-                                    eStats.atk -= Math.floor(eStats.atk * 0.25);
-                                    eStats.md -= Math.floor(eStats.md * 0.25);
-                                    eStats.def -= Math.floor(Math.min(eStats.def * 0.25, 660));
-                                    eStats.mr -= Math.floor(Math.min(eStats.mr * 0.25, 660));
+                                    eStats.atk -= Math.floor(eStats.atk * 0.2);
+                                    eStats.md -= Math.floor(eStats.md * 0.2);
+                                    eStats.def -= Math.floor(Math.min(eStats.def * 0.1, 212));
+                                    eStats.mr -= Math.floor(Math.min(eStats.mr * 0.1, 212));
                                 };
 
                                 return AbilityResponse.SUCCESS;
@@ -6635,8 +6641,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 0,
         pause: -11,
-        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `35% current HP`\n**Timeout**: `false`\n**Role**: `DPS (Non-critical)`\n\nBuilt out of high-energy pure crystals, Shorekeeper acts as a vessel where data filled with grief, chaos and decay flow through her for analysis. She repairs her scars with new crystals, as she witnesses the tragedies of humanity.\n\nHer ATTACK is altered to __Origin Calculus__, interpreting the reverberations. She deals **80%** DMG. For every `Flare Stare Butterfly` summoned, this hit’s damage scaling is increased by **6%**. If the hit is non-critical, gains **3x** `Core`. When she has **5x** or more `Core`, she immediately follows up with __Astral Chord__.\n\nAfter using DEFEND, she follows up with  __Astral Chord__. For every **5** existing `Core`, transforms them into **1x** `Flare Stare Butterfly` (Up to 10). She then casts Suction, where for every `Flare Stare Butterfly` on-field, the enemy has **-2%** critical rate and **-2%** DEF & MR for **3** rounds (Max 1.5x DMG, each shred calculated independently), meanwhile boosting her DEF & MR by **20** for **3** rounds, up to **200**.\n\nConsuming **35%** of her current HP, she casts her active, __End Loop__, where she summons a domain of Stellarealm for **10** rounds. During this period, She restores **5%** lost HP every round and has **+3%** ATK & MD for every **1x** `Flare Stare Butterfly` owned. Moreover, attacks will *benefit from the critical damage scaling* even if they don’t land a critical strike\n\nRight before exiting the domain, she increases critical DMG by **100%** for **1** round, before giving a final ordination.\n- [Default] : Deals **70%** DMG\n- [5+ Butterflies] : Deals **210%** undodgeable DMG + restores **25%** max HP\n- [10 Butterflies] : Deals **300%** undodgeable DMG + restores **50%** max HP + Increases dodge rate by **100%** for **1** round\n\nIn a party, whenever the ally lands a non-critical hit, they gain **1.5%** dodge rate, up to **15%**. Moreover, allies evade the first **2** lethal attacks and restore **15%** max HP right afterwards.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `10 rounds`\n**Cost**: `35% current HP`\n**Timeout**: `No`\n**Role**: `DPS (Non-critical)`\n\n__**Passive**__\n- After using DEF, follows up with “Astral Chord”\n\nATTACK is altered:\n- Deals **80%** DMG\n- For each `Butterfly` summoned, DMG scaling is increased by **6%**\n- If this hit is non-critical, grant **3x** additional `Core`\n- If amount of `Core` reaches **5** or more, follows up with “Astral Chord”\n\n“Astral Chord”:\n- For every **5** existing cores, transforms them to **1x** `Butterfly` (Up to 10)\n- For every `Butterfly` on-field:\n> - Reduces enemy’s critical rate by **2%** for **3** rounds\n> - Reduces enemy’s DEF/MR by **2%** for **3** rounds (Max 1.5x DMG, each shred calculated independently)\n> - Increases DEF/MR by **20** (Up to 200) for **3** rounds\n\n__**Active**__ (✨)\nCreates a domain of Stellarealm for **10** rounds, during this period:\n- Restores **5%** missing HP every round\n- Boosts ATK & MD by **3%** for every **1x** `Butterfly` owned\n- All attacks **will benefit from the critical damage scaling** even if they don’t land a critical strike\n\nRight before exiting the domain:\n- Increases critical DMG by **100%** for **1** round\n- Grants additional effects based off `Butterfly` owned\n> - [Default] : Deals **70%** DMG\n> - [5+ Butterflies] : Deals **210%** undodgeable DMG + restores **25%** max HP\n> - [10 Butterflies] : Deals **300%** undodgeable DMG + restores **50%** max HP + Increases dodge rate by **100%** for **1** round\n- The hit aforementioned will not reset combos\n\n__**Party**__ (👥):\nAfter the ally lands a non-critical strike: Increases ally’s dodge rate by **1.5%** (Up to 15%)\n- Allies evade the first **2** lethal attacks and restores **15%** max HP (Up to 2 times)",
+        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `35% current HP`\n**Timeout**: `false`\n**Role**: `DPS (Non-critical)`\n\nBuilt out of high-energy pure crystals, Shorekeeper acts as a vessel where data filled with grief, chaos and decay flow through her for analysis. She repairs her scars with new crystals, as she witnesses the tragedies of humanity.\n\nHer ATTACK is altered to __Origin Calculus__, interpreting the reverberations. She deals **80%** DMG. For every `Flare Stare Butterfly` summoned, this hit’s damage scaling is increased by **6%**. If the hit is non-critical, gains **3x** `Core`. When she has **5x** or more `Core`, she immediately follows up with __Astral Chord__.\n\nAfter using DEFEND, she follows up with  __Astral Chord__. For every **5** existing `Core`, transforms them into **1x** `Flare Stare Butterfly` (Up to 10). She then casts Suction, where for every `Flare Stare Butterfly` on-field, the enemy has **-2%** critical rate and **-2%** DEF & MR for **3** rounds (Max 1.5x DMG, each shred calculated independently), meanwhile boosting her DEF & MR by **20** for **3** rounds, up to **200**.\n\nConsuming **35%** of her current HP, she casts her active, __End Loop__, where she summons a domain of Stellarealm for **10** rounds. During this period, She restores **5%** lost HP every round and has **+3%** ATK & MD for every **1x** `Flare Stare Butterfly` owned. Moreover, attacks will *benefit from the critical damage scaling* even if they don’t land a critical strike\n\nRight before exiting the domain, she increases critical DMG by **30%** for **1** round, before giving a final ordination.\n- [Default] : Deals **70%** DMG\n- [5+ Butterflies] : Deals **210%** DMG + restores **15%** max HP\n- [10 Butterflies] : Deals **300%** DMG + restores **30%** max HP\n\nIn a party, whenever the ally lands a non-critical hit, they gain **1.5%** dodge rate, up to **15%**. Moreover, allies evade the first **2** lethal attacks and restore **15%** max HP right afterwards.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `10 rounds`\n**Cost**: `35% current HP`\n**Timeout**: `No`\n**Role**: `DPS (Non-critical)`\n\n__**Passive**__\n- After using DEF, follows up with “Astral Chord”\n\nATTACK is altered:\n- Deals **80%** DMG\n- For each `Butterfly` summoned, DMG scaling is increased by **6%**\n- If this hit is non-critical, grant **3x** additional `Core`\n- If amount of `Core` reaches **5** or more, follows up with “Astral Chord”\n\n“Astral Chord”:\n- For every **5** existing cores, transforms them to **1x** `Butterfly` (Up to 10)\n- For every `Butterfly` on-field:\n> - Reduces enemy’s critical rate by **2%** for **3** rounds\n> - Reduces enemy’s DEF/MR by **2%** for **3** rounds (Max 1.5x DMG, each shred calculated independently)\n> - Increases DEF/MR by **20** (Up to 200) for **3** rounds\n\n__**Active**__ (✨)\nCreates a domain of Stellarealm for **10** rounds, during this period:\n- Restores **5%** missing HP every round\n- Boosts ATK & MD by **3%** for every **1x** `Butterfly` owned\n- All attacks **will benefit from the critical damage scaling** even if they don’t land a critical strike\n\nRight before exiting the domain:\n- Increases critical DMG by **30%** for **1** round\n- Grants additional effects based off `Butterfly` owned\n> - [Default] : Deals **70%** DMG\n> - [5+ Butterflies] : Deals **210%** DMG + restores **15%** max HP\n> - [10 Butterflies] : Deals **300%** DMG + restores **30%** max HP\n- The hit aforementioned will not reset combos\n\n__**Party**__ (👥):\nAfter the ally lands a non-critical strike: Increases ally’s dodge rate by **1.5%** (Up to 15%)\n- Allies evade the first **2** lethal attacks and restores **15%** max HP (Up to 2 times)",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Shorekeeper EX
             matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -6673,21 +6679,20 @@ export const abilities: Record<number, Ability> = {
 
             // Exit Stellarealm
             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                myStats.cd += 1;
+                myStats.cd += 0.3;
 
                 // Activates additional effects based off Butterfly
                 switch (true) {
                     case myStats.butterfly >= 10:
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Rectify!* **${char.name}** dealt`, { atkMultiplier: 5, magicDamage: true, dodge: false, combodmg: true });
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.5), {});
-                        myStats.dodge = 1;
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Rectify!* **${char.name}** dealt`, { atkMultiplier: 3, magicDamage: true });
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.3), {});
                         break;
                     case myStats.butterfly >= 5:
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Perish!* **${char.name}** dealt`, { atkMultiplier: 2.5, magicDamage: true, dodge: false, combodmg: true });
-                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.25), {});
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Perish!* **${char.name}** dealt`, { atkMultiplier: 2.1, magicDamage: true });
+                        addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15), {});
                         break;
                     default:
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Ordained!* **${char.name}** dealt`, { atkMultiplier: 1, magicDamage: true, dodge: false, combodmg: true });
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Ordained!* **${char.name}** dealt`, { atkMultiplier: 0.7, magicDamage: true });
                         break;
                 };
 
@@ -6714,8 +6719,9 @@ export const abilities: Record<number, Ability> = {
                     myStats.core -= 7;
                     if (myStats.butterfly < 10) {
                         myStats.butterfly++;
-                    }
+                    };
                 };
+
                 // Suction - debuffs for 3 turns
                 const def_debuff = 0.02 * myStats.butterfly;
                 eStats.cr -= def_debuff;
@@ -6790,6 +6796,7 @@ export const abilities: Record<number, Ability> = {
                     };
                 },
             });
+
             // Removed party ability after discussion with Taskalot:
             // Allies cannot fall below 0% dodge rate. Increases dodge rate by 2% for every 5% missing HP, up to 20%
             // if (myStats.dodge < 0) myStats.dodge = 0;
