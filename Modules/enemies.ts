@@ -682,7 +682,7 @@ export const raidBosses: enemyInfo[] = [
             eStats.negateHeal = 1;
 
             matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (target === myStats) eStats.hp -= Math.floor(eStats.hp * 0.045);
+                if (target === myStats) eStats.hp -= Math.floor(myStats.hp * 0.045);
             });
 
             return AbilityResponse.SUCCESS;
