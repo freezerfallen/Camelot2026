@@ -2089,7 +2089,7 @@ export const abilities: Record<number, Ability> = {
                 // Lose 50% current HP instantly & 5% current HP every round
                 myStats.hp -= Math.floor(myStats.hp * 0.5);
                 mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.hp * 0.05), 9999));
-                notice.push(`\n<:dalusrose:1387007950601719908> Dalus summoned **Rosie** for the rest of the fight`);
+                notice.push(`\n🌹 Dalus summoned **Rosie** for the rest of the fight`);
 
                 // Permanent mana loss & dmg boost effect
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -2128,7 +2128,7 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             myStats.dalusPrime = (myStats.shell === "broken") ? false : true; // false = Past, true = Prime
-            const msg = (!myStats.dalusPrime) ? `\n<:brokenshell:1405524630520987771> **${char.name}** decides to hold onto the last bit of memories left...` : `\n<:dalusrose:1387007950601719908> The nightmare has given an impetus to **${char.name}**. Havoc shall wreck.`;
+            const msg = (!myStats.dalusPrime) ? `\n<:brokenshell:1405524630520987771> **${char.name}** decides to hold onto the last bit of memories left...` : `\n🌹 The nightmare has given an impetus to **${char.name}**. Havoc shall wreck.`;
             notice.push(msg);
             myStats.evadeDeathStrike ??= 0;
             myStats.evadeDeathChance ??= 0;
@@ -2147,7 +2147,7 @@ export const abilities: Record<number, Ability> = {
                         myStatsFixed.hp = 1;
                         myStats.maxhp = 1;
                         mybuff.mg.push(new buffInfo("+", 20, 5));
-                        notice.push(`\n<:dalusrose:1387007950601719908> The show must... go on. **Dalus** gained a **${shgain}** HP shield`);
+                        notice.push(`\n🌹 The show must... go on. **Dalus** gained a **${shgain}** HP shield`);
                         return true;
                     };
                 },
