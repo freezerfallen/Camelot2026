@@ -5423,8 +5423,10 @@ export const abilities: Record<number, Ability> = {
                     callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                         if (target == myStats) {
                             myStats.cr += 0.02;
+                            mybuff.cr.push(new buffInfo("+", 0.02, 9999));
                             if (myStats.cr > 1) myStats.cr = 1;
                             myStats.cd += 0.03;
+                            mybuff.cd.push(new buffInfo("+", 0.03, 9999));
                             return true;
                         };
                     },
