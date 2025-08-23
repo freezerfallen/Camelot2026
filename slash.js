@@ -1339,6 +1339,12 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('seasonal')
+			.setDescription('Seasonal events and activities')
+			.addSubcommand((subcommand) => subcommand.setName('shop').setDescription('View the seasonal shop'))
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('select')
 			.setDescription('Select a battle character for the dungeon and more')
 			.addStringOption(option => option.setName('character').setDescription('Select a character').setRequired(true))

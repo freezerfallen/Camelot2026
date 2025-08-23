@@ -1,3 +1,4 @@
+import { ColorResolvable } from "discord.js";
 
 type hpBarComponents = {
     start: {
@@ -23,10 +24,10 @@ type hpBarComponents = {
 export default class CustomHpBar {
     private _name: string;
     private _id: number;
-    private _color: string;
+    private _color: ColorResolvable;
     private _bar: hpBarComponents;
 
-    constructor(name: string, id: number, color: string, bar: hpBarComponents) {
+    constructor(name: string, id: number, color: ColorResolvable, bar: hpBarComponents) {
         this._name = name;
         this._id = id;
         this._color = color;
@@ -75,17 +76,28 @@ export default class CustomHpBar {
 };
 
 export const customHpBars: CustomHpBar[] = [
-    new CustomHpBar("Default", 0, "#000000", {
+    new CustomHpBar("Default", 0, 0x000000, {
         start: { empty: "<:dbl:944322994585612319>", hp_only: "<:dblh:944322994895990855>", mana_only: "<:dblm:944322994971476038>", full: "<:dblhm:944322994749210735>" },
         middle: { empty: "<:db:944322995067957288>", hp_only: "<:dbh:944322995336409128>", mana_only: "<:dbm:944322995088916541>", full: "<:dbhm:944322994942144542>" },
         end: { empty: "<:dbr:944322994778554400>", hp_only: "<:dbrh:944322995122503750>", mana_only: "<:dbrm:944322995135086602>", full: "<:dbrhm:944322997144158318>" },
     }),
 
-    new CustomHpBar("Coffee Brew", 1, "#e0c4ac", {
-        start: { empty: "<:dbl:1397207925935702169>", hp_only: "<:dblh:1397207928326459432>", mana_only: "<:dblm:1397207956625293475>", full: "<:dblhm:1397207954830131372>" },
-        middle: { empty: "<:db:1397207941509021716>", hp_only: "<:dbh:1397207943102857348>", mana_only: "<:dbm:1397207931350417450>", full: "<:dbhm:1397207945825226892>" },
-        end: { empty: "<:dbr:1397207933800153168>", hp_only: "<:dbrh:1397207936153030778>", mana_only: "<:dbrm:1397207939496018044>", full: "<:dbrhm:1397207938044526726>" },
+    new CustomHpBar("Coffee Brew", 1, 0xe0c4ac, {
+        start: { empty: "<:dbl:1408770662310482020>", hp_only: "<:dblh:1408770639711436860>", mana_only: "<:dblm:1408770644761378928>", full: "<:dblhm:1408770642790056107>" },
+        middle: { empty: "<:db:1408770656207765505>", hp_only: "<:dbh:1408770658497855558>", mana_only: "<:dbm:1408770646871248998>", full: "<:dbhm:1408770660452270201>" },
+        end: { empty: "<:dbr:1408770648666279976>", hp_only: "<:dbrh:1408770650117636127>", mana_only: "<:dbrm:1408770654655873134>", full: "<:dbrhm:1408770652525035530>" },
     }),
 
+    new CustomHpBar("Pinkish Fantasy", 2, 0xffc0cb, {
+        start: { empty: "<:dbl:1408775597869760532>", hp_only: "<:dblh:1408775599446691972>", mana_only: "<:dblm:1408775585567608944>", full: "<:dblhm:1408775583281844375>" },
+        middle: { empty: "<:db:1408775592052133988>", hp_only: "<:dbh:1408775594249814066>", mana_only: "<:dbm:1408775587924938903>", full: "<:dbhm:1408775596171071608>" },
+        end: { empty: "<:dbr:1408775589745262664>", hp_only: "<:dbrh:1408775547865141340>", mana_only: "<:dbrm:1408775552986382428>", full: "<:dbrhm:1408775550213816341>" },
+    }),
+
+    new CustomHpBar("Golden Grasslands", 3, 0x0057b7, {
+        start: { empty: "<:dbl:1408905623290253312>", hp_only: "<:dblh:1408905624980553799>", mana_only: "<:dblm:1408905603358658580>", full: "<:dblhm:1408905627148877905>" },
+        middle: { empty: "<:db:1408905617632137356>", hp_only: "<:dbh:1408905619901120674>", mana_only: "<:dbm:1408905605242028192>", full: "<:dbhm:1408905621637435464>" },
+        end: { empty: "<:dbr:1408905606831538226>", hp_only: "<:dbrh:1408905609155182623>", mana_only: "<:dbrm:1408905614238814258>", full: "<:dbrhm:1408905611818700872>" },
+    }),
 
 ];

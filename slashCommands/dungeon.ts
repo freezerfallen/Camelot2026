@@ -17,6 +17,7 @@ import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { addGuildDonation, getGuildSchema, getUserSchema, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
+import { customHpBars } from '../Modules/customHpBars';
 
 const dungeonInProgress = new Set();
 const captchaCooldown = new Map();
@@ -549,11 +550,13 @@ const exportCommand: SlashCommand = {
         const isCompactEmbed = !!author.schema.user_settings.compact_battle_embeds;
         const threatLevelWarning = isCompactEmbed ? "" : `You encountered ${enemy.title.split(" ")[0]} **${enemy.title.split(" ").slice(1).join(" ")}**!\n${difficulty}\n\n`;
 
+        const embedColor = [0x6def83, 0xfac044, 0xff7d7d, 0x7c7c7c, 0xbbffff][threatLevel];
+
         async function newFight() {
             let timestart = new Date().getTime();
             let result = await new Promise<EmbedBuilder | undefined>((resolve) => {
                 const Embed = new EmbedBuilder()
-                    .setColor([0x6def83, 0xfac044, 0xff7d7d, 0x7c7c7c, 0xbbffff][threatLevel])
+                    .setColor(embedColor)
                     .setThumbnail(isCompactEmbed ? eImage : myStatsC.thumbnail)
                     .setFooter({ text: `Enemy EP: ${eStatsC.ep} | round 1 | time left: 120s` })
                     .setTitle(`Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`)
