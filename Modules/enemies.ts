@@ -1636,7 +1636,7 @@ export const nightmareMobs: enemyInfo[] = [
 
                 if (matchStats.round % 2 === 0) {
                     let dmg = Math.floor(eStats.maxhp * 0.05);
-                    if (dmg > 0) dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:rosie:1387006066566627328> **Rosie**`, { overwriteDamage: dmg, dodge: false });
+                    if (dmg > 0) dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `<:rosie:1408505520641409127> **Rosie**`, { overwriteDamage: dmg, dodge: false });
                 };
                 return AbilityResponse.SUCCESS;
             }, 9999));

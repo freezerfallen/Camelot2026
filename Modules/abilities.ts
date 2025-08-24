@@ -2106,7 +2106,7 @@ export const abilities: Record<number, Ability> = {
                     if (eStats.maxhp * 0.05 > myStats.atk * dmgLimit) {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(Math.min(eStats.maxhp * 0.05 - myStats.atk * dmgLimit, myStats.maxhp * (myStats.dalusPrime ? 0.12 : 0.07))), {});
                     };
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:rosie:1387006066566627328> **Rosie**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:rosie:1408505520641409127> **Rosie**`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
 
                     return AbilityResponse.SUCCESS;
                 }, 9999));
@@ -2170,7 +2170,7 @@ export const abilities: Record<number, Ability> = {
         },
         party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
-            const dmgScale = names.includes("Kisogi") ? 0.15 : 0.1, critChance = names.includes("Kisogi") ? 1 : Math.random(), dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.atk * dmgScale) : 0, desc = names.includes("Kisogi") ? `**✨ Kisogi**` : `<:rosie:1387006066566627328> **Rosie**`;
+            const dmgScale = names.includes("Kisogi") ? 0.15 : 0.1, critChance = names.includes("Kisogi") ? 1 : Math.random(), dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.atk * dmgScale) : 0, desc = names.includes("Kisogi") ? `**✨ Kisogi**` : `<:rosie:1408505520641409127> **Rosie**`;
             // Dalus unique effects
             if (!names.includes("Kisogi")) {
                 eStats.def -= Math.min(Math.floor(eStats.def * 0.2), 660);
