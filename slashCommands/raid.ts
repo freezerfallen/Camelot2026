@@ -1404,7 +1404,7 @@ const exportCommand: SlashCommand = {
 
                     // Auto apply existing action sequence
                     const autoApply = async () => {
-                        while (actionSequence.length > 0) {
+                        while (actionSequence.length > 0 && !matchStats.ended) {
                             const action = actionSequence.shift();
                             switch (action) {
                                 case "atk": await userAttack(); break;
