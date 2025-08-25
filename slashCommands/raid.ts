@@ -1088,7 +1088,7 @@ const exportCommand: SlashCommand = {
 
                     function startNextRound() {
                         // Force end at MAX_ROUNDS
-                        if (matchStats.round === MAX_ROUNDS) {
+                        if (matchStats.round >= MAX_ROUNDS) {
                             notice.push(`\n🕗 You've reached the end`);
                             endMatch("l");
                         };

@@ -1,6 +1,6 @@
 import { AttachmentBuilder, EmbedBuilder, Message, User } from "discord.js";
 import { getDetailedStats, dealDamage, addHeal, getRefinement } from "./functions";
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { createCanvas, loadImage, Image } from '@napi-rs/canvas';
 import charInfo, { characters } from "./chars";
 import { items } from "./items";
 import delayedBuffs from "./delayedBuffs";
@@ -20,6 +20,8 @@ export type Ability = {
     passive?: (myStats: DetailedStats, myStatsFixed: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => Promise<AbilityResponse>;
     party?: (pStats: DetailedStats, myStats: DetailedStats, eStats: DetailedStats, mybuff: Buffs, ebuff: Buffs, char: charInfo, enemy: IentityInfo, matchStats: MatchStats, notice: string[], embed: EmbedBuilder, user: User, ...list: any[]) => Promise<AbilityResponse>;
 };
+
+const loadedImages: Record<string, Image> = {};
 
 export const abilities: Record<number, Ability> = {
     "64": {
@@ -2584,42 +2586,20 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 30,
         roundUsed: 0,
+        appliedIce: 0,
         buffer: undefined,
+        messageEditTimeout: undefined,
         desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her active's damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%**. Moreover, the action will be considered Timeout false, allowing Aneira to make another action that round.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
         shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `no`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** DMG\n- Increases this attack's DMG scaling by **25%** (Up to **175%**) for every round it wasn't used\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the round unchanged as well",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
 
-            //! Slow ability, have to use mana early to prevent bugs 
+            //! Slow ability, have to use mana early to prevent bugs
             myStats.sm -= this.cost;
 
             // Aneira
             const dmg = (!eStats.dodge && Math.random() < eStats.br) ? notice.push(`\n💨 **${enemy.name}** dodged the attack!`) : dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.5 + Math.min(0.25 * (matchStats.round - this.roundUsed), 1.75), magicDamage: true, block: false });
             this.roundUsed = matchStats.round;
-
-            // if (dmg) { // Don't freeze if dodged
-            //     matchStats.turn = matchStats.turnSkill ? 0 : 1;
-
-            //     eStats.def = Math.floor(eStats.def * 0.8); // Decrease DEF
-
-            //     const path = "icy-" + eStats.image.split("").filter((e) => !" /:\\*?!<>|".includes(e)).join("").toLowerCase();
-
-            //     // If it doesn't exist, generate it
-            //     if (!fs.existsSync(`./Images/${path}`)) {
-            //         await generateImage(eStats.image, "https://i.imgur.com/vzFuaNd.png", path);
-            //     };
-
-            //     const { AttachmentBuilder } = require('discord.js');
-            //     const file = new AttachmentBuilder(`./Images/${path}`);
-            //     message.edit({ files: [file] });
-            //     embed.setImage(`attachment://${path}`);
-
-            //     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            //         message.edit({ files: [] });
-            //         embed.setImage(eStats.image);
-            //     }));
-
-            //     notice.push(`\n✨ **${enemy.name}** was frozen for 1 round!`);
-            // };
+            const appliedIce = this.appliedIce++;
 
             if (dmg) {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
@@ -2630,23 +2610,50 @@ export const abilities: Record<number, Ability> = {
                     const canvas = createCanvas(225, 350);
                     const ctx = canvas.getContext('2d');
 
-                    const enemyImage = await loadImage(eStats.image);
-                    const iceLayer = await loadImage("https://i.imgur.com/vzFuaNd.png");
+                    const iceLayer = "https://i.ibb.co/d4XzMzrW/vzFuaNd.png";
+                    loadedImages[eStats.image] ||= await loadImage(eStats.image);
+                    loadedImages[iceLayer] ||= await loadImage(iceLayer);
 
-                    ctx.drawImage(enemyImage, 0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(iceLayer, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(loadedImages[eStats.image] || await loadImage(eStats.image), 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(loadedImages[iceLayer] || await loadImage(iceLayer), 0, 0, canvas.width, canvas.height);
 
                     // Convert to buffer and upload
                     const buffer = canvas.toBuffer('image/jpeg');
                     this.buffer = new AttachmentBuilder(buffer);
+
+                    // Clean up after 5 minutes
+                    setTimeout(() => {
+                        delete loadedImages[eStats.image];
+                        // delete loadedImages[iceLayer];           // --- Ice layer can stay loaded
+                    }, 5 * 60 * 1000);
                 };
 
-                message.edit({ files: [this.buffer] });
-                embed.setImage(`attachment://file.jpg`);
+                // Debounce message editing to prevent rate limits
+                if (this.messageEditTimeout) {
+                    clearTimeout(this.messageEditTimeout);
+                }
+                this.messageEditTimeout = setTimeout(async () => {
+                    try {
+                        await message.edit({ files: [this.buffer] });
+                        embed.setImage(`attachment://file.jpg`);
+                    } catch (error) {
+                        console.error('Failed to edit message with ice effect:', error);
+                    }
+                }, appliedIce === 0 ? 0 : 1200);
 
                 myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    message.edit({ files: [] });
-                    embed.setImage(eStats.image);
+                    // Debounce message editing for cleanup as well
+                    if (this.messageEditTimeout) {
+                        clearTimeout(this.messageEditTimeout);
+                    }
+                    this.messageEditTimeout = setTimeout(async () => {
+                        try {
+                            await message.edit({ files: [] });
+                            embed.setImage(eStats.image);
+                        } catch (error) {
+                            console.error('Failed to edit message to remove ice effect:', error);
+                        }
+                    }, 1200);
 
                     return AbilityResponse.SUCCESS;
                 }));
@@ -2654,13 +2661,23 @@ export const abilities: Record<number, Ability> = {
                 notice.push(`\n✨ **${enemy.name}** was frozen!`);
             };
 
-            //! Add the failsafe back 
+            //! Add the failsafe back
             myStats.sm += this.cost;
 
             return AbilityResponse.SUCCESS;
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, message, ...list) => {
             matchStats.xpboost += 0.25;
+
+            const iceLayer = "https://i.ibb.co/d4XzMzrW/vzFuaNd.png";
+            loadedImages[eStats.image] ||= await loadImage(eStats.image);
+            loadedImages[iceLayer] ||= await loadImage(iceLayer);
+
+            // Clean up after 5 minutes
+            setTimeout(() => {
+                delete loadedImages[eStats.image];
+                // delete loadedImages[iceLayer];           // --- Ice layer can stay loaded
+            }, 5 * 60 * 1000);
 
             return AbilityResponse.SUCCESS;
         },
