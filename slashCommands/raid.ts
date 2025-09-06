@@ -1088,7 +1088,7 @@ const exportCommand: SlashCommand = {
 
                     function startNextRound() {
                         // Force end at MAX_ROUNDS
-                        if (matchStats.round === MAX_ROUNDS) {
+                        if (matchStats.round >= MAX_ROUNDS) {
                             notice.push(`\n🕗 You've reached the end`);
                             endMatch("l");
                         };
@@ -1404,7 +1404,7 @@ const exportCommand: SlashCommand = {
 
                     // Auto apply existing action sequence
                     const autoApply = async () => {
-                        while (actionSequence.length > 0) {
+                        while (actionSequence.length > 0 && !matchStats.ended) {
                             const action = actionSequence.shift();
                             switch (action) {
                                 case "atk": await userAttack(); break;
