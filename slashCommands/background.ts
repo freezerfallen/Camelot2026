@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, AttachmentBuilder } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction, AttachmentBuilder, MessageFlags } from "discord.js";
 import { getProfileImage } from "./profile";
 import { CostTypes, ProfileDecorations, profileSets } from "../Modules/profileDecorations";
 import { getClassLvl, getDetailedStats, lastActive, userLevel } from "../Modules/functions";
@@ -125,6 +125,7 @@ const exportCommand: SlashCommand = {
         if (subcommand === "search") {
             const name = interaction.options.getString('name', true);
             const type = interaction.options.getString('type') ?? "background";
+            const isRedirect = interaction.deferred;
 
             const background = type === "background"
                 ? searchBackground(name, interaction)
@@ -134,7 +135,7 @@ const exportCommand: SlashCommand = {
             const pagesTotal = background.set.assets.length;
             let currPage = background.id + 1;
 
-            await interaction.deferReply().catch(() => {
+            if (!interaction.deferred) await interaction.deferReply().catch(() => {
                 return console.log(`ERROR Interaction Failed 'deferReply()', command: "${interaction.commandName}"`);
             });
 
@@ -198,7 +199,7 @@ const exportCommand: SlashCommand = {
                 .setImage(background.set.assets[currPage - 1].asset.url)
                 .setThumbnail(`attachment://profile.${background.set.assets[currPage - 1].asset.fileType === "gif" ? "gif" : "jpg"}`)
                 .setFooter({ text: `Page ${currPage}/${pagesTotal}` });
-            return interaction.editReply({ embeds: [Embed], components: [getPageRow(background.set.assets[currPage - 1], cachedImages, stats)], files: cachedImages[currPage - 1] ? [cachedImages[currPage - 1]] : [] }).then(msg => {
+            return interaction[isRedirect ? 'followUp' : 'editReply']({ embeds: [Embed], components: [getPageRow(background.set.assets[currPage - 1], cachedImages, stats)], files: cachedImages[currPage - 1] ? [cachedImages[currPage - 1]] : [] }).then(msg => {
                 const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 90000 });
 
                 collector.on('collect', async r => {
@@ -214,7 +215,7 @@ const exportCommand: SlashCommand = {
                                 if (!background || !background.set) return;
 
                                 const tempStats = await getUserSchema(interaction.user.id);
-                                if (!tempStats) return interaction.editReply("You haven't started playing yet.");
+                                if (!tempStats) return msg.edit("You haven't started playing yet.");
 
                                 let cost = 1_000_000_000, bgid;
                                 if (rr.customId.startsWith("set")) {
@@ -245,7 +246,7 @@ const exportCommand: SlashCommand = {
 
                                 // Edit replies
                                 ms.edit({ content: "Purchase Successful!", components: [] });
-                                interaction.editReply({ components: [getPageRow(background.set.assets[currPage - 1], cachedImages, tempStats)] });
+                                msg.edit({ components: [getPageRow(background.set.assets[currPage - 1], cachedImages, tempStats)] });
                             });
 
                         });
@@ -272,7 +273,7 @@ const exportCommand: SlashCommand = {
                         .setImage(background.set.assets[currPage - 1].asset.url)
                         .setThumbnail(cachedImages[currPage - 1] ? `attachment://profile.${background.set.assets[currPage - 1].asset.fileType === "gif" ? "gif" : "jpg"}` : null)
                         .setFooter({ text: `Page ${currPage}/${pagesTotal}` });
-                    interaction.editReply({ embeds: [Embed], components: [getPageRow(background.set.assets[currPage - 1], cachedImages, stats)], files: cachedImages[currPage - 1] ? [cachedImages[currPage - 1]] : [] });
+                    msg.edit({ embeds: [Embed], components: [getPageRow(background.set.assets[currPage - 1], cachedImages, stats)], files: cachedImages[currPage - 1] ? [cachedImages[currPage - 1]] : [] });
                 });
             });
         };

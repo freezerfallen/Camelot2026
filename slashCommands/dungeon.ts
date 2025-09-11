@@ -550,7 +550,7 @@ const exportCommand: SlashCommand = {
         const isCompactEmbed = !!author.schema.user_settings.compact_battle_embeds;
         const threatLevelWarning = isCompactEmbed ? "" : `You encountered ${enemy.title.split(" ")[0]} **${enemy.title.split(" ").slice(1).join(" ")}**!\n${difficulty}\n\n`;
 
-        const embedColor = 0xa0522d; // [0x6def83, 0xfac044, 0xff7d7d, 0x7c7c7c, 0xbbffff][threatLevel];
+        const embedColor = [0x6def83, 0xfac044, 0xff7d7d, 0x7c7c7c, 0xbbffff][threatLevel];
 
         async function newFight() {
             let timestart = new Date().getTime();
