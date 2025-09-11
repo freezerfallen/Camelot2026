@@ -7,7 +7,7 @@ import { characters } from "../Modules/chars";
 import { CompactUserSchema, ProfileImageArguments, SlashCommand } from '../types';
 import { items } from '../Modules/items';
 import { classes } from '../Modules/classes';
-import { profileColors } from '../Modules/components';
+import { currencyEmojis, profileColors } from '../Modules/components';
 import { getUserSchema, updateUsers } from '../Modules/queries';
 
 function getPageRow(background: ProfileDecorations, cachedImages: Record<number, AttachmentBuilder>, stats: CompactUserSchema) {
@@ -39,14 +39,13 @@ function getPageRow(background: ProfileDecorations, cachedImages: Record<number,
         );
 };
 
-const emojis = { gems: "<:genesis_gems:1034179687720681492>", coins: "<:coins:1030580480782893197>", lilies: "<:lilium:974057059618291732>", jades: "<:eternal_jade:1256124504141201428>" };
 function buyRow(background: ProfileDecorations) {
     return new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
             ...Object.entries(background.cost).map(([currency, amount]) => {
                 return new ButtonBuilder()
                     .setCustomId(currency)
-                    .setEmoji(emojis[currency as keyof CostTypes])
+                    .setEmoji(currencyEmojis[currency as keyof CostTypes])
                     .setLabel(`${amount}`)
                     .setStyle((currency === "jades") ? ButtonStyle.Success : ((currency === "gems") ? ButtonStyle.Primary : ButtonStyle.Secondary));
             }),
@@ -58,7 +57,7 @@ function buySetRow(background: ProfileDecorations) {
             ...Object.entries(background.set?.cost ?? {}).map(([currency, amount]) => {
                 return new ButtonBuilder()
                     .setCustomId(`set-${currency}`)
-                    .setEmoji(emojis[currency as keyof CostTypes])
+                    .setEmoji(currencyEmojis[currency as keyof CostTypes])
                     .setLabel(`${amount}`)
                     .setStyle((currency === "jades") ? ButtonStyle.Success : ((currency === "gems") ? ButtonStyle.Primary : ButtonStyle.Secondary));
             }),
@@ -229,7 +228,7 @@ const exportCommand: SlashCommand = {
 
                                 // Return if balance not enough
                                 if (tempStats[rr.customId as keyof CostTypes] < cost) {
-                                    ms.edit({ content: `You don't have enough ${rr.customId} (**${tempStats[rr.customId as keyof CostTypes]}**/${cost} ${emojis[rr.customId as keyof CostTypes]})`, components: [] });
+                                    ms.edit({ content: `You don't have enough ${rr.customId} (**${tempStats[rr.customId as keyof CostTypes]}**/${cost} ${currencyEmojis[rr.customId as keyof CostTypes]})`, components: [] });
                                     return;
                                 };
 

@@ -45,10 +45,12 @@ const getShopPage = (currentTab: SeasonalShopTab): ContainerBuilder => {
         // TODO: Add runes tab
     } else if (currentTab === 'hpbars') {
         const hpBarsForSale = [
+            { name: "Falling Leaves", id: 4, price: 500, isNew: true },
+            { name: "Autumn Leaves", id: 5, price: 500, isNew: true },
             { name: "Coffee Brew", id: 1, price: 500, isNew: true },
             { name: "Pinkish Fantasy", id: 2, price: 500, isNew: true },
             { name: "Golden Grasslands", id: 3, price: 500, isNew: true },
-            { name: "Default", id: 0, price: 200, isNew: false },
+            // { name: "Default", id: 0, price: 200, isNew: false },
         ];
 
         hpBarsForSale.forEach(hpBar => shopContainer

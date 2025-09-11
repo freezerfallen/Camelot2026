@@ -51,7 +51,7 @@ export default class Avalon {
 
     static hpbar(hp: number, mana: number) {
 
-        const hpBarTheme = customHpBars[0];
+        const hpBarTheme = customHpBars[5];
 
         return hpBarTheme.getHpBar(hp, mana);
 
