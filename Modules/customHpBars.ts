@@ -24,10 +24,10 @@ type hpBarComponents = {
 export default class CustomHpBar {
     private _name: string;
     private _id: number;
-    private _color: ColorResolvable;
+    private _color: number;
     private _bar: hpBarComponents;
 
-    constructor(name: string, id: number, color: ColorResolvable, bar: hpBarComponents) {
+    constructor(name: string, id: number, color: number, bar: hpBarComponents) {
         this._name = name;
         this._id = id;
         this._color = color;

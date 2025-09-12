@@ -341,6 +341,8 @@ export interface UserSchema {
     votereminder: number;
     items: Record<string, number>;
     skins: number[];
+    hpbars: number[];
+    hpbar: number | null;
     eventpts: number;
     brbest: number;
     mailbox: { type: string, rewards: string, message: string, date: number; }[];

@@ -71,6 +71,8 @@ async function createTables() {
         votereminder INT DEFAULT 1 NOT NULL,
         items JSONB DEFAULT '{}' NOT NULL,
         skins INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
+        hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
+        hpbar INT,
         eventpts INT DEFAULT 0 NOT NULL,
         eventpts2 INT DEFAULT 0 NOT NULL,
         brbest INT DEFAULT 0 NOT NULL,
@@ -480,7 +482,8 @@ async function alterTables() {
     // New with seasonal shop update
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
-
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
 
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
