@@ -908,6 +908,7 @@ export const items = [
     new weaponInfo("Dainsleif", "weapon", "sword", ["chest"], "<:dainsleif:1066858376585285663>", "https://i.imgur.com/w96701M.png", "atk", 36, 605, "mg", 1, 5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 50;
         myStats.sm += 10;
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+50**. Start the battle with **+10** mana.", "The legendary sword Dainsleif, passed down through the ages and wielded by only the most worthy warriors, is said to be cursed. Those who draw the blade are doomed to suffer a fate worse than death, as the sword compels its wielder to kill until it is satisfied. Its thirst for blood is insatiable, making it a weapon to be feared by even the bravest of men.", "unique", 170),
@@ -998,6 +999,7 @@ export const items = [
     new weaponInfo("Sssssssword of Ssssssssnek", "weapon", "sword", ["crafting", "chest"], "<:sssssssword_of_ssssssssnek:1066861510602793112>", "https://i.imgur.com/VmbU8fb.png", "atk", 31, 564, "cr", 0.04, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += Math.floor(eStats.sm * 0.5);
         eStats.sm -= Math.floor(eStats.sm * 0.5);
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
         myStats.mg += 1;
         eStats.mg -= 1;
         mybuff.mg.push(new buffInfo("+", 1, 9999));
@@ -1164,6 +1166,7 @@ export const items = [
     new weaponInfo("Tribute of Illumination", "weapon", "staff", ["crafting", "chest"], "<:tribute_of_illumination:1066864560423850034>", "https://i.imgur.com/HnUdOz6.png", "md", 32, 568, "mana", 5, 25, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.hp = Math.floor(myStats.hp * 0.5);
         myStats.sm += 30;
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
         myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
@@ -1599,6 +1602,7 @@ export const items = [
     new weaponInfo("Tristan's Trance", "weapon", "lance", ["chest"], "<:tristans_trance:1067200876197969973>", "https://i.imgur.com/iYaqRAr.png", "atk", 37, 580, "mg", 1, 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 40;
         myStats.sm += 10;
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
         myStats.mg += 2;
         mybuff.mg.push(new buffInfo("+", 2, 9999));
 
@@ -1840,6 +1844,7 @@ export const items = [
     new weaponInfo("Recruit's Ebon Ward", "weapon", "shield", ["crafting", "chest"], "<:recruits_ebon_ward:1067246103508029551>", "https://i.imgur.com/6Aa0qul.png", "shield", 67, 866, "mg", 1, 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 50;
         myStats.sm += 10;
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+50**. Start the battle with **+10** mana.", "The Recruit's Ebon Ward is the perfect shield for those new to the battlefield. Its sturdy construction and sleek design provide ample protection against incoming attacks, while its dark, menacing appearance strikes fear into the hearts of enemies. As you progress in your training, this shield will become a steadfast companion and a symbol of your growing strength and skill.", "unique", 276),
@@ -2283,6 +2288,7 @@ export const items = [
     }, "Executes the enemy when below **15%** HP. Increases the wielders attack by **14%** during the first 10 rounds.", "The Warbringer is a fearsome weapon, forged in the heat of battle and tempered in the fires of war. Its sharp, double-edged blade is capable of cleaving through armor and bone with ease, and its sturdy haft allows for powerful, crushing blows. In the hands of a skilled warrior, the Warbringer becomes a force to be reckoned with, striking fear into the hearts of enemies and bringing swift victory to its wielder.", "legendary", 330),
     new weaponInfo("Whisper of Woe", "weapon", "axe", ["crafting", "chest"], "<:whisper_of_woe:1068531160126332928>", "https://i.imgur.com/TO09o0Z.png", "atk", 55, 865, "mana", 10, 30, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += Math.floor(eStats.sm * 0.5);
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
         eStats.sm -= Math.floor(eStats.sm * 0.5);
         myStats.mg += 2;
         eStats.mg -= 2;
@@ -2879,6 +2885,7 @@ export const items = [
     new weaponInfo("Sirene's Song", "weapon", "sword", ["chest"], "<:sirenes_song:1068720493957497002>", "https://i.imgur.com/o9Ek5oh.png", "atk", 98, 1067, "mana", 15, 50, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm = myStats.mana;
         myStats.mg -= 5;
+        if (myStats.mg < 0) myStats.mg = 0;
         mybuff.mg.push(new buffInfo("+", -5, 9999));
 
         return AbilityResponse.SUCCESS;
@@ -3769,6 +3776,7 @@ export const items = [
     new armorInfo("Azure Enchantment Boots", "armor", "boots", "Azure Enchantment Set", ["crafting", "chest"], "<:azure_enchantment_boots:1081367325778919554>", "https://i.imgur.com/cgnYDv6.png", "def", 10, 105, "unique", 514, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 60;
         myStats.sm += 100;
+        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+60**. Start the battle with **+100** mana."),
