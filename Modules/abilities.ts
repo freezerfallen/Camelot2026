@@ -5969,6 +5969,168 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
+    // "22309": {
+    //     usage: 9999,
+    //     used: 0,
+    //     cost: 0,
+    //     pause: -5,
+    //     desc: "**Total Usage:** `Unlimited (CD: 4)`\n**Cost:** `0 💧`\n**Timeout:** `Yes`\n**Role:** `DPS/Support (Nuke, Bleed, Deflect, Progressive)`\n\n\Phrolova has **3** states – Compose, Reincarnate (lasts for 1 action), and Maestro. She starts off in her __Compose__ state, and gains `Volatile Notes` (🎶) via different means to enhance her capabilities.\n\nDuring her __Compose__ state:\n> - Her ATK is altered to deal **90%** damage. The **3rd** ATK additionally causes her to enter the __Reincarnate__ state for the next ATK/DEF\n\nDuring her __Reincarnate__ state:\n> - ATK is altered to deal **110%** damage and gain **1** 🎶\n> - DEF is altered to apply bleed on the enemy (**12%** of wielder’s max HP over **3** rounds) and gain **1** 🎶\n> - If she has **6** 🎶 after the action, consumes all 🎶 to activate Scarlet Coda, dealing **80%** damage and *stunning the enemy*. Then, she enters the __Maestro__ state for **6** rounds\n\nDuring her __Maestro__ state:\n> - Shares damage with Hecate, deflecting **28%** of damage taken (does not take damage and reflects it instead)\n> - ATK is altered to deal **120%** damage. The **3rd** ATK instead deals **140%** damage\n> - DEF is altered to double the damage deflect from hecate this round to **56%**\n\nBy the end of the __Maestro__ state: Deals **150%** damage\n### Come, let us finish this performance we've all been waiting for. Together\nWhen she is in the __Compose__ state: Her active (✨) deals **100%** damage and immediately causes her to enter the __Reincarnate__ state for the next ATK/DEF. This has a cooldown of **4** rounds.\n\nIn a party, Phrolova summons Hecate to deal **80%** damage twice every **10** rounds, after which the ally’s ATK & MD is boosted by **2%**, up to **5** times.",
+    //     shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `4 rounds`\n**Cost**: `0 💧`\n**Timeout**: `Yes`\n**Role**: `DPS/Support (Nuke, Bleed, Deflect, Progressive)`\n\n__**Passive**__\n- ATK (:crossed_swords:) is altered to do **90%** dmg. Every **3** attacks -> Enter __Reincarnate__ state\n\n__Core Mechanic__: Gaining notes for the Maestro state\n### During __Reincarnate__ state (ends after 1 action):\n- :crossed_swords:  -> Deals **110%** dmg and gain **1** :notes: \n- :shield:  -> Apply Bleed on the enemy (12% of wielder’s max HP over 3 rounds) and gain **1** :notes:\n- With **6** :notes: -> Automatically deals **80%** damage and enters __Maestro state__ for **6** rounds\n\n### During __Maestro__ state (ends after 1 action):\n- Deflects **28%** of damage taken (Doesn't take but reflects)\n- :crossed_swords: -> Deal **120%** dmg. Every **3rd** ATK deals **140%** instead\n- :shield: -> Deflects another **28%** of damage taken\n\n__**Active**__ (:sparkles:)\n- Enter __Reincarnate__ state if she isn't in Reincarnate/Maestro state\n\n__**Party**__ (:busts_in_silhouette:)\n- Every **10th** turn: Deal **80%** damage twice and boost ATK & MD by **2%** up to **5** times.",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //         // Phrolova
+
+    //         // Whispers of a Fleeting Dream
+    //         if (myStats.phrState === 1) {
+    //             matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //             this.used--;
+    //             matchStats.sendWarning({ content: `**${char.name}** is already in the __Reincarnate__ state`, ephemeral: true });
+    //             return AbilityResponse.FAILURE;
+    //         };
+
+    //         if (myStats.phrState === 2) {
+    //             matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //             this.used--;
+    //             matchStats.sendWarning({ content: `**${char.name}** is already in the __Maestro__ state`, ephemeral: true });
+    //             return AbilityResponse.FAILURE;
+    //         };
+
+    //         // Cooldown
+    //         if (this.pause > matchStats.round) {
+    //             matchStats.turn = matchStats.turnSkill ? 0 : 1;
+    //             this.used--;
+    //             matchStats.sendWarning({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //             return AbilityResponse.FAILURE;
+    //         };
+
+    //         this.pause = matchStats.round + 4;
+    //         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ *Preparatory beat, begin.* **${char.name}**`, { atkMultiplier: 1, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //         myStats.phrState = 1;
+    //         notice.push(`\n✨ **${char.name}** entered the __Reincarnate__ state`);
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.phrState = 0; // 0 = Compose ; 1 = Reincarnate ; 2 = Maestro
+    //         myStats.volatileNote = 0;
+    //         myStats.atkcount = 0;
+    //         myStats.deflectDamage ??= 0
+
+    //         const scarletCoda = () => {
+    //             if (myStats.volatileNote >= 6) {
+    //                 myStats.volatileNote = 0;
+    //                 myStats.phrState = 2;
+    //                 notice.push(`\n✨ **${char.name}** entered the __Maestro__ state`);
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> *Wails... Rejoicing!* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                    
+    //                 // Maestro immediate effects: Stun for 1 round
+    //                 eStats.timeFrozen = true;
+    //                 eStats.frozenMessage = "was stunned for **1** round";
+    //                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                     eStats.timeFrozen = false;
+
+    //                     return AbilityResponse.SUCCESS;
+    //                 }, 1));
+
+    //                 // Maestro prolonged effects: 28% damage deflection
+    //                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                     // Deflect 28% of damage taken every round
+    //                     myStats.deflectDamage += 0.28;
+    //                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                         myStats.deflectDamage -= 0.28;
+    //                         return AbilityResponse.SUCCESS;
+    //                     }));
+    //                     return AbilityResponse.SUCCESS;
+    //                 }, 6));
+
+    //                 // By the end of Maestro: Deal 150% damage
+    //                 myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 6, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> *Chant, songs of old!* **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //                     myStats.phrState = myStats.phrState = 1 ? 1 : 0;
+    //                     return AbilityResponse.SUCCESS;
+    //                 }));
+    //             } else {
+    //                 // Reset state to Compose
+    //                 myStats.phrState = 0;
+    //             };
+    //         };
+
+    //         // replace attack
+    //         myStats.replaceButton.atk = {
+    //             run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 myStats.atkcount++;
+    //                 let atkScale = [0.9, 1.1, 1.2][myStats.phrState];
+    //                 let flairemoji = ["<:rednote:1417513133559386303>","🎵","<:purplenote:1417513260453990450>"][myStats.phrState];
+    //                 if (myStats.atkcount === 3) {
+    //                     myStats.atkcount = 0;
+    //                     if (myStats.phrState === 0) {
+    //                         myStats.phrState = 1; // 3rd ATK in Compose enters Reincarnate
+    //                     } else if (myStats.phrState === 3) {
+    //                         atkScale += 0.2;
+    //                     }; // 3rd ATK in Maestro deals 20% more dmg
+    //                 } else if (myStats.phrState === 1) {
+    //                     myStats.volatileNote++;
+    //                     // Enter Maestro State for 6 rounds if applicable
+    //                     scarletCoda();
+    //                 };
+
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `${flairemoji} **${char.name}**`, { atkMultiplier: atkScale, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //                 if (myStats.phrState === 1) notice.push(`\n✨ **${char.name}** entered the __Reincarnate__ state`); // notice for entering Reincarnate
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
+
+    //         // replace def optionally every round
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (myStats.phrState !== 0) {
+    //                 myStats.replaceButton.def = {
+    //                     run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+    //                     // Reincarnate
+    //                     if (myStats.phrState === 1) {
+    //                         // Apply Bleed on the enemy (12% of wielder’s max HP over 3 rounds) 
+    //                         ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.04), 3));
+    //                         myStats.volatileNote++;
+    //                         // Enter Maestro State for 6 rounds if applicable
+    //                         scarletCoda();
+    //                     } else if (myStats.phrState === 2) {
+    //                         // Deflect +28% of damage taken
+    //                         myStats.deflectDamage += 0.28;
+    //                         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                             myStats.deflectDamage -= 0.28;
+    //                             return AbilityResponse.SUCCESS;
+    //                         }, 1));
+    //                     };
+    //                     delete myStats.replaceButton.def;
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));            
+
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         const name = pStats.name;
+    //         myStats.phrbuff = 0;
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (matchStats.round % 10 === 0) {
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
+    //                 if (myStats.phrbuff < 5) {
+    //                     myStats.phrbuff++
+    //                     myStats.atk += Math.floor(myStats.atk * 0.02);
+    //                     myStats.md += Math.floor(myStats.md * 0.02);
+    //                     mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.02), 9999));
+    //                     mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.02), 9999));
+    //                 };
+    //             };
+
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
+
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     "22610": {
         usage: 5,
         used: 0,
@@ -6325,7 +6487,7 @@ export const abilities: Record<number, Ability> = {
                 matchStats.turn = matchStats.turnSkill ? 0 : 1;
                 this.pause = matchStats.round + 10;
 
-                notice.push(`\n✨ 2B and 9S entered their flight units for **10** rounds.`);
+                notice.push(`\n✨ **${char.name}** entered their flight units for **10** rounds.`);
 
                 // Additional effects after ATK/DEF/CSKILL
                 matchStats.on("ATK", {
@@ -6979,7 +7141,6 @@ export const abilities: Record<number, Ability> = {
 
             myStats.evadeDeathChance ??= 0;
             myStats.evadeDeathStrike ??= 0;
-            myStats.evadeDeathChance ??= 0;
             myStats.evadeDeathStrike += 2;
             myStats.evadeDeathChance += 2;
 
