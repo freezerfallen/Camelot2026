@@ -3,7 +3,7 @@ import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonSty
 import { abilities, Ability } from "../Modules/abilities.js";
 import { classes } from "../Modules/classes.js";
 import { curses } from "../Modules/curses.js";
-import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items.js";
+import { armorInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items.js";
 import { stampedes } from "../Modules/stampedes.js";
 import { skills, eventBossAbilities } from "../Modules/skills.js";
 import charInfo, { characters } from "../Modules/chars.js";
@@ -327,6 +327,14 @@ const exportCommand: SlashCommand = {
         let myClass = myStats.class !== -1 ? classes[myStats.class] : undefined;
         let skill = myStats.class !== -1 ? _.cloneDeep(skills[myStats.class]) : undefined;
         let myAbility = myChar.id in abilities ? _.cloneDeep(abilities[myChar.id]) : undefined;
+
+        if (myStats.rune) {
+            const rune = items[parseInt(myStats.rune)];
+            if (rune instanceof runeInfo) {
+                if (myAbility === undefined) myAbility = rune.ability as Ability;
+                else myAbility = { ...myAbility, ..._.cloneDeep(rune.ability) };
+            };
+        };
 
         // Banned builds
         // if (myStats.class === 31 && stats.stampedechar === 5549) return interaction.editReply("The <:Rogue:964837711468969984> **Rogue** + **Yue** combination was banned from this stampede, please try something else.");
@@ -679,14 +687,22 @@ const exportCommand: SlashCommand = {
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items[myStats.helmet] as armorInfo).setname === (items[myStats.cuirass] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.gloves] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.boots] as armorInfo)?.setname) await (items[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
+        if (myStats.rune) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+
         if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        partyStatsC.forEach((e, i) => {
+        partyStatsC.forEach(async (e, i) => {
             if (e.id in abilities) {
                 partyAbility[i] = _.cloneDeep(abilities[e.id]);
-                partyAbility[i]?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+
+                const runeAbility = e.rune ? items[parseInt(e.rune)] as runeInfo : undefined;
+                if (runeAbility && runeAbility.party) {
+                    await runeAbility.party(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+                } else {
+                    await partyAbility[i]?.party?.(partyStatsC[i], myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+                };
             } else {
                 partyAbility[i] = undefined;
             };

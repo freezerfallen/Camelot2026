@@ -4,6 +4,7 @@ import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal } from "./functions";
 import { AbilityResponse } from "./components";
+import { Ability } from "./abilities";
 
 export class itemInfo {
     private _name: string;
@@ -301,6 +302,57 @@ export class potionInfo extends itemInfo {
         return this._subtype;
     };
 };
+
+type RuneAbilities =
+    | (Partial<Ability> & {
+        ability: Ability['ability'];
+        usage: number;
+        used: number;
+        cost: number;
+    })
+    | (Partial<Ability> & {
+        ability?: undefined;
+        usage?: number;
+        used?: number;
+        cost?: number;
+    })
+    & {
+        buff?: ItemAbility;
+    };
+
+export class runeInfo extends itemInfo {
+    private _ability: RuneAbilities;
+    private _buffdesc: string;
+
+    constructor(name: string, obtain: string[], emoji: `<:${string}:${number}>`, image: `https://${string}`, ability: RuneAbilities, buffdesc: string, grade: ItemRarity, id: number, desc: string = "", unique: boolean = true, tradable: boolean = false, sellable: boolean = true) {
+        const category = "rune";
+        const type = "rune";
+
+        super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable, desc);
+        this._ability = ability;
+        this._buffdesc = buffdesc;
+    };
+
+    get ability() {
+        return this._ability;
+    };
+    get active() {
+        return this.ability.ability;
+    };
+    get passive() {
+        return this.ability.passive;
+    };
+    get party() {
+        return this.ability.party;
+    };
+    get buff(): ItemAbility {
+        return this.ability.buff || (async () => AbilityResponse.SUCCESS);
+    };
+    get buffdesc() {
+        return this._buffdesc;
+    };
+};
+
 
 export const items = [
     // Fish
@@ -6280,7 +6332,7 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
-    // New loot - Liminal Descent (Summer2025)
+    // New loot - Liminal Descent (Summer 2025)
     new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "As Juliette's strength begins to fade, the pendant at her chest glows — not with power, but with longing.\n\nUrashima’s presence stirs within, answering the silent call of the one he once cherished. The pendant cracks, and stardust flows into her — a quiet promise, a final embrace.\n\nThe sea accepts the stars.\nShe rises again, reborn as Twilight Juliette —\nnot alone, but fused with the will of Urashima, her guardian and guide.\n\nOcean and cosmos move as one.\nAnd together, they will not fall.\n\n~ Liminal Descent | Summer 2025"),
 
     // Potions
@@ -6289,8 +6341,53 @@ export const items = [
     new potionInfo("Huge XP Potion", "xp", [], "<:huge_xp_potion:1411700642887766086>", "https://i.ibb.co/GKDnnMr/c.png", "flair text", "legendary", 781),
     new potionInfo("Small Instant XP Potion", "instant xp", [], "<:small_instant_xp_potion:1411713377511800842>", "https://i.ibb.co/jvy4rdK8/c.png", "flair text", "rare", 782),
     new potionInfo("Large Instant XP Potion", "instant xp", [], "<:large_instant_xp_potion:1411713396260339873>", "https://i.ibb.co/7wSYggL/c.png", "flair text", "unique", 783),
-    new potionInfo("Huge Instant XP Potion", "instant xp", [], "<:huge_instant_xp_potion:1411713671977107496>", "https://i.ibb.co/9m6tXSv9/c.png", "flair text", "legendary", 784)
+    new potionInfo("Huge Instant XP Potion", "instant xp", [], "<:huge_instant_xp_potion:1411713671977107496>", "https://i.ibb.co/9m6tXSv9/c.png", "flair text", "legendary", 784),
 
+    // Runes
+    new runeInfo("Arcane Rebirth", ["seasonal shop"], "<:arcane_rebirth:1419634455911596163>", "https://i.ibb.co/0yN5xDSD/Arcane-Rebirth.png", {
+        cost: 60,
+        usage: 9999,
+        used: 0,
+        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:arcane_rebirth:1419634455911596163> **${char.name}**`, { atkMultiplier: 2, magicDamage: true, mdChance: -1 });
+
+            return AbilityResponse.SUCCESS;
+        },
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.mdChance = 1;
+
+            mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.1), 9999));
+            myStats.md += Math.floor(myStats.md * 0.1);
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Attacks deal magic damage by default.\n- Increases magic damage by **10%**.\n- When using the active ability, deals **200%** magic damage.", "rare", 785),
+    new runeInfo("Coinmark of Riches", ["seasonal shop"], "<:coinmark_of_riches:1420459821362315337>", "https://i.ibb.co/svFFZvQB/Coinmark-of-Riches.png", {
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            matchStats.lootm += 0.1;
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Increases coins earned from the dungeon by **10%**.", "rare", 786),
+    new runeInfo("Valkyrie Sigil", ["seasonal shop"], "<:valkyrie_sigil:1420830074118209547>", "https://i.ibb.co/VYSdFjh2/Valkyrie-Sigil.png", {
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.counter ??= 0;
+
+            myStats.atk += Math.floor(myStats.atk * 0.1);
+            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.1), 9999));
+
+            // Counter every 8th round
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 8 === 0) {
+                    myStats.counter += 1;
+                };
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Increases attack by **10%**.\n- Every **8** rounds, the wearer gains **1x** counter attempt.", "rare", 787),
 
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

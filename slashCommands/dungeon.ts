@@ -1,12 +1,12 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ChatInputCommandInteraction, ButtonStyle } from "discord.js";
 import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
-import { abilities } from "../Modules/abilities";
+import { abilities, Ability } from "../Modules/abilities";
 import { achievements } from "../Modules/achievements";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
 import { floors } from "../Modules/enemies";
-import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
+import { armorInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items";
 import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
@@ -192,6 +192,13 @@ const exportCommand: SlashCommand = {
         let skill = myStats.class !== -1 ? _.cloneDeep(skills[myStats.class]) : undefined;
         let myAbility = myChar.id in abilities ? _.cloneDeep(abilities[myChar.id]) : undefined;
 
+        if (myStats.rune) {
+            const rune = items[parseInt(myStats.rune)];
+            if (rune instanceof runeInfo) {
+                if (myAbility === undefined) myAbility = rune.ability as Ability;
+                else myAbility = { ...myAbility, ..._.cloneDeep(rune.ability) };
+            };
+        };
 
         // Enemy Stats
         let enemy = floors[floor].monster;
@@ -288,6 +295,9 @@ const exportCommand: SlashCommand = {
 
                 // Guild Buff
                 if (guild) boost += (0.2 * guild.xpbuff);
+
+                // Loot run buff
+                if (dunLim[0] >= stats.dungeon_limit) boost *= 5;
 
                 boost = Math.round(boost * 100) / 100;
                 let cxp = Math.floor(((floor < 100 ? floor : 100 + (floor / 3)) + (Math.floor(Math.random() * 8))) * boost) + 12;
@@ -507,6 +517,8 @@ const exportCommand: SlashCommand = {
         if (myStats.weapon !== -1) await (items[myStats.weapon] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.cuirass] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.gloves] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.boots] as armorInfo)?.setname) await (items?.[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+
+        if (myStats.rune) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
         if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);

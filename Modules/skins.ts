@@ -184,21 +184,20 @@ export const skins: skinInfo[] = [
     new skinInfo("Cosmic Garou EX", 23390, "easter event 2025", "<@897369859757842473>", "", {}, "https://i.ibb.co/7NxyvkPS/Cosmic-Garou-EX.png", 112),
 
     /* Fall 2025 */
-    new skinInfo("Artoria Pendragon (Fall 2025)", 405, "fall season 2025", "youalreadylost7799", "", { season_keys: 30 }, "https://i.ibb.co/FbfPtcCZ/c.png", 113),
-    new skinInfo("Kaedehara Kazuha (Fall 2025)", 693, "fall season 2025", "kidsad", "", { season_keys: 50 }, "https://i.ibb.co/G3kR391x/KazuhaK.png", 114),
-    new skinInfo("Yukino Yukinoshita (Fall 2025)", 2551, "fall season 2025", "kidsad", "", { season_keys: 50 }, "https://i.ibb.co/rGj77xRm/Yuki-NOshita.webp", 115),
-    new skinInfo("Asuna Yuuki (Fall 2025)", 72, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/8GPGZ3P/AASuna.png", 116),
-    new skinInfo("Sakura Yamauchi (Fall 2025)", 2008, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/8nxZYPfK/SSakuraY.png", 117),
-    new skinInfo("Gin (Fall 2025)", 1716, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/Df2VDjNW/GinG.png", 118),
-    new skinInfo("Dalus (Fall 2025)", 10528, "fall season 2025", "beaca", "", { season_keys: 30 }, "https://i.ibb.co/23YkTzfM/Dalus-Rain-Season-Fall-Skin.png", 119),
-    new skinInfo("Gaius (Fall 2025)", 12388, "fall season 2025", "beaca", "", { season_keys: 30 }, "https://i.ibb.co/wrNGhnzH/Gaius-Fall-Skin.png", 120),
-    new skinInfo("Tetsuya Kuroko (Fall 2025)", 4330, "fall season 2025", "freezerfallen._", "", { season_keys: 30 }, "https://i.ibb.co/4gT25D76/kuroko.png", 121),
-    new skinInfo("Arlecchino (Fall 2025)", 16195, "fall season 2025", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/4g9Szy9z/6-OIIgk-AAAAGSURBVAMAM52-FMGr-QMk-AAAAASUVORK5-CYII.png", 122),
-    new skinInfo("Alisa Kujou (Fall 2025)", 22054, "fall season 2025", "snowflake.ex", "", { season_keys: 40 }, "https://i.ibb.co/Pst5k0Dd/image.png", 123),
-    new skinInfo("Apple EX (Fall 2025)", 19275, "fall season 2025", "snowflake.ex", "", { season_keys: 50 }, "https://i.ibb.co/v4zdkyDC/image.png", 124),
-    new skinInfo("Blade (Fall 2025)", 14909, "fall season 2025", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/prQ516M7/image.png", 125),
-    new skinInfo("Kyouko Hori (Fall 2025)", 24, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/GQHT3JS7/Hori-1.png", 126),
-
+    new skinInfo("Artoria Pendragon (Fall 2025)", 405, "fall season 2025", "youalreadylost7799", "", { season_keys: 25 }, "https://i.ibb.co/FbfPtcCZ/c.png", 113),
+    new skinInfo("Kaedehara Kazuha (Fall 2025)", 693, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/G3kR391x/KazuhaK.png", 114),
+    new skinInfo("Yukino Yukinoshita (Fall 2025)", 2551, "fall season 2025", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/rGj77xRm/Yuki-NOshita.webp", 115),
+    new skinInfo("Asuna Yuuki (Fall 2025)", 72, "fall season 2025", "kidsad", "", { season_keys: 30 }, "https://i.ibb.co/8GPGZ3P/AASuna.png", 116),
+    new skinInfo("Sakura Yamauchi (Fall 2025)", 2008, "fall season 2025", "kidsad", "", { season_keys: 30 }, "https://i.ibb.co/8nxZYPfK/SSakuraY.png", 117),
+    new skinInfo("Gin (Fall 2025)", 1716, "fall season 2025", "kidsad", "", { season_keys: 30 }, "https://i.ibb.co/Df2VDjNW/GinG.png", 118),
+    new skinInfo("Dalus (Fall 2025)", 10528, "fall season 2025", "beaca", "", { season_keys: 25 }, "https://i.ibb.co/23YkTzfM/Dalus-Rain-Season-Fall-Skin.png", 119),
+    new skinInfo("Gaius (Fall 2025)", 12388, "fall season 2025", "beaca", "", { season_keys: 25 }, "https://i.ibb.co/wrNGhnzH/Gaius-Fall-Skin.png", 120),
+    new skinInfo("Tetsuya Kuroko (Fall 2025)", 4330, "fall season 2025", "freezerfallen._", "", { season_keys: 25 }, "https://i.ibb.co/4gT25D76/kuroko.png", 121),
+    new skinInfo("Arlecchino (Fall 2025)", 16195, "fall season 2025", "snowflake.ex", "", { season_keys: 25 }, "https://i.ibb.co/4g9Szy9z/6-OIIgk-AAAAGSURBVAMAM52-FMGr-QMk-AAAAASUVORK5-CYII.png", 122),
+    new skinInfo("Alisa Kujou (Fall 2025)", 22054, "fall season 2025", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/Pst5k0Dd/image.png", 123),
+    new skinInfo("Apple EX (Fall 2025)", 19275, "fall season 2025", "snowflake.ex", "", { season_keys: 40 }, "https://i.ibb.co/v4zdkyDC/image.png", 124),
+    new skinInfo("Blade (Fall 2025)", 14909, "fall season 2025", "snowflake.ex", "", { season_keys: 25 }, "https://i.ibb.co/prQ516M7/image.png", 125),
+    new skinInfo("Kyouko Hori (Fall 2025)", 24, "fall season 2025", "kidsad", "", { season_keys: 30 }, "https://i.ibb.co/GQHT3JS7/Hori-1.png", 126),
 
 
 ];
