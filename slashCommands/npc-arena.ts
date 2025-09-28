@@ -1,11 +1,11 @@
 import fs from 'fs';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, MessageFlags } from "discord.js";
-import { abilities } from "../Modules/abilities";
+import { abilities, Ability } from "../Modules/abilities";
 import { achievements } from "../Modules/achievements";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
 import skillInfo, { skills } from "../Modules/skills";
-import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
+import { armorInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
 import { getDetailedStats, customEmojis, dealDamage } from "../Modules/functions";
@@ -46,6 +46,13 @@ const exportCommand: SlashCommand = {
         let skill = myStats.class !== -1 ? _.cloneDeep(skills[myStats.class]) : undefined;
         let myAbility = myChar.id in abilities ? _.cloneDeep(abilities[myChar.id]) : undefined;
 
+        if (myStats.rune) {
+            const rune = items[parseInt(myStats.rune)];
+            if (rune instanceof runeInfo) {
+                if (myAbility === undefined) myAbility = rune.ability as Ability;
+                else myAbility = { ...myAbility, ..._.cloneDeep(rune.ability) };
+            };
+        };
 
         // Enemy Stats
         const enemy = new enemyInfo("Luminous", "Human", "the Luminous", "F", true, {}, {}, {}, [], luminousImages, [], 0);
@@ -142,6 +149,8 @@ const exportCommand: SlashCommand = {
         if (myStats.weapon !== -1) await (items[myStats.weapon] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items[myStats.helmet] as armorInfo).setname === (items[myStats.cuirass] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.gloves] as armorInfo)?.setname && (items[myStats.helmet] as armorInfo).setname === (items[myStats.boots] as armorInfo)?.setname) await (items[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+
+        if (myStats.rune) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
         if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);

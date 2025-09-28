@@ -36,6 +36,7 @@ async function createTables() {
         battlechar INT,
         lootbox INT DEFAULT 0 NOT NULL,
         lastvote TIMESTAMP,
+        lastvoteserver TIMESTAMP,
         weeklyclaimed INT DEFAULT 0 NOT NULL,
         dailyclaimed INT DEFAULT 0 NOT NULL,
         dailystreak INT DEFAULT 0 NOT NULL,
@@ -207,14 +208,18 @@ async function createTables() {
         elders TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         members TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
         banned TEXT[] DEFAULT ARRAY[]::TEXT[] NOT NULL,
+
         eventpoints INT DEFAULT 0 NOT NULL,
         bosshuntstage INT DEFAULT 1 NOT NULL,
         boss1 BIGINT DEFAULT 124080 NOT NULL,
         boss2 BIGINT DEFAULT 160260 NOT NULL,
         boss3 BIGINT DEFAULT 113720 NOT NULL,
         boss4 BIGINT DEFAULT 144640 NOT NULL,
+        
         lastlevelup TIMESTAMP,
-        raidid INT
+
+        raidid INT,
+        raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL
     )`);
 
     // Guild donations table
@@ -480,10 +485,14 @@ async function alterTables() {
     // await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS user_settings JSONB DEFAULT '{}' NOT NULL`);
 
     // New with seasonal shop update
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
+
+    // await query('ALTER TABLE guilds ADD COLUMN IF NOT EXISTS raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL;');
+
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
 
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
