@@ -318,6 +318,7 @@ export interface UserSchema {
     battlechar: number | null;
     lootbox: number;
     lastvote: Date | null;
+    lastvoteserver: Date | null;
     weeklyclaimed: number;
     dailyclaimed: number;
     dailystreak: number;

@@ -36,6 +36,7 @@ async function createTables() {
         battlechar INT,
         lootbox INT DEFAULT 0 NOT NULL,
         lastvote TIMESTAMP,
+        lastvoteserver TIMESTAMP,
         weeklyclaimed INT DEFAULT 0 NOT NULL,
         dailyclaimed INT DEFAULT 0 NOT NULL,
         dailystreak INT DEFAULT 0 NOT NULL,
@@ -484,13 +485,14 @@ async function alterTables() {
     // await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS user_settings JSONB DEFAULT '{}' NOT NULL`);
 
     // New with seasonal shop update
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
 
-    await query('ALTER TABLE guilds ADD COLUMN IF NOT EXISTS raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL;');
+    // await query('ALTER TABLE guilds ADD COLUMN IF NOT EXISTS raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL;');
 
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
 
 
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
