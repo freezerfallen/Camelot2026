@@ -1851,7 +1851,7 @@ export const abilities: Record<number, Ability> = {
     //         matchStats.on("deathEvade", {
     //                maxUsage: 1,
     //                callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-    //                    if (target == myStats) {
+    //                    if (target === myStats) {
     //                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** landed an unexpected punch! She`, { atkMultiplier: 2.2, dodge: false, combodmg: true, selfdmg: true, selfheal: true });
     //                        eStats.def -= Math.min(Math.floor(eStats.def * 0.2), 660);
     //                        eStats.mr -= Math.min(Math.floor(eStats.mr * 0.2), 660);
@@ -2156,7 +2156,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("deathEvade", {
                 maxUsage: 1,
                 callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (target == myStats) {
+                    if (target === myStats) {
                         const shgain = myStats.maxhp;
                         myStats.shield += myStats.maxhp;
                         myStatsFixed.maxhp = 1;
@@ -4680,7 +4680,7 @@ export const abilities: Record<number, Ability> = {
     //         matchStats.on("DEF", {
     //                 maxUsage: 6,
     //                 callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-    //                     if (caster == myStats) {
+    //                     if (caster === myStats) {
     //                         myStats.defUsed++;
     //                         if (myStats.defUsed === 5) {
     //                             myStats.brCap = 0.3;
@@ -4707,7 +4707,7 @@ export const abilities: Record<number, Ability> = {
     //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //         myStats.creampuff ??= 0;
     //         myStats.counter ??= 0;
-            
+
     //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //             // 75% chance to offer creampuff, up to 10
     //             if (0.75 > Math.random() && myStats.creampuff < 10) {
@@ -5627,7 +5627,7 @@ export const abilities: Record<number, Ability> = {
                 matchStats.on("counter", {
                     maxUsage: 10,
                     callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                        if (target == myStats) {
+                        if (target === myStats) {
                             myStats.cr += 0.02;
                             mybuff.cr.push(new buffInfo("+", 0.02, 9999));
                             if (myStats.cr > 1) myStats.cr = 1;
@@ -6020,7 +6020,7 @@ export const abilities: Record<number, Ability> = {
     //                 myStats.phrState = 2;
     //                 notice.push(`\n✨ **${char.name}** entered the __Maestro__ state`);
     //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> *Wails... Rejoicing!* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                    
+
     //                 // Maestro immediate effects: Stun for 1 round
     //                 eStats.timeFrozen = true;
     //                 eStats.frozenMessage = "was stunned for **1** round";
@@ -7158,7 +7158,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("noncrit", {
                 maxUsage: 10,
                 callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster == myStats) {
+                    if (caster === myStats) {
                         myStats.dodge += 0.015;
                         mybuff.dodge.push(new buffInfo("+", 0.015, 9999));
                         if (myStats.dodge > 1) myStats.dodge = 1;
