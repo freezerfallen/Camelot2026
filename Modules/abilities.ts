@@ -849,7 +849,7 @@ export const abilities: Record<number, Ability> = {
                 myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
                     if (Math.random() < Math.min(125, stampede?.participation?.[matchStats.interaction.user.id]?.[1] || 0) / 500) {
                         let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **Tetsuya Kuroko** stole the shot! He`, { atkMultiplier: 1.2 });
-                        matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { dmg });
+                        matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { damage: dmg });
                     };
 
                     return AbilityResponse.SUCCESS;
@@ -857,7 +857,7 @@ export const abilities: Record<number, Ability> = {
             } else if (matchStats.interaction.commandName === "raid") {
                 if (Math.random() < 0.25) {
                     let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **Tetsuya Kuroko** stole the shot! He`, { atkMultiplier: 1.2 });
-                    matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { dmg });
+                    matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { damage: dmg });
                 };
             };
 
@@ -6844,6 +6844,7 @@ export const abilities: Record<number, Ability> = {
     //         //Garou EX
     //         if (myStats.equippedSkin !== 127 && myStats.equippedSkin !== 112) {
     //             matchStats.sendWarning({ content: `You need to equip either of his skins to use his active`, ephemeral: true });
+    //             matchStats.turn = matchStats.turnSkill ? 0 : 1;
     //             return AbilityResponse.FAILURE;
     //         };
 
