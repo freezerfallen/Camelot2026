@@ -20,6 +20,7 @@ client.login(config.token);
 
 // Collections
 client.slashCommands = new Collection<string, SlashCommand>();
+client.blacklist = new Map<string, string>();
 
 // Add Handlers
 const handlersDir = join(__dirname, "./handlers");

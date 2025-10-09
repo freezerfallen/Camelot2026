@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { dailies } from "../Modules/dailyQuests";
 import { characters } from "../Modules/chars";
 import { EmbedBuilder } from "discord.js";
@@ -29,8 +28,6 @@ const exportCommand: SlashCommand = {
     name: 'quests',
     async execute({ interaction, author }) {
 
-        const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
-
         const user = interaction.options.getUser('user') ?? interaction.user;
 
         const stats = author.schema;
@@ -56,7 +53,7 @@ const exportCommand: SlashCommand = {
         };
 
         let thumbnail = characters[stats.chars[Math.floor(Math.random() * stats.chars.length)]].image || "https://i.imgur.com/Ta2YDBN.png";
-        if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, customSettings[user.id]?.cimg[stats.favchar], stats.char_skin[stats.favchar]);
+        if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, stats.custom_skins[stats.favchar], stats.char_skin[stats.favchar]);
 
         const todaysQuests = getQuests(user.id, dailies.length);
 

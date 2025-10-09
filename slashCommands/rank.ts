@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { EmbedBuilder, ComponentType } from "discord.js";
 import { characters } from "../Modules/chars";
 import { getDetailedStats, showPage, baseEP, RoK } from "../Modules/functions";
@@ -30,8 +29,6 @@ export const exportCommand: SlashCommand = {
     name: 'rank',
     async execute({ interaction, author, server }) {
         if (!interaction.guild || !server.schema) return interaction.reply("Please use this command in a server");
-
-        const blacklist = JSON.parse(fs.readFileSync('Storage/blacklist.json', 'utf8'));
 
         let scope = interaction.options.getString('scope') ?? "global";
         let page = interaction.options.getInteger('page') ?? 1;
@@ -82,17 +79,16 @@ export const exportCommand: SlashCommand = {
             } else {
                 sortedRoK = [...RoK.values()];
             };
-            sortedRoK = sortedRoK.filter((e) => e && !(e.id in blacklist));
+            sortedRoK = sortedRoK.filter((e) => e && !interaction.client.blacklist.has(e.id));
             sortedRoK.sort((a, b) => b.ep - a.ep);
 
             sortedArr = sortedRoK.map((e) => `${rarities[characters[e.char].rarity]} ${count++}. **${characters[e.char].name}** - EP: ${e.ep} => ${e.name}`);
 
             embedTitle = `🏆 ${scope === "server" ? interaction.guild.name : "Camelot"} top characters 🏆`;
-            const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
 
             const tuser = await getUserSchema(sortedRoK[0].id);
             if (!tuser) return interaction.reply("Something went wrong, please try again later.");
-            thumbnail = characters[sortedRoK[0].char].getImage((tuser?.premium || 0), (customSettings?.[tuser?.id]?.cimg[sortedRoK[0].char] || ""), tuser?.char_skin[sortedRoK[0].char] || undefined);
+            thumbnail = characters[sortedRoK[0].char].getImage((tuser?.premium || 0), (tuser?.custom_skins[sortedRoK[0].char] || ""), tuser?.char_skin[sortedRoK[0].char] || undefined);
         };
 
         const elementsPerPage = 15;
