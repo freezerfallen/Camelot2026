@@ -503,12 +503,20 @@ async function endRaid(raidRowId: number, equalRewardDistribution: boolean) {
     // Distribute remaining rewards
     for (let [key, value] of Object.entries(remainingRewards)) {
         if (value >= 1) {
+            const remReceived = new Set<string>(); // users who have already received a remaining reward
             let maxIterations = players.length;
             while (value >= 1 && maxIterations > 0) {
-                const weightedRandomNumber = Math.random() * sumOfShares;
-                const weightedRandomPlayer = players.find((player) => weightedRandomNumber <= player.percentile);
+                let weightedRandomNumber = Math.random() * sumOfShares;
+                let weightedRandomPlayer = players.find((player) => (weightedRandomNumber <= player.percentile && !remReceived.has(player.id)));
+                let maxRerolls = 10;
+                while (!weightedRandomPlayer && maxRerolls > 0) {
+                    weightedRandomNumber = Math.random() * sumOfShares;
+                    weightedRandomPlayer = players.find((player) => (weightedRandomNumber <= player.percentile && !remReceived.has(player.id)));
+                    maxRerolls--;
+                };
                 if (weightedRandomPlayer) {
                     weightedRandomPlayer.rewards[key as keyof typeof weightedRandomPlayer.rewards] += 1;
+                    remReceived.add(weightedRandomPlayer.id);
                 };
                 value--;
                 maxIterations--;

@@ -539,23 +539,6 @@ const exportCommand: SlashCommand = {
             return interaction.reply({ content: `**Top Donators** (total: $${stats.reduce((acc, stat) => acc + (stat.donated ?? 0), 0)})\n\n${stats.slice(0, 20).map((e, i) => `${i + 1}) ${e.name} ➜ $${e.donated}`).join("\n")}`, ephemeral });
         };
 
-        // transfer customSettings[user.id].cimg[char.id] to user.custom_skins[char.id]
-        if (cmd === "transfer_custom_skins") {
-            if (!user || user.bot) return interaction.reply({ content: `Please specify a valid user to transfer\nUsage: \`/admin transfer user:<user>\``, ephemeral });
-            const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8')) as { [userid: string]: { cimg: Record<string, string>; }; };
-
-            for (const usrid of Object.keys(customSettings)) {
-                const usrSkins = customSettings[usrid].cimg;
-                if (Object.keys(usrSkins).length > 0) {
-                    await updateUsers(usrid, {
-                        custom_skins: { type: "set", value: usrSkins },
-                    });
-                };
-            };
-
-            return interaction.reply({ content: `Action Successful: Transferred custom skins to database`, ephemeral });
-        };
-
         // Ban Players
         if (cmd === "ban" || cmd === "blacklist" || cmd === "suspend") {
             if (!user || user.bot || user.id === "489490486734880774") return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });

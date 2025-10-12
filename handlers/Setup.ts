@@ -57,7 +57,7 @@ const handler: BotHandler = {
 
         // Load Ranking
         indexRanking();
-        setInterval(indexRanking, 15 * 60 * 1000); // 15 min interval
+        setInterval(indexRanking, 6 * 60 * 60 * 1000); // 6h interval
     },
 };
 

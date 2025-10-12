@@ -7,7 +7,7 @@ export default class WorkerPool {
     private _workers: Worker[];
     private _queue: any[];
 
-    constructor(workerScript: string, numWorkers: number = os.cpus().length) {
+    constructor(workerScript: string, numWorkers: number = Math.max(1, os.cpus().length - 1)) {
         this._workerScript = workerScript;
         this._numWorkers = numWorkers;
         this._workers = [];

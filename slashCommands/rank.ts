@@ -106,7 +106,7 @@ export const exportCommand: SlashCommand = {
             .setTitle(embedTitle)
             .setDescription(showUsersF.join("\n"))
             .setThumbnail(thumbnail)
-            .setFooter({ text: `Page ${currPage}/${pagesTotal} ${(scope === "server" || scope === "global") ? "| Ranking updates every 15 minutes" : ""}` });
+            .setFooter({ text: `Page ${currPage}/${pagesTotal} ${(scope === "server" || scope === "global") ? "| Ranking updates every 6 hours" : ""}` });
         if (pagesTotal === 1) return interaction[interaction.deferred ? "editReply" : "reply"]({ embeds: [Embed] });
         return interaction[interaction.deferred ? "editReply" : "reply"]({ embeds: [Embed], components: [PageRow], fetchReply: true }).then(msg => {
             const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 90000 });
@@ -122,7 +122,7 @@ export const exportCommand: SlashCommand = {
 
                 showUsersF = showPage(currPage, sortedArr, elementsPerPage);
 
-                Embed.setDescription(showUsersF.join("\n")).setFooter({ text: `Page ${currPage}/${pagesTotal} ${(scope === "server" || scope === "global") ? "| Ranking updates every 15 minutes" : ""}` });
+                Embed.setDescription(showUsersF.join("\n")).setFooter({ text: `Page ${currPage}/${pagesTotal} ${(scope === "server" || scope === "global") ? "| Ranking updates every 6 hours" : ""}` });
                 msg.edit({ embeds: [Embed], components: [PageRow] });
             });
 
