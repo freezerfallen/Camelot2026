@@ -7080,11 +7080,13 @@ export const abilities: Record<number, Ability> = {
             // Enter Stellarealm
 
             // Increase ATK by 3% for every butterfly
-            const atkbuff = 0.03 * myStats.butterfly;
+            const atkbuff = 0.03 * Math.min(10, myStats.butterfly);
             myStats.atk += Math.floor(myStats.atk * atkbuff);
             myStats.md += Math.floor(myStats.md * atkbuff);
-            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * atkbuff), domainLast));
-            mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * atkbuff), domainLast));
+            mybuff.atk.push(new buffInfo("*", 1 + (atkbuff), domainLast));
+            mybuff.md.push(new buffInfo("*", 1 + (atkbuff), domainLast));
+            // mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * atkbuff), domainLast));
+            // mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * atkbuff), domainLast));
 
             // Restore 5% missing HP every round
             addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
