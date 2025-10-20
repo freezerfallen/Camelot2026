@@ -6953,7 +6953,7 @@ export const abilities: Record<number, Ability> = {
     //         };
 
     //         myStats.risingSurge ??= 0;
-    //         myStats.redirectionLastTriggered ??= 0;
+    //         myStats.redirectionLastTriggered ??= -4;
     //         myStats.evadeDeathChance ??= 0;
     //         myStats.evadeDeathStrike ??= 0;
     //         myStats.evadeDeathStrike += 3;
