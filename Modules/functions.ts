@@ -1702,7 +1702,7 @@ export const getLetterRank = (score: number) => {
 };
 
 export const isStampedeMonth = () => {
-    return (new Date().getMonth() % 2) === 1;
+    return (new Date().getMonth() % 2) === 0;
 };
 
 // Export CSV
