@@ -1,8 +1,9 @@
 import fs from 'fs';
 import { join } from "path";
 import { Client, GatewayIntentBits, Partials, Options, Collection } from 'discord.js';
-import config from './config.json';
 import { SlashCommand } from './types';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Create Client
 const client = new Client({
@@ -16,7 +17,7 @@ const client = new Client({
     }),
     shards: "auto",
 });
-client.login(config.token);
+client.login(process.env.TOKEN);
 
 // Collections
 client.slashCommands = new Collection<string, SlashCommand>();

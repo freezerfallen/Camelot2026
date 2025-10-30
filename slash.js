@@ -1,7 +1,8 @@
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { token, clientId } = require('./config.json');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const commands = [
 	{
@@ -1655,14 +1656,14 @@ const commands = [
 	}.data.toJSON(),
 ];
 
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 (async () => {
 	try {
 		console.log('Started refreshing application (/) commands.');
 
 		await rest.put(
-			Routes.applicationCommands(clientId.active),
+			Routes.applicationCommands(process.env.CLIENT_ID),
 			{ body: commands },
 		);
 

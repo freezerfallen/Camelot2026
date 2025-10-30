@@ -1,5 +1,4 @@
 import fs from 'fs';
-import config from '../config.json';
 import { Campaign } from 'patreon-discord';
 import { Client } from "discord.js";
 import { BotHandler } from "../types";
@@ -10,8 +9,8 @@ const handler: BotHandler = {
     execute: async (client: Client) => {
 
         const myCampaign = new Campaign({
-            patreonToken: config.patreon.token,
-            campaignId: config.patreon.campaignId,
+            patreonToken: process.env.PATREON_TOKEN,
+            campaignId: process.env.PATREON_CAMPAIGN_ID,
         });
 
         // Check if premium gift expired (every 15 min)

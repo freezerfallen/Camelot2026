@@ -852,17 +852,21 @@ declare global {
             CAMELOT: string,
             ELDER: string,
 
-            PREFIX: string,
+            CLIENT_ID: string,
 
             PATREON_TOKEN: string,
             PATREON_CAMPAIGN_ID: string,
 
             RANK_AUTH: string,
+            RANK_API_KEY: string,
 
             TOPGG_AUTH: string,
             TOPGG_TOKEN: string,
 
-            DONATEBOT_KEY: string,
+            GEMINI_API_KEY: string,
+
+            RUNWARE_SOURCE: string,
+            RUNWARE_API_KEY: string,
 
             PG_USER: string,
             PG_DATABASE: string,
@@ -871,6 +875,7 @@ declare global {
 
             ADMINS: string,
             VERSION: string,
+            PREFIX: string,
         }
     }
 }
