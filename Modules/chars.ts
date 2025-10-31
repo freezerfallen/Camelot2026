@@ -23289,7 +23289,7 @@ export const characters: charInfo[] = [
     new charInfo("Nobushige Oyamada", [], anime[602], "M", "https://i.ibb.co/WWMBNTBg/c.png", 23184, "D"),
     new charInfo("2B & 9S EX", ["2B&9S EX", "2B/9S EX", "2B EX", "9S EX"], anime[310], "NB", "https://i.ibb.co/RGXGRWk6/2-B-9-S-EX.gif", 23185, "EX"),
     new charInfo("Castorice", [], anime[343], "F", "https://i.ibb.co/rK9s1757/c.png", 23186, "SS"),
-    new charInfo("Firefly", ["SAM (HSR)"], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
+    new charInfo("Firefly", ["SAM (HSR)",], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
     new charInfo("Aventurine", [], anime[343], "M", "https://i.ibb.co/s92jpyBV/c.png", 23188, "SS"),
     new charInfo("Acheron", [], anime[343], "F", "https://i.ibb.co/pvYh9gTs/c.png", 23189, "SS"),
     new charInfo("Jingliu", [], anime[343], "F", "https://i.ibb.co/ywH6zTp/c.png", 23190, "S"),
