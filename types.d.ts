@@ -251,6 +251,16 @@ export type DetailedStats = {
     damageFormula: string;
     delayedBuffs: IdelayedBuff[];
     replaceButton: ReplaceButton;
+    dodgebuffLast?: number;
+    dodgebuff: number;
+    twinshot: number;
+    selfdmg: number;
+    critbleed: boolean;
+    critbleedlast: number;
+    heap1: any;
+    timeout: boolean;
+    allowExecution: boolean;
+    defUsed: number,
     lvl: number;
     ref: number;
     class: number;
@@ -348,6 +358,8 @@ export interface UserSchema {
     votestotal: number;
     arenawins: number;
     arenalosses: number;
+    arenastreak: number;
+    arenastreakhighest: number;
     animationdelay: number;
     achievements: number[];
     lastpull: Date | null;
@@ -662,6 +674,7 @@ export type TriggerOptions = {
 export type MatchStats = {
     turn: number;
     round: number;
+    user: string;
     roundCheck: number;
     ended: boolean;
     interaction: ChatInputCommandInteraction;
@@ -679,28 +692,14 @@ export type MatchStats = {
     loot: number;
     lootm: number;
     xpboost: number;
-    counter: number;
-    counterChance: number;
     currentCharacter: number;
     currentOpponent: number;
     myStatsCC: Record<string, any>;
     eStatsCC: Record<string, any>;
     tdChance: number;
     shieldBreak: number;
-    selfdmg: number;
-    twinshot: number;
-    critbleed: boolean;
-    critbleedlast: number;
-    evadeDeathStrike: number;
-    evadeDeathChance: number;
-    allowExecution: boolean;
     damageFormula: "default" | `log_scale_${number}`;
-    consumeMana: number;
-    lightningMultiplier?: number;
-    dodgebuffLast?: number;
-    dodgebuff?: number;
     allowSelfheal?: boolean;
-    heap1: any;
 
     sendWarning: ({ content, ephemeral = true }: { content: string, ephemeral?: boolean; }) => void;
 
@@ -874,6 +873,7 @@ declare global {
             PG_PORT: string,
 
             ADMINS: string,
+
             VERSION: string,
             PREFIX: string,
         }
