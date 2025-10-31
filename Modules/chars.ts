@@ -23289,7 +23289,7 @@ export const characters: charInfo[] = [
     new charInfo("Nobushige Oyamada", [], anime[602], "M", "https://i.ibb.co/WWMBNTBg/c.png", 23184, "D"),
     new charInfo("2B & 9S EX", ["2B&9S EX", "2B/9S EX", "2B EX", "9S EX"], anime[310], "NB", "https://i.ibb.co/RGXGRWk6/2-B-9-S-EX.gif", 23185, "EX"),
     new charInfo("Castorice", [], anime[343], "F", "https://i.ibb.co/rK9s1757/c.png", 23186, "SS"),
-    new charInfo("Firefly", ["SAM (HSR)",], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
+    new charInfo("Firefly", ["SAM (HSR)"], anime[343], "F", "https://i.ibb.co/ccTJqxzy/c.png", 23187, "SS"),
     new charInfo("Aventurine", [], anime[343], "M", "https://i.ibb.co/s92jpyBV/c.png", 23188, "SS"),
     new charInfo("Acheron", [], anime[343], "F", "https://i.ibb.co/pvYh9gTs/c.png", 23189, "SS"),
     new charInfo("Jingliu", [], anime[343], "F", "https://i.ibb.co/ywH6zTp/c.png", 23190, "S"),
@@ -25659,6 +25659,7 @@ export const characters: charInfo[] = [
     new charInfo("Shia Gold", [], anime[676], "F", "https://i.ibb.co/jPgzFmyZ/c.png", 25555, "D"),
     new charInfo("Souemon", [], anime[676], "M", "https://i.ibb.co/sdbKRgmX/c.png", 25556, "D"),
     new charInfo("Wolfgang", [], anime[676], "M", "https://i.ibb.co/4n20b3xX/c.png", 25557, "D"),
+    new charInfo("Firefly EX", ["SAM EX"], anime[343], "F", "https://i.ibb.co/ZRw9tB0D/firefly-ex.png", 25558, "EX"),
 
 
 ];

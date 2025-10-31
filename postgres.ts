@@ -148,6 +148,7 @@ async function createTables() {
         stamps INT DEFAULT 0 NOT NULL,
         user_settings JSONB DEFAULT '{}' NOT NULL,
         custom_skins JSONB DEFAULT '{}' NOT NULL,
+        discovered_via TEXT,
 
         -- Characters table columns
         chars INT[] DEFAULT ARRAY[]::INT[] NOT NULL,
@@ -503,8 +504,9 @@ async function alterTables() {
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreak INT DEFAULT 0 NOT NULL');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreakhighest INT DEFAULT 0 NOT NULL');
 
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discovered_via TEXT;');
 
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
     await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_skins JSONB DEFAULT '{}' NOT NULL;`);
 
 

@@ -448,6 +448,7 @@ export interface UserSchema {
     raid_supports: number[];
     user_settings: Record<string, any>;
     custom_skins: Record<string, string>;
+    discovered_via: string | null;
     created: Date;
 
     chars: number[];
@@ -873,7 +874,6 @@ declare global {
             PG_PORT: string,
 
             ADMINS: string,
-
             VERSION: string,
             PREFIX: string,
         }

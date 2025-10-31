@@ -54,8 +54,8 @@ export const OfferRow = new ActionRowBuilder<ButtonBuilder>()
     );
 
 // Event
-export const ongoingEvent = "anniversary" as SeasonalEvent;
-export const seasonalEventStart = new Date('2025-08-16 00:00:00');
+export const ongoingEvent = "halloween" as SeasonalEvent;
+export const seasonalEventStart = new Date('2025-11-01 00:00:00');
 export const seasonalEventLastsDays = 16;
 export const seasonalEventEnd = new Date(seasonalEventStart.getTime() + (seasonalEventLastsDays * 24 * 60 * 60 * 1000));
 export const isEventOngoing = () => seasonalEventStart.getTime() <= Date.now() && Date.now() < seasonalEventEnd.getTime();
@@ -65,6 +65,7 @@ export const requestVerification = new Map();
 export const dungeonTempBan = new Map();
 
 export const botPfp = "https://i.ibb.co/mDX54t4/Ta2YDBN.png";
+export const embedColor = 0xbbffff;
 
 export const donationWeekStart = new Date('2024-02-12T00:00:00');
 

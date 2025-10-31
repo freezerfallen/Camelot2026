@@ -12,19 +12,8 @@ import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
 import { getUserSchema, updateUsers } from '../Modules/queries';
-import { AbilityResponse } from '../Modules/components';
+import { AbilityResponse, OfferRow } from '../Modules/components';
 import { customHpBars } from '../Modules/customHpBars';
-
-const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-        .setCustomId('1')
-        .setLabel('Accept')
-        .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-        .setCustomId('0')
-        .setLabel('Decline')
-        .setStyle(ButtonStyle.Danger),
-);
 
 const exportCommand: SlashCommand = {
     name: 'arena',
@@ -853,17 +842,19 @@ const exportCommand: SlashCommand = {
             )
             .setFooter({ text: `Win Streak: ${stats.arenastreak} (Highest: ${stats.arenastreakhighest}) | Win Rate: ${Math.round((stats.arenawins / (stats.arenawins + stats.arenalosses)) * 100)}%` });
 
-        interaction.reply({ content: `<@${user.id}> ${interaction.user.username} challenges you to a battle`, embeds: [Embed], components: [row2] }).then(msg2 => {
+        interaction.reply({ content: `<@${user.id}> ${interaction.user.username} challenges you to a battle`, embeds: [Embed], components: [OfferRow] }).then(msg2 => {
 
             const collector = msg2.createMessageComponentCollector({ filter: (r) => ((r.user.id === user.id) || (r.user.id === interaction.user.id)), componentType: ComponentType.Button, time: 30000 });
 
             collector.on('collect', async r => {
-                if ((r.customId === "1") && (r.user.id === interaction.user.id)) return;
+                if ((r.customId === "confirm") && (r.user.id === interaction.user.id)) return;
                 collector.stop();
 
-                if (r.customId === "1") newFight();
-                else {
-                    msg2.edit({ content: `${user.username} has declined the challenge!`, components: [], embeds: [] });
+                if (r.customId === "confirm") {
+                    newFight();
+                } else {
+                    msg2.edit({ components: [] });
+                    interaction.followUp({ content: `${r.user.username} has cancelled the challenge` });
                     return;
                 };
             });

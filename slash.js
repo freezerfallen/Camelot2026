@@ -285,8 +285,8 @@ const commands = [
 		// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
 		// egg-hunt: See what you find! 🧺 🐰
 		data: new SlashCommandBuilder()
-			.setName('celebrate')
-			.setDescription('Claim your daily anniversary reward! 🎂 🎉')
+			.setName('trick-or-treat')
+			.setDescription('Trick, or treat? 👻 🍬')
 		// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
 		// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
 	}.data.toJSON(),
@@ -1559,6 +1559,11 @@ const commands = [
 		data: new SlashCommandBuilder()
 			.setName('support')
 			.setDescription('Get an invite link to our support server'),
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
+			.setName('survey')
+			.setDescription('Take a survey to help us improve'),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
