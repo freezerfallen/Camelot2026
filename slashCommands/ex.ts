@@ -32,7 +32,7 @@ const thumbnail = "https://i.ibb.co/ZRw9tB0D/firefly-ex.png";
 const expity = 24;
 
 const newex: { [key: string]: number; } = {
-    "25558": 0.016, // Firefly EX
+    "25695": 0.016, // Firefly EX
     "19277": 0.007, // SJW EX
     "23390": 0.003, // Garou EX
 
