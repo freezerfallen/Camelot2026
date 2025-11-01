@@ -1,5 +1,4 @@
 import express from 'express';
-import config from '../config.json';
 import { Client } from "discord.js";
 import { BotHandler } from "../types";
 import { Webhook } from '@top-gg/sdk';
@@ -19,12 +18,12 @@ const handler: BotHandler = {
     execute: async (client: Client) => {
 
         // Only if Camelot
-        if (config.clientId.active !== "706183309943767112") return;
+        if (process.env.CLIENT_ID !== "706183309943767112") return;
 
         const app = express();
         app.use(express.json());
 
-        const webhook = new Webhook(config.topgg.auth);
+        const webhook = new Webhook(process.env.TOPGG_AUTH);
 
         // Top.gg Webhook
         app.post('/dblwebhook', webhook.listener(async (vote) => {
@@ -68,7 +67,7 @@ const handler: BotHandler = {
             const vote = req.body;
 
             // Check if authorization is valid
-            if (req.headers.authorization !== config.rank.auth && vote.authorization !== config.rank.auth) {
+            if (req.headers.authorization !== process.env.RANK_AUTH && vote.authorization !== process.env.RANK_AUTH) {
                 return res.status(401).send('Unauthorized');
             };
 

@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { dailies } from "../Modules/dailyQuests";
 import { characters } from "../Modules/chars";
 import { EmbedBuilder } from "discord.js";
@@ -16,7 +15,7 @@ function getHash(key: string, hash: number) {
 
 function getQuests(id: string, len: number) {
     const quests = new Set<number>();
-    const key = new Intl.DateTimeFormat('en-UK', { timeZone: 'Europe/Berlin' }).format(new Date()).split("/").reverse().join("-") + id;
+    const key = new Intl.DateTimeFormat('en-UK', { timeZone: 'Etc/GMT-2' }).format(new Date()).split("/").reverse().join("-") + id;
     let i = 0;
     while (quests.size < 4 && i < 100) {
         const hash = getHash(key, i++);
@@ -28,8 +27,6 @@ function getQuests(id: string, len: number) {
 const exportCommand: SlashCommand = {
     name: 'quests',
     async execute({ interaction, author }) {
-
-        const customSettings = JSON.parse(fs.readFileSync('Storage/customSettings.json', 'utf8'));
 
         const user = interaction.options.getUser('user') ?? interaction.user;
 
@@ -56,7 +53,7 @@ const exportCommand: SlashCommand = {
         };
 
         let thumbnail = characters[stats.chars[Math.floor(Math.random() * stats.chars.length)]].image || "https://i.imgur.com/Ta2YDBN.png";
-        if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, customSettings[user.id]?.cimg[stats.favchar], stats.char_skin[stats.favchar]);
+        if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, stats.custom_skins[stats.favchar], stats.char_skin[stats.favchar]);
 
         const todaysQuests = getQuests(user.id, dailies.length);
 
