@@ -638,6 +638,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         damageFormula: attacker.damageFormula ?? matchStats.damageFormula,
         canTwinshot: true,
         isLightning: false,
+        isPyro: false,
         canCounter: true,
         normalATK: false,
         turn: 0,
@@ -752,9 +753,14 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         if (attacker.hp < 1) attacker.hp = 0;
     };
 
-    // Vulnerability
+    // Vulnerability // **For effects that have one-time vulnerability effects / only the highest apply (Replace)
     if (target.vulnerability) {
         damage = Math.floor(damage * target.vulnerability);
+    };
+
+    // Vulnerability (Dynamic) // **Only add / subtract from this, NEVER replace
+    if (target.vulnerabilityDynamic) {
+        damage = Math.floor(damage * target.vulnerabilityDynamic);
     };
 
     // Overwrite damage
@@ -892,6 +898,9 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         targetBuff.hp.push(new buffInfo("+", -Math.floor(0.06 * damage), attacker.guinaifenStackLast));
         attacker.guinaifenStackRounds.push(matchStats.round);
     };
+    if (options.isPyro) {
+        targetBuff.hp.push(new buffInfo("+", -Math.round(attacker.atk * 0.04), 3));
+    };
     // if (attacker.sjwUsedActive) {
     //     if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
     //     if (isCrit) { // Igris
@@ -916,9 +925,10 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         damage, isCrit,
         magicDamage: (options.magicDamage && options.mdChance < attacker.mdChance),
         isLightning: options.isLightning,
+        isPyro: options.isPyro,
         preventRetaliation: options.preventRetaliation,
     });
-    if (isCrit) matchStats.trigger("crit", attacker, target, attackerBuff, targetBuff, { damage });
+    if (isCrit) matchStats.trigger("crit", attacker, target, attackerBuff, targetBuff, { damage, normalATK: options.normalATK });
     else matchStats.trigger("noncrit", attacker, target, attackerBuff, targetBuff, { damage, normalATK: options.normalATK });
 
     return damage;
@@ -955,7 +965,7 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
         };
 
         // 2: General Heal reduction
-        if (attacker.reduceHealing) amount * (1 - attacker.reduceHealing);
+        if (attacker.reduceHealing) amount *= (1 - attacker.reduceHealing);
         if (amount > 0) target.hp += Math.floor(amount);
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
@@ -1293,7 +1303,7 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     // Beat floor 300
     if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
 
-    return total;
+    return 3;//total;
 };
 
 export const formatNumberWithQuotes = (num: number) => {
@@ -1637,23 +1647,23 @@ export const numberToRoman = (n: number): string => {
 };
 
 export const customEmojis: Record<PrimaryStat, string> = {
-    "hp": "<:HP:1062043800979116143>",
-    "hp%": "<:HP:1062043800979116143>",
-    "atk": "<:ATK:1063214925528440832>",
-    "atk%": "<:ATK:1063214925528440832>",
-    "def": "<:DEF:1047269141662417037>",
-    "def%": "<:DEF:1047269141662417037>",
-    "md": "<:magic_dmg:948568336621527040>",
-    "md%": "<:magic_dmg:948568336621527040>",
-    "mr": "<:magic_resistance:1047269149237334086>",
-    "cr": "<:crit_rate:1047269144195776512>",
-    "cd": "<:crit_damage:1047269146511016046>",
-    "dodge": "<:dodge_chance:1047269150948606063>",
-    "br": "<:block_rate:1217949026281066599>",
-    "mana": "<:mana:1047269152957661255>",
-    "sm": "<:mana:1047269152957661255>",
-    "mg": "<:mana_generation:1063215562349629570>",
-    "shield": "<:shield:1062050038211166310>",
+    "hp": "💖",
+    "hp%": "💖",
+    "atk": "⚔️",
+    "atk%": "⚔️",
+    "def": "🛡️",
+    "def%": "🛡️",
+    "md": "🪄",
+    "md%": "🪄",
+    "mr": "👕",
+    "cr": "🎯",
+    "cd": "💥",
+    "dodge": "💨",
+    "br": "🛡️",
+    "mana": "💧",
+    "sm": "💧",
+    "mg": "💦",
+    "shield": "💠",
 
     // "coins": "<:coins:872926669055356939>",
 };
