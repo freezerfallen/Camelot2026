@@ -24,19 +24,19 @@ const RUNES_FOR_SALE = [
 ] as const; // Total cost: 210
 
 const HP_BARS_FOR_SALE = [
-    { name: "Pumpkin Parade", id: 8, price: 70, isNew: true },
-    { name: "Poison Silk", id: 7, price: 70, isNew: true },
-    { name: "Velvet Night", id: 6, price: 70, isNew: true },
-    { name: "Coffee Brew", id: 1, price: 50, isNew: false },
-] as const; // Total cost: 250
+    { name: "Winter Brew", id: 9, price: 70, isNew: true },
+    { name: "Lucky Ribbon", id: 10, price: 70, isNew: true },
+    { name: "Padoru", id: 11, price: 70, isNew: true },
+    { name: "Pinkish Fantasy", id: 2, price: 50, isNew: false },
+] as const; // Total cost: 260
 
 const BACKGROUNDS_FOR_SALE = [
-    { name: "Festival of Shadows", id: 16, price: 80, isNew: true },
-    { name: "Devastation", id: 14, price: 60, isNew: true },
-    { name: "Augury", id: 15, price: 60, isNew: true },
-] as const; // Total cost: 200
+    { name: "Echoes of Frost", id: 17, price: 60, isNew: true },
+    { name: "Aurora Borealis", id: 18, price: 60, isNew: true },
+    { name: "Winter Solace", id: 19, price: 60, isNew: true },
+] as const; // Total cost: 180
 
-const SKIN_SEASON = "halloween season 2025"; // Total cost: 630
+const SKIN_SEASON = "winter season 2025"; // Total cost: 650
 
 const BuyKeysRow = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
@@ -227,7 +227,7 @@ const getShopPage = (currentTab: SeasonalShopTab, stats: CompactUserSchema): Con
                     .addComponents(
                         ...chunk.map((skin, i2) => new ButtonBuilder()
                             .setCustomId(`buy_skin_${skin.id}`)
-                            .setLabel(`${(i1 * 5) + i2 + 1}) ${skin.name.split(" ")[0]}`)
+                            .setLabel(`${(i1 * 5) + i2 + 1}) ${skin.name.split(" ")[0].length > 4 ? skin.name.split(" ")[0] : skin.name.split(" ")[0] + ` ${skin.name.split(" ")[1] || ""}`}`)
                             .setStyle(ButtonStyle.Secondary)
                             .setDisabled(stats.skins.includes(skin.id))
                         )
