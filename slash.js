@@ -515,6 +515,15 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('frostbound')
+			.setDescription('Winter event commands')
+			.addSubcommand((subcommand) => subcommand
+				.setName('yule')
+				.setDescription('Frostbound Yule story event')
+			),
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('generate')
 			.setDescription('Generate images')
 			.addStringOption(option => option.setName('type')
