@@ -454,6 +454,7 @@ export interface UserSchema {
 
     // Frostbound Yule event
     yule_chapter: number;
+    yule_chapter_failed: boolean;
     yule_timestamp: Date | null;
     perpetual_fire: number;
     perpetual_fragments: number;

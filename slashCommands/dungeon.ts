@@ -10,7 +10,7 @@ import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
 import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, formatNumberWithQuotes } from "../Modules/functions";
-import { requestVerification, dungeonTempBan, AbilityResponse } from "../Modules/components";
+import { requestVerification, dungeonTempBan, AbilityResponse, isEventOngoing } from "../Modules/components";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
@@ -449,6 +449,10 @@ const exportCommand: SlashCommand = {
                     dungeon_classlevels: { type: 'set', value: stats.dungeon_classlevels },
                     tutorial: { type: 'append_unique', value: [9] },
                     donatedtotal: { type: "increment", value: tax },
+
+                    ...(isEventOngoing() ? { perpetual_fire: { type: "increment", value: 1 } } : {}),
+                    ...(isEventOngoing() ? { perpetual_fragments: { type: "increment", value: 1 } } : {}),
+                    ...((isEventOngoing() && stats.perpetual_fire <= 0) ? { yule_chapter_failed: { type: "set", value: true } } : {}),
                 },
             });
 
