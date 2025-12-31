@@ -7836,8 +7836,8 @@ export const abilities: Record<number, Ability> = {
         usage: 1,
         used: 0,
         cost: 60,
-        desc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n**Role**: `DPS (Progressive, Nuke, Freeze)`\nAneira, the queen of frost, commands ice to move fluidly with her hands, able to pierce through armor and glide through flesh, staining the ice with red.\n\nShe passively gains **1** icicle ( <:icicle:1446880458498375701> ) every round, up to **40**. Using her active (:sparkles:), she no longer gains <:icicle:1446880458498375701> passively. Her ATK is altered to consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701>  >  20, the damage scaling is increased to **150%**. Her class skill is also altered, consuming **5** to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice. \n\nWhen <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, dealing **60%**, **80%** and alas **220%** damage, before freezing the enemy for **3** rounds, ensuring they remain in place for her brutal wrath of chill to any that oppose her.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n\n**__Passive__**: Gain **1** `Icicle` (<:icicle:1446880458498375701>) every round (Up to 40).\n\n**__Active (✨)__ - <Cross not my path>**\n> ?? enters a special state, utilizing her Icicles.\n- Stop gaining <:icicle:1446880458498375701> passively.\n- ATK (:crossed_swords:) is altered: Consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701> > 20, the damage scaling is increased to **150%**.\n- Class Skill (:fleur_de_lis:) is altered: Consume **5** <:icicle:1446880458498375701> to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice.\n- When <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, hitting **3** times (**60+80+220%** damage), then freezes the enemy for **3** rounds.",
+        desc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n**Role**: `DPS (Progressive, Nuke, Freeze)`\nAneira, the queen of frost, commands ice to move fluidly with her hands, able to pierce through armor and glide through flesh, staining the ice with red.\n\nShe passively gains **1** icicle ( <:icicle:1446880458498375701> ) every round, up to **40**. Using her active (:sparkles:), she no longer gains <:icicle:1446880458498375701>, permanently. Her ATK is altered to consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701>  >  20, the damage scaling is increased to **150%**. Her class skill is also altered, consuming **5** to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice. \n\nWhen <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, dealing **60%**, **80%** and alas **220%** damage, before freezing the enemy for **3** rounds, ensuring they remain in place for her brutal wrath of chill to any that oppose her.",
+        shortdesc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n\n**__Passive__**: Gain **1** `Icicle` (<:icicle:1446880458498375701>) every round (Up to 40).\n\n**__Active (✨)__ - <Cross not my path>**\n> ?? enters a special state, utilizing her Icicles.\n- Stop gaining <:icicle:1446880458498375701> permanently.\n- ATK (:crossed_swords:) is altered: Consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701> > 20, the damage scaling is increased to **150%**.\n- Class Skill (:fleur_de_lis:) is altered: Consume **5** <:icicle:1446880458498375701> to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice.\n- When <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, hitting **3** times (**60+80+220%** damage), then freezes the enemy for **3** rounds.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Aneira EX
             myStats.aneiraUsedActive = true;
@@ -7881,7 +7881,7 @@ export const abilities: Record<number, Ability> = {
                     eStats.timeFrozen = true;
                     let lastfrozenmsg = eStats.frozenMessage ? eStats.frozenMessage : "is frozen";
                     eStats.frozenMessage = "is frozen";
-                    myStats.aneiraUsedActive = false;
+                    //myStats.aneiraUsedActive = false;
                     delete myStats.replaceButton.atk;
                     delete myStats.replaceButton.cskill;
 
@@ -7907,11 +7907,13 @@ export const abilities: Record<number, Ability> = {
 
             // Gain icicle every round
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (!myStats.aneiraUsedActive) myStats.icicle++;
-                switch (myStats.icicle) {
-                    case 15: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **15** icicles.`); break;
-                    case 25: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **25** icicles.`); break;
-                    case 40: if (iciNotif) notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **40** icicles (maxed).`); iciNotif = 0; break;
+                if (!myStats.aneiraUsedActive) {
+                    myStats.icicle++;
+                    switch (myStats.icicle) {
+                        case 15: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **15** icicles.`); break;
+                        case 25: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **25** icicles.`); break;
+                        case 40: if (iciNotif) notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **40** icicles (maxed).`); iciNotif = 0; break;
+                    };
                 };
                 return AbilityResponse.SUCCESS;
             }, 9999));
