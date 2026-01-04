@@ -1702,7 +1702,7 @@ export const crazeBossAbilities2023: skillInfo[] = [
 
 ];
 
-export const crazeBossAbilities: skillInfo[] = [
+export const crazeBossAbilities2024: skillInfo[] = [
     new skillInfo(0, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         return AbilityResponse.SUCCESS;
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -2054,6 +2054,213 @@ export const crazeBossAbilities: skillInfo[] = [
     }, [16, "Sukuna"]),
 
 ];
+
+export const crazeBossAbilities: skillInfo[] = [
+    new skillInfo(0, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        return AbilityResponse.SUCCESS;
+    }, [1, "Dimensional Soul Eater"]),
+    new skillInfo(1, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        return AbilityResponse.SUCCESS;
+    }, [2, "Earth Golem"]),
+    new skillInfo(2, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        return AbilityResponse.SUCCESS;
+    }, [3, "Mime (E33)"]),
+    new skillInfo(3, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        // If nakama
+        if ([996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005].includes(char.id)) {
+            eStats.image = "https://i.ibb.co/rjmX2Xc/c.png";
+        };
+
+        // If fish equipped
+        const weapon = myStats.equipped_weapon_id !== null ? items[myStats.equipped_weapon_id] : null;
+        if (weapon?.type === "fish") {
+            eStats.image = "https://i.ibb.co/DfqJ9w79/c.png";
+            eStats.hp = Math.floor(eStats.hp * 0.02);
+            eStats.atk = 0;
+            eStats.md = 0;
+            eStats.def = 600;
+            eStats.mr = 600;
+            ebuff.atk.push(new buffInfo("=", 0, 9999));
+            ebuff.md.push(new buffInfo("=", 0, 9999));
+            ebuff.def.push(new buffInfo("=", 600, 9999));
+            ebuff.mr.push(new buffInfo("=", 600, 9999));
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [4, "Monkey D. Luffy"]),
+    new skillInfo(4, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        if (char.id === 1652) {
+            eStats.image = "https://i.ibb.co/sd4GXyTk/c.png";
+            eStats.hp = Math.floor(eStats.hp * 0.02);
+            eStats.atk = 5;
+            eStats.md = 5;
+            eStats.def = 0;
+            eStats.mr = 0;
+            ebuff.atk.push(new buffInfo("=", 5, 9999));
+            ebuff.md.push(new buffInfo("=", 5, 9999));
+            ebuff.def.push(new buffInfo("=", 0, 9999));
+            ebuff.mr.push(new buffInfo("=", 0, 9999));
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [5, "APPLe"]),
+    new skillInfo(5, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        return AbilityResponse.SUCCESS;
+    }, [6, "Puss in Boots"]),
+    new skillInfo(6, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        return AbilityResponse.SUCCESS;
+    }, [7, "Thorfinn"]),
+    new skillInfo(7, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        if (char.id === 1824 && !myStats.helmet && !myStats.cuirass && !myStats.gloves && !myStats.boots) {
+            eStats.hp = Math.floor(eStats.hp * 0.02);
+            eStats.atk = 0;
+            eStats.md = 0;
+            eStats.def = 0;
+            eStats.mr = 0;
+            ebuff.atk.push(new buffInfo("=", 0, 9999));
+            ebuff.md.push(new buffInfo("=", 0, 9999));
+            ebuff.def.push(new buffInfo("=", 0, 9999));
+            ebuff.mr.push(new buffInfo("=", 0, 9999));
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [8, "Satsuki Kiryuuin"]),
+    new skillInfo(8, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        if (char.name === "Tanjirou Kamado" && list[1].some((e: any) => e.name === "Giyuu Tomioka")) {
+            eStats.hp = Math.floor(eStats.hp * 0.03);
+            eStats.atk *= 0.5;
+            eStats.md *= 0.5;
+            eStats.def = 0;
+            eStats.mr = 0;
+            ebuff.atk.push(new buffInfo("*", 0.5, 9999));
+            ebuff.md.push(new buffInfo("*", 0.5, 9999));
+            ebuff.def.push(new buffInfo("=", 0, 9999));
+            ebuff.mr.push(new buffInfo("=", 0, 9999));
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [9, "Akaza"]),
+    new skillInfo(9, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.removeDefCap = true;
+
+        if (list[1].some((e: any) => e.name === "Serie")) {
+            eStats.image = "https://i.ibb.co/rfyf1yGF/c.png";
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [10, "Land"]),
+    new skillInfo(10, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        if (char.name === "Kanna Kamui") {
+            eStats.image = "https://i.ibb.co/zhbSWK6W/c.gif";
+            eStats.hp = 0;
+            eStats.dodge = 0;
+            eStats.br = 0;
+            notice.push(`\n🍽️ Kanna ate the world!`);
+        } else if (char.name === "Dio Brando") {
+            eStats.image = "https://i.ibb.co/wr2V7SMM/c.png";
+            notice.push(`\n<a:Jojo_Menacing_1:637672661505409064> ZA WARUDO!!`);
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [11, "The World"]),
+    new skillInfo(11, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        // list[2] = stats.craze_levels
+        if (list[2][11] < 0) {
+            eStats.image = "https://i.ibb.co/SD5s5yjg/c.png";
+        };
+
+        if ((list[2][11] === -10 && char.name === "Makima") || (list[2][11] > 0)) {
+            eStats.image = "https://i.ibb.co/0yH9fk9r/c.png";
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [12, "Reze"]),
+    new skillInfo(12, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        if ((list[2][12] === -2 && char.name === "Ram") || (list[2][12] > 0 && char.name === "Ram")) {
+            eStats.image = "https://i.ibb.co/x8qbm0Hc/c.png";
+            eStats.hp = 0;
+            notice.push(`\n🩸 So you've finally come to die, Barusu...`);
+        } else if (list[2][12] === -1 && char.name === "Emilia" && myStats.equipped_weapon_id == 686) {
+            eStats.image = "https://i.ibb.co/ZRqX66wz/c.png";
+            eStats.hp = 0;
+            notice.push(`\n🩸 No.. that can't be... that's a lie... you're lying!`);
+        } else if (list[2][12] < 0) {
+            eStats.image = "https://i.ibb.co/WW7bvFf1/c.png";
+
+            if (Math.random() < 0.5) {
+                notice.push(`\n🩸 The Purge King flips a coin... heads.`);
+                notice.push(`\n🩸 Don't worry, **${char.name}**, your family is safe for now.`);
+            } else {
+                notice.push(`\n🩸 The Purge King flips a coin... tails.`);
+                myStats.hp = 0;
+                myStats.rev = 0;
+                myStats.revhp = 0;
+            };
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [13, "Natsuki Subaru"]),
+    new skillInfo(13, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+
+        if (list[2][13] < 0) {
+            eStats.hp = 0;
+            notice.push(`\n☔ Mayuri has... Mayuri has passed away...`);
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, [14, "Mayuri Shiina"]),
+
+];
+
 
 export const rollingCowAbilities: skillInfo[] = [
     new skillInfo(0, 500, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

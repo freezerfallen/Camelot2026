@@ -245,7 +245,7 @@ export const skins: skinInfo[] = [
 
     // Frostbound Yule Event (Christmas 2025)
     new skinInfo("Aneira (Winter Veil)", 12394, "christmas event 2025", "skykey291", "", {}, "https://i.ibb.co/dsR2s0pM/aneira-bride.png", 167),
-    new skinInfo("Aneira (Glacial Waltz)", 25829, "christmas event 2025", "mercy4afool", "", {}, "https://i.ibb.co/hRRz1G6Y/aneira-skin.png", 168),
+    new skinInfo("Aneira EX (Glacial Waltz)", 25829, "christmas event 2025", "mercy4afool", "", {}, "https://i.ibb.co/hRRz1G6Y/aneira-skin.png", 168),
 
 
     // new skinInfo("Monster Garou", 23390, "fall season 2025", "skykey291", "", { season_keys: 0 }, "https://i.ibb.co/kVP4TCBZ/image.png", 127),

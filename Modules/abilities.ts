@@ -7567,7 +7567,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "6308": {
+    "25828": {
         usage: 9999,
         used: 0,
         cost: 80,
@@ -7832,7 +7832,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "1": {
+    "25829": {
         usage: 1,
         used: 0,
         cost: 60,

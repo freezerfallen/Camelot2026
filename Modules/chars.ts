@@ -18221,11 +18221,11 @@ export const characters: charInfo[] = [
     new charInfo("Macht", [], anime[457], "M", "https://i.ibb.co/6PZkcWk/c.png", 18116, "C"),
     new charInfo("Aura", [], anime[457], "F", "https://i.ibb.co/9wHpCk2/c.png", 18117, "S"),
     new charInfo("Denken", [], anime[457], "M", "https://i.ibb.co/mCgHb7M/c.png", 18118, "C"),
-    new charInfo("Serie", [], anime[457], "F", "https://i.ibb.co/JBXzf9S/c.png", 18119, "B"),
+    new charInfo("Serie", [], anime[457], "F", "https://i.ibb.co/3y2wcxQw/c.png", 18119, "B"),
     new charInfo("Linie", [], anime[457], "F", "https://i.ibb.co/z7q9ZV2/c.png", 18120, "B"),
     new charInfo("Sense", [], anime[457], "F", "https://i.ibb.co/NpTBTkr/c.png", 18121, "D"),
     new charInfo("Stoltz", [], anime[457], "M", "https://i.ibb.co/QYGBJkg/c.png", 18122, "C"),
-    new charInfo("Land", [], anime[457], "M", "https://i.ibb.co/2hnMJV9/c.png", 18123, "D"),
+    new charInfo("Land", [], anime[457], "M", "https://i.ibb.co/j9gwjVCX/c.png", 18123, "A"),
     new charInfo("Lügner", [], anime[457], "M", "https://i.ibb.co/9VkpYwc/c.png", 18124, "C"),
     new charInfo("Qual", [], anime[457], "M", "https://i.ibb.co/pjhqgsj/c.png", 18125, "C"),
     new charInfo("Kraft", [], anime[457], "M", "https://i.ibb.co/9NH8YKB/c.png", 18126, "D"),
@@ -25929,8 +25929,8 @@ export const characters: charInfo[] = [
     new charInfo("Aiselle Wolf", [], anime[687], "F", "https://i.ibb.co/8g5723vX/c.png", 25825, "A"),
     new charInfo("Flame", [], anime[687], "F", "https://i.ibb.co/tMp0WCkJ/c.png", 25826, "B"),
     new charInfo("Yu-Seong Ma", ["Descendant of the Dark Mage King", "Filthy Blood", "Mixed Blood"], anime[687], "M", "https://i.ibb.co/cKJq3tfy/c.png", 25827, "S"),
-    new charInfo("Yor Forger EX", ["Yor EX", "Yor Briar EX"], anime[195], "F", "https://i.ibb.co/0yGMFbv/c.png", 25828, "EX"), //! Replace Image
-    new charInfo("Aneira EX", [], anime[242], "F", "https://i.ibb.co/3SSXkHJ/c.png", 25829, "EX"), //! Replace Image
+    new charInfo("Yor Forger EX", ["Yor EX", "Yor Briar EX"], anime[195], "F", "https://i.ibb.co/tpk9fQyC/yor.gif", 25828, "EX"),
+    new charInfo("Aneira EX", [], anime[242], "F", "https://i.ibb.co/rKQWNqQm/aneira-ex.gif", 25829, "EX"),
     new charInfo("Amelia Rozequarts", [], anime[688], "F", "https://i.ibb.co/TDh6kXJV/c.png", 25830, "S"),
     new charInfo("Akira Oda", [], anime[688], "M", "https://i.ibb.co/PdtPyCd/c.png", 25831, "S"),
     new charInfo("Latticenail", [], anime[688], "F", "https://i.ibb.co/FL76wmQT/c.png", 25832, "A"),
@@ -25991,6 +25991,8 @@ export const characters: charInfo[] = [
     new charInfo("Chiyo's Residence's Cat", ["Chiyo-chan-ke no Neko"], anime[693], "F", "https://i.ibb.co/Wv6xDBC1/c.png", 25887, "B"),
     new charInfo("Chiyo no Haha", ["Chiyo's Mother"], anime[693], "F", "https://i.ibb.co/wZ8TX5z8/c.png", 25888, "D"),
     new charInfo("Shitsuji Joshi", ["Butler Woman"], anime[693], "F", "https://i.ibb.co/Z1b0R3nd/c.png", 25889, "D"),
+    new charInfo("Reze", [], anime[243], "F", "https://i.ibb.co/tT0vbp07/c.png", 25890, "SS"),
+    new charInfo("Übel", ["Ubel"], anime[457], "F", "https://i.ibb.co/8nYyJ0Y8/c.png", 25891, "S"),
 
 ];
 
@@ -26049,7 +26051,7 @@ characters.forEach((e, i) => {
 // // Print
 // {
 //     let totalChars = 0, totalAnime = 0;
-//     for (let i = 674; i < anime.length; i++) {
+//     for (let i = 683; i < anime.length; i++) {
 //         const numberOfChars = characters.filter(char => char.animeInfo.id === anime[i].id).length;
 //         console.log(`  - **${anime[i].name}** (${numberOfChars} chars)`);
 //         totalChars += numberOfChars;
