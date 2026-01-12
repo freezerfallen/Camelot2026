@@ -18,10 +18,10 @@ const SEASON_END_DATE = new Date('2025-12-20 00:00:00');
 const loadedImages: Record<string | number, Image> = {};
 
 const RUNES_FOR_SALE = [
-    { name: "Wailing Lantern", item: items[789] as runeInfo, price: 80, isNew: true },
-    { name: "Hollow Crown", item: items[788] as runeInfo, price: 70, isNew: true },
-    { name: "Coinmark of Riches", item: items[786] as runeInfo, price: 60, isNew: false },
-] as const; // Total cost: 210
+    { name: "Eirfrost von Neira", item: items[790] as runeInfo, price: 80, isNew: true },
+    { name: "Voidseer", item: items[791] as runeInfo, price: 80, isNew: true },
+    { name: "Valkyrie Sigil", item: items[787] as runeInfo, price: 60, isNew: false },
+] as const; // Total cost: 220
 
 const HP_BARS_FOR_SALE = [
     { name: "Winter Brew", id: 9, price: 70, isNew: true },

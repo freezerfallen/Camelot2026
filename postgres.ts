@@ -525,11 +525,11 @@ async function alterTables() {
     await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_skins JSONB DEFAULT '{}' NOT NULL;`);
 
     // Frostbound Yule event
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter_failed BOOLEAN DEFAULT FALSE NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_timestamp TIMESTAMP');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fire INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fragments INT DEFAULT 0 NOT NULL');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter INT DEFAULT 0 NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter_failed BOOLEAN DEFAULT FALSE NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_timestamp TIMESTAMP;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fire INT DEFAULT 0 NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fragments INT DEFAULT 0 NOT NULL;');
 
 
 

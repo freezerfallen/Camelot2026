@@ -6442,10 +6442,39 @@ export const items = [
 
             return AbilityResponse.SUCCESS;
         },
-    }, "- Once per round after using **ATK**, inflicts `Spooked`, decreasing ATK and MD by **15%** for **2** rounds.\n- When using the active ability, deals **160%** magic damage.", "rare", 789)
+    }, "- Once per round after using **ATK**, inflicts `Spooked`, decreasing ATK and MD by **15%** for **2** rounds.\n- When using the active ability, deals **160%** magic damage.", "rare", 789),
 
+    new runeInfo("Eirfrost von Neira", ["seasonal shop"], "<:EirfrostvonNeira:1453761105460596888>", "https://i.ibb.co/VcBN52YM/Eirfrost-von-Neira.png", {
+        cost: 80,
+        usage: 3,
+        used: 0,
+        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
+            eStats.timeFrozen = true;
+            eStats.frozenMessage = "is frozen in place";
+            eStats.vulnerability += 0.05;
 
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                eStats.timeFrozen = false;
 
+                return AbilityResponse.SUCCESS;
+            }));
+
+            return AbilityResponse.SUCCESS;
+        },
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.vulnerability += 0.1;
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Applies **10%** vulnerability to the enemy.\n- When using the active ability, freezes the enemy for **3** rounds, and increases vulnerability by **+5%** permanently.", "rare", 790),
+
+    new runeInfo("Voidseer", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            matchStats.xpboost += 0.1;
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Increases class xp earned from the dungeon by **+10%**.", "rare", 791),
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;

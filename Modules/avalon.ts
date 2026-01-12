@@ -85,7 +85,7 @@ export default class Avalon {
         if (stability === null) return "";
         if (stability <= 0) return "<:stability0:1439087950314078269>";
         if (stability <= 25) return "<:stability1:1439088092370960404>";
-        if (stability <= 50) return "<:stability2:1439088127523164220>";
+        if (stability <= 50) return "<:stability2:1446880353263423528>";
         if (stability <= 75) return "<:stability3:1439088164101816330>";
         if (stability <= 100) return "<:stabilityfull:1439088205159993518>";
         return "";
@@ -99,7 +99,7 @@ export default class Avalon {
             switch (true) {
                 case side.stability <= 0: iconbar += "<:stability0:1446880287396200599>"; break;
                 case side.stability <= 25: iconbar += "<:stability1:1446880326029934714>"; break;
-                case side.stability <= 50: iconbar += "<:stability2:1439088127523164220>"; break;
+                case side.stability <= 50: iconbar += "<:stability2:1446880353263423528>"; break;
                 case side.stability <= 75: iconbar += "<:stability3:1446880381327376425>"; break;
                 case side.stability <= 100: iconbar += "<:stabilityfull:1446880407579656243>"; break;
             };

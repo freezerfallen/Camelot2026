@@ -953,7 +953,7 @@ export const updateUsers = async (
                             ? 'integer'
                             : 'text'
                         : 'text';
-                    return `${key} = (
+                    return `${key} = COALESCE((
                         SELECT array_agg(orig.elem ORDER BY orig.idx)
                         FROM (
                             SELECT elem,
@@ -969,7 +969,7 @@ export const updateUsers = async (
                         ON orig.elem = rem.elem
                         AND orig.rn = rem.rn
                         WHERE rem.elem IS NULL
-                    )`;
+                    ), '{}')`;
                 case 'remove_all':
                     const arrayType = Array.isArray(value) && value.length > 0
                         ? typeof value[0] === 'number'
@@ -1155,7 +1155,7 @@ export const updateGuilds = async (
                             ? 'integer'
                             : 'text'
                         : 'text';
-                    return `${key} = (
+                    return `${key} = COALESCE((
                         SELECT array_agg(orig.elem ORDER BY orig.idx)
                         FROM (
                             SELECT elem,
@@ -1171,7 +1171,7 @@ export const updateGuilds = async (
                         ON orig.elem = rem.elem
                         AND orig.rn = rem.rn
                         WHERE rem.elem IS NULL
-                    )`;
+                    ), '{}')`;
                 case 'remove_all':
                     const arrayType = Array.isArray(value) && value.length > 0
                         ? typeof value[0] === 'number'
@@ -1247,7 +1247,7 @@ export const updateParties = async (
                             ? 'integer'
                             : 'text'
                         : 'text';
-                    return `${key} = (
+                    return `${key} = COALESCE((
                         SELECT array_agg(orig.elem ORDER BY orig.idx)
                         FROM (
                             SELECT elem,
@@ -1263,7 +1263,7 @@ export const updateParties = async (
                         ON orig.elem = rem.elem
                         AND orig.rn = rem.rn
                         WHERE rem.elem IS NULL
-                    )`;
+                    ), '{}')`;
                 case 'remove_all':
                     const arrayType = Array.isArray(value) && value.length > 0
                         ? typeof value[0] === 'number'
