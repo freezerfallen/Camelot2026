@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User } from "discord.js";
+import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User, Embed } from "discord.js";
 import imagesize from 'imagesize';
 import axios from 'axios';
 import sharp from 'sharp';
@@ -772,7 +772,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     if (options.canCounter && target.counter > 0 && (!isNaN(target.counterchance) ? target.counterchance : 1) > Math.random() && !attacker.blockCounter) {
         target.counter--;
         notice.push(`\n<:counter:1340459549374546032> **${target.name}** countered the attack!`);
-        if (target.soulfistAtkStack !== undefined) {
+        /*if (target.soulfistAtkStack !== undefined) {
             if (target.soulfistAtkStack++ < 5) {
                 targetBuff.atk.push(new buffInfo("*", 1.03, 9999));
                 targetBuff.md.push(new buffInfo("*", 1.03, 9999));
@@ -780,13 +780,13 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
                 target.sm += 10;
                 if (target.sm > target.mana) target.sm = target.mana;
             };
-        };
+        };*/
 
         // Event Triggers
         matchStats.trigger("counter", attacker, target, attackerBuff, targetBuff, { damage });
         matchStats.trigger("miss", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
 
-        return dealDamage(attacker, target, attackerBuff, targetBuff, matchStats, notice, `⚔️ **${target.name}**`, flags);
+        return dealDamage(attacker, target, attackerBuff, targetBuff, matchStats, notice, `${target.replaceCounterEmoji ? target.replaceCounterEmoji : "⚔️"} **${target.name}**`, { atkMultiplier: target.replaceCounter ? target.replaceCounter : 1, ...(flags || {}) });
     };
 
     // Evade Deadly Attack
@@ -1302,7 +1302,7 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     // Beat floor 300
     if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
 
-    return total;
+    return 3; //total;
 };
 
 export const formatNumberWithQuotes = (num: number) => {
@@ -1646,25 +1646,25 @@ export const numberToRoman = (n: number): string => {
 };
 
 export const customEmojis: Record<PrimaryStat, string> = {
-    "hp": "<:HP:1062043800979116143>",
-    "hp%": "<:HP:1062043800979116143>",
-    "atk": "<:ATK:1063214925528440832>",
-    "atk%": "<:ATK:1063214925528440832>",
-    "def": "<:DEF:1047269141662417037>",
-    "def%": "<:DEF:1047269141662417037>",
-    "md": "<:magic_dmg:948568336621527040>",
-    "md%": "<:magic_dmg:948568336621527040>",
-    "mr": "<:magic_resistance:1047269149237334086>",
-    "cr": "<:crit_rate:1047269144195776512>",
-    "cd": "<:crit_damage:1047269146511016046>",
-    "dodge": "<:dodge_chance:1047269150948606063>",
-    "br": "<:block_rate:1217949026281066599>",
-    "mana": "<:mana:1047269152957661255>",
-    "sm": "<:mana:1047269152957661255>",
-    "mg": "<:mana_generation:1063215562349629570>",
-    "shield": "<:shield:1062050038211166310>",
+    "hp": "💖",
+    "hp%": "💖",
+    "atk": "⚔️",
+    "atk%": "⚔️",
+    "def": "🛡️",
+    "def%": "🛡️",
+    "md": "🪄",
+    "md%": "🪄",
+    "mr": "👕",
+    "cr": "🎯",
+    "cd": "💥",
+    "dodge": "💨",
+    "br": "🛡️",
+    "mana": "💧",
+    "sm": "💧",
+    "mg": "💦",
+    "shield": "💠",
 
-    // "coins": "<:coins:872926669055356939>",
+    // "coins": ":coins:",
 };
 
 export const RoK = new Map<string, IRoK>();

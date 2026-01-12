@@ -636,6 +636,111 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
+    "2596": {
+        usage: 1,
+        used: 0,
+        cost: 50,
+        desc: "**Uses**: `1`\n**Cost**: `50 💧`\n**Timeout**: `True`\n**Tags**: `DPS`\nAkame wields her trusty Murasame, rendering the enemy *incapable of healing*. Moreover, the lethal power of the weapon allows Akame to execute the enemy immediately when have less than **10%** max HP.\n\nUtilizing her active, she cuts herself with Murasame, accepting the souls slain by the blade. This grants her the [<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] status for the rest of the fight, until she runs out of mana.\n\n[<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] :\n- Its TIER increases by **1** every **10** rounds with the status, up to TIER <:tierV:1459382519483994224>.\n- She has  **+8%** ATK for every TIER, and *enhances* her ATK and DEF. However, she loses **4** :droplet: and **1.5%** max HP every round for every TIER.(Not counted as a DoT, HP cannot fall below **1** from this effect).\n- If she has less than **30%** HP remaining and has a higher TIER than <:tierI:1459382388227444952>, she may lower the TIER by **1** and recover **40%** missing HP. The same logic applies to when she runs out of mana to sustain the status. Yet if she is already at TIER <:tierI:1459382388227444952>, she will simply lose the entire status.\n\nPassively, her ATK and DEF are altered:\n- ⚔️: Deal **80%** damage and inflict a **12%** DoT over **2** rounds.\n- <:akameATK:1459382352248832123> - Enhanced: Deal **110%** damage and inflict a **24%** DoT over **3** rounds.\n\n- 🛡️: Has a **40%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **20** :droplet:\n- <:akameDEF:1459446152469418004> - Enhanced: Has a **80%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **40** :droplet:\n\nIn a party:\n- Akame will turn to fight Esdeath if they are in the same party, making both flee from the ongoing battle.",
+        shortdesc: "Refer to full desc for now",
+        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
+            // Akame
+            imageChange(embed, matchStats, myStats, "https://i.ibb.co/rGJtSn1q/RB53Rja.gif");
+            notice.push(`\n🩸 **${char.name}** cut herself with her Murasame...`);
+            myStats.elimination = 1;
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.elimination = 0;
+            myStats.counter ??= 0;
+            myStats.defCD = 0;
+            myStats.executeHP = Math.max(0.1, myStats.executeHP); // Execute enemy when they are below 10% HP
+            myStats.negateHeal = 1;
+
+            if (matchStats.interaction.commandName === "stampede") {
+                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
+                if (names.includes("Esdeath")) {
+                    notice.push(`\n✨ Not a target.`);
+                    myStats.hp = 0;
+                };
+            };
+
+            // ATK-alter
+            myStats.replaceButton.atk = {
+                "emoji": "<:akameATK:1459382352248832123>",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    let emoji = myStats.elimination ? "<:akameATK:1459382352248832123>" : "⚔️", atkScale = myStats.elimination ? 1.1 : 0.8, dot = myStats.elimination ? 0.08 : 0.06, dotRounds = myStats.elimination ? 3 : 2;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `${emoji} **${char.name}**`, { atkMultiplier: atkScale, combodmg: true, selfdmg: true, selfheal: true });
+                    ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.atk * dot), dotRounds));
+
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            // DEF-alter
+            myStats.replaceButton.def = {
+                "emoji": "<:akameDEF:1459446152469418004>",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    if (myStats.defCD > matchStats.round) {
+                        noTimeout(matchStats, myStats);
+                        matchStats.sendWarning({ content: `**${char.name}** needs to rest ${myStats.defCD - matchStats.round} more ${myStats.defCD - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                        return AbilityResponse.FAILURE;
+                    };
+                    myStats.defCD = matchStats.round + 4;
+                    let counterChance = myStats.elimination ? 0.8 : 0.4, manaGain = myStats.elimination ? 40 : 20;
+                    if (Math.random() < counterChance) {
+                        myStats.counter = Math.max(myStats.counter, 1);
+                        notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** prepares to counter the next hit.`);
+                    } else {
+                        myStats.sm += manaGain;
+                        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                        notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** gained **${manaGain}** 💧.`);
+                    };
+
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.elimination) {
+                    let tier = Math.floor(myStats.elimination / 10) + 1;
+                    if (myStats.sm < 4 * tier) {
+                        if (myStats.elimination > 10) {
+                            myStats.elimination -= 10;
+                            notice.push(`\n✨ **${char.name}** ran out of mana and lowered the elimination TIER by **1**`);
+                        } else {
+                            notice.push(`\n✨ **${char.name}** ran out of mana and lost the <:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010> status`);
+                            myStats.elimination = 0;
+                            imageChange(embed, matchStats, myStats, "https://i.ibb.co/T8bv1kS/c.png");
+                        };
+                    } else {
+                        if (myStats.elimination < 40) myStats.elimination++;
+                        myStats.atk += Math.floor(myStats.atk * 0.08 * tier);
+                        myStats.sm -= 4 * tier;
+                        myStats.hp -= Math.floor(myStats.maxhp * 0.015 * tier);
+                        if (myStats.hp <= 0) myStats.hp = 1;
+                        if (myStats.hp / myStats.maxhp < 0.3 && myStats.elimination > 10) {
+                            myStats.elimination -= 10;
+                            let hpBefore = myStats.hp;
+                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.4), {});
+                            notice.push(`\n✨ **${char.name}** fell below **30%** HP and lowered the elimination TIER by **1** to recover **${myStats.hp - hpBefore}** HP`);
+                        }
+                    };
+                };
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (myStats.name === "Esdeath") {
+                myStats.hp = 0;
+                notice.push(`\n✨ You deserve your reputation, Akame.`);
+            };
+
+            return AbilityResponse.SUCCESS;
+        },
+    },
     "2814": {
         usage: 1,
         used: 0,
@@ -3155,6 +3260,132 @@ export const abilities: Record<number, Ability> = {
 
                 notice.push(`\n✨ Arataka Reigen entered his 1000% state! Consuming Mob's psychic powers...`);
             };
+
+            return AbilityResponse.SUCCESS;
+        },
+    },
+    "14126": {
+        usage: 1,
+        used: 0,
+        cost: 250,
+        desc: "Check shortdesc",
+        shortdesc: "**Uses**: `1`\n**Cost**: `250 💧`\n**Timeout**: `No`\n**Role**: `DPS`\n\n__**Passive**__:\n> Accelerator changes between different wing states based on his emotional state, reflected through his <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>.\n\n<:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>: [ <a:stability:1451561886339436675> ] : Starts off at **50%**, which then changes based on Accelerator's actions. When it reaches **0%** or **100%** through his actions, refreshes back to **50%** after **4** rounds.\n> At 100%, he gains __White :wing:__\n> At 0%, he gains __Black <:blackwing:1459920122549633285> __\n> Else, he is __Wingless__\n\nHis ATK and DEF are both altered.\nATK - Off the chain\n- When with <:blackwing:1459920122549633285> and he has **100%** critical rate, deals **150%** damage and recovers **15%** max HP, before losing **10%** critical rate. If he does not have max critical rate, only deals **120%** damage.\n- Else: deals **90%** damage and raises critical rate by **2%** permanently, then lowers <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **10%**.\n\nDEF - The Undefined\n- When with :wing:, recovers **8%** max HP and deflects **66%** of incoming damage this round.\n- Else: recovers **5%** max HP and deflects **33%** of incoming damage this round, before raising <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **10%**.\n\n__**Active**__ (:sparkles:) - Spear of Imaginary Vectors\n- Deals **20%** damage for every **5%** of missing <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> on self.\n- Gains a protective shield equal to **5%** max HP for every **5%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> on self.\n- Inflict a permanent **18%** vulnerability effect on the enemy\n\n__**Party ability** (:busts_in_silhouette:)__: He initially harms allies, costing them **5%** max HP every round for **20** rounds. However by having a change of heart, he transitions into a role of protection, with a **20%** chance to counter incoming hits for them.\n\n-# Note: His <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> effect can only be triggered once at a time, i.e. When it is awaiting a refresh, other stability-burst effects (e.g. Weakpoint) will not be triggered, vice versa.",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Accelerator
+            // Deal 20% damage for every 5% missing STAB. Gain 5% max HP shield for every 5% STAB
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.2 * Math.floor((100 - myStats.stability) / 5) });
+            myStats.shield += Math.floor((myStats.maxhp * 0.05) * Math.floor(myStats.stability / 5));
+
+            eStats.vulnerabilityDynamic += 0.18;
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            myStats.stability = 50;
+            eStats.ignoreSTABILITY = false;
+            eStats.vulnerabilityDynamic ??= 1;
+            myStats.wing = 0; // (1 = Black, 2 = White)
+
+            // Fun text
+            notice.push(`\n<a:stability:1451561886339436675> The <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> effect has been activated`);
+
+            // Alters ATK
+            myStats.replaceButton.atk = {
+                "emoji": "<:blackwing:1459920122549633285>",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    switch (true) {
+                        case (myStats.wing === 1 && myStats.cr >= 1):
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15));
+                            myStats.cr -= 0.1;
+                            if (myStats.cr < 0) myStats.cr = 0;
+                            mybuff.cr.push(new buffInfo("+", -0.1, 9999));
+                            break;
+                        case (myStats.wing === 1 && myStats.cr <= 1):
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                            break;
+                        default:
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                            myStats.cr += 0.02;
+                            mybuff.cr.push(new buffInfo("+", 0.02, 9999));
+                            myStats.stability -= 10;
+                            if (myStats.stability <= 0 && !eStats.ignoreSTABILITY) {
+                                eStats.ignoreSTABILITY = true;
+                                myStats.wing = 1;
+                                notice.push(`\n<:blackwing:1459920122549633285> **${char.name}** lost all <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> and gained __Black Wings__`);
+                                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                    myStats.stability = 50;
+                                    eStats.ignoreSTABILITY = false;
+                                    myStats.wing = 0;
+                                    notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>`);
+                                    matchStats.trigger("stabilRefresh", myStats, eStats, mybuff, ebuff);
+                                    return AbilityResponse.SUCCESS;
+                                }));
+                            };
+                    };
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            // Alters DEF
+            myStats.replaceButton.def = {
+                "emoji": "🪽",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    switch (true) {
+                        case (myStats.wing === 2):
+                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.08));
+                            myStats.deflectDamage = 0.66;
+                            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                myStats.deflectDamage = 0;
+                                return AbilityResponse.SUCCESS;
+                            }));
+                            break;
+                        default:
+                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05));
+                            myStats.deflectDamage = 0.33;
+                            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                myStats.deflectDamage = 0;
+                                return AbilityResponse.SUCCESS;
+                            }));
+                            myStats.stability += 10;
+                            if (myStats.stability >= 100 && !eStats.ignoreSTABILITY) {
+                                eStats.ignoreSTABILITY = true;
+                                notice.push(`\n🪽 **${char.name}** reached maximum <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> and gained __White Wings__.`);
+                                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                    myStats.stability = 50;
+                                    eStats.ignoreSTABILITY = false;
+                                    notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>`);
+                                    matchStats.trigger("stabilRefresh", myStats, eStats, mybuff, ebuff);
+                                    return AbilityResponse.SUCCESS;
+                                }));
+                            };
+                            break;
+                    };
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            // Get WINGS based off stability at the start of the round
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                switch (myStats.stability) {
+                    case (100): myStats.wing = 2; break;
+                    case (0): myStats.wing = 1; break;
+                    default: myStats.wing = 0; break;
+                };
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.counter ??= 0;
+            mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 20));
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 20, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (Math.random() < 0.2) {
+                    myStats.counter++;
+                };
+                return AbilityResponse.SUCCESS;
+            }, 9999));
 
             return AbilityResponse.SUCCESS;
         },
@@ -6029,7 +6260,7 @@ export const abilities: Record<number, Ability> = {
                     myStats.volatileNote = 0;
                     myStats.phrState = 2;
                     notice.push(`\n✨ **${char.name}** entered the __Maestro__ state`);
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> *Wails... Rejoicing!* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1458819590162485309> *Wails... Rejoicing!* **${char.name}**`, { atkMultiplier: 0.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
                     // Maestro immediate effects: Stun for 1 round
                     eStats.timeFrozen = true;
@@ -6054,7 +6285,7 @@ export const abilities: Record<number, Ability> = {
 
                     // By the end of Maestro: Deal 150% damage
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 6, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> *Chant, songs of old!* **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1458819590162485309> *Chant, songs of old!* **${char.name}**`, { atkMultiplier: 1.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
                         myStats.phrState = myStats.phrState = 1 ? 1 : 0;
                         imageChange(embed, matchStats, myStats, "https://i.ibb.co/chjTjNDY/c.png");
                         return AbilityResponse.SUCCESS;
@@ -6070,7 +6301,7 @@ export const abilities: Record<number, Ability> = {
                 run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     myStats.atkcount++;
                     let atkScale = [0.9, 1.1, 1.2][myStats.phrState];
-                    let flairemoji = ["<:rednote:1417513133559386303>", "🎵", "<:purplenote:1417513260453990450>"][myStats.phrState];
+                    let flairemoji = ["<:rednote:1458819362168373281>", "🎵", "<:purplenote:1458819429814243457>"][myStats.phrState];
                     if (myStats.atkcount === 3) {
                         myStats.atkcount = 0;
                         if (myStats.phrState === 0) {
@@ -6126,8 +6357,8 @@ export const abilities: Record<number, Ability> = {
             myStats.phrbuff = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round % 10 === 0) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1417507350486712320> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1458819590162485309> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:spiderlily:1458819590162485309> **${name}**'s Hecate`, { atkMultiplier: 0.8, magicDamage: true, mdChance: -1 });
                     if (myStats.phrbuff < 5) {
                         myStats.phrbuff++;
                         myStats.atk += Math.floor(myStats.atk * 0.02);
@@ -7572,8 +7803,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 80,
         pause: -7,
-        desc: "**Uses**: `Unlimited (CD: 6)`\n**Cost**: `80 💧`\n**Timeout**: `False`\n**Role**: `DPS (Stability, Weakpoint)`\n\nYor Forger may seem like an ordinary office clerk on the surface, but is secretly a Garden assistant, known for her great physical power through punches and kicks.\n\nAt the onset of the fight, she lands a surprise attack, dealing **150%** critical true damage to the enemy. Moreover, she interacts with the stability [ [ <a:stability:1451561886339436675> ] ] effect. The enemy enters battles with **100%** `STABILITY`. Every critical strike landed on the enemy reduces their `STABILITY` by **2%**. When it reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, `STABILITY` resets to **100%**.\n\nWith great intuition, Yor can often execute opponents in rapid succession, through multiple consecutive actions. Her active (:sparkles:) allows her to make haste for **3** rounds. During this period, every time she lands a critical hit, she can make another action (counted as no timeout, up to **2** times).\n\nBy the end of the effect, for every time she gained another action, she has a **20%** chance to disarm the enemy, lowering their ATK & MD by **15%**, while doubling the `STABILITY` loss from critical strikes for **3** rounds, allowing her to quickly break the opponent down.\n\nIn a party, Yor Forger applies her great insight over the battlefield to allies. The `STABILITY` and `WEAKPOINT` mechanic is applied universally to all of ally's battles.",
-        shortdesc: "< «•   Passives   •» >\n- When starting combat: Deals **150%** critical true Damage.\n\n< «•  __Core Mechanic__   •» >\n> *Yor focuses on accumulating critical strikes to wear down the enemy's defense.* [ <a:stability:1451561886339436675> ]\n- The enemy enters battles with **100%** `STABILITY`. Every critical strike landed on the enemy reduces their `STABILITY` by **2%**.\n- When `STABILITY` reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, `STABILITY` resets to **100%**.\n\n< «• __Active (✨)__  •» >\nUses: `Unlimited (CD: 6)`\nCost: `80 💧`\nTimeout: `False`\n> *Yor makes haste, making multiple actions every round*\n\nFor **3** rounds:\n- Every time she lands a critical hit: she gains another action (counted as no timeout, up to **2** additional actions)\n- By the end of the effect, for every time she gained another action, she has a **20%** chance to decrease their ATK/MD by **15%** and doubling the `STABILITY` lost from critical strikes for **3** rounds\n\n< «• __Party (👥)__  •» >\n- Applies the `STABILITY` and `WEAKPOINT` mechanic to all ally's battles",
+        desc: "**Uses**: `Unlimited (CD: 6)`\n**Cost**: `80 💧`\n**Timeout**: `False`\n**Role**: `DPS (Stability, Weakpoint)`\n\nYor Forger may seem like an ordinary office clerk on the surface, but is secretly a Garden assistant, known for her great physical power through punches and kicks.\n\nAt the onset of the fight, she lands a surprise attack, dealing **150%** critical true damage to the enemy. Moreover, she interacts with the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> [ [ <a:stability:1451561886339436675> ] ] effect. The enemy enters battles with **100%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. Every critical strike landed on the enemy reduces their <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **2%**. When it reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> resets to **100%**.\n\nWith great intuition, Yor can often execute opponents in rapid succession, through multiple consecutive actions. Her active (:sparkles:) allows her to make haste for **3** rounds. During this period, every time she lands a critical hit, she can make another action (counted as no timeout, up to **2** times).\n\nBy the end of the effect, for every time she gained another action, she has a **20%** chance to disarm the enemy, lowering their ATK & MD by **15%**, while doubling the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> loss from critical strikes for **3** rounds, allowing her to quickly break the opponent down.\n\nIn a party, Yor Forger applies her great insight over the battlefield to allies. The <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> and `WEAKPOINT` mechanic is applied universally to all of ally's battles.",
+        shortdesc: "< «•   Passives   •» >\n- When starting combat: Deals **150%** critical true Damage.\n\n< «•  __Core Mechanic__   •» >\n> *Yor focuses on accumulating critical strikes to wear down the enemy's defense.* [ <a:stability:1451561886339436675> ]\n- The enemy enters battles with **100%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. Every critical strike landed on the enemy reduces their <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **2%**.\n- When <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> resets to **100%**.\n\n< «• __Active (✨)__  •» >\nUses: `Unlimited (CD: 6)`\nCost: `80 💧`\nTimeout: `False`\n> *Yor makes haste, making multiple actions every round*\n\nFor **3** rounds:\n- Every time she lands a critical hit: she gains another action (counted as no timeout, up to **2** additional actions)\n- By the end of the effect, for every time she gained another action, she has a **20%** chance to decrease their ATK/MD by **15%** and doubling the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> lost from critical strikes for **3** rounds\n\n< «• __Party (👥)__  •» >\n- Applies the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> and `WEAKPOINT` mechanic to all ally's battles",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Yor Forger EX
             noTimeout(matchStats, myStats);
@@ -7625,7 +7856,7 @@ export const abilities: Record<number, Ability> = {
             myStats.ignoreSTABILITY = false;
 
             // Fun text
-            notice.push(`\n<a:stability:1451561886339436675> The STABILITY effect has been activated`);
+            notice.push(`\n<a:stability:1451561886339436675> The <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> effect has been activated`);
 
             // Reduce stability / grants timeout false after crits
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
@@ -7733,8 +7964,8 @@ export const abilities: Record<number, Ability> = {
         usage: 0,
         used: 0,
         cost: 0,
-        desc: "**Role**: `DPS/Support (Stability, Weakpoint)`\n\nLoid forger is an undercover spy, adept at makeshifting and completing whatever missions given at quick speed.\n\nHe interacts with the stability [ <a:stability:1451561886339436675> ] effect. The enemy enters battles with **100%** `STABILITY`. Every critical strike landed on the enemy reduces their STABILITY by **2%**. When `STABILITY` reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, `STABILITY` resets to **100%**.\n\nHis own ATTACK is altered depending on enemy's `STABILITY`. If the enemy has **50%+** stability, it deals **80%** damage and gives himself **24%** incoming damage mitigation. Else, he uses [Twilight].\n\n[Twilight] : Increases own ATK by **1%** for every **2%** missing stability from the enemy, up to +28%, for **1** round. Then he deals **140%** undodgeable damage. If the enemy is in `WEAKPOINT`, instead deals **170%** undodgeable damage.\n\nIn a party, loid analyzes all personnel for outcome maximization. If the `STABILITY` mechanic is active, the enemy will only have **1%** `STABILITY` upon entering battle. Moreover, after the reset of `STABILITY`, the enemy immediately loses **33%** `STABILITY`. Else, the ally will have **+12%** ATK simply.",
-        shortdesc: "**Tags**: `DPS (STABILITY, Nuke)`\n\n< «• Core Mechanic •» >\n> Loid focuses on accumulating critical strikes to wear down the enemy's defense. [ <a:stability:1451561886339436675> ]\n- The enemy enters battles with **100%** `STABILITY`. Every critical strike landed on the enemy reduces their `STABILITY` by **2%**.\n- When `STABILITY` reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds.\n- After **4** rounds, `STABILITY` resets to **100%**.\n\n< «• Passives •» >\n> Loid dons a separate identity for every mission, only showing his true colors when necessary\n- Own ATTACK ( :crossed_swords: ) is altered depending on the enemy's stability.\n- If the enemy has **50%+** stability: Deals **80%** damage and gain **24%** incoming damage mitigation\n- Else, own ATK is instead altered to [Twilight]\n[Twilight] :\n- The lower the enemy's `STABILITY`, the higher his ATK (**2%** = **1%** ATK, up to +28% ATK). This ATK boost lasts for that round only.\n- Deals **140%** undodgeable damage. If the enemy is in `WEAKPOINT`, instead deals **170%** undodgeable damage\n\n< «• Party (:busts_in_silhouette:) •» >\n> Loid requires time to analyze all personnel for outcome maximization.\n- If the `STABILITY` mechanic is active, the enemy will only have **1%** `STABILITY` upon entering battle. Moreover, after the reset of `STABILITY`, the enemy immediately loses **33%** `STABILITY`.\n- Else, the ally will have **+12%** ATK.",
+        desc: "**Role**: `DPS/Support (Stability, Weakpoint)`\n\nLoid forger is an undercover spy, adept at makeshifting and completing whatever missions given at quick speed.\n\nHe interacts with the stability [ <a:stability:1451561886339436675> ] effect. The enemy enters battles with **100%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. Every critical strike landed on the enemy reduces their <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **2%**. When <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds. After **4** rounds, <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> resets to **100%**.\n\nHis own ATTACK is altered depending on enemy's <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. If the enemy has **50%+** stability, it deals **80%** damage and gives himself **24%** incoming damage mitigation. Else, he uses [Twilight].\n\n[Twilight] : Increases own ATK by **1%** for every **2%** missing stability from the enemy, up to +28%, for **1** round. Then he deals **140%** undodgeable damage. If the enemy is in `WEAKPOINT`, instead deals **170%** undodgeable damage.\n\nIn a party, loid analyzes all personnel for outcome maximization. If the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> mechanic is active, the enemy will only have **1%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> upon entering battle. Moreover, after the reset of <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>, the enemy immediately loses **33%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. Else, the ally will have **+12%** ATK simply.",
+        shortdesc: "**Tags**: `DPS (Stability, Nuke)`\n\n< «• Core Mechanic •» >\n> Loid focuses on accumulating critical strikes to wear down the enemy's defense. [ <a:stability:1451561886339436675> ]\n- The enemy enters battles with **100%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>. Every critical strike landed on the enemy reduces their <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> by **2%**.\n- When <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> reaches **0%**, triggers `WEAKPOINT`, stunning the enemy and lowering their DEF/MR by **50%** (Up to 2.5x damage) the next **2** rounds.\n- After **4** rounds, <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> resets to **100%**.\n\n< «• Passives •» >\n> Loid dons a separate identity for every mission, only showing his true colors when necessary\n- Own ATTACK ( :crossed_swords: ) is altered depending on the enemy's stability.\n- If the enemy has **50%+** stability: Deals **80%** damage and gain **24%** incoming damage mitigation\n- Else, own ATK is instead altered to [Twilight]\n[Twilight] :\n- The lower the enemy's <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>, the higher his ATK (**2%** = **1%** ATK, up to +28% ATK). This ATK boost lasts for that round only.\n- Deals **140%** undodgeable damage. If the enemy is in `WEAKPOINT`, instead deals **170%** undodgeable damage\n\n< «• Party (:busts_in_silhouette:) •» >\n> Loid requires time to analyze all personnel for outcome maximization.\n- If the <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> mechanic is active, the enemy will only have **1%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> upon entering battle. Moreover, after the reset of <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>, the enemy immediately loses **33%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>.\n- Else, the ally will have **+12%** ATK.",
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             // Loid Forger
             eStats.stability = 100;
@@ -7743,7 +7974,7 @@ export const abilities: Record<number, Ability> = {
             myStats.putDamageOnHold ??= 0;
 
             // Fun text
-            notice.push(`\n<a:stability:1451561886339436675> The STABILITY effect has been activated`);
+            notice.push(`\n<a:stability:1451561886339436675> The <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> effect has been activated`);
 
             // Reduce stability
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
@@ -7773,7 +8004,7 @@ export const abilities: Record<number, Ability> = {
                         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                             eStats.stability = 100;
                             myStats.ignoreSTABILITY = false;
-                            notice.push(`\n💠 **${enemy.name}** regained **100%** stability.`);
+                            notice.push(`\n💠 **${enemy.name}** regained **100%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>.`);
                             matchStats.trigger("stabilRefresh", myStats, eStats, mybuff, ebuff);
 
                             return AbilityResponse.SUCCESS;
@@ -7817,12 +8048,12 @@ export const abilities: Record<number, Ability> = {
             if (eStats.stability) {
                 if (eStats.stability > 1) {
                     eStats.stability = 1;
-                    notice.push(`\n<a:stability:1451561886339436675> **${pStats.name}** lowered the enemy's STABILITY to **1%**`);
+                    notice.push(`\n<a:stability:1451561886339436675> **${pStats.name}** lowered the enemy's <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655> to **1%**`);
                 };
                 matchStats.on("stabilRefresh", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                     if (target == eStats) {
                         eStats.stability -= 33;
-                        notice.push(`\n<a:stability:1451561886339436675> **${enemy.name}** lost **33%** STABILITY`);
+                        notice.push(`\n<a:stability:1451561886339436675> **${enemy.name}** lost **33%** <:stab1:1460280813450039493><:stab2:1460280844311855175><:stab3:1460280869842583655>`);
                     };
                 });
             } else {

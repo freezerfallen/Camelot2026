@@ -349,23 +349,40 @@ export const skills: skillInfo[] = [
         myStats.classUsed ||= 0;
         myStats.classUsed++;
 
+        // 50% damage mitigation ; heal 50% less
+        myStats.damageReduction = Math.max(0.5, myStats.damageReduction);
+        eStats.reduceHealing = Math.max(0.5, eStats.reduceHealing);
+
+        matchStats.on("attack", { // When attacked, deal 120% damage and triggers counter effects twice
+            maxRound: 10,
+            callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === eStats && target === myStats && myStats.soulfistCap < 2 && myStats.counterchance > 0) {
+                    let dmg = dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚜️ **${char.name}** retaliated and`, { atkMultiplier: 1.2 });
+                    matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { damage: dmg });
+                    matchStats.trigger("counter", eStats, myStats, ebuff, mybuff, { damage: dmg });
+                    myStats.soulfistCap++;
+                };
+            }
+        });
+
         // Change counter chance
-        myStats.counterchanceBeforeActive = myStats.counterchance;
-        myStats.counterchance = 1;
-        matchStats.playerPausingRounds = 3;
+        //myStats.counterchanceBeforeActive = myStats.counterchance;
+        //myStats.counterchance = 1;
+        //matchStats.playerPausingRounds = 3;
 
         // After the domain
-        myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.counterchance = myStats.counterchanceBeforeActive;
-            const shred = Math.min(0.4, myStats.counterchance);
+        myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            //myStats.counterchance = myStats.counterchanceBeforeActive;
+            const shred = 0.2;//Math.min(0.4, myStats.counterchance);
             ebuff.def.push(new buffInfo("+", -Math.min(eStats.def * shred, 872), 9999));
             ebuff.mr.push(new buffInfo("+", -Math.min(eStats.mr * shred, 872), 9999));
             eStats.def -= Math.floor(Math.min(eStats.def * shred, 872));
             eStats.mr -= Math.floor(Math.min(eStats.mr * shred, 872));
+            notice.push(`\n⚜️ **${char.name}** has exited __Dormant Sage__ and decreased the enemy's DEF/MR by **${shred * 100}**%.`);
 
-            if (myStats.counterchance > 0.4) {
-                mybuff.cd.push(new buffInfo("+", Math.min(0.2, myStats.counterchance - 0.4), 9999));
-            };
+            //if (myStats.counterchance > 0.4) {
+            //mybuff.cd.push(new buffInfo("+", Math.min(0.2, myStats.counterchance - 0.4), 9999));
+            //};
 
             myStats.counterchance = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -376,17 +393,33 @@ export const skills: skillInfo[] = [
             return AbilityResponse.SUCCESS;
         }));
 
-        notice.push(`\n⚜️ **${char.name}** has entered Dormant Sage for 3 turns.`);
+        notice.push(`\n⚜️ **${char.name}** has entered __Dormant Sage__ for **10** turns.`);
 
         return AbilityResponse.SUCCESS;
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        myStats.soulfistAtkStack = 0;
-        myStats.counterchance = 0.18;
-        myStats.counter = 1;
+        myStats.soulfistCap = 0;
+        myStats.soulfistBuff = 0;
+        myStats.counterchance = 0.2;
+        myStats.soulfistLastHeal = -1;
+        myStats.counter ??= 0;
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.counter += 1;
+            myStats.soulfistCap = 0;
+            if (myStats.counterchance > Math.random()) myStats.counter += 1;
             return AbilityResponse.SUCCESS;
         }, 9999));
+
+        matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+            if (target == myStats && myStats.soulfistBuff < 5) {
+                mybuff.atk.push(new buffInfo("*", 1.05, 9999));
+                mybuff.md.push(new buffInfo("*", 1.05, 9999));
+                myStats.soulfistBuff++;
+            } else {
+                if (myStats.soulfistLastHeal !== matchStats.round) {
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05 * Math.min(matchStats.round - myStats.soulfistLastHeal, 5)), {});
+                    myStats.soulfistLastHeal = matchStats.round;
+                };
+            };
+        });
 
         return AbilityResponse.SUCCESS;
     }),

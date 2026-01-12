@@ -95,7 +95,7 @@ export default class Avalon {
         let iconbar = "";
 
         // ABILITY-SPECIFIC
-        if (side.stability !== null || side.stability !== false) { // Stability - Yor Forger & Loid Forger
+        if (side.stability !== null || side.stability !== false) { // Stability - Yor Forger, Loid Forger, Accelerator
             switch (true) {
                 case side.stability <= 0: iconbar += "<:stability0:1446880287396200599>"; break;
                 case side.stability <= 25: iconbar += "<:stability1:1446880326029934714>"; break;
@@ -120,6 +120,23 @@ export default class Avalon {
             switch (side.formX) {
                 case 1: iconbar += "🚶🏻‍♂️"; break;
                 case 2: iconbar += "<:Xskill:1446886746204799159>"; break;
+            };
+        };
+
+        if (side.elimination) { // Akame
+            switch (Math.floor(side.elimination / 10)) {
+                case 0: iconbar += "<:tierI:1459382388227444952>"; break;
+                case 1: iconbar += "<:tierII:1459382415536423064>"; break;
+                case 2: iconbar += "<:tierIII:1459382445072842783>"; break;
+                case 3: iconbar += "<:tierIV:1459382483882606674>"; break;
+                case 4: iconbar += "<:tierV:1459382519483994224>"; break;
+            };
+        };
+
+        if (side.wing) {
+            switch (side.wing) {
+                case 1: iconbar += "<:blackwing:1459920122549633285>"; break;
+                case 2: iconbar += "🪽"; break;
             };
         };
 
