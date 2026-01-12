@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User, Embed } from "discord.js";
+import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User } from "discord.js";
 import imagesize from 'imagesize';
 import axios from 'axios';
 import sharp from 'sharp';
@@ -786,7 +786,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         matchStats.trigger("counter", attacker, target, attackerBuff, targetBuff, { damage });
         matchStats.trigger("miss", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
 
-        return dealDamage(attacker, target, attackerBuff, targetBuff, matchStats, notice, `${target.replaceCounterEmoji ? target.replaceCounterEmoji : "⚔️"} **${target.name}**`, { atkMultiplier: target.replaceCounter ? target.replaceCounter : 1, ...(flags || {}) });
+        return dealDamage(attacker, target, attackerBuff, targetBuff, matchStats, notice, `⚔️ **${target.name}**`, { flags });
     };
 
     // Evade Deadly Attack
