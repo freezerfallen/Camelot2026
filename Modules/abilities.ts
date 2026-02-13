@@ -638,111 +638,111 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "2596": {
-        usage: 1,
-        used: 0,
-        cost: 50,
-        desc: "**Uses**: `1`\n**Cost**: `50 💧`\n**Timeout**: `True`\n**Tags**: `DPS`\nAkame wields her trusty Murasame, rendering the enemy *incapable of healing*. Moreover, the lethal power of the weapon allows Akame to execute the enemy immediately when have less than **10%** max HP.\n\nUtilizing her active, she cuts herself with Murasame, accepting the souls slain by the blade. This grants her the [<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] status for the rest of the fight, until she runs out of mana.\n\n[<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] :\n- Its TIER increases by **1** every **10** rounds with the status, up to TIER <:tierV:1461197069799653468>.\n- She has  **+8%** ATK for every TIER, and *enhances* her ATK and DEF. However, she loses **4** :droplet: and **1.5%** max HP every round for every TIER.(Not counted as a DoT, HP cannot fall below **1** from this effect).\n- If she has less than **30%** HP remaining and has a higher TIER than <:tierI:1461197271134634176>, she may lower the TIER by **1** and recover **40%** missing HP. The same logic applies to when she runs out of mana to sustain the status. Yet if she is only at TIER <:tierI:1461197271134634176>, she will simply lose the entire status.\n\nPassively, her ATK and DEF are altered:\n- ⚔️: Deal **80%** damage and inflict a **12%** DoT over **2** rounds.\n- <:akameATK:1459382352248832123> - Enhanced: Deal **110%** damage and inflict a **24%** DoT over **3** rounds.\n\n- 🛡️: Has a **40%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **20** :droplet:\n- <:akameDEF:1459446152469418004> - Enhanced: Has a **80%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **40** :droplet:\n\nIn a party:\n- Akame will turn to fight Esdeath if they are in the same party, making both flee from the ongoing battle.",
-        shortdesc: "Refer to full desc for now",
-        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
-            // Akame
-            imageChange(embed, matchStats, myStats, "https://i.ibb.co/rGJtSn1q/RB53Rja.gif");
-            notice.push(`\n🩸 **${char.name}** cut herself with her Murasame...`);
-            myStats.elimination = 1;
+    // "2596": {
+    //     usage: 1,
+    //     used: 0,
+    //     cost: 50,
+    //     desc: "**Uses**: `1`\n**Cost**: `50 💧`\n**Timeout**: `True`\n**Tags**: `DPS`\nAkame wields her trusty Murasame, rendering the enemy *incapable of healing*. Moreover, the lethal power of the weapon allows Akame to execute the enemy immediately when have less than **10%** max HP.\n\nUtilizing her active, she cuts herself with Murasame, accepting the souls slain by the blade. This grants her the [<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] status for the rest of the fight, until she runs out of mana.\n\n[<:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010>] :\n- Its TIER increases by **1** every **10** rounds with the status, up to TIER <:tierV:1461197069799653468>.\n- She has  **+8%** ATK for every TIER, and *enhances* her ATK and DEF. However, she loses **4** :droplet: and **1.5%** max HP every round for every TIER.(Not counted as a DoT, HP cannot fall below **1** from this effect).\n- If she has less than **30%** HP remaining and has a higher TIER than <:tierI:1461197271134634176>, she may lower the TIER by **1** and recover **40%** missing HP. The same logic applies to when she runs out of mana to sustain the status. Yet if she is only at TIER <:tierI:1461197271134634176>, she will simply lose the entire status.\n\nPassively, her ATK and DEF are altered:\n- ⚔️: Deal **80%** damage and inflict a **12%** DoT over **2** rounds.\n- <:akameATK:1459382352248832123> - Enhanced: Deal **110%** damage and inflict a **24%** DoT over **3** rounds.\n\n- 🛡️: Has a **40%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **20** :droplet:\n- <:akameDEF:1459446152469418004> - Enhanced: Has a **80%** chance to counter the next hit (unstackable, CD: 4). If it fails, instead rejuvenates **40** :droplet:\n\nIn a party:\n- Akame will turn to fight Esdeath if they are in the same party, making both flee from the ongoing battle.",
+    //     shortdesc: "Refer to full desc for now",
+    //     ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
+    //         // Akame
+    //         imageChange(embed, matchStats, myStats, "https://i.ibb.co/rGJtSn1q/RB53Rja.gif");
+    //         notice.push(`\n🩸 **${char.name}** cut herself with her Murasame...`);
+    //         myStats.elimination = 1;
 
-            return AbilityResponse.SUCCESS;
-        },
-        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.elimination = 0;
-            myStats.counter ??= 0;
-            myStats.defCD = 0;
-            myStats.executeHP = Math.max(0.1, myStats.executeHP); // Execute enemy when they are below 10% HP
-            myStats.negateHeal = 1;
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.elimination = 0;
+    //         myStats.counter ??= 0;
+    //         myStats.defCD = 0;
+    //         myStats.executeHP = Math.max(0.1, myStats.executeHP); // Execute enemy when they are below 10% HP
+    //         myStats.negateHeal = 1;
 
-            if (matchStats.interaction.commandName === "stampede") {
-                const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
-                if (names.includes("Esdeath")) {
-                    notice.push(`\n✨ Not a target.`);
-                    myStats.hp = 0;
-                };
-            };
+    //         if (matchStats.interaction.commandName === "stampede") {
+    //             const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
+    //             if (names.includes("Esdeath")) {
+    //                 notice.push(`\n✨ Not a target.`);
+    //                 myStats.hp = 0;
+    //             };
+    //         };
 
-            // ATK-alter
-            myStats.replaceButton.atk = {
-                "emoji": "<:akameATK:1459382352248832123>",
-                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    let emoji = myStats.elimination ? "<:akameATK:1459382352248832123>" : "⚔️", atkScale = myStats.elimination ? 1.1 : 0.8, dot = myStats.elimination ? 0.08 : 0.06, dotRounds = myStats.elimination ? 3 : 2;
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `${emoji} **${char.name}**`, { atkMultiplier: atkScale, combodmg: true, selfdmg: true, selfheal: true });
-                    ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.atk * dot), dotRounds));
+    //         // ATK-alter
+    //         myStats.replaceButton.atk = {
+    //             "emoji": "<:akameATK:1459382352248832123>",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 let emoji = myStats.elimination ? "<:akameATK:1459382352248832123>" : "⚔️", atkScale = myStats.elimination ? 1.1 : 0.8, dot = myStats.elimination ? 0.08 : 0.06, dotRounds = myStats.elimination ? 3 : 2;
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `${emoji} **${char.name}**`, { atkMultiplier: atkScale, combodmg: true, selfdmg: true, selfheal: true });
+    //                 ebuff.hp.push(new buffInfo("+", -Math.floor(myStats.atk * dot), dotRounds));
 
-                    return AbilityResponse.SUCCESS;
-                },
-            };
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
 
-            // DEF-alter
-            myStats.replaceButton.def = {
-                "emoji": "<:akameDEF:1459446152469418004>",
-                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    if (myStats.defCD > matchStats.round) {
-                        noTimeout(matchStats, myStats);
-                        matchStats.sendWarning({ content: `**${char.name}** needs to rest ${myStats.defCD - matchStats.round} more ${myStats.defCD - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-                        return AbilityResponse.FAILURE;
-                    };
-                    myStats.defCD = matchStats.round + 4;
-                    let counterChance = myStats.elimination ? 0.8 : 0.4, manaGain = myStats.elimination ? 40 : 20;
-                    if (Math.random() < counterChance) {
-                        myStats.counter = Math.max(myStats.counter, 1);
-                        notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** prepares to counter the next hit.`);
-                    } else {
-                        myStats.sm += manaGain;
-                        if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                        notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** gained **${manaGain}** 💧.`);
-                    };
+    //         // DEF-alter
+    //         myStats.replaceButton.def = {
+    //             "emoji": "<:akameDEF:1459446152469418004>",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 if (myStats.defCD > matchStats.round) {
+    //                     noTimeout(matchStats, myStats);
+    //                     matchStats.sendWarning({ content: `**${char.name}** needs to rest ${myStats.defCD - matchStats.round} more ${myStats.defCD - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //                     return AbilityResponse.FAILURE;
+    //                 };
+    //                 myStats.defCD = matchStats.round + 4;
+    //                 let counterChance = myStats.elimination ? 0.8 : 0.4, manaGain = myStats.elimination ? 40 : 20;
+    //                 if (Math.random() < counterChance) {
+    //                     myStats.counter = Math.max(myStats.counter, 1);
+    //                     notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** prepares to counter the next hit.`);
+    //                 } else {
+    //                     myStats.sm += manaGain;
+    //                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+    //                     notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** gained **${manaGain}** 💧.`);
+    //                 };
 
-                    return AbilityResponse.SUCCESS;
-                },
-            };
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (myStats.elimination) {
-                    let tier = Math.floor(myStats.elimination / 10) + 1;
-                    if (myStats.sm < 4 * tier) {
-                        if (myStats.elimination > 10) {
-                            myStats.elimination -= 10;
-                            notice.push(`\n✨ **${char.name}** ran out of mana and lowered the elimination TIER by **1**`);
-                        } else {
-                            notice.push(`\n✨ **${char.name}** ran out of mana and lost the <:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010> status`);
-                            myStats.elimination = 0;
-                            imageChange(embed, matchStats, myStats, "https://i.ibb.co/T8bv1kS/c.png");
-                        };
-                    } else {
-                        if (myStats.elimination < 40) myStats.elimination++;
-                        myStats.atk += Math.floor(myStats.atk * 0.08 * tier);
-                        myStats.sm -= 4 * tier;
-                        myStats.hp -= Math.floor(myStats.maxhp * 0.015 * tier);
-                        if (myStats.hp <= 0) myStats.hp = 1;
-                        if (myStats.hp / myStats.maxhp < 0.3 && myStats.elimination > 10) {
-                            myStats.elimination -= 10;
-                            let hpBefore = myStats.hp;
-                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.4), {});
-                            notice.push(`\n✨ **${char.name}** fell below **30%** HP and lowered the elimination TIER by **1** to recover **${myStats.hp - hpBefore}** HP`);
-                        }
-                    };
-                };
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (myStats.elimination) {
+    //                 let tier = Math.floor(myStats.elimination / 10) + 1;
+    //                 if (myStats.sm < 4 * tier) {
+    //                     if (myStats.elimination > 10) {
+    //                         myStats.elimination -= 10;
+    //                         notice.push(`\n✨ **${char.name}** ran out of mana and lowered the elimination TIER by **1**`);
+    //                     } else {
+    //                         notice.push(`\n✨ **${char.name}** ran out of mana and lost the <:elim1:1459193294478377226><:elim2:1459193356772053115><:elim3:1459193398614561026><:elim4:1459193442629452010> status`);
+    //                         myStats.elimination = 0;
+    //                         imageChange(embed, matchStats, myStats, "https://i.ibb.co/T8bv1kS/c.png");
+    //                     };
+    //                 } else {
+    //                     if (myStats.elimination < 40) myStats.elimination++;
+    //                     myStats.atk += Math.floor(myStats.atk * 0.08 * tier);
+    //                     myStats.sm -= 4 * tier;
+    //                     myStats.hp -= Math.floor(myStats.maxhp * 0.015 * tier);
+    //                     if (myStats.hp <= 0) myStats.hp = 1;
+    //                     if (myStats.hp / myStats.maxhp < 0.3 && myStats.elimination > 10) {
+    //                         myStats.elimination -= 10;
+    //                         let hpBefore = myStats.hp;
+    //                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.4), {});
+    //                         notice.push(`\n✨ **${char.name}** fell below **30%** HP and lowered the elimination TIER by **1** to recover **${myStats.hp - hpBefore}** HP`);
+    //                     }
+    //                 };
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
 
-            return AbilityResponse.SUCCESS;
-        },
-        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            if (myStats.name === "Esdeath") {
-                myStats.hp = 0;
-                notice.push(`\n✨ You deserve your reputation, Akame.`);
-            };
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         if (myStats.name === "Esdeath") {
+    //             myStats.hp = 0;
+    //             notice.push(`\n✨ You deserve your reputation, Akame.`);
+    //         };
 
-            return AbilityResponse.SUCCESS;
-        },
-    },
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     "2814": {
         usage: 1,
         used: 0,
@@ -978,17 +978,17 @@ export const abilities: Record<number, Ability> = {
     //     used: 0,
     //     cost: 0,
     //     pause: 0,
-    //     desc: "**Total Usage**: `unlimited`\n**Mana**: `50 (Can be substituted with 15% max HP, HP cost increased by 0.7% after every use starting from the 11th use)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **15%** (Up to 2x DMG), lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **15%** of his max HP to elevate his arms. HP cost increased by **0.7%** after every use starting from the **11th** use. If his HP is above **1** after the consumption, he slams the shot, dealing **120%** DMG and boosting his ATK by **10%** for **2** rounds. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **240%** DMG, boosting his ATK by **20%** for **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
-    //     shortdesc: "**Uses**: `Unlimited`\n**Cost**: `50 💧 (Can be substituted with 15% max HP, HP cost increased by 0.7% after every use starting from the 11th use)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **15%** permanently (Up to 2x DMG) \n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **15%** max HP instead as substitute.\n- HP cost increased by **0.7%** after every use starting from the **11th** use\n\nIf he is at **1** HP or more:\n- Deals **120%** DMG\n- Increases ATK by **10%** for **2** rounds\n\nElse:\n- Remains at **1** HP\n- Deals **240%** DMG\n- Increases ATK by **20%** for **2** rounds\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
+    //     desc: "**Total Usage**: `unlimited`\n**Mana**: `60 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **15%** (Up to 2x DMG), lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **15%** of his max HP to elevate his arms. HP cost increased by **0.7%** after every use starting from the **11th** use. If his HP is above **1** after the consumption, he slams the shot, dealing **120%** DMG and boosting his ATK by **10%** for **2** rounds. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **240%** DMG, boosting his ATK by **20%** for **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
+    //     shortdesc: "**Uses**: `Unlimited`\n**Cost**: `60 💧 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **15%** permanently (Up to 2x DMG) \n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **15%** max HP instead as substitute.\n- HP cost increased by **0.7%** after every use starting from the **11th** use\n\nIf he is at **1** HP or more:\n- Deals **120%** DMG\n- Increases ATK by **10%** for **2** rounds\n\nElse:\n- Remains at **1** HP\n- Deals **240%** DMG\n- Increases ATK by **20%** for **2** rounds\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
     //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
     //         // Taiga Kagami
 
     //         // Active cost
-    //         if (myStats.sm < 50) {
-    //             let hpCost = myStats.maxhp * (0.15 + (this.used >= 10 ? this.used - 10 : 0) * 0.007);
+    //         if (myStats.sm < 60) {
+    //             let hpCost = myStats.maxhp * (0.18 + (this.used >= 10 ? this.used - 10 : 0) * 0.009);
     //             myStats.hp -= Math.floor(hpCost);
     //         } else {
-    //             myStats.sm -= 50;
+    //             myStats.sm -= 60;
     //         };
 
     //         // Meteor Jam
@@ -3273,132 +3273,132 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "14126": {
-        usage: 1,
-        used: 0,
-        cost: 250,
-        desc: "**Total Usage**: `1`\n**Cost**: `250 💧`\n**Timeout**: `No`\n**Role**: `DPS (Stability)`\n\nAs one of the most formidable espers in the city, Accelerator is masterful at manipulating vectors, whilst computing combat calculations through the Misaka Network.\n\nAt the outset of the battle, he interacts with the <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> [ <a:stability:1451561886339436675> ] mechanic, which starts off at **50%**. When it reaches **0%** or **100%**, refreshes back to **50%** after **4** rounds. This can be changed with his actions:\n\nHis `ATK` deals **90%** damage and raises critical rate by **2%**, while losing **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> in the process. On the otherhand, his `DEF` recovers **5%** max HP and deflects **33%** of incoming damage, before recovering **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>\n\n> At **100%**, he gains __White :wing:__ (w/ DEF)\n> At **0%**, he gains __Black <:blackwing:1459920122549633285>__ (w/ ATK)\n> Else, he is __Wingless__\n\nHis `ATK` w/ <:blackwing:1459920122549633285> have enhanced effects: When at **100%** critical rate, it deals **140%** damage, recovers **15%** max HP, then lowers critical rate by **10%**. Else, it simply deals **110%** damage. As for his `DEF`, it too has enhanced effects w/ :wing:, recovering **8%** max HP and deflecting **66%** of incoming damage instead of the default amount.\n\nHis active casts Spear of Imaginary Vectors, piercing through the enemy. This deals **20%** damage for every **5%** of missing <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self, and grants him a protective shield equal to **5%** max HP for every **5%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self. Alas, the sheer power of vectors nflict a permanent **12%** vulnerability effect on the enemy (take +12% damage)\n\nIn a party, he initially harms allies, costing them **5%** max HP every round for **20** rounds. However by having a change of heart, he transitions into a role of protection, with a **20%** chance to counter incoming hits for them.\n\n-# Note: His <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect can only be triggered once at a time, i.e. When it is awaiting a refresh, other stability-burst effects (e.g. Weakpoint) will not be triggered, vice versa.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `250 💧`\n**Timeout**: `No`\n**Role**: `DPS (Stability)`\n\n__**Passive**__:\n<:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> [ <a:stability:1451561886339436675> ] : Starts off at **50%**. When it reaches **0%** or **100%** through his actions, refreshes back to **50%** after **4** rounds. This can be changed with his actions:\n\nATK: Deals **90%** damage and raises critical rate by **2%**, then loses **10%** stability\n\nDEF: Recovers **5%** max HP and deflects **33%** of incoming damage, then gains **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>\n\n> At **100%**, he gains __White :wing:__ (w/ DEF)\n> At **0%**, he gains __Black <:blackwing:1459920122549633285>__ (w/ ATK)\n> Else, he is __Wingless__\n\nATK w/ <:blackwing:1459920122549633285>:\n- When at **100%** critical rate: Deal **140%** damage, recover **15%** max HP, then lose **10%** critical rate\n- Else: Deal **110%** damage\n\nDEF w/ :wing::\n- Recover **8%** max HP and deflect **66%** of incoming damage\n\n__**Active**__ (:sparkles:) - Spear of Imaginary Vectors\n- Deals **20%** damage for every **5%** of missing <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self.\n- Gains a protective shield equal to **5%** max HP for every **5%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self.\n- Inflict a permanent **12%** vulnerability effect on the enemy\n\n__**Party ability** (:busts_in_silhouette:)__:\n- Allies lose **5%** max HP every round for the first **20** rounds.\n- After that, he has a **20%** chance to counter incoming hits for allies.\n\n-# Note: His <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect can only be triggered once at a time, i.e. When it is awaiting a refresh, other stability-burst effects (e.g. Weakpoint) will not be triggered, vice versa.",
-        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Accelerator
-            // Deal 20% damage for every 5% missing STAB. Gain 5% max HP shield for every 5% STAB
-            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.2 * Math.floor((100 - myStats.stability) / 5) });
-            myStats.shield += Math.floor((myStats.maxhp * 0.05) * Math.floor(myStats.stability / 5));
+    // "14126": {
+    //     usage: 1,
+    //     used: 0,
+    //     cost: 250,
+    //     desc: "**Total Usage**: `1`\n**Cost**: `250 💧`\n**Timeout**: `No`\n**Role**: `DPS (Stability)`\n\nAs one of the most formidable espers in the city, Accelerator is masterful at manipulating vectors, whilst computing combat calculations through the Misaka Network.\n\nAt the outset of the battle, he interacts with the <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> [ <a:stability:1451561886339436675> ] mechanic, which starts off at **50%**. When it reaches **0%** or **100%**, refreshes back to **50%** after **4** rounds. This can be changed with his actions:\n\nHis `ATK` deals **90%** damage and raises critical rate by **2%**, while losing **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> in the process. On the otherhand, his `DEF` recovers **5%** max HP and deflects **33%** of incoming damage, before recovering **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>\n\n> At **100%**, he gains __White :wing:__ (w/ DEF)\n> At **0%**, he gains __Black <:blackwing:1459920122549633285>__ (w/ ATK)\n> Else, he is __Wingless__\n\nHis `ATK` w/ <:blackwing:1459920122549633285> have enhanced effects: When at **100%** critical rate, it deals **140%** damage, recovers **15%** max HP, then lowers critical rate by **10%**. Else, it simply deals **110%** damage. As for his `DEF`, it too has enhanced effects w/ :wing:, recovering **8%** max HP and deflecting **66%** of incoming damage instead of the default amount.\n\nHis active casts Spear of Imaginary Vectors, piercing through the enemy. This deals **20%** damage for every **5%** of missing <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self, and grants him a protective shield equal to **5%** max HP for every **5%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self. Alas, the sheer power of vectors nflict a permanent **12%** vulnerability effect on the enemy (take +12% damage)\n\nIn a party, he initially harms allies, costing them **5%** max HP every round for **20** rounds. However by having a change of heart, he transitions into a role of protection, with a **20%** chance to counter incoming hits for them.\n\n-# Note: His <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect can only be triggered once at a time, i.e. When it is awaiting a refresh, other stability-burst effects (e.g. Weakpoint) will not be triggered, vice versa.",
+    //     shortdesc: "**Uses**: `1`\n**Cost**: `250 💧`\n**Timeout**: `No`\n**Role**: `DPS (Stability)`\n\n__**Passive**__:\n<:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> [ <a:stability:1451561886339436675> ] : Starts off at **50%**. When it reaches **0%** or **100%** through his actions, refreshes back to **50%** after **4** rounds. This can be changed with his actions:\n\nATK: Deals **90%** damage and raises critical rate by **2%**, then loses **10%** stability\n\nDEF: Recovers **5%** max HP and deflects **33%** of incoming damage, then gains **10%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>\n\n> At **100%**, he gains __White :wing:__ (w/ DEF)\n> At **0%**, he gains __Black <:blackwing:1459920122549633285>__ (w/ ATK)\n> Else, he is __Wingless__\n\nATK w/ <:blackwing:1459920122549633285>:\n- When at **100%** critical rate: Deal **140%** damage, recover **15%** max HP, then lose **10%** critical rate\n- Else: Deal **110%** damage\n\nDEF w/ :wing::\n- Recover **8%** max HP and deflect **66%** of incoming damage\n\n__**Active**__ (:sparkles:) - Spear of Imaginary Vectors\n- Deals **20%** damage for every **5%** of missing <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self.\n- Gains a protective shield equal to **5%** max HP for every **5%** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> on self.\n- Inflict a permanent **12%** vulnerability effect on the enemy\n\n__**Party ability** (:busts_in_silhouette:)__:\n- Allies lose **5%** max HP every round for the first **20** rounds.\n- After that, he has a **20%** chance to counter incoming hits for allies.\n\n-# Note: His <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect can only be triggered once at a time, i.e. When it is awaiting a refresh, other stability-burst effects (e.g. Weakpoint) will not be triggered, vice versa.",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //         // Accelerator
+    //         // Deal 20% damage for every 5% missing STAB. Gain 5% max HP shield for every 5% STAB
+    //         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.2 * Math.floor((100 - myStats.stability) / 5) });
+    //         myStats.shield += Math.floor((myStats.maxhp * 0.05) * Math.floor(myStats.stability / 5));
 
-            eStats.vulnerabilityDynamic += 0.12;
+    //         eStats.vulnerabilityDynamic += 0.12;
 
-            return AbilityResponse.SUCCESS;
-        },
-        passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            myStats.stability = 50;
-            eStats.ignoreSTABILITY = false;
-            eStats.vulnerabilityDynamic = Math.max(eStats.vulnerabilityDynamic, 1);
-            myStats.wing = 0; // (1 = Black, 2 = White)
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //         myStats.stability = 50;
+    //         eStats.ignoreSTABILITY = false;
+    //         eStats.vulnerabilityDynamic = Math.max(eStats.vulnerabilityDynamic, 1);
+    //         myStats.wing = 0; // (1 = Black, 2 = White)
 
-            // Fun text
-            notice.push(`\n<a:stability:1451561886339436675> The <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect has been activated`);
+    //         // Fun text
+    //         notice.push(`\n<a:stability:1451561886339436675> The <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> effect has been activated`);
 
-            // Alters ATK
-            myStats.replaceButton.atk = {
-                "emoji": "<:blackwing:1459920122549633285>",
-                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    switch (true) {
-                        case (myStats.wing === 1 && myStats.cr >= 1):
-                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.4, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15));
-                            myStats.cr -= 0.1;
-                            if (myStats.cr < 0) myStats.cr = 0;
-                            mybuff.cr.push(new buffInfo("+", -0.1, 9999));
-                            break;
-                        case (myStats.wing === 1 && myStats.cr <= 1):
-                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.1, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                            break;
-                        default:
-                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
-                            myStats.cr += 0.02;
-                            mybuff.cr.push(new buffInfo("+", 0.02, 9999));
-                            myStats.stability -= 10;
-                            if (myStats.stability <= 0 && !eStats.ignoreSTABILITY) {
-                                eStats.ignoreSTABILITY = true;
-                                myStats.wing = 1;
-                                notice.push(`\n<:blackwing:1459920122549633285> **${char.name}** lost all <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> and gained __Black Wings__`);
-                                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                    myStats.stability = 50;
-                                    eStats.ignoreSTABILITY = false;
-                                    myStats.wing = 0;
-                                    notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>`);
-                                    matchStats.trigger("stabilRefresh", myStats, myStats, mybuff, mybuff);
-                                    return AbilityResponse.SUCCESS;
-                                }));
-                            };
-                    };
-                    return AbilityResponse.SUCCESS;
-                },
-            };
+    //         // Alters ATK
+    //         myStats.replaceButton.atk = {
+    //             "emoji": "<:blackwing:1459920122549633285>",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 switch (true) {
+    //                     case (myStats.wing === 1 && myStats.cr >= 1):
+    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.4, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.15));
+    //                         myStats.cr -= 0.1;
+    //                         if (myStats.cr < 0) myStats.cr = 0;
+    //                         mybuff.cr.push(new buffInfo("+", -0.1, 9999));
+    //                         break;
+    //                     case (myStats.wing === 1 && myStats.cr <= 1):
+    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 1.1, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //                         break;
+    //                     default:
+    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { atkMultiplier: 0.9, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+    //                         myStats.cr += 0.02;
+    //                         mybuff.cr.push(new buffInfo("+", 0.02, 9999));
+    //                         myStats.stability -= 10;
+    //                         if (myStats.stability <= 0 && !eStats.ignoreSTABILITY) {
+    //                             eStats.ignoreSTABILITY = true;
+    //                             myStats.wing = 1;
+    //                             notice.push(`\n<:blackwing:1459920122549633285> **${char.name}** lost all <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> and gained __Black Wings__`);
+    //                             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                                 myStats.stability = 50;
+    //                                 eStats.ignoreSTABILITY = false;
+    //                                 myStats.wing = 0;
+    //                                 notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>`);
+    //                                 matchStats.trigger("stabilRefresh", myStats, myStats, mybuff, mybuff);
+    //                                 return AbilityResponse.SUCCESS;
+    //                             }));
+    //                         };
+    //                 };
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
 
-            // Alters DEF
-            myStats.replaceButton.def = {
-                "emoji": "🪽",
-                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    switch (true) {
-                        case (myStats.wing === 2):
-                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.08));
-                            myStats.deflectDamage = 0.66;
-                            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                myStats.deflectDamage = 0;
-                                return AbilityResponse.SUCCESS;
-                            }));
-                            break;
-                        default:
-                            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05));
-                            myStats.deflectDamage = 0.33;
-                            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                myStats.deflectDamage = 0;
-                                return AbilityResponse.SUCCESS;
-                            }));
-                            myStats.stability += 10;
-                            if (myStats.stability >= 100 && !eStats.ignoreSTABILITY) {
-                                eStats.ignoreSTABILITY = true;
-                                notice.push(`\n🪽 **${char.name}** reached maximum <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> and gained __White Wings__.`);
-                                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                                    myStats.stability = 50;
-                                    eStats.ignoreSTABILITY = false;
-                                    notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>`);
-                                    matchStats.trigger("stabilRefresh", myStats, myStats, mybuff, mybuff);
-                                    return AbilityResponse.SUCCESS;
-                                }));
-                            };
-                            break;
-                    };
-                    return AbilityResponse.SUCCESS;
-                },
-            };
+    //         // Alters DEF
+    //         myStats.replaceButton.def = {
+    //             "emoji": "🪽",
+    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                 switch (true) {
+    //                     case (myStats.wing === 2):
+    //                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.08));
+    //                         myStats.deflectDamage = 0.66;
+    //                         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                             myStats.deflectDamage = 0;
+    //                             return AbilityResponse.SUCCESS;
+    //                         }));
+    //                         break;
+    //                     default:
+    //                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05));
+    //                         myStats.deflectDamage = 0.33;
+    //                         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                             myStats.deflectDamage = 0;
+    //                             return AbilityResponse.SUCCESS;
+    //                         }));
+    //                         myStats.stability += 10;
+    //                         if (myStats.stability >= 100 && !eStats.ignoreSTABILITY) {
+    //                             eStats.ignoreSTABILITY = true;
+    //                             notice.push(`\n🪽 **${char.name}** reached maximum <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866> and gained __White Wings__.`);
+    //                             myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 4, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //                                 myStats.stability = 50;
+    //                                 eStats.ignoreSTABILITY = false;
+    //                                 notice.push(`\n<a:stability:1451561886339436675> **${char.name}** regained **50** <:stab1:1464513839323414549><:stab2:1464513732926509161><:stab3:1464513789935353866>`);
+    //                                 matchStats.trigger("stabilRefresh", myStats, myStats, mybuff, mybuff);
+    //                                 return AbilityResponse.SUCCESS;
+    //                             }));
+    //                         };
+    //                         break;
+    //                 };
+    //                 return AbilityResponse.SUCCESS;
+    //             },
+    //         };
 
-            // Get WINGS based off stability at the start of the round
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                switch (myStats.stability) {
-                    case (100): myStats.wing = 2; break;
-                    case (0): myStats.wing = 1; break;
-                    default: myStats.wing = 0; break;
-                };
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //         // Get WINGS based off stability at the start of the round
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             switch (myStats.stability) {
+    //                 case (100): myStats.wing = 2; break;
+    //                 case (0): myStats.wing = 1; break;
+    //                 default: myStats.wing = 0; break;
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
 
-            return AbilityResponse.SUCCESS;
-        },
-        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            myStats.counter ??= 0;
-            mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 20));
-            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 20, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (Math.random() < 0.2) {
-                    myStats.counter++;
-                };
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         myStats.counter ??= 0;
+    //         mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 20));
+    //         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 20, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (Math.random() < 0.2) {
+    //                 myStats.counter++;
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
 
-            return AbilityResponse.SUCCESS;
-        },
-    },
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     "14903": {
         usage: 9999,
         used: 0,
@@ -7313,117 +7313,117 @@ export const abilities: Record<number, Ability> = {
     //         return AbilityResponse.SUCCESS;
     //     },
     // },
-    "24185": {
-        usage: 9999,
-        used: 0,
-        cost: 0,
-        pause: -15,
-        nsbTick: 0,
-        desc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit (😎)`\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the __All-Fire Armaments__ passed down through the line of human Archons (deals **25%** pyro damage every **4** rounds, effect expires when exiting NBS), before dealing **100%** Pyro DMG. After using this, Mavuika's Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__ – NBS:\n- When Mavuika has at least **5** Nightsoul points, enter this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** 🎯(Crit Rate)  and 💥(Crit Dmg) for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n- Pyro DMG: After an attack, inflicts burn on the opponent, dealing **3%** ATK as DoT over **3** rounds.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (😎).\n- When Mavuika is not in NBS and has ≥ **50** 😎, her active is altered to consume all the fighting spirit to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **120%** Pyro DMG, for each 😎 consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__ – Fighting Spirit:\nMavuika can obtain Fighting Spirit via the following methods (max 100):\n- Nightsoul points consumed are converted to Fighting Spirit.\n- When hitting opponents, Mavuika gains **1** Fighting Spirit.\n\n**__Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** Pyro DMG every fourth round.",
-        shortdesc: "Check fulldesc",
-        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Mavuika
-            if (myStats.fightspirit < 50 || myStats.nbs > 0) {// Active (I)
-                if (this.pause > matchStats.round) {
-                    myStats.sm += this.cost;
-                    noTimeout(matchStats, myStats);
-                    matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-                    this.used--;
-                    return AbilityResponse.FAILURE;
-                };
+    // "24185": {
+    //     usage: 9999,
+    //     used: 0,
+    //     cost: 0,
+    //     pause: -15,
+    //     nsbTick: 0,
+    //     desc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit (😎)`\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the __All-Fire Armaments__ passed down through the line of human Archons (deals **25%** pyro damage every **4** rounds, effect expires when exiting NBS), before dealing **100%** Pyro DMG. After using this, Mavuika's Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__ – NBS:\n- When Mavuika has at least **5** Nightsoul points, enter this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** 🎯(Crit Rate)  and 💥(Crit Dmg) for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n- Pyro DMG: After an attack, inflicts burn on the opponent, dealing **3%** ATK as DoT over **3** rounds.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (😎).\n- When Mavuika is not in NBS and has ≥ **50** 😎, her active is altered to consume all the fighting spirit to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **120%** Pyro DMG, for each 😎 consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__ – Fighting Spirit:\nMavuika can obtain Fighting Spirit via the following methods (max 100):\n- Nightsoul points consumed are converted to Fighting Spirit.\n- When hitting opponents, Mavuika gains **1** Fighting Spirit.\n\n**__Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** Pyro DMG every fourth round.",
+    //     shortdesc: "Check fulldesc",
+    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+    //         // Mavuika
+    //         if (myStats.fightspirit < 50 || myStats.nbs > 0) {// Active (I)
+    //             if (this.pause > matchStats.round) {
+    //                 myStats.sm += this.cost;
+    //                 noTimeout(matchStats, myStats);
+    //                 matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+    //                 this.used--;
+    //                 return AbilityResponse.FAILURE;
+    //             };
 
-                if (myStats.sm < 75) {
-                    noTimeout(matchStats, myStats);
-                    matchStats.interaction.followUp({ content: `**${char.name}** does not have sufficient mana (**${myStats.sm}**/75 💧)`, ephemeral: true });
-                    this.used--;
-                    return AbilityResponse.FAILURE;
-                };
-                if (myStats.nbs <= 0) this.pause = matchStats.round + 15;
-                myStats.sm -= 75;
-                myStats.nsp = 40;
+    //             if (myStats.sm < 75) {
+    //                 noTimeout(matchStats, myStats);
+    //                 matchStats.interaction.followUp({ content: `**${char.name}** does not have sufficient mana (**${myStats.sm}**/75 💧)`, ephemeral: true });
+    //                 this.used--;
+    //                 return AbilityResponse.FAILURE;
+    //             };
+    //             if (myStats.nbs <= 0) this.pause = matchStats.round + 15;
+    //             myStats.sm -= 75;
+    //             myStats.nsp = 40;
 
-                notice.push(`\n✨ **${char.name}** restored Nightsoul Points to **40**!`);
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isPyro: true });
-            } else {
-                myStats.nsp += 20; if (myStats.nsp > 60) myStats.nsp = 60;
-                notice.push(`\n✨ Let the people's inner voices reach the divine throne in the heavens. **${char.name}** gained **20** Nightsoul Points and enterred NightSoul Blessing State!`);
-                // NBS entering
-                myStats.nsp -= 5; myStats.fightspirit += 5;
-                if (myStats.fightspirit > 100) myStats.fightspirit = 100;
-                myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
-                myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
-                myStats.nbs++;
+    //             notice.push(`\n✨ **${char.name}** restored Nightsoul Points to **40**!`);
+    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isPyro: true });
+    //         } else {
+    //             myStats.nsp += 20; if (myStats.nsp > 60) myStats.nsp = 60;
+    //             notice.push(`\n✨ Let the people's inner voices reach the divine throne in the heavens. **${char.name}** gained **20** Nightsoul Points and enterred NightSoul Blessing State!`);
+    //             // NBS entering
+    //             myStats.nsp -= 5; myStats.fightspirit += 5;
+    //             if (myStats.fightspirit > 100) myStats.fightspirit = 100;
+    //             myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
+    //             myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
+    //             myStats.nbs++;
 
-                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+    //             if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
 
-                const flair = ["Wrath from the skies!", "Pyroclastic surge!", "Light of the blazing sun!"];
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.2 + 0.02 * (myStats.fightspirit - 50), isPyro: true });
-                myStats.fightspirit = 0;
-            };
-            return AbilityResponse.SUCCESS;
-        },
-        passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-            myStats.nbs ??= 0; // NightSoul Blessing State
-            myStats.nsp ??= 0; // NightSoul Points
-            myStats.fightspirit ??= 0; // Fighting Spirit
+    //             const flair = ["Wrath from the skies!", "Pyroclastic surge!", "Light of the blazing sun!"];
+    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.2 + 0.02 * (myStats.fightspirit - 50), isPyro: true });
+    //             myStats.fightspirit = 0;
+    //         };
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+    //         myStats.nbs ??= 0; // NightSoul Blessing State
+    //         myStats.nsp ??= 0; // NightSoul Points
+    //         myStats.fightspirit ??= 0; // Fighting Spirit
 
-            // Fun text
-            switch (matchStats.interaction.commandName) {
-                case "dungeon": notice.push(`\n😎 Dungeons? Heh, adventuring is right up my alley.`); break;
-                case "stampede": notice.push(`\n😎 I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
-                case "arena": notice.push(`\n😎 If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
-                default: notice.push(`\n😎 Ready to ride, any time, any place.`); break;
-            };
+    //         // Fun text
+    //         switch (matchStats.interaction.commandName) {
+    //             case "dungeon": notice.push(`\n😎 Dungeons? Heh, adventuring is right up my alley.`); break;
+    //             case "stampede": notice.push(`\n😎 I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
+    //             case "arena": notice.push(`\n😎 If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
+    //             default: notice.push(`\n😎 Ready to ride, any time, any place.`); break;
+    //         };
 
-            // Gain Fighting Spirit
-            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (caster === myStats && target === eStats && myStats.fightspirit < 100) myStats.fightspirit++;
-            });
+    //         // Gain Fighting Spirit
+    //         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+    //             if (caster === myStats && target === eStats && myStats.fightspirit < 100) myStats.fightspirit++;
+    //         });
 
-            const nightsoulblessing = () => {
-                myStats.nsp -= 5; myStats.fightspirit += 5;
-                if (myStats.fightspirit > 100) myStats.fightspirit = 100;
-                myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
-                myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
-                myStats.nbs++;
+    //         const nightsoulblessing = () => {
+    //             myStats.nsp -= 5; myStats.fightspirit += 5;
+    //             if (myStats.fightspirit > 100) myStats.fightspirit = 100;
+    //             myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
+    //             myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
+    //             myStats.nbs++;
 
-                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
-            };
+    //             if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+    //         };
 
-            // NightSoul Blessing Mechanic
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (myStats.nbs > 0) {
-                    if (myStats.nsp < 5) { // Exit
-                        myStats.nbs = 0;
-                        notice.push(`\n<:NBS:1449333178765541491> **${char.name}** exited NightSoul Blessing State.`);
-                    } else {
-                        nightsoulblessing();
-                    };
-                } else {
-                    if (myStats.nsp >= 5) {
-                        notice.push(`\n<:NBS:1449333178765541491> **${char.name}** entered NightSoul Blessing State.`);
-                        nightsoulblessing();
-                    };
-                };
-                return AbilityResponse.SUCCESS;
-            }, 9999));
+    //         // NightSoul Blessing Mechanic
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (myStats.nbs > 0) {
+    //                 if (myStats.nsp < 5) { // Exit
+    //                     myStats.nbs = 0;
+    //                     notice.push(`\n<:NBS:1449333178765541491> **${char.name}** exited NightSoul Blessing State.`);
+    //                 } else {
+    //                     nightsoulblessing();
+    //                 };
+    //             } else {
+    //                 if (myStats.nsp >= 5) {
+    //                     notice.push(`\n<:NBS:1449333178765541491> **${char.name}** entered NightSoul Blessing State.`);
+    //                     nightsoulblessing();
+    //                 };
+    //             };
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
 
-            return AbilityResponse.SUCCESS;
-        },
-        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.def -= Math.min(Math.round(eStats.def * 0.12), 660);
-            ebuff.def.push(new buffInfo("+", -Math.min(Math.round(eStats.def * 0.12), 660), 9999));
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         eStats.def -= Math.min(Math.round(eStats.def * 0.12), 660);
+    //         ebuff.def.push(new buffInfo("+", -Math.min(Math.round(eStats.def * 0.12), 660), 9999));
 
-            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (matchStats.round % 4 === 0) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isPyro: true });
-                };
+    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //             if (matchStats.round % 4 === 0) {
+    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isPyro: true });
+    //             };
 
-                return AbilityResponse.SUCCESS;
-            }, 9999));
-            return AbilityResponse.SUCCESS;
-        },
-    },
+    //             return AbilityResponse.SUCCESS;
+    //         }, 9999));
+    //         return AbilityResponse.SUCCESS;
+    //     },
+    // },
     // "24256": {
     //     usage: 9999,
     //     used: 0,
