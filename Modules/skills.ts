@@ -349,9 +349,8 @@ export const skills: skillInfo[] = [
         myStats.classUsed ||= 0;
         myStats.classUsed++;
 
-        // 50% damage mitigation ; heal 50% less
+        // 50% damage mitigation
         myStats.damageReduction = Math.max(0.5, myStats.damageReduction);
-        eStats.reduceHealing = Math.max(0.5, eStats.reduceHealing);
 
         matchStats.on("attack", { // When attacked, deal 120% damage and triggers counter effects twice
             maxRound: 10,
@@ -378,6 +377,7 @@ export const skills: skillInfo[] = [
             ebuff.mr.push(new buffInfo("+", -Math.min(eStats.mr * shred, 872), 9999));
             eStats.def -= Math.floor(Math.min(eStats.def * shred, 872));
             eStats.mr -= Math.floor(Math.min(eStats.mr * shred, 872));
+            myStats.damageReduction = 0;
             notice.push(`\n⚜️ **${char.name}** has exited __Dormant Sage__ and decreased the enemy's DEF/MR by **${shred * 100}**%.`);
 
             //if (myStats.counterchance > 0.4) {
@@ -388,7 +388,7 @@ export const skills: skillInfo[] = [
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 myStats.counterchance = 0;
                 return AbilityResponse.SUCCESS;
-            }, 9999));
+            }));
 
             return AbilityResponse.SUCCESS;
         }));

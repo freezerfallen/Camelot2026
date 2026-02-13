@@ -95,13 +95,14 @@ export default class Avalon {
         let iconbar = "";
 
         // ABILITY-SPECIFIC
-        if (side.stability !== null || side.stability !== false) { // Stability - Yor Forger, Loid Forger, Accelerator
+        if (side.stability) { // Stability - Yor Forger, Loid Forger, Accelerator
             switch (true) {
                 case side.stability <= 0: iconbar += "<:stability0:1446880287396200599>"; break;
                 case side.stability <= 25: iconbar += "<:stability1:1446880326029934714>"; break;
                 case side.stability <= 50: iconbar += "<:stability2:1446880353263423528>"; break;
                 case side.stability <= 75: iconbar += "<:stability3:1446880381327376425>"; break;
                 case side.stability <= 100: iconbar += "<:stabilityfull:1446880407579656243>"; break;
+                default: iconbar += "<:stabilityfull:1446880407579656243>"; break;
             };
         };
 
@@ -125,11 +126,11 @@ export default class Avalon {
 
         if (side.elimination) { // Akame
             switch (Math.floor(side.elimination / 10)) {
-                case 0: iconbar += "<:tierI:1459382388227444952>"; break;
-                case 1: iconbar += "<:tierII:1459382415536423064>"; break;
-                case 2: iconbar += "<:tierIII:1459382445072842783>"; break;
-                case 3: iconbar += "<:tierIV:1459382483882606674>"; break;
-                case 4: iconbar += "<:tierV:1459382519483994224>"; break;
+                case 0: iconbar += "<:tierI:1461197271134634176>"; break;
+                case 1: iconbar += "<:tierII:1461197224011894878>"; break;
+                case 2: iconbar += "<:tierIII:1461197179036368998>"; break;
+                case 3: iconbar += "<:tierIV:1461197108550832190>"; break;
+                case 4: iconbar += "<:tierV:1461197069799653468>"; break;
             };
         };
 
@@ -137,6 +138,17 @@ export default class Avalon {
             switch (side.wing) {
                 case 1: iconbar += "<:blackwing:1459920122549633285>"; break;
                 case 2: iconbar += "🪽"; break;
+            };
+        };
+
+        if (side.ce && side.ceCap) {
+            switch (true) {
+                case (side.ce / side.ceCap) <= 0: iconbar += "<:ce1:1468213404463534090>"; break;
+                case (side.ce / side.ceCap) <= 0.25: iconbar += "<:ce2:1468213982966845502>"; break;
+                case (side.ce / side.ceCap) <= 0.5: iconbar += "<:ce3:1468214304158257203>"; break;
+                case (side.ce / side.ceCap) <= 0.75: iconbar += "<:ce4:1468214557892677727>"; break;
+                case (side.ce / side.ceCap) <= 1: iconbar += "<:ce5:1468214821437575178>"; break;
+                default: side.ceCap ? iconbar += "<:ce5:1468214821437575178>" : ""; break;
             };
         };
 
