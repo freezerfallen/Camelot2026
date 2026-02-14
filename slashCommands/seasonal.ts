@@ -13,30 +13,30 @@ type SeasonalShopTab = 'runes' | 'hpbars' | 'backgrounds' | 'skins';
 
 const EMBED_COLOR = 0x2aad9d;
 
-const SEASON_END_DATE = new Date('2025-12-20 00:00:00');
+const SEASON_END_DATE = new Date('2026-04-03 00:00:00');
 
 const loadedImages: Record<string | number, Image> = {};
 
 const RUNES_FOR_SALE = [
-    { name: "Eirfrost von Neira", item: items[790] as runeInfo, price: 80, isNew: true },
-    { name: "Voidseer", item: items[791] as runeInfo, price: 80, isNew: true },
-    { name: "Valkyrie Sigil", item: items[787] as runeInfo, price: 60, isNew: false },
+    { name: "The Fated", item: items[793] as runeInfo, price: 80, isNew: true },
+    { name: "Thorn's Contender", item: items[792] as runeInfo, price: 80, isNew: true },
+    { name: "Hollow Crown", item: items[788] as runeInfo, price: 60, isNew: false },
 ] as const; // Total cost: 220
 
 const HP_BARS_FOR_SALE = [
-    { name: "Winter Brew", id: 9, price: 70, isNew: true },
-    { name: "Lucky Ribbon", id: 10, price: 70, isNew: true },
-    { name: "Padoru", id: 11, price: 70, isNew: true },
-    { name: "Pinkish Fantasy", id: 2, price: 50, isNew: false },
-] as const; // Total cost: 260
+    { name: "Neon Heartbeats", id: 12, price: 70, isNew: true },
+    { name: "Cupid's Pulse", id: 13, price: 70, isNew: true },
+    { name: "Velvet Night", id: 6, price: 50, isNew: false },
+    { name: "Golden Grasslands", id: 3, price: 50, isNew: false },
+] as const; // Total cost: 240
 
 const BACKGROUNDS_FOR_SALE = [
-    { name: "Echoes of Frost", id: 17, price: 60, isNew: true },
-    { name: "Aurora Borealis", id: 18, price: 60, isNew: true },
-    { name: "Winter Solace", id: 19, price: 60, isNew: true },
-] as const; // Total cost: 180
+    { name: "Forever Valentines", id: 20, price: 80, isNew: true },
+    { name: "Moments", id: 22, price: 70, isNew: true },
+    { name: "Fireworks", id: 21, price: 60, isNew: true },
+] as const; // Total cost: 210
 
-const SKIN_SEASON = "winter season 2025"; // Total cost: 650
+const SKIN_SEASON = "valentines season 2026"; // Total cost: 645
 
 const BuyKeysRow = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(

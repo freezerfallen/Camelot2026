@@ -148,4 +148,16 @@ export const customHpBars: CustomHpBar[] = [
         end: { empty: "<:dbr:1415266560745934848>", hp_only: "<a:dbrh:1452628787396218890>", mana_only: "<a:dbrm:1452628794920927343>", full: "<a:dbrhm:1452628791510696028>" },
     }),
 
+    new CustomHpBar("Neon Heartbeats", 12, 0xff3bad, {
+        start: { empty: "<:dbl:1415266537748828203>", hp_only: "<:dblh:1472230710839345304>", mana_only: "<:dblm:1472230715927036189>", full: "<:dblhm:1472230713742069852>" },
+        middle: { empty: "<:db:1415266524532314272>", hp_only: "<:dbh:1472230705953247264>", mana_only: "<:dbm:1472230718342959176>", full: "<:dbhm:1472230708226297927>" },
+        end: { empty: "<:dbr:1415266560745934848>", hp_only: "<:dbrh:1472230721086029835>", mana_only: "<:dbrm:1472230703340191989>", full: "<:dbrhm:1472230700584538275>" },
+    }),
+
+    new CustomHpBar("Cupid's Pulse", 13, 0x31013c, {
+        start: { empty: "<:dbl:1472231799647109162>", hp_only: "<:dblh:1472231763580551248>", mana_only: "<:dblm:1472231771398734017>", full: "<:dblhm:1472231768177512538>" },
+        middle: { empty: "<:db:1472231789383913482>", hp_only: "<:dbh:1472231792743551138>", mana_only: "<:dbm:1472231774544334954>", full: "<:dbhm:1472231796153384971>" },
+        end: { empty: "<:dbr:1472231777501446316>", hp_only: "<:dbrh:1472231780424749118>", mana_only: "<:dbrm:1472231786535715049>", full: "<:dbrhm:1472231783402836165>" },
+    }),
+
 ];

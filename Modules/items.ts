@@ -6451,7 +6451,6 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Once per round after using **ATK**, inflicts `Spooked`, decreasing ATK and MD by **15%** for **2** rounds.\n- When using the active ability, deals **160%** magic damage.", "rare", 789),
-
     new runeInfo("Eirfrost von Neira", ["seasonal shop"], "<:EirfrostvonNeira:1453761105460596888>", "https://i.ibb.co/VcBN52YM/Eirfrost-von-Neira.png", {
         cost: 80,
         usage: 3,
@@ -6476,7 +6475,6 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Applies **10%** vulnerability to the enemy.\n- When using the active ability, freezes the enemy for **3** rounds, and increases vulnerability by **+5%** permanently. (80 💧, 3 uses, Timeout true)", "rare", 790),
-
     new runeInfo("Voidseer", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.xpboost += 0.1;
@@ -6485,7 +6483,7 @@ export const items = [
         },
     }, "- Increases class xp earned from the dungeon by **+10%**.", "rare", 791),
 
-    new runeInfo("Thorn's Contender", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
+    new runeInfo("Thorn's Contender", ["seasonal shop"], "<:thorns_contender:1472217027459416084>", "https://i.ibb.co/HL1fTdJP/thorns-contender.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.thorns ??= 0;
             myStats.thornsintertwined = false;
@@ -6520,8 +6518,7 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Whenever the wearer is attacked, gains **1** <:thorn1:1466828338604802068><:thorn2:1466828379482230873> (Up to 100).\n- At the start of the round, loses **0.5%** current HP but gains **1** 💧 for every **5** <:thorn1:1466828338604802068><:thorn2:1466828379482230873>.\n- When <:thorn1:1466828338604802068><:thorn2:1466828379482230873> reaches **100**, consumes all <:thorn1:1466828338604802068><:thorn2:1466828379482230873> and becomes intertwined with the enemy: No longer gain <:thorn1:1466828338604802068><:thorn2:1466828379482230873>, but instead steals **15%** of the enemy's mana every round.", "rare", 792),
-
-    new runeInfo("The Fated", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
+    new runeInfo("The Fated", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats && target === eStats) {
@@ -6542,6 +6539,8 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher).", "rare", 793),
+
+
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;
     //     myStats.flesh ??= 0;

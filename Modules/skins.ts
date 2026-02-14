@@ -1,5 +1,6 @@
 import { CostTypes } from "./profileDecorations";
 
+// new skinInfo("Monster Garou", 23390, "fall season 2025", "skykey291", "", { season_keys: 0 }, "https://i.ibb.co/kVP4TCBZ/image.png", 127),
 
 export default class skinInfo {
     private _name: string;
@@ -247,7 +248,28 @@ export const skins: skinInfo[] = [
     new skinInfo("Aneira (Winter Veil)", 12394, "christmas event 2025", "skykey291", "", {}, "https://i.ibb.co/dsR2s0pM/aneira-bride.png", 167),
     new skinInfo("Aneira EX (Glacial Waltz)", 25829, "christmas event 2025", "mercy4afool", "", {}, "https://i.ibb.co/hRRz1G6Y/aneira-skin.png", 168),
 
+    /* Valentine's 2026 */
+    new skinInfo("Sang Lang (Valentine's 2026)", 25753, "valentines season 2026", "kaito.1412", "", { season_keys: 25 }, "https://i.ibb.co/fKVMrJ8/c.jpg", 169),
+    new skinInfo("Kaguya Shinomiya (Valentine's 2026)", 2024, "valentines season 2026", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/kRKcxRp/kaguya2.png", 170),
+    new skinInfo("Frieren (Valentine's 2026)", 18106, "valentines season 2026", "kaito.1412", "", { season_keys: 30 }, "https://i.ibb.co/Myc7bZvX/c.png", 171),
+    new skinInfo("Roy Mustang (Valentine's 2026)", 13054, "valentines season 2026", "kaito.1412", "", { season_keys: 30 }, "https://i.ibb.co/xtkR9QwW/c.jpg", 172),
+    new skinInfo("Reze (Valentine's 2026)", 25890, "valentines season 2026", "mercy4afool", "", { season_keys: 35 }, "https://i.ibb.co/KxdgLnyH/c.png", 173),
+    new skinInfo("Violet Evergarden (Valentine's 2026)", 5000, "valentines season 2026", "kidsad", "", { season_keys: 40 }, "https://i.ibb.co/YBQgwDZV/image.png", 174),
+    new skinInfo("C.C. (Valentine's 2026)", 2360, "valentines season 2026", "kaito.1412", "", { season_keys: 35 }, "https://i.ibb.co/Y7gt7w2b/image.png", 175),
+    new skinInfo("Zero Two (Valentine's 2026)", 861, "valentines season 2026", "ranahunter", "", { season_keys: 30 }, "https://i.ibb.co/ZzcLwrsz/c.jpg", 176),
+    new skinInfo("Mahiru Shiina (Valentine's 2026)", 12400, "valentines season 2026", "truleho", "", { season_keys: 30 }, "https://i.ibb.co/KjHbG6kP/Mahiru-Shiina.png", 177),
+    new skinInfo("Yumeko Jabami (Valentine's 2026)", 3219, "valentines season 2026", "kaito.1412", "", { season_keys: 35 }, "https://i.ibb.co/gMMKwHmK/yumeko.png", 178),
+    new skinInfo("Hae-in Shin (Valentine's 2026)", 25033, "valentines season 2026", "youalreadylost7799", "", { season_keys: 40 }, "https://i.ibb.co/G4dfMcfp/c.png", 179),
+    new skinInfo("Kana Arima (Valentine's 2026)", 4932, "valentines season 2026", "ranahunter", "", { season_keys: 35 }, "https://i.ibb.co/tpm27QkM/kanaarima.png", 180),
+    new skinInfo("Arlecchino (Valentine's 2026)", 16195, "valentines season 2026", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/KjsDMfFC/c.png", 181),
+    new skinInfo("Ai Hoshino (Valentine's 2026)", 4931, "valentines season 2026", "kaito.1412", "", { season_keys: 30 }, "https://i.ibb.co/hxGyJ6HW/oshiai.png", 182),
+    new skinInfo("Raiden Shogun (Valentine's 2026)", 680, "valentines season 2026", "kaito.1412", "", { season_keys: 30 }, "https://i.ibb.co/Dgr6Yz5q/c.jpg", 183),
+    new skinInfo("Shinobu Kochou (Valentine's 2026)", 161, "valentines season 2026", "kaito.1412", "", { season_keys: 35 }, "https://i.ibb.co/WrwRzjM/ge.png", 184),
+    new skinInfo("Tohru (Valentine's 2026)", 12356, "valentines season 2026", "youalreadylost7799", "", { season_keys: 25 }, "https://i.ibb.co/KMBm9dR/c.png", 185),
+    new skinInfo("Ram (Valentine's 2026)", 5051, "valentines season 2026", "mercy4afool", "", { season_keys: 25 }, "https://i.ibb.co/zWmRsgTL/ram.png", 186),
+    new skinInfo("Rem (Valentine's 2026)", 5050, "valentines season 2026", "cyber_46", "", { season_keys: 30 }, "https://i.ibb.co/R4v5W2Fy/rem.png", 187),
+    new skinInfo("Momo Ayase (Valentine's 2026)", 22416, "valentines season 2026", "youalreadylost7799", "", { season_keys: 30 }, "https://i.ibb.co/Z6y2XHHY/c.png", 188),
 
-    // new skinInfo("Monster Garou", 23390, "fall season 2025", "skykey291", "", { season_keys: 0 }, "https://i.ibb.co/kVP4TCBZ/image.png", 127),
 
 ];
+
