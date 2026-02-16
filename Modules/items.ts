@@ -6520,8 +6520,11 @@ export const items = [
     }, "- Whenever the wearer is attacked, gains **1** <:thorn1:1466828338604802068><:thorn2:1466828379482230873> (Up to 100).\n- At the start of the round, loses **0.5%** current HP but gains **1** 💧 for every **5** <:thorn1:1466828338604802068><:thorn2:1466828379482230873>.\n- When <:thorn1:1466828338604802068><:thorn2:1466828379482230873> reaches **100**, consumes all <:thorn1:1466828338604802068><:thorn2:1466828379482230873> and becomes intertwined with the enemy: No longer gain <:thorn1:1466828338604802068><:thorn2:1466828379482230873>, but instead steals **15%** of the enemy's mana every round.", "rare", 792),
     new runeInfo("The Fated", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.theFatedUsed = -1;
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (myStats.theFatedUsed === matchStats.round) return AbilityResponse.FAILURE;
                 if (caster === myStats && target === eStats) {
+                    myStats.theFatedUsed = matchStats.round;
                     myStats.cr -= 0.1;
                     if (myStats.cr < 0) myStats.cr = 0;
                     mybuff.cr.push(new buffInfo("+", -0.1, 9999));
@@ -6529,6 +6532,7 @@ export const items = [
                 };
 
                 if (caster === eStats && target === myStats) {
+                    myStats.theFatedUsed = matchStats.round;
                     eStats.cr -= 0.1;
                     if (eStats.cr < 0) eStats.cr = 0;
                     ebuff.cr.push(new buffInfo("+", -0.1, 9999));
@@ -6538,7 +6542,7 @@ export const items = [
 
             return AbilityResponse.SUCCESS;
         },
-    }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher).", "rare", 793),
+    }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher). This can occur once every round.", "rare", 793),
 
     // Loot - Valentine's
     new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
