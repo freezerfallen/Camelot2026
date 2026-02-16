@@ -4484,7 +4484,7 @@ export const items = [
     }, "Critical strikes inflict a poison, dealing **3%** damage to the enemy for 3 rounds (or **6%** of own HP if enemy has more than twice your HP). Additionally, the wielder takes **15%** less damage.\n\n_A reduction of 15% = 155 DEF|MR_", "This dagger is as deadly elegant as its namesake, forged by celestial blacksmiths guided by the goddess Serket, who is associated with scorpions and protection. More than just a weapon, Serket's Sting is a representation of the heavenly might and protection. With an iridescent sheen like to a scorpion's exoskeleton, its blade is crafted from an unearthly metal. Its edge is so sharp that it seems to pierce both the earthly and spiritual planes. Its real strength comes from its affinity with the goddess herself. The dagger gains the ability to extend the goddess's divine will during terrible circumstances or when the wielder calls upon Serket. The blows it delivers have the power of a skilled killer combined with the protective edge of a kind guardian angel. Wielding Serket's Sting is a sacred duty, and those chosen to bear it are considered both guardians and avengers under the watchful eyes of the Divine Viper.", "mythical", 685),
 
     // Loot - Valentine's
-    new lootInfo("Valentine's Chocolate", "loot", "event exclusive item", ["valentine's event"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/hXP3CkT/Valentine-s-Chocolate.png", "mythical", 686, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
+    new lootInfo("Valentine's Chocolate (2024)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/hXP3CkT/Valentine-s-Chocolate.png", "mythical", 686, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
 
     // Additional Weapons
     new weaponInfo("Sacred Life Salamander", "weapon", "staff", ["chest"], "<:sacred_life_salamander:1274884340840665088>", "https://i.imgur.com/OGnmcD7.png", "md", 173, 976, "mr", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -6451,7 +6451,6 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Once per round after using **ATK**, inflicts `Spooked`, decreasing ATK and MD by **15%** for **2** rounds.\n- When using the active ability, deals **160%** magic damage.", "rare", 789),
-
     new runeInfo("Eirfrost von Neira", ["seasonal shop"], "<:EirfrostvonNeira:1453761105460596888>", "https://i.ibb.co/VcBN52YM/Eirfrost-von-Neira.png", {
         cost: 80,
         usage: 3,
@@ -6470,13 +6469,12 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.vulnerabilityDynamic ??= 0;
+            eStats.vulnerabilityDynamic ??= 1;
             eStats.vulnerabilityDynamic += 0.1;
 
             return AbilityResponse.SUCCESS;
         },
     }, "- Applies **10%** vulnerability to the enemy.\n- When using the active ability, freezes the enemy for **3** rounds, and increases vulnerability by **+5%** permanently. (80 💧, 3 uses, Timeout true)", "rare", 790),
-
     new runeInfo("Voidseer", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.xpboost += 0.1;
@@ -6485,7 +6483,7 @@ export const items = [
         },
     }, "- Increases class xp earned from the dungeon by **+10%**.", "rare", 791),
 
-    new runeInfo("Thorn's Contender", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
+    new runeInfo("Thorn's Contender", ["seasonal shop"], "<:thorns_contender:1472217027459416084>", "https://i.ibb.co/HL1fTdJP/thorns-contender.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.thorns ??= 0;
             myStats.thornsintertwined = false;
@@ -6520,8 +6518,7 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Whenever the wearer is attacked, gains **1** <:thorn1:1466828338604802068><:thorn2:1466828379482230873> (Up to 100).\n- At the start of the round, loses **0.5%** current HP but gains **1** 💧 for every **5** <:thorn1:1466828338604802068><:thorn2:1466828379482230873>.\n- When <:thorn1:1466828338604802068><:thorn2:1466828379482230873> reaches **100**, consumes all <:thorn1:1466828338604802068><:thorn2:1466828379482230873> and becomes intertwined with the enemy: No longer gain <:thorn1:1466828338604802068><:thorn2:1466828379482230873>, but instead steals **15%** of the enemy's mana every round.", "rare", 792),
-
-    new runeInfo("The Fated", ["seasonal shop"], "<:Voidseer:1453761099827777707>", "https://i.ibb.co/VccLg1Mj/Voidseer.png", {
+    new runeInfo("The Fated", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
                 if (caster === myStats && target === eStats) {
@@ -6542,6 +6539,12 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher).", "rare", 793),
+
+    // Loot - Valentine's
+    new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
+
+
+
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;
     //     myStats.flesh ??= 0;

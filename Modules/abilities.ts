@@ -971,98 +971,98 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    // "4334": {
-    //     usage: 9999,
-    //     used: 0,
-    //     cost: 0,
-    //     pause: 0,
-    //     desc: "**Total Usage**: `unlimited`\n**Mana**: `60 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **15%** (Up to 2x DMG), lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **15%** of his max HP to elevate his arms. HP cost increased by **0.7%** after every use starting from the **11th** use. If his HP is above **1** after the consumption, he slams the shot, dealing **120%** DMG and boosting his ATK by **10%** for **2** rounds. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **240%** DMG, boosting his ATK by **20%** for **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
-    //     shortdesc: "**Uses**: `Unlimited`\n**Cost**: `60 💧 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **15%** permanently (Up to 2x DMG) \n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **15%** max HP instead as substitute.\n- HP cost increased by **0.7%** after every use starting from the **11th** use\n\nIf he is at **1** HP or more:\n- Deals **120%** DMG\n- Increases ATK by **10%** for **2** rounds\n\nElse:\n- Remains at **1** HP\n- Deals **240%** DMG\n- Increases ATK by **20%** for **2** rounds\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
-    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-    //         // Taiga Kagami
+    "4334": {
+        usage: 9999,
+        used: 0,
+        cost: 0,
+        pause: 0,
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `60 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nTaiga Kagami is known for his offensive capabilities from massive jumps and powerful dunks, making him a formidable opponent with brute force. Thanks to his athleticism, upon falling below **50%** HP the first time, he enters `ZONE`, where he steals **15%** dodge rate from the enemy, and decreases their DEF & MR by **15%** (Up to 2x DMG), lasting permanently.\n\nUpon using his active, if he doesn't have the required mana, he'll instead consume **15%** of his max HP to elevate his arms. HP cost increased by **0.7%** after every use starting from the **11th** use. If his HP is above **1** after the consumption, he slams the shot, dealing **120%** DMG and boosting his ATK by **10%** for **2** rounds. Yet if his HP does fall below **1** HP, he remains at **1** HP and instead uses Meteor Jam, a defining dunk that shatters all expectations, dealing **240%** DMG, boosting his ATK by **20%** for **2** rounds.\n\nIn a party, Kagami assists party members with quick rebounds, boosting ally's ATK by **10%**. Moreover, he deals an additional instance of **30%** DMG to the enemy when the ally counters. If the ally is Tetsuya Kuroko, all of the buffs/effects aforementioned will have **doubled** effectiveness.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `60 💧 (Can be substituted with 18% max HP, HP cost increased by 0.9% after every use starting from the 11th use)`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Nuke, Additional Attack)`\n\n__**Passive**__\nUpon falling below **50%** HP the first time:\n- Steals **15%** dodge rate permanently\n- Decreases enemy's DEF & MR by **15%** permanently (Up to 2x DMG) \n\n__**Active**__ (✨)\n> If he does not have sufficient mana, consumes **15%** max HP instead as substitute.\n- HP cost increased by **0.7%** after every use starting from the **11th** use\n\nIf he is at **1** HP or more:\n- Deals **120%** DMG\n- Increases ATK by **10%** for **2** rounds\n\nElse:\n- Remains at **1** HP\n- Deals **240%** DMG\n- Increases ATK by **20%** for **2** rounds\n\n__**Party**__ (👥)\n- **+10%** ATK\n- Follows up any counters by the ally, dealing **30%** DMG\n- If Tetsuya Kuroko is the ally, gains **doubled** effectiveness from the aforementioned buffs/effects",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Taiga Kagami
 
-    //         // Active cost
-    //         if (myStats.sm < 60) {
-    //             let hpCost = myStats.maxhp * (0.18 + (this.used >= 10 ? this.used - 10 : 0) * 0.009);
-    //             myStats.hp -= Math.floor(hpCost);
-    //         } else {
-    //             myStats.sm -= 60;
-    //         };
+            // Active cost
+            if (myStats.sm < 60) {
+                let hpCost = myStats.maxhp * (0.18 + (this.used >= 10 ? this.used - 10 : 0) * 0.009);
+                myStats.hp -= Math.floor(hpCost);
+            } else {
+                myStats.sm -= 60;
+            };
 
-    //         // Meteor Jam
-    //         if (myStats.hp <= 0) {
-    //             myStats.hp = 1;
-    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🌠 **${char.name}** used Meteor Jam! He`, { atkMultiplier: 2.4 });
-    //             // ATK buffs (Doubled effectiveness)
-    //             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 2));
-    //             myStats.atk += Math.floor(myStats.atk * 0.2);
-    //         } else {
-    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **${char.name}** slammed the shot! He`, { atkMultiplier: 1.2 });
-    //             // ATK buffs
-    //             myStats.atk += Math.floor(myStats.atk * 0.1);
-    //             mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.1), 2));
-    //         };
+            // Meteor Jam
+            if (myStats.hp <= 0) {
+                myStats.hp = 1;
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🌠 **${char.name}** used Meteor Jam! He`, { atkMultiplier: 2.4 });
+                // ATK buffs (Doubled effectiveness)
+                mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.2), 2));
+                myStats.atk += Math.floor(myStats.atk * 0.2);
+            } else {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🏀 **${char.name}** slammed the shot! He`, { atkMultiplier: 1.2 });
+                // ATK buffs
+                myStats.atk += Math.floor(myStats.atk * 0.1);
+                mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * 0.1), 2));
+            };
 
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    //     passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //         myStats.zone = false;
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.zone = false;
 
-    //         // Crit DMG Buff
-    //         //mybuff.cd.push(new buffInfo("+", 0.25, 9999));
-    //         //myStats.cd += 0.25;
+            // Crit DMG Buff
+            //mybuff.cd.push(new buffInfo("+", 0.25, 9999));
+            //myStats.cd += 0.25;
 
-    //         // Counter Chance
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-    //             //if (Math.random() < 0.1) myStats.counter += 1;
+            // Counter Chance
+            myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                //if (Math.random() < 0.1) myStats.counter += 1;
 
-    //             // Zone (One-time)
-    //             if ((myStats.hp / myStats.maxhp < 0.4) && !myStats.zone) {
-    //                 notice.push(`\n💢 We have to win... **${char.name}** entered ZONE.`);
-    //                 let def_debuff = 0.15;
-    //                 myStats.zone = true;
+                // Zone (One-time)
+                if ((myStats.hp / myStats.maxhp < 0.4) && !myStats.zone) {
+                    notice.push(`\n💢 We have to win... **${char.name}** entered ZONE.`);
+                    let def_debuff = 0.15;
+                    myStats.zone = true;
 
-    //                 eStats.dodge -= 0.15;
-    //                 if (eStats.dodge < 0) eStats.dodge = 0;
-    //                 myStats.dodge += 0.15;
-    //                 if (myStats.dodge > 1) myStats.dodge = 1;
-    //                 eStats.def -= Math.min(Math.floor(eStats.def * def_debuff), 660);
-    //                 eStats.mr -= Math.min(Math.floor(eStats.mr * def_debuff), 660);
+                    eStats.dodge -= 0.15;
+                    if (eStats.dodge < 0) eStats.dodge = 0;
+                    myStats.dodge += 0.15;
+                    if (myStats.dodge > 1) myStats.dodge = 1;
+                    eStats.def -= Math.min(Math.floor(eStats.def * def_debuff), 660);
+                    eStats.mr -= Math.min(Math.floor(eStats.mr * def_debuff), 660);
 
-    //                 ebuff.dodge.push(new buffInfo("+", -0.15, 9999));
-    //                 mybuff.dodge.push(new buffInfo("+", 0.15, 9999));
-    //                 ebuff.def.push(new buffInfo("+", Math.min(Math.floor(eStats.def * def_debuff), 660), 9999));
-    //                 ebuff.mr.push(new buffInfo("+", Math.min(Math.floor(eStats.mr * def_debuff), 660), 9999));
-    //                 imageChange(embed, matchStats, myStats, "https://i.ibb.co/2YYgNyw5/c.png");
-    //             };
+                    ebuff.dodge.push(new buffInfo("+", -0.15, 9999));
+                    mybuff.dodge.push(new buffInfo("+", 0.15, 9999));
+                    ebuff.def.push(new buffInfo("+", Math.min(Math.floor(eStats.def * def_debuff), 660), 9999));
+                    ebuff.mr.push(new buffInfo("+", Math.min(Math.floor(eStats.mr * def_debuff), 660), 9999));
+                    imageChange(embed, matchStats, myStats, "https://i.ibb.co/2YYgNyw5/c.png");
+                };
 
-    //             return AbilityResponse.SUCCESS;
-    //         }, 9999));
+                return AbilityResponse.SUCCESS;
+            }, 9999));
 
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    //     party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-    //         let buff_multiplier = 0.1;
-    //         // Kuroko synergy
-    //         if (myStats.name == "Tetsuya Kuroko") {
-    //             buff_multiplier = 0.2;
-    //             notice.push(`\n✨ I won't let your ray of hope go out this time.`);
-    //         };
+            return AbilityResponse.SUCCESS;
+        },
+        party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            let buff_multiplier = 0.1;
+            // Kuroko synergy
+            if (myStats.name == "Tetsuya Kuroko") {
+                buff_multiplier = 0.2;
+                notice.push(`\n✨ I won't let your ray of hope go out this time.`);
+            };
 
-    //         // General DMG buff
-    //         myStats.atk += Math.floor(myStats.atk * buff_multiplier);
-    //         mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buff_multiplier), 9999));
+            // General DMG buff
+            myStats.atk += Math.floor(myStats.atk * buff_multiplier);
+            mybuff.atk.push(new buffInfo("+", Math.floor(myStats.atk * buff_multiplier), 9999));
 
-    //         // Upon ally counter, follows up with additional hit
-    //         matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-    //             if (target == myStats) {
-    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${pStats.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
-    //             };
-    //         });
+            // Upon ally counter, follows up with additional hit
+            matchStats.on("counter", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (target == myStats) {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `=͟͟͞͞🏀 **${pStats.name}** followed up with an alley-oop! He`, { atkMultiplier: 0.3 * buff_multiplier });
+                };
+            });
 
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    // },
+            return AbilityResponse.SUCCESS;
+        },
+    },
     "4767": {
         usage: 0,
         used: 0,
@@ -8143,16 +8143,16 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "1": {
+    "25978": {
         usage: 9999,
         used: 0,
         cost: 0,
         pause: -11,
         spskill: -1,
-        desc: "**Total Usage**: `Unlimited (CD: 10) + 3 (No CD)`\n**Cost**: `150 CE / ALL CE (up to 1000)`\n**Timeout**: `False, True`\n**Tags**: `DPS (Cursed Energy, Class Skill)`\n\nAs one of the four recognized special grade sorcerers, Yuta not only is adept at manipulating his cursed energy, but also landing synergistic strikes by manifesting Rika.\n\nAt the start of every round, he converts **80%** of :droplet:into a separate [Cursed Energy Pool], with a limit of **2000** Cursed Energy (<:ce:1466817050860191817>).\n\nHe alters his `Class Skill (⚜️)`:\nWhen he has less than half of his CE pool filled, he consumes **50** <:ce:1466817050860191817> and randomly uses one of the copied techniques below:\n> - Shrine: Decrease enemy's dodge rate by **25%** for **1** round, then deal **3** hits of **30%** damage\n> - Thin Ice Breaker: Apply **5%** vulnerability for **1** round, then deal **70-90%** damage\n> - Cursed Speech: Decrease enemy's ATK, MD, critical rate and crit. damage by **25%**, then deals **20%** damage\n\nElse, he enters the domain of __Authentic Mutual Love (真贋相愛)__ for **7** rounds. (timeout false). He may choose to specialize in any of the three techniques by using `ATK`, `DEF` or `Class Skill` again. Further `Class Skill`will only trigger the specialized technique. Right before exiting the domain, he casts Max. Output -- Jacob's Ladder, dealing **10%** damage for every `Class Skill` used during this duration (Up to 70%)\n\nUsing his active, he summons __Rika__ to fight alongside him for **8** rounds. immediately gains **0.5x** <:ce:1466817050860191817> currently owned (Does not bypass cap). The enemy is immobilized for **5** rounds, but has a base chance of **40%** chance to break free. This is increased by **10%** every round. Upon breaking free, they receive **30%** true damage for every round they weren't restrained. When used while Rika is alongside him, he casts the beam of love, dealing **1%** undodgeable damage for every **8** <:ce:1466817050860191817>. Then, loses all <:ce:1466817050860191817> (Up to 1000).",
-        shortdesc: "**Uses**: `Unlimited (CD: 10) + 3 (No CD)`\n**Cost**: `150 CE / ALL CE (up to 1000)`\n**Timeout**: `False / True`\n\n__**Passive**__:\n- At the start of the round, converts **80%** of mana into a separate [Cursed Energy Pool], with the limit of **2000** Cursed Energy (<:ce:1466817050860191817>).\n\n__**Class Ability**__:\nWhen he has less than half of his CE pool filled, he consumes **50** <:ce:1466817050860191817> and randomly uses one of the copied techniques below:\n- Shrine : Decrease enemy's dodge rate by **25%** for **1** round, then deal **3** hits of **30%** damage\n- Thin Ice Breaker : Apply **5%** vulnerability for **1** round, then deal **70-90%** damage.\n- Cursed Speech : Decrease the enemy's ATK, MD, critical rate and critical damage by **25%**, before dealing **20%** damage.\n\nElse, he enters the domain of __Authentic Mutual Love (真贋相愛)__ for **7** rounds. (timeout false):\n- He may choose to specialize in any of the three techniques by using ATK, DEF or Class Ability again\n- Now, using the class ability will only trigger the specialized technique\n- Right before exiting the domain, casts Max. Output - Jacob's Ladder, dealing **10%** damage for every class skill used during this duration (Up to 70%)\n\n__**Active (I)**__:\n- Summons __Rika__ to fight alongside him for **7** rounds. Immediately gains **0.5x** <:ce:1466817050860191817> currently owned (Does not bypass cap)\n- The enemy is immobilized for **5** rounds, but has a base chance of **40%** chance to break free. This is increased by **10%** every round. Upon breaking free, they receive **30%** true damage for every round they weren't restrained.\n\n__**Active (II)**__:\n- When __Rika__ is alongside him, he casts the beam of love, dealing **1%** undodgeable damage for every **8** <:ce:1466817050860191817>. Then, loses all <:ce:1466817050860191817> (At most 1000).",
+        desc: "**Total Usage**: `Unlimited (CD: 15) + 3 (No CD)`\n**Cost**: `150 CE / ALL CE (up to 1000)`\n**Timeout**: `False, True`\n**Tags**: `DPS (Cursed Energy, Class Skill)`\n\nAs one of the four recognized special grade sorcerers, Yuta not only is adept at manipulating his cursed energy, but also landing synergistic strikes by manifesting Rika.\n\nAt the start of every round, he converts **80%** of :droplet:into a separate [Cursed Energy Pool], with a limit of **2000** Cursed Energy (<:ce:1466817050860191817>).\n\nHe alters his `Class Skill (⚜️)`:\nWhen he has less than half of his CE pool filled, he consumes **50** <:ce:1466817050860191817> and randomly uses one of the copied techniques below:\n> - Shrine: Decrease enemy's dodge rate by **25%** for **1** round, then deal **3** hits of **30%** damage\n> - Thin Ice Breaker: Apply **5%** vulnerability for **1** round, then deal **70-90%** damage\n> - Cursed Speech: Decrease enemy's ATK, MD, critical rate and crit. damage by **25%**, then deals **20%** damage\n\nElse, he enters the domain of __Authentic Mutual Love (真贋相愛)__ for **7** rounds. (timeout false). He may choose to specialize in any of the three techniques by using `ATK`, `DEF` or `Class Skill` again. Further `Class Skill`will only trigger the specialized technique. Right before exiting the domain, he casts Max. Output -- Jacob's Ladder, dealing **10%** damage for every `Class Skill` used during this duration (Up to 70%)\n\nUsing his active, he summons __Rika__ to fight alongside him for **8** rounds. immediately gains **0.5x** <:ce:1466817050860191817> currently owned (Does not bypass cap). The enemy is immobilized for **5** rounds, but has a base chance of **40%** chance to break free. This is increased by **10%** every round. Upon breaking free, they receive **30%** true damage for every round they weren't restrained. When used while Rika is alongside him, he casts the beam of love, dealing **1%** undodgeable damage for every **8** <:ce:1466817050860191817>. Then, loses all <:ce:1466817050860191817> (Up to 1000).",
+        shortdesc: "**Uses**: `Unlimited (CD: 15) + 3 (No CD)`\n**Cost**: `150 CE / ALL CE (up to 1000)`\n**Timeout**: `False / True`\n\n__**Passive**__:\n- At the start of the round, converts **80%** of mana into a separate [Cursed Energy Pool], with the limit of **2000** Cursed Energy (<:ce:1466817050860191817>).\n\n__**Class Ability**__:\nWhen he has less than half of his CE pool filled, he consumes **50** <:ce:1466817050860191817> and randomly uses one of the copied techniques below:\n- Shrine : Decrease enemy's dodge rate by **25%** for **1** round, then deal **3** hits of **30%** damage\n- Thin Ice Breaker : Apply **5%** vulnerability for **1** round, then deal **70-90%** damage.\n- Cursed Speech : Decrease the enemy's ATK, MD, critical rate and critical damage by **25%**, before dealing **20%** damage.\n\nElse, he enters the domain of __Authentic Mutual Love (真贋相愛)__ for **7** rounds. (timeout false):\n- He may choose to specialize in any of the three techniques by using ATK, DEF or Class Ability again\n- Now, using the class ability will only trigger the specialized technique\n- Right before exiting the domain, casts Max. Output - Jacob's Ladder, dealing **10%** damage for every class skill used during this duration (Up to 70%)\n\n__**Active (I)**__:\n- Summons __Rika__ to fight alongside him for **7** rounds. Immediately gains **0.5x** <:ce:1466817050860191817> currently owned (Does not bypass cap)\n- The enemy is immobilized for **5** rounds, but has a base chance of **40%** chance to break free. This is increased by **10%** every round. Upon breaking free, they receive **30%** true damage for every round they weren't restrained.\n\n__**Active (II)**__:\n- When __Rika__ is alongside him, he casts the beam of love, dealing **1%** undodgeable damage for every **8** <:ce:1466817050860191817>. Then, loses all <:ce:1466817050860191817> (At most 1000).",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Okkotsu EX
+            // Yuta Okkotsu EX
 
             // Return when Insufficient cost to even summon Rika (Active I)
             if (myStats.ce < 150 && !myStats.rika) {
@@ -8171,7 +8171,7 @@ export const abilities: Record<number, Ability> = {
                 };
 
                 noTimeout(matchStats, myStats);
-                this.pause = matchStats.round + 10;
+                this.pause = matchStats.round + 15;
                 myStats.rika = true;
                 myStats.ce = (myStats.ce * 1.5);
                 if (myStats.ce > myStats.ceCap) myStats.ce = myStats.ceCap;
@@ -8183,7 +8183,7 @@ export const abilities: Record<number, Ability> = {
 
                 // When Domain Ends
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    let restrainedRounds = matchStats.round - (this.pause - 10);
+                    let restrainedRounds = matchStats.round - (this.pause - 15);
                     if (myStats.ignoreRestrain) return AbilityResponse.SUCCESS;
                     if (Math.random() < (0.4 + 0.1 * restrainedRounds) || matchStats.round === this.pause + 5) {
                         notice.push(`\n✨**${enemy.name}** broke through **Rika**'s grip!`);
@@ -8370,7 +8370,7 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "2": {
+    "25977": {
         usage: 9999,
         used: 0,
         cost: 0,

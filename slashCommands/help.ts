@@ -36,9 +36,9 @@ const exportCommand: SlashCommand = {
                         anniversary: "🌙 Anniversary Event",
                         halloween: "🎃 Halloween Event",
                         christmas: "🎄 Christmas Event",
-                        valentines: "💖 Valentines Event",
+                        valentines: "💖 Valentine's Event",
                         easter: "🐣 Easter Event",
-                    }[ongoingEvent], value: "`/christmas craze` `/frostbound yule` `/seasonal shop`\n`/christmas-present` `/event pass` `/ex pull`"
+                    }[ongoingEvent], value: "`/boss hunt` `/valentines-chocolate` `/seasonal shop`\n`/event pass` `/event rewards` `/ex pull`"
                 },
             );
             Embed.addFields(
