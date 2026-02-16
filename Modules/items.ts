@@ -4484,7 +4484,7 @@ export const items = [
     }, "Critical strikes inflict a poison, dealing **3%** damage to the enemy for 3 rounds (or **6%** of own HP if enemy has more than twice your HP). Additionally, the wielder takes **15%** less damage.\n\n_A reduction of 15% = 155 DEF|MR_", "This dagger is as deadly elegant as its namesake, forged by celestial blacksmiths guided by the goddess Serket, who is associated with scorpions and protection. More than just a weapon, Serket's Sting is a representation of the heavenly might and protection. With an iridescent sheen like to a scorpion's exoskeleton, its blade is crafted from an unearthly metal. Its edge is so sharp that it seems to pierce both the earthly and spiritual planes. Its real strength comes from its affinity with the goddess herself. The dagger gains the ability to extend the goddess's divine will during terrible circumstances or when the wielder calls upon Serket. The blows it delivers have the power of a skilled killer combined with the protective edge of a kind guardian angel. Wielding Serket's Sting is a sacred duty, and those chosen to bear it are considered both guardians and avengers under the watchful eyes of the Divine Viper.", "mythical", 685),
 
     // Loot - Valentine's
-    new lootInfo("Valentine's Chocolate", "loot", "event exclusive item", ["valentine's event"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/hXP3CkT/Valentine-s-Chocolate.png", "mythical", 686, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
+    new lootInfo("Valentine's Chocolate (2024)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_chocolate:1207055321839960194>", "https://i.ibb.co/hXP3CkT/Valentine-s-Chocolate.png", "mythical", 686, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
 
     // Additional Weapons
     new weaponInfo("Sacred Life Salamander", "weapon", "staff", ["chest"], "<:sacred_life_salamander:1274884340840665088>", "https://i.imgur.com/OGnmcD7.png", "md", 173, 976, "mr", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -6469,7 +6469,7 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.vulnerabilityDynamic ??= 0;
+            eStats.vulnerabilityDynamic ??= 1;
             eStats.vulnerabilityDynamic += 0.1;
 
             return AbilityResponse.SUCCESS;
@@ -6539,6 +6539,10 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher).", "rare", 793),
+
+    // Loot - Valentine's
+    new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
+
 
 
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
