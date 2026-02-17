@@ -8106,6 +8106,7 @@ export const abilities: Record<number, Ability> = {
                     //myStats.aneiraUsedActive = false;
                     delete myStats.replaceButton.atk;
                     delete myStats.replaceButton.cskill;
+                    myStats.icicle = -1;
 
                     // Remove frozen
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -8131,9 +8132,10 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (!myStats.aneiraUsedActive) {
                     myStats.icicle++;
+                    if (myStats.icicle > 40) myStats.icicle = 40;
                     switch (myStats.icicle) {
-                        case 15: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **15** icicles.`); break;
-                        case 25: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **25** icicles.`); break;
+                        case 15: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now owns **15** icicles.`); break;
+                        case 25: notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now owns **25** icicles.`); break;
                         case 40: if (iciNotif) notice.push(`\n<:icicle:1446880458498375701> **${char.name}** now own **40** icicles (maxed).`); iciNotif = 0; break;
                     };
                 };
