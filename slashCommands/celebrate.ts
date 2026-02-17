@@ -80,7 +80,7 @@ export const exportCommand: SlashCommand = {
                     await updateUsers(interaction.user.id, {
                         valentine: { type: 'set', value: user.id }
                     });
-                    await updateUsers(interaction.user.id, {
+                    await updateUsers(user.id, {
                         items: { type: 'merge_json', value: { [794]: 1 } }
                     });
 
