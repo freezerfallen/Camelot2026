@@ -25992,8 +25992,8 @@ export const characters: charInfo[] = [
     new charInfo("Chiyo no Haha", ["Chiyo's Mother"], anime[693], "F", "https://i.ibb.co/wZ8TX5z8/c.png", 25888, "D"),
     new charInfo("Shitsuji Joshi", ["Butler Woman"], anime[693], "F", "https://i.ibb.co/Z1b0R3nd/c.png", 25889, "D"),
     new charInfo("Reze", [], anime[243], "F", "https://i.ibb.co/tT0vbp07/c.png", 25890, "SS"),
-    new charInfo("Suho Kim", [], anime[375], "M", 'https://i.ibb.co/WNHrCXnJ/c.png', 25891, "S"),
-    new charInfo("Tyrannus", [], anime[375], "M", 'https://i.ibb.co/xSv0qdtR/c.png', 25892, "C"),
+    new charInfo("Übel", ["Ubel"], anime[457], "F", "https://i.ibb.co/8nYyJ0Y8/c.png", 25891, "S"),
+    new charInfo("Suho Kim", [], anime[375], "M", 'https://i.ibb.co/WNHrCXnJ/c.png', 25892, "S"),
     new charInfo("Samarkhan al-Ahinsyad", [], anime[375], "M", 'https://i.ibb.co/gZH9SDsP/c.png', 25893, "D"),
     new charInfo("Giyeong Go", [], anime[375], "M", 'https://i.ibb.co/7tNb6bLy/c.png', 25894, "S"),
     new charInfo("Lila", [], anime[375], "F", 'https://i.ibb.co/Xffn8HPc/c.png', 25895, "D"),
@@ -26081,6 +26081,8 @@ export const characters: charInfo[] = [
     new charInfo("Fern & Stark EX", ["Fern&Stark EX", "Fern EX", "Stark EX"], anime[457], "F", "https://i.ibb.co/FqmXLDxH/c.png", 25977, "EX"),
     new charInfo("Yuta Okkotsu EX", ["Yuta EX", "Okkotsu EX"], anime[42], "M", "https://i.ibb.co/SwTBswsr/c.png", 25978, "EX"),
     new charInfo("Suyeon Lee", [], anime[375], "F", 'https://i.ibb.co/qFpvB6ms/c.png', 25979, "C"),
+    new charInfo("Tyrannus", [], anime[375], "M", 'https://i.ibb.co/xSv0qdtR/c.png', 25980, "C"),
+
 
 ];
 
