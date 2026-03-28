@@ -1374,7 +1374,7 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     // Beat floor 300
     if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
 
-    return 3; //total;
+    return total;
 };
 
 export const formatNumberWithQuotes = (num: number) => {
