@@ -67,7 +67,7 @@ export default class charInfo implements IcharInfo {
     };
     get rarityEmoji() {
         return {
-            "VIP": "<a:EXTRA:1138530846144462968>",
+            "VIP": "<a:vip1:1488516064982597732><a:vip2:1488516143307161811>",
             "EX": "<a:EXTRA:1138530846144462968>",
             "SS": "<:SSTier:869316489931546644>",
             "S": "<:STier:869316518675095552>",
@@ -26099,6 +26099,8 @@ export const uniqueAnimeCharacters = characters.reduce((acc: { seenAnimes: Recor
 
 export const charactersF = characters.filter((e) => e.gender === "F");
 export const charactersM = characters.filter((e) => e.gender === "M");
+export const charactersVIP = characters.filter((e) => e.rarity === "VIP");
+export const charactersEX = characters.filter((e) => e.rarity === "EX");
 export const charactersSS = characters.filter((e) => e.rarity === "SS");
 export const charactersS = characters.filter((e) => e.rarity === "S");
 export const charactersA = characters.filter((e) => e.rarity === "A");

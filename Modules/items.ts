@@ -6711,6 +6711,11 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- The enemy and wearer are pierced by <:cupid1:1467345464499376132><:cupid2:1467345506723168308><:cupid3:1467345548230004854><:cupid4:1467345585328885945> at the start of the fight, where if either lands a critical hit on the other, they lose **10%** critical rate and take **20%** damage (scaling off the other's ATK/MD, whichever is higher). This can occur once every round.", "rare", 793),
+
+    // Loot - Valentine's
+    new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
+
+    // Easter Runes 2026
     new runeInfo("Hunt of the Leporine", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.hotlrabbit = 0;
@@ -6732,7 +6737,7 @@ export const items = [
 
             return AbilityResponse.SUCCESS;
         },
-    }, "- Summons **1** `Rabbit` every healing instance (Up to once per round), inflicting a **0.5%** ATK/MD (whichever is higher at the time) DoT on the enemy for the rest of the fight.\n- Stops summoning `Rabbit` when there are **50** of them. Instead, deal **10%** damage every round.", "rare", 794),
+    }, "- Summons **1** `Rabbit` every healing instance (Up to once per round), inflicting a **0.5%** ATK/MD (whichever is higher at the time) DoT on the enemy for the rest of the fight.\n- Stops summoning `Rabbit` when there are **50** of them. Instead, deal **10%** damage every round.", "rare", 795),
     new runeInfo("Unravelling", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.unravelling = 3;
@@ -6766,10 +6771,8 @@ export const items = [
 
             return AbilityResponse.SUCCESS;
         },
-    }, "- Enters battles with **3** layers of protection cover, each increasing damage mitigation by **8%**.\n- Upon falling below **33%** HP, sacrifices a layer to recover **10%** max HP, and deal **40%** damage to the enemy.", "rare", 795),
+    }, "- Enters battles with **3** layers of protection cover, each increasing damage mitigation by **8%**.\n- Upon falling below **33%** HP, sacrifices a layer to recover **10%** max HP, and deal **40%** damage to the enemy.", "rare", 796),
 
-    // Loot - Valentine's
-    new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
 
 
 
