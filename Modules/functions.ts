@@ -659,8 +659,10 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         target.dodgeStreak = 0;
         target.blockStreak++;
         if (target.blockBuffDef) targetBuff.def.push(new buffInfo("+", target.blockBuffDef, 6)), targetBuff.mr.push(new buffInfo("+", target.blockBuffDef, 6));
-        if (target.blockBurn) attacker.hp -= Math.floor(attacker.hp > 2 * target.hp ? 2 * target.hp * target.blockBurn : attacker.hp * target.blockBurn);
-
+        if (target.blockBurn) {
+            attacker.hp -= Math.floor(attacker.hp > 2 * target.hp ? 2 * target.hp * target.blockBurn : attacker.hp * target.blockBurn);
+            attacker.burnduration++;
+        };
         // Diminishing Returns
         // if (target.blockStreak >= 2) targetBuff.br.push(new buffInfo("*", 0.875, 6));
 
@@ -718,7 +720,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         mr: Math.max(Math.pow(0.99895, options.defReductionCap ? Math.max(effectiveMr - options.defReductionCap, options.defMultiplier * effectiveMr) : (options.defMultiplier * effectiveMr)), (target.removeDefCap ? 0 : 0.1)) * ((((target.increase_mrcap ?? 0) > 0) && ((options.defMultiplier * effectiveMr) - 2192 > 0)) ? Math.pow(0.99895, Math.min((options.defMultiplier * effectiveMr) - 2192, options.defMultiplier * target.increase_mrcap)) : 1),
         crit: ((isCrit || attacker.shorekeeperUsedActive) ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
-        lightning: options.isLightning ? ((1 + (attacker.lightningMultiplier || 0)) * (1 - (target.lightningResistance || 0))) : 1,
+        lightning: options.isLightning ? ((1 + (attacker.lightningMultiplier || 0) + ((attacker.tempLightningBuff && attacker.tempLightningBuffActive) ? attacker.tempLightningBuff : 0)) * (1 - (target.lightningResistance || 0))) : 1,
         rng: (1 - (0.2 * Math.random())),
     };
     // Removed redundant line: crit scaling now handled in multipliers.crit
@@ -730,6 +732,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     if (attacker.critbonus && (isCrit || attacker.shorekeeperUsedActive)) damage = Math.floor(damage * (1 + attacker.critbonus));
     attacker.crittedTotal ||= 0;
     attacker.crittedTotal++;
+
 
     // Other Damage Formulas
     if (options.damageFormula.startsWith("log_scale_")) {
@@ -768,6 +771,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     if (target.deflectDamage) {
         attacker.hp = Math.floor(attacker.hp - Math.floor(damage * target.deflectDamage));
         if (target.mitrecord) target.mitstore += Math.floor(damage * Math.min(1, target.deflectDamage));
+        if (target.deflheal) addHeal(target, attacker, target, targetBuff, attackerBuff, matchStats, notice, ``, Math.floor(Math.min(target.maxhp * 0.04, Math.floor(damage * Math.min(1, target.deflectDamage)))), {});
         damage = Math.floor(damage * (1 - Math.max(0, Math.min(1, target.deflectDamage))));
         if (attacker.hp < 1) attacker.hp = 0;
     };
@@ -920,6 +924,9 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     if (options.isPyro) {
         targetBuff.hp.push(new buffInfo("+", -Math.round(attacker.atk * 0.03), 3));
     };
+
+    if (options.isLightning) attacker.lightningcount = (attacker.lightningcount ?? 0) + 1;
+    if (options.isLightning && attacker.lightningBuff && attacker.lightningBuffActive) attacker.lightningBuffActive--;
     // if (attacker.sjwUsedActive) {
     //     if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
     //     if (isCrit) { // Igris
@@ -983,14 +990,60 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
             };
         };
 
-        // 2: General Heal reduction
-        if (attacker.reduceHealing) amount *= (1 - attacker.reduceHealing);
+        // 2: General Heal addition/reduction
+        if (attacker.reduceHealing || target.increaseHealing) amount *= (1 - (attacker.reduceHealing ? attacker.reduceHealing : 0) + (target.increaseHealing ? target.increaseHealing : 0));
         if (amount > 0) target.hp += Math.floor(amount);
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
+
+        matchStats.trigger("heal", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
     };
     if (log && amount > 0) notice.push(`\n💖 **${target.name}** has healed **${amount}** HP`);
     if (log && amount < 0) notice.push(`\n💔 **${target.name}** has lost **${amount}** HP`);
+};
+
+export const procburn = (target: DetailedStats, attacker: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, flags = {}) => {
+    const options = { // true = enabled, false = disabled
+        type: target.burntype,
+        ignoreDuration: false,
+        burncrit: false,
+    };
+    if (target.burnduration <= 0 && !options.ignoreDuration) return;
+    Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
+    const critChance = (options.burncrit || attacker.burncrit) ? 0 : Math.random();
+    switch (options.type) {
+        case 1: {
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance });
+            target.burnduration--;
+            matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
+            break;
+        };
+        case 2: {
+            const total = (attacker.lightningcount ?? 0) + (attacker.burncount ?? 0);
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:plasma:1480572957788082267> **${target.name}**'s plasma`, { atkMultiplier: 0.2 + Math.min(0.01 * Math.floor(total / 5), 0.5), magicDamage: true, flexibleDmg: true, critChance: critChance });
+            target.burnduration--;
+            matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
+            break;
+        };
+        case 3: {
+            const atkScale = Math.min(0.01 * target.burnduration, 0.5), critBuff = Math.min(0.01 * Math.floor(matchStats.round / 4), 0.2);
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:vivium:1480572908496490710> **${target.name}**'s vivium`, { atkMultiplier: atkScale, critBuff: critBuff, magicDamage: true, critChance: critChance });
+            target.sm -= 5;
+            if (target.sm < 0) target.sm = 0;
+            target.burnduration--;
+            matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
+            break;
+        };
+        default: {
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance });
+            target.burnduration--;
+            matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
+            break;
+        };
+    };
+
+    if (target.burnduration < 0) target.burnduration = 0;
+    if (attacker.burncount >= 0) attacker.burncount++;
 };
 
 // export const applyDynamicDoT = (
