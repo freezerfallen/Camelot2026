@@ -5,7 +5,7 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Gender = 'M' | 'F' | 'NB';
 
-export type CharacterRarity = 'EX' | 'SS' | 'S' | 'A' | 'B' | 'C' | 'D';
+export type CharacterRarity = 'VIP' | 'EX' | 'SS' | 'S' | 'A' | 'B' | 'C' | 'D';
 
 export type ItemRarity = 'genesis' | 'mythical' | 'legendary' | 'unique' | 'rare' | 'special' | 'normal';
 
