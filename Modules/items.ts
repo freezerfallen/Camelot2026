@@ -5,7 +5,6 @@ import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal, noTimeout, procburn } from "./functions";
 import { AbilityResponse } from "./components";
 import { Ability } from "./abilities";
-import { isInteger } from "lodash";
 
 export class itemInfo {
     private _name: string;
@@ -2025,7 +2024,7 @@ export const items = [
     }, "Drains **2.5%** HP from the enemy and adds it to the wielder every round. If enemy HP is more than twice of the wielders HP, it drains the equivalent of **5%** of the wielders HP instead.", "The legendary sword known as the Draiocht is said to have been forged by the ancient vampire lords, imbued with the power to drain the life force of its victims. Its razor-sharp blade, forged from the purest silver, is capable of slicing through flesh and bone with ease. Those who wield it are said to be blessed with the strength and immortality of the vampire race, but beware, for the sword's thirst for blood is insatiable.", "legendary", 288),
     new weaponInfo("Fafnir's Breath", "weapon", "sword", ["chest"], "<:fafnirs_breath:1068510727352111246>", "https://i.imgur.com/33iwj5O.png", "atk", 50, 820, "cd", 0.08, 0.5, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -2155,7 +2154,7 @@ export const items = [
     }, "The wielder gains an additional **30%** magic damage buff when their mana bar is at least **80%** full.", "Aetherius is imbued with the very essence of the skies, channeling the boundless power of the heavens into devastating blasts of magical energy. Those who wield it are said to be able to call down the wrath of the gods themselves, smiting their foes with the fury of the storm.", "legendary", 301),
     new weaponInfo("Avalon's Fury", "weapon", "staff", ["chest"], "<:avalons_fury:1068521931063689316>", "https://i.imgur.com/EMNhQn4.png", "md", 54, 847, "md%", 0.06, 0.18, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -2320,7 +2319,7 @@ export const items = [
     }, "The wielder has **100%** crit rate during the first 4 rounds.", "As Death's Bite descends upon its foes, its sharp blade glints in the light, ready to deliver the final blow. With each swing, the axe unleashes a powerful and deadly force, tearing through armor and flesh with ease. Those who dare to face it in combat will feel the cold embrace of death in its devastating strikes.", "legendary", 320),
     new weaponInfo("Death's Fragrance", "weapon", "axe", ["chest"], "<:deaths_fragrance:1068531128065077389>", "https://i.imgur.com/bXI5QCd.png", "atk", 60, 884, "cd", 0.05, 0.37, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -2595,7 +2594,7 @@ export const items = [
     }, "The wielder has twice as much crit damage during the first 8 rounds (max +40%).", "The Life Subtractor is a weapon of death and destruction, crafted with the sole purpose of draining the life force from its victims. With a single strike, this lance can leave even the strongest of warriors on the brink of death, their life essence siphoned away by its dark power. Wield it with caution, for the Life Subtractor has a thirst for blood that can never be quenched.", "legendary", 351),
     new weaponInfo("Ignis Aureus", "weapon", "lance", ["chest"], "<:ignis_aureus:1068648981925728407>", "https://i.imgur.com/KHXDQ6i.png", "atk", 52, 837, "sm", 2, 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -2758,7 +2757,7 @@ export const items = [
     }, "Drains **6%** HP from the enemy and adds it to the wielder every 3rd round. If enemy HP is more than twice of the wielders HP, it drains the equivalent of **12%** of the wielders HP instead.", "Forged in the fiery depths of Elysium, Elysium's Edge is a weapon of pure grace and precision. Its sharp, glistening blade is imbued with the power of the gods, capable of slicing through even the toughest armor with ease. In the hands of a skilled warrior, this dagger is a weapon of true destruction, capable of striking fear into the hearts of even the bravest of foes.", "legendary", 369),
     new weaponInfo("Ember's Kiss", "weapon", "dagger", ["chest"], "<:embers_kiss:1068703206391164998>", "https://i.imgur.com/j9ahUSM.png", "atk", 52, 834, "cd", 0.07, 0.48, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -3251,7 +3250,7 @@ export const items = [
     }, "Drains **3%** HP from the enemy and adds it to the wielder every round. If enemy HP is more than twice of the wielders HP, it drains the equivalent of **6%** of the wielders HP instead.", "The Nightwing Myst bow is a sleek and deadly weapon, perfectly balanced and designed for speed and accuracy. Its dark finish is nearly impossible to see in the shadows, making it the perfect tool for stealthy and deadly archery. The Nightwing Myst is a favorite among assassins and other shadowy figures, who rely on its quick strike and silent power to eliminate their targets without being detected. With the Nightwing Myst in hand, you can strike fear into the hearts of your enemies and leave them trembling in the darkness.", "mythical", 413),
     new weaponInfo("Sagitta Solis", "weapon", "bow", ["chest"], "<:sagitta_solis:1069016593356566528>", "https://i.imgur.com/xZmQlxx.png", "atk", 104, 1052, "md", 86, 857, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -3440,7 +3439,7 @@ export const items = [
     }, "Non-critical hits on the enemy grant **1x** `Slice` (Up to **10**, can be procced once every round). Every `Slice` raises MD by **3%**. After any non-critical hit, if the wielder has **10x** `Slice`, consumes **10x** to unleash mystic arcane power, dealing **120%** undodgeable MD. This attack will not break combos.", "The Arcane Slicer is a dagger imbued with ancient magic, capable of slicing through even the toughest of defenses. Its razor-sharp blade glows with a faint, otherworldly light, making it a formidable weapon in the hands of those skilled in the arcane arts.", "mythical", 423),
     new weaponInfo("Flaming Fomor", "weapon", "dagger", ["chest"], "<:flaming_fomor:1069020248398897202>", "https://i.imgur.com/7sryILJ.png", "atk", 108, 1137, "cd", 0.12, 0.54, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -3615,7 +3614,7 @@ export const items = [
     }, "The wielder decreases the enemy's MR by **1%** for every **2%** critical rate, up to **-45%**. (Capped at 3x DMG). Heals the wielder by **8%** of the damage dealt.", "The Sacred Lifemender staff is a powerful tool, as with a single touch, it can mend even the most severe injuries... But what gives off such power of pain soothing? The delicate smiles after every revitalization, the bewildered faces after every rekindlement, the stream of praises after every relaxation... Perhaps healing has its costs, Mari guesses wildly, gently brushing off the layers of dust covering this staff. Just maybe, such power does not come from the staff, but the wielder, its capabilities of compassion and care, spreading the eagerness of repairing the broken, rejuvenating the old, and in the same way, reigniting that inner passion.", "genesis", 436),
     new weaponInfo("Vermillion Vane", "weapon", "staff", ["chest"], "<:vermillion_vane:1069025800965324882>", "https://i.imgur.com/ccvhu0B.png", "md", 227, 1306, "mr", 64, 254, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -3713,7 +3712,7 @@ export const items = [
     // Weapons - Genesis Bow
     new weaponInfo("Flames of Valyria", "weapon", "bow", ["chest"], "<:flames_of_valyria:1069028632065998888>", "https://i.imgur.com/oGn5Whz.png", "atk", 212, 1187, "atk%", 0.12, 0.28, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -3854,7 +3853,7 @@ export const items = [
     }, "Every odd round the wielder takes **40%** reduced physical damage, and every even round **40%** reduced magic damage. The wielder gets **+25%** more class xp in the dungeon after a win.\n\n_A reduction of 40% = 486 DEF|MR_", "Roots of Yggdrasil is a weapon of great significance, crafted from the roots of Yggdrasil, the great tree that holds the universe together. Its surface is decorated with intricate patterns and symbols that represent the different realms and creatures. When wielded in combat, it can provide powerful protection and support to its user.", "genesis", 449),
     new weaponInfo("Wyrmfire Wall", "weapon", "shield", ["chest"], "<:wyrmfire_wall:1069033761481703504>", "https://i.imgur.com/5Z7mChd.png", "shield", 248, 1526, "br", 0.08, 0.24, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
