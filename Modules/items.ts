@@ -5,7 +5,6 @@ import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal, noTimeout, procburn } from "./functions";
 import { AbilityResponse } from "./components";
 import { Ability } from "./abilities";
-import { isInteger } from "lodash";
 
 export class itemInfo {
     private _name: string;
