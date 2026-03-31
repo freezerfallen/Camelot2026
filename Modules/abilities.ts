@@ -8,7 +8,6 @@ import buffInfo from "./buffs";
 import { Buffs, DetailedStats, IbuffInfo, IcharInfo, IentityInfo, MatchStats } from "../types";
 import { getLatestStampede, getUserSchema, getUserWeaponCount, updateUsers, getPartyMembers, getUserSchemas } from "./queries";
 import { AbilityResponse } from "./components";
-import { isInteger } from "lodash";
 
 export type Ability = {
     usage: number;
@@ -344,7 +343,7 @@ export const abilities: Record<number, Ability> = {
             myStats.yoimiyaLastTwinshot = matchStats.round;
 
             eStats.burntype ??= 1;
-            if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+            if (typeof eStats.burnduration !== "number") {// Trigger burn every round
                 eStats.burnduration = 0;
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -4318,7 +4317,7 @@ export const abilities: Record<number, Ability> = {
 
             // Burn SETUP
             eStats.burntype ??= 1;
-            if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+            if (typeof eStats.burnduration !== "number") {// Trigger burn every round
                 eStats.burnduration = 0;
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
@@ -8716,7 +8715,7 @@ export const abilities: Record<number, Ability> = {
         },
         passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             eStats.burntype = 3; // 3 = Vivium
-            if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+            if (typeof eStats.burnduration !== "number") {// Trigger burn every round
                 eStats.burnduration = 0;
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                     procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});

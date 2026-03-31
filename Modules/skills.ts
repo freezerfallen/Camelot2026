@@ -7,7 +7,6 @@ import delayedBuffs from "./delayedBuffs";
 import { CharacterRarity, ClassAbility, IskillInfo } from "../types";
 import { getUserSchema } from "./queries";
 import { AbilityResponse } from "./components";
-import { isInteger } from "lodash";
 
 export default class skillInfo implements IskillInfo {
     private _id: number;
@@ -1061,7 +1060,7 @@ export const skills: skillInfo[] = [
         //myStats.md += Math.floor(myStats.md * 0.2);
 
         eStats.burntype ??= 1;
-        if (!isInteger(eStats.burnduration)) {// Trigger burn every round
+        if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
