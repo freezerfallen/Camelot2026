@@ -63,10 +63,11 @@ export default class charInfo implements IcharInfo {
     };
 
     get rarityValue() {
-        return { "D": 0, "C": 1, "B": 2, "A": 3, "S": 4, "SS": 5, "EX": 6 }[this._rarity];
+        return { "D": 0, "C": 1, "B": 2, "A": 3, "S": 4, "SS": 5, "EX": 6, "VIP": 7 }[this._rarity];
     };
     get rarityEmoji() {
         return {
+            "VIP": "<a:EXTRA:1138530846144462968>",
             "EX": "<a:EXTRA:1138530846144462968>",
             "SS": "<:SSTier:869316489931546644>",
             "S": "<:STier:869316518675095552>",

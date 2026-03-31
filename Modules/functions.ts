@@ -134,6 +134,7 @@ export const cat1 = (num: number) => {
 };
 
 const lvlupStats = {
+    "VIP": { "hp": { "base": 5, "add": 1 }, "atk": { "base": 2.4, "add": 0.35 }, "def": { "base": 1.25, "add": 0.25 } },
     "EX": { "hp": { "base": 5, "add": 1 }, "atk": { "base": 2.4, "add": 0.35 }, "def": { "base": 1.25, "add": 0.25 } },
     "SS": { "hp": { "base": 5, "add": 1 }, "atk": { "base": 2.4, "add": 0.35 }, "def": { "base": 1.25, "add": 0.25 } },
     "S": { "hp": { "base": 3.9, "add": 0.6 }, "atk": { "base": 1.9, "add": 0.3 }, "def": { "base": 1, "add": 0.2 } },
@@ -1211,6 +1212,7 @@ export const searchAnimeTitle = (name: string, interaction: ChatInputCommandInte
 
 export const rarity = (rar: CharacterRarity) => {
     switch (rar) {
+        case "VIP": return "https://i.ibb.co/dwT30xDn/vip.gif";
         case "EX": return "https://i.ibb.co/1GDqXkg/extra-dark.gif"; // "https://i.ibb.co/0V1bDLm/ex.png";
         case "SS": return "https://i.ibb.co/GdhDTj1/n3qj4i2.png";
         case "S": return "https://i.ibb.co/8KZJLLZ/aSXEB8J.png";
@@ -1220,6 +1222,34 @@ export const rarity = (rar: CharacterRarity) => {
         case "D": return "https://i.ibb.co/Yp26KZG/qHR5lBz.png";
         default: return "https://i.ibb.co/j6Vhb5B/zPpfb14.jpg";
     };
+};
+
+export const rarityColor = (rar: CharacterRarity) => {
+    switch (rar) {
+        case "VIP": return 0xfdc7f9;
+        case "EX": return 0x2aad9d;
+        case "SS": return 0x9952eb;
+        case "S": return 0xfef300;
+        case "A": return 0x2cdfe5;
+        case "B": return 0xf2591c;
+        case "C": return 0x44d53a;
+        case "D": return 0x7a7a7a;
+        default: return 0xbbffff;
+    };
+};
+
+export const rarityEmoji = (rar: CharacterRarity): string => {
+    switch (rar) {
+        case "VIP": return "<a:EXTRA:1138530846144462968>";
+        case "EX": return "<a:EXTRA:1138530846144462968>";
+        case "SS": return "<:SSTier:869316489931546644>";
+        case "S": return "<:STier:869316518675095552>";
+        case "A": return "<:ATier:869316558013464627>";
+        case "B": return "<:BTier:869316586803179571>";
+        case "C": return "<:CTier:869316602858991657>";
+        case "D": return "<:DTier:869316616071032843>";
+        default: return "";
+    }
 };
 
 export const getSingleRefinement = (cid: number) => {
@@ -1270,7 +1300,7 @@ export const displayPull = (user: User, thisChar: charInfo, pCount: number, dupe
     };
 
     const Embed = new EmbedBuilder()
-        .setColor({ D: 0x7a7a7a, C: 0x44d53a, B: 0xf2591c, A: 0x2cdfe5, S: 0xfef300, SS: 0x9952eb, EX: 0x2aad9d, default: 0xbbffff }[thisChar.rarity])
+        .setColor(rarityColor(thisChar.rarity))
         .setImage(thisChar.image)
         .setThumbnail(rarity(thisChar.rarity))
         .setDescription(`**${thisChar.name}**\n${animeL}\n\n**Ref**. ${refinement}`)
@@ -1363,13 +1393,13 @@ export const getItemLevel = (xp: number) => {
 export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon_classlevels" | "dungeon_floors">) => {
     let total = 0;
 
+    // Reach account level 20
+    const accLevel = userLevel(stats.xp);
+    if (accLevel >= 20) total++;
+
     // Reach clvl 1000
     const classLevelTotal = getClassLvl(41, { 41: Object.values(stats.dungeon_classlevels).reduce((acc, e) => acc + e, 0) });
     if (classLevelTotal >= 1000) total++;
-
-    // Reach account level 100
-    const accLevel = userLevel(stats.xp);
-    if (accLevel >= 100) total++;
 
     // Beat floor 300
     if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;

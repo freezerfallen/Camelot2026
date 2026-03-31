@@ -1703,8 +1703,8 @@ export const crazeBossAbilities2023: skillInfo[] = [
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.removeDefCap = true;
 
-        const setDef: number = { "D": 0, "C": 150, "B": 300, "A": 500, "S": 600, "SS": 800, "EX": 1000 }[char.rarity as CharacterRarity];
-        const multAtk: number = { "D": 3.2, "C": 2, "B": 1.6, "A": 1.2, "S": 0.8, "SS": 0.6, "EX": 0.4 }[char.rarity as CharacterRarity] * ((7 - (items[myStats.weapon]?.gradeValue ?? 0)) / 2);
+        const setDef: number = { "D": 0, "C": 150, "B": 300, "A": 500, "S": 600, "SS": 800, "EX": 1000, "VIP": 1200 }[char.rarity as CharacterRarity];
+        const multAtk: number = { "D": 3.2, "C": 2, "B": 1.6, "A": 1.2, "S": 0.8, "SS": 0.6, "EX": 0.4, "VIP": 0.2 }[char.rarity as CharacterRarity] * ((7 - (items[myStats.weapon]?.gradeValue ?? 0)) / 2);
 
         ebuff.def.push(new buffInfo("=", setDef, 9999));
         eStats.def = setDef;

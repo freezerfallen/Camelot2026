@@ -1,6 +1,6 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType, ButtonStyle, ChatInputCommandInteraction } from "discord.js";
 import charInfo, { characters } from "../Modules/chars";
-import { splitTitle, rarity, getRefinement } from "../Modules/functions";
+import { splitTitle, rarity, getRefinement, rarityColor } from "../Modules/functions";
 import { CompactUserSchema, SlashCommand } from "../types";
 import { getUserSchema, updateUsers } from "../Modules/queries";
 
@@ -8,7 +8,7 @@ function displayMy(thisChar: charInfo, inv: CompactUserSchema, interaction: Chat
     const dupes = inv.chars.filter((e) => e === thisChar.id).length;
 
     const Embed = new EmbedBuilder()
-        .setColor({ D: 0x7a7a7a, C: 0x44d53a, B: 0xf2591c, A: 0x2cdfe5, S: 0xfef300, SS: 0x9952eb, EX: 0x2aad9d, default: 0xbbffff }[thisChar.rarity])
+        .setColor(rarityColor(thisChar.rarity))
         .setImage(thisChar.image)
         .setThumbnail(rarity(thisChar.rarity))
         .setDescription(`**${thisChar.name}**\n${splitTitle(thisChar.anime)}\n\n**Ref**. ${getRefinement(inv.char_ref[thisChar.id])}`)
