@@ -6715,7 +6715,7 @@ export const items = [
     new lootInfo("Valentine's Chocolate (2026)", "loot", "event exclusive item", ["valentine's event"], "<:valentines_choco_2026:1472686937277071442>", "https://i.ibb.co/MkRxRQpf/valentine-s-choco.png", "mythical", 794, false, false, false, "Crafted with the finest cocoa and infused with a touch of magic, this Valentine's Chocolate is not only a sweet treat but also a source of strength and affection. It's a coveted item among heroes seeking to strengthen bonds or mend broken hearts."),
 
     // Easter Runes 2026
-    new runeInfo("Hunt of the Leporine", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
+    new runeInfo("Hunt of the Leporine", ["seasonal shop"], "<:hunt_of_the_leporine:1488533076903460884>", "https://i.ibb.co/5gMb4RwH/Hunt-of-the-Leporine.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.hotlrabbit = 0;
             myStats.hotl = -1;
@@ -6737,7 +6737,7 @@ export const items = [
             return AbilityResponse.SUCCESS;
         },
     }, "- Summons **1** `Rabbit` every healing instance (Up to once per round), inflicting a **0.5%** ATK/MD (whichever is higher at the time) DoT on the enemy for the rest of the fight.\n- Stops summoning `Rabbit` when there are **50** of them. Instead, deal **10%** damage every round.", "rare", 795),
-    new runeInfo("Unravelling", ["seasonal shop"], "<:the_fated:1472217039027441674>", "https://i.ibb.co/pj1vtfNd/the-fated.png", {
+    new runeInfo("Unravelling", ["seasonal shop"], "<:unravelling:1488533092053287004>", "https://i.ibb.co/R8cyykj/Unravelling.png", {
         buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.unravelling = 3;
             myStats.damageReduction ??= 0;

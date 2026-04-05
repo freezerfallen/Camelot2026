@@ -264,7 +264,7 @@ function levelSelection(interaction: ChatInputCommandInteraction, stats: RcUserS
                     stats.cow_char = newChar;
                     stats.cow_timer = Date.now();
                     stats.cow_rolled_today++;
-                    stats.cow_enemy_index = stats.cow_timer % rollingCowMobs.length;
+                    stats.cow_enemy_index = (stats.cow_timer ?? 0) % rollingCowMobs.length;
 
                     // Update users table
                     await updateUsers(stats.id, {

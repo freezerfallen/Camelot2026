@@ -741,6 +741,15 @@ const commands = [
 						{ name: 'chronological', value: 'chronological' },
 					)
 			)
+			.addStringOption(option =>
+				option.setName('filter')
+					.setDescription('Filter your inventory')
+					.setRequired(false)
+					.addChoices(
+						{ name: 'ability', value: 'ability' },
+						{ name: 'non-ability', value: 'non-ability' },
+					)
+			)
 			.addIntegerOption(option => option.setName('page').setDescription('Choose a page to jump to').setRequired(false))
 			.addUserOption(option => option.setName('user').setDescription('Select a user').setRequired(false))
 			.addStringOption(option =>
