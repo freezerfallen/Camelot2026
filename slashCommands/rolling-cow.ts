@@ -57,6 +57,8 @@ const rankingPrizes = [
     },
 ];
 
+const getCowEnemyIndex = (t: number, n: number) => (r => r < n - 1 ? r : (r - (n - 1)) % (n - 1))(t % (n * 5 - 4));
+
 function participationPrize(points: number) { // points: [0, 100] = ceil(100 * (rolls / (days * (rollsPerDay + 1) * fightsPerCharacter)))
     const prizePool = {
         deluxe: (points < 60) ? 0 : 1,
@@ -264,7 +266,7 @@ function levelSelection(interaction: ChatInputCommandInteraction, stats: RcUserS
                     stats.cow_char = newChar;
                     stats.cow_timer = Date.now();
                     stats.cow_rolled_today++;
-                    stats.cow_enemy_index = (stats.cow_timer ?? 0) % rollingCowMobs.length;
+                    stats.cow_enemy_index = getCowEnemyIndex(stats.cow_timer ?? 0, rollingCowMobs.length);
 
                     // Update users table
                     await updateUsers(stats.id, {
@@ -353,7 +355,7 @@ const exportCommand: SlashCommand = {
 
         const stats = author.schema as RcUserSchema;
         stats.cow_char = stats.cow_chars.length ? stats.cow_chars[stats.cow_chars.length - 1] : undefined;
-        stats.cow_enemy_index = (stats.cow_timer ?? 0) % rollingCowMobs.length;
+        stats.cow_enemy_index = getCowEnemyIndex(stats.cow_timer ?? 0, rollingCowMobs.length);
 
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots]);
         const userItems = myWeapons.map((e) => items[e.itemid]);

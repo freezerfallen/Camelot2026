@@ -160,4 +160,18 @@ export const customHpBars: CustomHpBar[] = [
         end: { empty: "<:dbr:1472231777501446316>", hp_only: "<:dbrh:1472231780424749118>", mana_only: "<:dbrm:1472231786535715049>", full: "<:dbrhm:1472231783402836165>" },
     }),
 
+    new CustomHpBar("Floating Easter", 14, 0xccff41, {
+        start: { empty: "<:dbl:1415266537748828203>", hp_only: "<:dblh:1490347466808365127>", mana_only: "<:dblm:1490347477667283055>", full: "<:dblhm:1490347475092111601>" },
+        middle: { empty: "<:db:1415266524532314272>", hp_only: "<:dbh:1490347493421223987>", mana_only: "<:dbm:1490347480137601164>", full: "<:dbhm:1490347463746261032>" },
+        end: { empty: "<:dbr:1415266560745934848>", hp_only: "<:dbrh:1490347482754842684>", mana_only: "<:dbrm:1490347489671254057>", full: "<:dbrhm:1490347487347605717>" },
+    }),
+
+    new CustomHpBar("Bunny Dash", 15, 0xe5e1e0, {
+        start: { empty: "<:dbl:1415266537748828203>", hp_only: "<a:dblh:1490348688751460412>", mana_only: "<:dblm:944322994971476038>", full: "<a:drlhm:1490348697261703261>" },
+        middle: { empty: "<:db:1415266524532314272>", hp_only: "<a:dbh:1490348699262386346>", mana_only: "<:dbm:944322995088916541>", full: "<a:dbhm:1490348686566359183>" },
+        end: { empty: "<:dbr:1415266560745934848>", hp_only: "<a:dbrh:1490348691394007061>", mana_only: "<:dbrm:944322995135086602>", full: "<a:dbrhm:1490348694153723966>" },
+    }),
+
+
+
 ];

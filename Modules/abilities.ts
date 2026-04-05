@@ -7453,185 +7453,185 @@ export const abilities: Record<number, Ability> = {
     //         return AbilityResponse.SUCCESS;
     //     },
     // },
-    // "24256": {
-    //     usage: 9999,
-    //     used: 0,
-    //     cost: 0,
-    //     pause: -11,
-    //     desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `False`\n**Tags**: `DPS`\n\nX’s strength is fueled by public belief. He has `Trust Value` based off his Mana Bar. The higher the Trust, the more reality bends to his will. When Trust reaches **50%** or higher, he gains additional buffs across different states.\n\nHe starts the action in `2D`. His basic attacks deal **2** hits of **50%** damage: one as physical damage and another as magic damage. In this state, as an additional Buff, whenever he lands a critical strike, there's a **10%** chance to increase his dodge rate by **2%** (Max: 16%).\n\nAbility: Dimensional Leap\nUsing this ability, he leaves `2D`, and has an **80%** chance to pop out to `3D`, or else, into the `X` dimension.\n\nIn `3D`, his basic attacks deal **3** hits of **35%** damage: as physical, magical, and true damage respectively. In this state, as an additional Buff, at the end of 3D, he deals **40%** damage for every time he lands all **3** hits (Max: 200%).\n\nIn the `X` dimension, his basic attacks deal **133%** damage, and he decreases the enemy's ATK, MD, DEF (up to 2x damage), MR (up to 2x damage), CR, CD, BR, and dodge by **20%**. He also gains **24%** damage mitigation and has a **50%** chance to evade a lethal hit every round. In this state, as an additional Buff, if he takes **4** consecutive hits from the opponent, he counters the next attack and increases his ATK and MD by **10%** for **2** rounds.",
-    //     shortdesc: "Mana bar = TRUST value\n- Grants bonus effects (💎) across different states (`2D`, `3D` and `XD`) when Trust ≥ **50%**. Starts off battle in `2D`.\n\n`2D` :\n- ATK (:man_walking:) : Deals **2** hits of **50%** damage, one as physical damage and one as magical damage (MD).\n- 💎 : A critical hit from the strikes has a **10%** chance to increase his dodge by **2%** permanently (Max: 8 times)\n- May use Ability (✨)  [Cost: 0 | Timeout: False | CD: 10]\n> Stuns enemy for 1 round and has a **80%** chance to switch to  `3D`. If he doesn't, enters `XD` instead. After **5** rounds, reverts back to `2D`.\n\n`3D` :\n- ATK (:man_walking: ) : Deals **3** hits of **35%** damage, one as physical damage, one as MD and one as true damage\n- 💎 : [X] is used by the end of `3D`, dealing **40%** damage for every time all three hits are critical at once (Max: 200%)\n\n`XD` :\n- ATK (:man_walking:) : Deals **133%** damage\n- Decreases enemy's ATK, MD, DEF (Up to 2x damage), MR (Up to 2x damage), CR, CD, BR and dodge by **20%**\n- Gains **24%** damage mitigation (Only the highest of this effect is applied)\n- Has a **50%** chance to evade a lethal hit at the start of every round (Will not stack)\n- 💎 : If he takes **4** consecutive hits from the opponent: Counters the next attack and increases the ATK & MD by **10%** for **2** rounds. (Resets when leaving XD)",
-    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-    //         // X (TBHX)
-    //         noTimeout(matchStats, myStats);
+    "24256": {
+        usage: 9999,
+        used: 0,
+        cost: 0,
+        pause: -11,
+        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `False`\n**Tags**: `DPS`\n\nX’s strength is fueled by public belief. He has `Trust Value` based off his Mana Bar. The higher the Trust, the more reality bends to his will. When Trust reaches **50%** or higher, he gains additional buffs across different states.\n\nHe starts the action in `2D`. His basic attacks deal **2** hits of **50%** damage: one as physical damage and another as magic damage. In this state, as an additional Buff, whenever he lands a critical strike, there's a **10%** chance to increase his dodge rate by **2%** (Max: 16%).\n\nAbility: Dimensional Leap\nUsing this ability, he leaves `2D`, and has an **80%** chance to pop out to `3D`, or else, into the `X` dimension.\n\nIn `3D`, his basic attacks deal **3** hits of **35%** damage: as physical, magical, and true damage respectively. In this state, as an additional Buff, at the end of 3D, he deals **40%** damage for every time he lands all **3** hits (Max: 200%).\n\nIn the `X` dimension, his basic attacks deal **133%** damage, and he decreases the enemy's ATK, MD, DEF (up to 2x damage), MR (up to 2x damage), CR, CD, BR, and dodge by **20%**. He also gains **24%** damage mitigation and has a **50%** chance to evade a lethal hit every round. In this state, as an additional Buff, if he takes **4** consecutive hits from the opponent, he counters the next attack and increases his ATK and MD by **10%** for **2** rounds.",
+        shortdesc: "Mana bar = TRUST value\n- Grants bonus effects (💎) across different states (`2D`, `3D` and `XD`) when Trust ≥ **50%**. Starts off battle in `2D`.\n\n`2D` :\n- ATK (:man_walking:) : Deals **2** hits of **50%** damage, one as physical damage and one as magical damage (MD).\n- 💎 : A critical hit from the strikes has a **10%** chance to increase his dodge by **2%** permanently (Max: 8 times)\n- May use Ability (✨)  [Cost: 0 | Timeout: False | CD: 10]\n> Stuns enemy for 1 round and has a **80%** chance to switch to  `3D`. If he doesn't, enters `XD` instead. After **5** rounds, reverts back to `2D`.\n\n`3D` :\n- ATK (:man_walking: ) : Deals **3** hits of **35%** damage, one as physical damage, one as MD and one as true damage\n- 💎 : [X] is used by the end of `3D`, dealing **40%** damage for every time all three hits are critical at once (Max: 200%)\n\n`XD` :\n- ATK (:man_walking:) : Deals **133%** damage\n- Decreases enemy's ATK, MD, DEF (Up to 2x damage), MR (Up to 2x damage), CR, CD, BR and dodge by **20%**\n- Gains **24%** damage mitigation (Only the highest of this effect is applied)\n- Has a **50%** chance to evade a lethal hit at the start of every round (Will not stack)\n- 💎 : If he takes **4** consecutive hits from the opponent: Counters the next attack and increases the ATK & MD by **10%** for **2** rounds. (Resets when leaving XD)",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // X (TBHX)
+            noTimeout(matchStats, myStats);
 
-    //         if (this.pause > matchStats.round) {
-    //             //myStats.sm += this.cost;
-    //             matchStats.interaction.followUp({ content: `I'm sick of working overtime until midnight. ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"} later.`, ephemeral: true });
-    //             //matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-    //             this.used--;
-    //             return AbilityResponse.FAILURE;
-    //         };
+            if (this.pause > matchStats.round) {
+                //myStats.sm += this.cost;
+                matchStats.interaction.followUp({ content: `I'm sick of working overtime until midnight. ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"} later.`, ephemeral: true });
+                //matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                this.used--;
+                return AbilityResponse.FAILURE;
+            };
 
-    //         if (myStats.formX !== 0) {
-    //             //myStats.sm += this.cost;
-    //             matchStats.interaction.followUp({ content: "**X (TBHX)** is not in the `2D` state`", ephemeral: true });
-    //             this.used--;
-    //             return AbilityResponse.FAILURE;
-    //         };
+            if (myStats.formX !== 0) {
+                //myStats.sm += this.cost;
+                matchStats.interaction.followUp({ content: "**X (TBHX)** is not in the `2D` state`", ephemeral: true });
+                this.used--;
+                return AbilityResponse.FAILURE;
+            };
 
-    //         this.pause = matchStats.round + 10;
+            this.pause = matchStats.round + 10;
 
-    //         const domainLast = 5;
-    //         let lastfreezemsg = eStats.frozenMessage ? eStats.frozenMessage : "was snapped away <:Xskill:1446886746204799159>";
+            const domainLast = 5;
+            let lastfreezemsg = eStats.frozenMessage ? eStats.frozenMessage : "was snapped away <:Xskill:1446886746204799159>";
 
-    //         // Stun for 1 round
-    //         eStats.timeFrozen = true;
-    //         eStats.frozenMessage = "was snapped away <:Xskill:1446886746204799159>";
+            // Stun for 1 round
+            eStats.timeFrozen = true;
+            eStats.frozenMessage = "was snapped away <:Xskill:1446886746204799159>";
 
-    //         // When stun is over
-    //         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             eStats.timeFrozen = false;
-    //             eStats.frozenMessage = lastfreezemsg;
-    //             return AbilityResponse.SUCCESS;
-    //         }));
+            // When stun is over
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                eStats.timeFrozen = false;
+                eStats.frozenMessage = lastfreezemsg;
+                return AbilityResponse.SUCCESS;
+            }));
 
-    //         // Change form
-    //         if (Math.random() < 0.8) {
-    //             myStats.formX = 1;
-    //         } else {
-    //             myStats.formX = 2;
-    //             // Decrease most stats by 20%
-    //             const debuff = 0.2;
-    //             eStats.atk -= Math.floor(eStats.atk * debuff);
-    //             eStats.md -= Math.floor(eStats.md * debuff);
-    //             eStats.def -= Math.min(Math.floor(eStats.def * debuff), 660);
-    //             eStats.mr -= Math.min(Math.floor(eStats.mr * debuff), 660);
-    //             eStats.cr -= debuff;
-    //             eStats.cd -= debuff;
-    //             eStats.br -= debuff;
-    //             eStats.dodge -= debuff;
+            // Change form
+            if (Math.random() < 0.8) {
+                myStats.formX = 1;
+            } else {
+                myStats.formX = 2;
+                // Decrease most stats by 20%
+                const debuff = 0.2;
+                eStats.atk -= Math.floor(eStats.atk * debuff);
+                eStats.md -= Math.floor(eStats.md * debuff);
+                eStats.def -= Math.min(Math.floor(eStats.def * debuff), 660);
+                eStats.mr -= Math.min(Math.floor(eStats.mr * debuff), 660);
+                eStats.cr -= debuff;
+                eStats.cd -= debuff;
+                eStats.br -= debuff;
+                eStats.dodge -= debuff;
 
-    //             ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * debuff), 5));
-    //             ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * debuff), 5));
-    //             ebuff.def.push(new buffInfo("+", -Math.min(Math.floor(eStats.def * debuff), 660), 5));
-    //             ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * debuff), 660), 5));
-    //             ebuff.cr.push(new buffInfo("+", -debuff, 5));
-    //             ebuff.cd.push(new buffInfo("+", -debuff, 5));
-    //             ebuff.br.push(new buffInfo("+", -debuff, 5));
-    //             ebuff.dodge.push(new buffInfo("+", -debuff, 5));
-    //         };
+                ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * debuff), 5));
+                ebuff.md.push(new buffInfo("+", -Math.floor(eStats.md * debuff), 5));
+                ebuff.def.push(new buffInfo("+", -Math.min(Math.floor(eStats.def * debuff), 660), 5));
+                ebuff.mr.push(new buffInfo("+", -Math.min(Math.floor(eStats.mr * debuff), 660), 5));
+                ebuff.cr.push(new buffInfo("+", -debuff, 5));
+                ebuff.cd.push(new buffInfo("+", -debuff, 5));
+                ebuff.br.push(new buffInfo("+", -debuff, 5));
+                ebuff.dodge.push(new buffInfo("+", -debuff, 5));
+            };
 
-    //         // State effects
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             if (myStats.formX === 2) {
-    //                 if (myStats.damageReduction < 0.24) myStats.damageReduction = 0.24;
-    //                 if (Math.random() > 0.5) { // 50% chance to evade a lethal hit
-    //                     if (myStats.evadeDeathChance === 0) myStats.evadeDeathChance++;
-    //                     if (myStats.evadeDeathStrike === 0) myStats.evadeDeathStrike++;
-    //                 };
-    //             };
+            // State effects
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.formX === 2) {
+                    if (myStats.damageReduction < 0.24) myStats.damageReduction = 0.24;
+                    if (Math.random() > 0.5) { // 50% chance to evade a lethal hit
+                        if (myStats.evadeDeathChance === 0) myStats.evadeDeathChance++;
+                        if (myStats.evadeDeathStrike === 0) myStats.evadeDeathStrike++;
+                    };
+                };
 
-    //             return AbilityResponse.SUCCESS;
-    //         }, domainLast));
+                return AbilityResponse.SUCCESS;
+            }, domainLast));
 
-    //         // Exit Domain
-    //         myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             if (myStats.formX === 1) {
-    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Xskill:1446886746204799159> **${char.name}**`, { atkMultiplier: Math.min(0.4 * myStats.scalingX, 2), combodmg: true, normalATK: true });
-    //                 myStats.scalingX = 0;
-    //                 myStats.gothitX = 0;
-    //             };
-    //             myStats.formX = 0; // Revert back to 2D
+            // Exit Domain
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + domainLast, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.formX === 1) {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Xskill:1446886746204799159> **${char.name}**`, { atkMultiplier: Math.min(0.4 * myStats.scalingX, 2), combodmg: true, normalATK: true });
+                    myStats.scalingX = 0;
+                    myStats.gothitX = 0;
+                };
+                myStats.formX = 0; // Revert back to 2D
 
-    //             return AbilityResponse.SUCCESS;
-    //         }));
+                return AbilityResponse.SUCCESS;
+            }));
 
-    //         notice.push(`\n<:Xskill:1446886746204799159> **${char.name}** entered the **${myStats.formX === 1 ? "3D" : "XD"}** state for **5** rounds`);
+            notice.push(`\n<:Xskill:1446886746204799159> **${char.name}** entered the **${myStats.formX === 1 ? "3D" : "XD"}** state for **5** rounds`);
 
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    //     passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //         myStats.formX = 0; // Start off in 2D
-    //         myStats.cap2d = 8;
-    //         myStats.triplecritHitsThisAtk = 0;
-    //         myStats.scalingX = 0;
-    //         myStats.gothitX = 0;
-    //         myStats.damageReduction ??= 0;
-    //         myStats.evadeDeathChance ??= 0;
-    //         myStats.evadeDeathStrike ??= 0;
-    //         myStats.counter ??= 0;
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.formX = 0; // Start off in 2D
+            myStats.cap2d = 8;
+            myStats.triplecritHitsThisAtk = 0;
+            myStats.scalingX = 0;
+            myStats.gothitX = 0;
+            myStats.damageReduction ??= 0;
+            myStats.evadeDeathChance ??= 0;
+            myStats.evadeDeathStrike ??= 0;
+            myStats.counter ??= 0;
 
-    //         // Alter ATTACK
-    //         myStats.replaceButton.atk = {
-    //             "emoji": "🚶🏻‍♂️",
-    //             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // Alter ATTACK
+            myStats.replaceButton.atk = {
+                "emoji": "🚶🏻‍♂️",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-    //                 switch (myStats.formX) {
-    //                     case 0:
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.5, magicDamage: false, combodmg: true, normalATK: true });
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️‍➡️ **${char.name}**`, { atkMultiplier: 0.5, magicDamage: true, mdChance: -1, combodmg: true, normalATK: true });
-    //                         break;
-    //                     case 1:
-    //                         // Reset per-attack crit hit counter for 3D
-    //                         myStats.triplecritHitsThisAtk = 0;
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.35, magicDamage: false, combodmg: true, normalATK: true });
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️‍➡️ **${char.name}**`, { atkMultiplier: 0.35, magicDamage: true, mdChance: -1, combodmg: true, normalATK: true });
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.35, combodmg: true, normalATK: true, ignoreShield: true });
-    //                         // If all three hits crit in this attack while in 3D, increment scaling for end-of-3D burst
-    //                         if (myStats.triplecritHitsThisAtk === 3) {
-    //                             myStats.scalingX++;
-    //                         }
-    //                         // Reset for safety after evaluation
-    //                         myStats.triplecritHitsThisAtk = 0;
-    //                         break;
-    //                     case 2:
-    //                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Xskill:1446886746204799159> **${char.name}**`, { atkMultiplier: 1.33, combodmg: true, normalATK: true });
-    //                 };
-    //                 return AbilityResponse.SUCCESS;
-    //             },
-    //         };
+                    switch (myStats.formX) {
+                        case 0:
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.5, magicDamage: false, combodmg: true, normalATK: true });
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️‍➡️ **${char.name}**`, { atkMultiplier: 0.5, magicDamage: true, mdChance: -1, combodmg: true, normalATK: true });
+                            break;
+                        case 1:
+                            // Reset per-attack crit hit counter for 3D
+                            myStats.triplecritHitsThisAtk = 0;
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.35, magicDamage: false, combodmg: true, normalATK: true });
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️‍➡️ **${char.name}**`, { atkMultiplier: 0.35, magicDamage: true, mdChance: -1, combodmg: true, normalATK: true });
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🚶🏻‍♂️ **${char.name}**`, { atkMultiplier: 0.35, combodmg: true, normalATK: true, ignoreShield: true });
+                            // If all three hits crit in this attack while in 3D, increment scaling for end-of-3D burst
+                            if (myStats.triplecritHitsThisAtk === 3) {
+                                myStats.scalingX++;
+                            }
+                            // Reset for safety after evaluation
+                            myStats.triplecritHitsThisAtk = 0;
+                            break;
+                        case 2:
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Xskill:1446886746204799159> **${char.name}**`, { atkMultiplier: 1.33, combodmg: true, normalATK: true });
+                    };
+                    return AbilityResponse.SUCCESS;
+                },
+            };
 
-    //         // Effects when normalATK crit
-    //         matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-    //             if (caster === myStats && options.normalATK && caster.sm / caster.mana >= 0.5) {
-    //                 if (myStats.formX === 0 && myStats.cap2d > 0 && Math.random() < 0.1) {
-    //                     // Effects of 2D
-    //                     myStats.cap2d--;
-    //                     myStats.dodge += 0.02;
-    //                     mybuff.dodge.push(new buffInfo("+", 0.02, 9999));
-    //                     notice.push(`\n<:drink:1446886667205218494> **${char.name}** gained **2%** dodge`);
-    //                 } else if (myStats.formX === 1) {
-    //                     myStats.triplecritHitsThisAtk++;
-    //                 };
-    //             };
-    //         });
+            // Effects when normalATK crit
+            matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats && options.normalATK && caster.sm / caster.mana >= 0.5) {
+                    if (myStats.formX === 0 && myStats.cap2d > 0 && Math.random() < 0.1) {
+                        // Effects of 2D
+                        myStats.cap2d--;
+                        myStats.dodge += 0.02;
+                        mybuff.dodge.push(new buffInfo("+", 0.02, 9999));
+                        notice.push(`\n<:drink:1446886667205218494> **${char.name}** gained **2%** dodge`);
+                    } else if (myStats.formX === 1) {
+                        myStats.triplecritHitsThisAtk++;
+                    };
+                };
+            });
 
-    //         // Effects when hit (For XD form)
-    //         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-    //             if (caster === eStats && target === myStats && target.sm / target.mana >= 0.5) {
-    //                 if (myStats.formX === 2) {
-    //                     myStats.gothitX++;
-    //                     if (myStats.gothitX === 4) { // Consecutively hit for 4 times -> Counter next hit and buff ATK/MD by 10%
-    //                         myStats.counter++;
-    //                         notice.push(`\n<:drink:1446886667205218494> **${char.name}** prepares to counter the next attack`);
-    //                         myStats.atk += Math.floor(myStats.atk * 0.1);
-    //                         myStats.md += Math.floor(myStats.md * 0.1);
-    //                         mybuff.atk.push(new buffInfo("*", 1.1, 2));
-    //                         mybuff.md.push(new buffInfo("*", 1.1, 2));
-    //                         myStats.gothitX = 0;
-    //                     };
-    //                 }
-    //             };
-    //         });
+            // Effects when hit (For XD form)
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === eStats && target === myStats && target.sm / target.mana >= 0.5) {
+                    if (myStats.formX === 2) {
+                        myStats.gothitX++;
+                        if (myStats.gothitX === 4) { // Consecutively hit for 4 times -> Counter next hit and buff ATK/MD by 10%
+                            myStats.counter++;
+                            notice.push(`\n<:drink:1446886667205218494> **${char.name}** prepares to counter the next attack`);
+                            myStats.atk += Math.floor(myStats.atk * 0.1);
+                            myStats.md += Math.floor(myStats.md * 0.1);
+                            mybuff.atk.push(new buffInfo("*", 1.1, 2));
+                            mybuff.md.push(new buffInfo("*", 1.1, 2));
+                            myStats.gothitX = 0;
+                        };
+                    }
+                };
+            });
 
-    //         matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-    //             if (caster === eStats && target === myStats && target.sm / target.mana >= 0.5) {
-    //                 if (myStats.formX === 2) myStats.gothitX = 0;
-    //             };
-    //         });
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    // },
+            matchStats.on("miss", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === eStats && target === myStats && target.sm / target.mana >= 0.5) {
+                    if (myStats.formX === 2) myStats.gothitX = 0;
+                };
+            });
+            return AbilityResponse.SUCCESS;
+        },
+    },
     "24798": {
         usage: 9999,
         used: 0,
@@ -8553,7 +8553,82 @@ export const abilities: Record<number, Ability> = {
             return AbilityResponse.SUCCESS;
         },
     },
-    "1": {
+    "26199": {
+        usage: 9999,
+        used: 0,
+        pause: 0,
+        cost: 0,
+        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `No`\n**Tags**: `DPS`\n\n-# In the magical world, Arthur Leywin reincarnates with the refined skills and discipline from his past life as a King. Through gradual exploration, he becomes an Aether user with increasingly potent manipulation of Godrunes.\n\nTo commence, he interacts with the BURNING mechanic. Burning (triggered every round) is altered to __Vivium__ (still considered a type of burning) [ <a:vivium:1480572908496490710> ] :\n> - Deals **1%** true damage for its applied duration, up to **50%**\n> - Critical damage of burn increased by **1%** every **4** rounds, up to **20%**.\n> - Burns **5** :droplet: away from the enemy\n\nBuilding on this, he manipulates Spatium, increasingly dodge rate by **10%**. After dodging, casts __Vivium__, burning the enemy for **+1** round. (at most once per round)\n\nUtilizing his active, he doubles down on his eradication of life, where his next **7** ATKs will be followed up by [Destruction].\n\n[Destruction]:\n- If __Vivium__ on the enemy lasts more than **50** rounds, the upcoming technique deals **+70%** damage. Else, applies __Vivium__ for **3** rounds. Then, he uses a random Aether Technique:\n> - Aether Claw: Deals **10%** damage\n> - Aether Cannon: Deals **12%** damage\n> - Aether Flying Sword: Deals **2** hits of **12%** damage\n- Alas, triggers Vivium on the enemy forcibly once.",
+        shortdesc: "**Uses**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `False`\n**Role**: `DPS (Burn - Vivium)`\n\n__**Passive**__:\n- Burning (triggered every round) is altered to Vivium [ <a:vivium:1480572908496490710> ] :\n> - Deals **1%** true damage for its applied duration, up to **50%**\n> - Critical damage of burn increased by **1%** every **4** rounds, up to **20%**.\n> - Burns **5** :droplet: away from the enemy\n\n- With Spatium, has **+10%** dodge rate. After dodging, casts Vivium, burning the enemy for **+1** round. (at most once per round).\n\n__**Active (:sparkles:)**__:\n- Imbues Vivium in his attacks. His next **7** ATKs is followed up by [Destruction].\n\n[Destruction]:\n- If Vivium on the enemy lasts more than **50** rounds, the upcoming technique deals **+70%** damage. Else, applies Vivium for **3** rounds.\n- Then: Trigger a random effect from his Aether Techniques:\n> - Aether Claw: Deals **10%** damage\n> - Aether Cannon: Deals **12%** damage\n> - Aether Flying Sword: Deals **2** hits of **12%** damage\n- Alas, triggers Vivium on the enemy forcibly once.",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Arthur Leywin EX
+
+            noTimeout(matchStats, myStats);
+            if (this.pause > matchStats.round) {
+                this.used--;
+                matchStats.sendWarning({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                return AbilityResponse.SUCCESS;
+            };
+            this.pause = matchStats.round + 10;
+
+            matchStats.on("ATK", {
+                maxUsage: 7,
+                callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                    if (caster === myStats) {
+                        let multi = 1;
+                        if (eStats.burnduration < 50) {
+                            eStats.burnduration += 3;
+                        } else {
+                            multi = 1.7;
+                            let n = Math.random();
+                            if (n < 0.33) {
+                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Claw`, { atkMultiplier: 0.1 * multi, magicDamage: true });
+                            } else if (n < 0.66) {
+                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Cannon`, { atkMultiplier: 0.12 * multi, magicDamage: true });
+                            } else if (n < 1) {
+                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Flying Sword`, { atkMultiplier: 0.12 * multi, magicDamage: true });
+                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Flying Sword`, { atkMultiplier: 0.12 * multi, magicDamage: true });
+                            };
+                            procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
+                        };
+                        return true;
+                    };
+                }
+            });
+
+            notice.push(`\n✨ **${char.name}**'s next **7** ATKs are enhanced`);
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.burntype = 3; // 3 = Vivium
+            if (typeof eStats.burnduration !== "number") {// Trigger burn every round
+                eStats.burnduration = 0;
+                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
+
+                    return AbilityResponse.SUCCESS;
+                }, 9999));
+            };
+
+            // Spatium
+            myStats.dodge += 0.1;
+            if (myStats.dodge > 1) myStats.dodge = 1;
+            mybuff.dodge.push(new buffInfo("+", 0.1, 9999));
+
+            matchStats.on("dodge", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (target === myStats && myStats.aldodgeBurnUsedRound !== matchStats.round) {
+                    myStats.aldodgeBurnUsedRound = matchStats.round;
+                    eStats.burnduration++;
+                };
+            });
+
+            myStats.replaceButton.ability = { "emoji": "<a:vivium:1480572908496490710>" };
+
+            return AbilityResponse.SUCCESS;
+        },
+    },
+    "26200": {
         usage: 9999,
         used: 0,
         pause: 0,
@@ -8662,81 +8737,6 @@ export const abilities: Record<number, Ability> = {
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
-
-            return AbilityResponse.SUCCESS;
-        },
-    },
-    "2": {
-        usage: 9999,
-        used: 0,
-        pause: 0,
-        cost: 0,
-        desc: "**Total Usage**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `No`\n**Tags**: `DPS`\n\n-# In the magical world, Arthur Leywin reincarnates with the refined skills and discipline from his past life as a King. Through gradual exploration, he becomes an Aether user with increasingly potent manipulation of Godrunes.\n\nTo commence, he interacts with the BURNING mechanic. Burning (triggered every round) is altered to __Vivium__ (still considered a type of burning) [ <a:vivium:1480572908496490710> ] :\n> - Deals **1%** true damage for its applied duration, up to **50%**\n> - Critical damage of burn increased by **1%** every **4** rounds, up to **20%**.\n> - Burns **5** :droplet: away from the enemy\n\nBuilding on this, he manipulates Spatium, increasingly dodge rate by **10%**. After dodging, casts __Vivium__, burning the enemy for **+1** round. (at most once per round)\n\nUtilizing his active, he doubles down on his eradication of life, where his next **7** ATKs will be followed up by [Destruction].\n\n[Destruction]:\n- If __Vivium__ on the enemy lasts more than **50** rounds, the upcoming technique deals **+70%** damage. Else, applies __Vivium__ for **3** rounds. Then, he uses a random Aether Technique:\n> - Aether Claw: Deals **10%** damage\n> - Aether Cannon: Deals **12%** damage\n> - Aether Flying Sword: Deals **2** hits of **12%** damage\n- Alas, triggers Vivium on the enemy forcibly once.",
-        shortdesc: "**Uses**: `Unlimited (CD: 10)`\n**Cost**: `None`\n**Timeout**: `False`\n**Role**: `DPS (Burn - Vivium)`\n\n__**Passive**__:\n- Burning (triggered every round) is altered to Vivium [ <a:vivium:1480572908496490710> ] :\n> - Deals **1%** true damage for its applied duration, up to **50%**\n> - Critical damage of burn increased by **1%** every **4** rounds, up to **20%**.\n> - Burns **5** :droplet: away from the enemy\n\n- With Spatium, has **+10%** dodge rate. After dodging, casts Vivium, burning the enemy for **+1** round. (at most once per round).\n\n__**Active (:sparkles:)**__:\n- Imbues Vivium in his attacks. His next **7** ATKs is followed up by [Destruction].\n\n[Destruction]:\n- If Vivium on the enemy lasts more than **50** rounds, the upcoming technique deals **+70%** damage. Else, applies Vivium for **3** rounds.\n- Then: Trigger a random effect from his Aether Techniques:\n> - Aether Claw: Deals **10%** damage\n> - Aether Cannon: Deals **12%** damage\n> - Aether Flying Sword: Deals **2** hits of **12%** damage\n- Alas, triggers Vivium on the enemy forcibly once.",
-        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-            // Arthur Leywin EX
-
-            noTimeout(matchStats, myStats);
-            if (this.pause > matchStats.round) {
-                this.used--;
-                matchStats.sendWarning({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-                return AbilityResponse.SUCCESS;
-            };
-            this.pause = matchStats.round + 10;
-
-            matchStats.on("ATK", {
-                maxUsage: 7,
-                callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                    if (caster === myStats) {
-                        let multi = 1;
-                        if (eStats.burnduration < 50) {
-                            eStats.burnduration += 3;
-                        } else {
-                            multi = 1.7;
-                            let n = Math.random();
-                            if (n < 0.33) {
-                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Claw`, { atkMultiplier: 0.1 * multi, magicDamage: true });
-                            } else if (n < 0.66) {
-                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Cannon`, { atkMultiplier: 0.12 * multi, magicDamage: true });
-                            } else if (n < 1) {
-                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Flying Sword`, { atkMultiplier: 0.12 * multi, magicDamage: true });
-                                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**'s Aether Flying Sword`, { atkMultiplier: 0.12 * multi, magicDamage: true });
-                            };
-                            procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
-                        };
-                        return true;
-                    };
-                }
-            });
-
-            notice.push(`\n✨ **${char.name}**'s next **7** ATKs are enhanced`);
-
-            return AbilityResponse.SUCCESS;
-        },
-        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-            eStats.burntype = 3; // 3 = Vivium
-            if (typeof eStats.burnduration !== "number") {// Trigger burn every round
-                eStats.burnduration = 0;
-                myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    procburn(eStats, myStats, ebuff, mybuff, matchStats, notice, ``, {});
-
-                    return AbilityResponse.SUCCESS;
-                }, 9999));
-            };
-
-            // Spatium
-            myStats.dodge += 0.1;
-            if (myStats.dodge > 1) myStats.dodge = 1;
-            mybuff.dodge.push(new buffInfo("+", 0.1, 9999));
-
-            matchStats.on("dodge", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
-                if (target === myStats && myStats.aldodgeBurnUsedRound !== matchStats.round) {
-                    myStats.aldodgeBurnUsedRound = matchStats.round;
-                    eStats.burnduration++;
-                };
-            });
-
-            myStats.replaceButton.ability = { "emoji": "<a:vivium:1480572908496490710>" };
 
             return AbilityResponse.SUCCESS;
         },

@@ -13,30 +13,30 @@ type SeasonalShopTab = 'runes' | 'hpbars' | 'backgrounds' | 'skins';
 
 const EMBED_COLOR = 0x2aad9d;
 
-const SEASON_END_DATE = new Date('2026-04-03 00:00:00');
+const SEASON_END_DATE = new Date('2026-06-04 00:00:00');
 
 const loadedImages: Record<string | number, Image> = {};
 
 const RUNES_FOR_SALE = [
-    { name: "The Fated", item: items[793] as runeInfo, price: 80, isNew: true },
-    { name: "Thorn's Contender", item: items[792] as runeInfo, price: 80, isNew: true },
-    { name: "Hollow Crown", item: items[788] as runeInfo, price: 60, isNew: false },
+    { name: "Hunt of the Leporine", item: items[795] as runeInfo, price: 80, isNew: true },
+    { name: "Unravelling", item: items[796] as runeInfo, price: 80, isNew: true },
+    { name: "Coinmark of Riches", item: items[786] as runeInfo, price: 60, isNew: false },
 ] as const; // Total cost: 220
 
 const HP_BARS_FOR_SALE = [
-    { name: "Neon Heartbeats", id: 12, price: 70, isNew: true },
-    { name: "Cupid's Pulse", id: 13, price: 70, isNew: true },
-    { name: "Velvet Night", id: 6, price: 50, isNew: false },
-    { name: "Golden Grasslands", id: 3, price: 50, isNew: false },
-] as const; // Total cost: 240
+    { name: "Bunny Dash", id: 15, price: 80, isNew: true },
+    { name: "Floating Easter", id: 14, price: 70, isNew: true },
+    { name: "Poison Silk", id: 7, price: 50, isNew: false },
+    { name: "Lucky Ribbon", id: 10, price: 50, isNew: false },
+] as const; // Total cost: 250
 
 const BACKGROUNDS_FOR_SALE = [
-    { name: "Forever Valentines", id: 20, price: 80, isNew: true },
-    { name: "Moments", id: 22, price: 70, isNew: true },
-    { name: "Fireworks", id: 21, price: 60, isNew: true },
+    { name: "Eternal Petals", id: 25, price: 70, isNew: true },
+    { name: "Petals and Promises", id: 26, price: 70, isNew: true },
+    { name: "Easter Slumber", id: 24, price: 70, isNew: true },
 ] as const; // Total cost: 210
 
-const SKIN_SEASON = "valentines season 2026"; // Total cost: 645
+const SKIN_SEASON = "easter season 2026"; // Total cost: 680
 
 const BuyKeysRow = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(

@@ -732,6 +732,8 @@ export const anime: animeInfo[] = [
     new animeInfo("You and I are Polar Opposites", ["Seihantai na Kimi to Boku", "YaIaPO", "Polar Opposites"], 697),
     new animeInfo("The Extra's Academy Survival Guide", ["How to Survive at the Academy", "Surviving the Academy"], 698),
     new animeInfo("Webtoon Character Na Kang Lim", ["Suyo Webtoon-ui Na Kang Lim"], 699),
+    new animeInfo("SHIBOYUGI: Playing Death Games to Put Food on the Table", ["Shibou Yuugi de Meshi wo Kuu", "Shibouyugi", "SYMK"], 700),
+
 
 ];
 

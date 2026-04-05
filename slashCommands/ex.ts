@@ -28,19 +28,20 @@ function r1(stats: CompactUserSchema) {
         );
 };
 
-const thumbnail = "https://i.ibb.co/vx0Qcjsc/c.webp";
+const thumbnail = "https://i.ibb.co/Ncyrbr7/arthur.gif";
 const expity = 24;
 
 const newex: { [key: string]: number; } = {
-    "25978": 0.009, // Okkotsu EX
-    "25977": 0.009, // Fern & Stark EX
+    "26199": 0.008, // Arthur Leywin EX
+    "26200": 0.008, // Columbina EX
 
-    "24798": 0.003, // Shorekeeper EX
-    "22612": 0.003, // Itachi Uchiha EX
-    "25695": 0.008, // Firefly EX
-    "19049": 0.008, // Ruminas Valentine EX
-    "17743": 0.006, // Shinpachi EX
-}; // sum = 0.046
+    "19277": 0.003, // Sung Jin Woo EX
+    "21928": 0.003, // Boa Hancock EX
+    "21929": 0.006, // Urashima EX
+    "21930": 0.008, // Lucyna EX
+    "19276": 0.009, // Mai EX
+    "18011": 0.005, // Lria EX
+}; // sum = 0.05
 
 const oldex: { [key: string]: number; } = {
     "17743": 0, // Shinpachi EX
@@ -51,7 +52,7 @@ const expool: { [key: string]: number; } = {
     ...newex,
 };
 
-const exDropRate = Math.floor(10000 * Object.values(expool).reduce((acc, rate) => acc + rate, 0)) / 100;
+const exDropRate = Math.round(10000 * Object.values(expool).reduce((acc, rate) => acc + rate, 0)) / 100;
 
 function getChar(pity: boolean = false, forcePity: boolean = false) {
     let char: charInfo, weightSum = 0, ranum = Math.random(); // ranum = Math.floor(Math.random() * 1000); // 0-999
@@ -108,7 +109,7 @@ const exportCommand: SlashCommand = {
         function getDesc() {
             return `Pull for a chance of getting an EX character!\nIncludes the following characters:\n` +
                 // `${Object.keys(newex).map((e) => `**${characters[e as any].name}**`).join(", ")}, ${Object.keys(oldex).map((e) => `**${characters[e as any].name}**`).join(", ")}\n\n` +
-                `**Yuta Okkotsu EX**, **Fern & Stark EX**, **Itachi Uchiha EX**, **Shorekeeper EX**, **Firefly EX**, **Ruminas Valentine EX**, **Shinpachi EX**\n\n` +
+                `**Arthur Leywin EX**, **Columbina EX**, **Sung Jin Woo EX**, **Boa Hancock EX**, **Urashima EX**, **Lria EX**, **Lucyna EX**, **Mai EX**\n\n` +
                 `**Drop Rates**:\n<a:EXTRA:1138530846144462968> Tier ➜ **${exDropRate}**% | Pity: **${stats.expity}**/${expity}\n<:SSTier:869316489931546644> Tier ➜ **${50 - exDropRate}**%\n<:STier:869316518675095552> Tier ➜ **50**%\n\n` +
                 `-# Tip: Use up your <a:EXTRA:1138530846144462968> pulls before the next event starts, you'll lose them otherwise!`;
         };

@@ -270,6 +270,28 @@ export const skins: skinInfo[] = [
     new skinInfo("Rem (Valentine's 2026)", 5050, "valentines season 2026", "cyber_46", "", { season_keys: 30 }, "https://i.ibb.co/R4v5W2Fy/rem.png", 187),
     new skinInfo("Momo Ayase (Valentine's 2026)", 22416, "valentines season 2026", "youalreadylost7799", "", { season_keys: 30 }, "https://i.ibb.co/Z6y2XHHY/c.png", 188),
 
+    /* Easter 2026 */
+    new skinInfo("Chisa (Easter 2026)", 26188, "easter season 2026", "reixier", "", { season_keys: 40 }, "https://i.ibb.co/d0fqb0Hf/chisa.png", 189),
+    new skinInfo("Scathach (Easter 2026)", 518, "easter season 2026", "mercy4afool", "", { season_keys: 30 }, "https://i.ibb.co/MybtX4g3/c.png", 190),
+    new skinInfo("Isolde (Easter 2026)", 17116, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/rRHnx375/c.png", 191),
+    new skinInfo("Satoru Gojo (Easter 2026)", 19048, "easter season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/TD5DZRXv/gojo.png", 192),
+    new skinInfo("Shea Haulia (Easter 2026)", 5550, "easter season 2026", "truleho", "", { season_keys: 30 }, "https://i.ibb.co/fVsWBSJT/shea.png", 193),
+    new skinInfo("Anya Forger (Easter 2026)", 6307, "easter season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/9mtWtV6k/c.png", 194),
+    new skinInfo("Castorice (Easter 2026)", 23186, "easter season 2026", "truleho", "", { season_keys: 35 }, "https://i.ibb.co/RGzjHjKS/c.png", 195),
+    new skinInfo("Shinei Nouzen (Easter 2026)", 6030, "easter season 2026", "freezerfallen._", "", { season_keys: 25 }, "https://i.ibb.co/tVzW0jM/c.png", 196),
+    new skinInfo("2B (Easter 2026)", 13780, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/sv8ky81R/2b.png", 197),
+    new skinInfo("Saber (alter) (Easter 2026)", 510, "easter season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/m5F3G5fV/saber.png", 198),
+    new skinInfo("Tanya Degurechaff (Easter 2026)", 2814, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/B50KwScr/tanya.png", 199),
+    new skinInfo("Neko (Easter 2026)", 16250, "easter season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/Y7m1cKx9/c.png", 200),
+    new skinInfo("Ayanami Rei (Easter 2026)", 1851, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/Gv7v9b0h/c.png", 201),
+    new skinInfo("Hoshimachi Suisei (Easter 2026)", 5820, "easter season 2026", "reixier", "", { season_keys: 40 }, "https://i.ibb.co/zVhLTnYx/c.png", 202),
+    new skinInfo("Holo (Easter 2026)", 5032, "easter season 2026", "reixier", "", { season_keys: 40 }, "https://i.ibb.co/ZzPgkCp5/holo.png", 203),
+    new skinInfo("Epsilon (Easter 2026)", 4948, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/S4hzBSZC/c.png", 204),
+    new skinInfo("Kaoruko Waguri (Easter 2026)", 24316, "easter season 2026", "kidsad", "", { season_keys: 35 }, "https://i.ibb.co/3y7qHyq4/waguri.png", 205),
+    new skinInfo("Ceres Fauna (Easter 2026)", 5862, "easter season 2026", "mercy4afool", "", { season_keys: 35 }, "https://i.ibb.co/ZR4nX49n/c.png", 206),
+    new skinInfo("Hwaryun (Easter 2026)", 3412, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/C5nYvMzM/c.png", 207),
+    new skinInfo("Fei Xiao (Easter 2026)", 23193, "easter season 2026", "youalreadylost7799", "", { season_keys: 40 }, "https://i.ibb.co/Q76XsbdP/c.png", 208),
+
 
 ];
 
