@@ -1123,6 +1123,8 @@ export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude
         if (fItem.grade === "genesis") exchangeItem = items[676];
         else if (fItem.grade === "mythical") exchangeItem = items[677];
         else if (fItem.grade === "legendary") exchangeItem = items[678];
+        // Don't give tokens for guild shop items
+        if (fItem.obtain.includes("guild")) exchangeItem = false;
 
         const ascMatsNeeded = Math.round((1 / 6) * 12 * ((0.5 * item.ascension * item.ascension) + (3.5 * item.ascension) + 3));
         const craftMatsNeeded = Math.round((1 / 6) * 8 * ((0.5 * item.ascension * item.ascension) + (3.5 * item.ascension) + 3)) + (fItem.grade === "legendary" ? 4 : (fItem.grade === "mythical" ? 12 : (fItem.grade === "genesis" ? 28 : 0)));

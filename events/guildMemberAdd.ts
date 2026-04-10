@@ -3,6 +3,7 @@ import { BotEvent } from "../types";
 
 const event: BotEvent = {
     name: "guildMemberAdd",
+    disabled: true,
     execute: (member: GuildMember) => {
 
         // Only if Camelot

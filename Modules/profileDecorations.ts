@@ -272,20 +272,20 @@ export const profileSets = [
         new Background("Midnight Village", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/winter-solace/midnight-village.jpg", url: "https://i.ibb.co/SDdKgVbQ/midnight-village.jpg" })),
     ]),
 
-    new ProfileSet("Forever Valentines", 20, { jades: 900, gems: 1200, season_keys: 80 }, [
+    new ProfileSet("Forever Valentines", 20, { jades: 900, gems: 1200 }, [
         new Background("Love You, Mari", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/forever-valentines/love-you-mari.gif", url: "https://i.ibb.co/zTYsCR9L/love-you-mari.gif" }), { delay: 200 }),
         new Background("Gazing at the Stars", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/forever-valentines/gazing-at-the-stars.gif", url: "https://i.ibb.co/JFnbxpby/gazing-at-the-stars.gif" }), { delay: 200 }),
         new Background("Dalus and Kisogi Valentine", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/forever-valentines/dalus-and-kisogi-valentine.gif", url: "https://i.ibb.co/xtQLS8my/dalus-and-kisogi-valentine.gif" }), { delay: 125 }),
     ]),
 
-    new ProfileSet("Fireworks", 21, { jades: 800, gems: 1200, season_keys: 60 }, [
+    new ProfileSet("Fireworks", 21, { jades: 800, gems: 1200 }, [
         new Background("Vibrant Fireworks", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/fireworks/vibrant-fireworks.gif", url: "https://i.ibb.co/YBRBhmTv/vibrant-fireworks.gif" }), { delay: 100 }),
         new Background("Explosive Fireworks", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/fireworks/explosive-fireworks.gif", url: "https://i.ibb.co/hxCwjfhh/explosive-fireworks.gif" }), { delay: 100 }),
         new Background("Bright Fireworks", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/fireworks/bright-fireworks.gif", url: "https://i.ibb.co/rR3Vtr92/bright-fireworks.gif" }), { delay: 80 }),
         new Background("Midnight Fireworks", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/fireworks/midnight-fireworks.gif", url: "https://i.ibb.co/DP3gQFx8/midnight-fireworks.gif" }), { delay: 80 }),
     ]),
 
-    new ProfileSet("Moments", 22, { jades: 800, gems: 1200, season_keys: 70 }, [
+    new ProfileSet("Moments", 22, { jades: 800, gems: 1200 }, [
         new Background("Denji's Fantasy", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/moments/denjis-fantasy.gif", url: "https://i.ibb.co/VpY4VR3T/denjis-fantasy.gif" }), { delay: 125 }),
         new Background("Floating Hearts", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/moments/floating-hearts.jpg", url: "https://i.ibb.co/8LTcXN9s/floating-hearts.jpg" })),
         new Background("Midnight Disconnect", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/moments/midnight-disconnect.jpg", url: "https://i.ibb.co/8LD8Zjxg/midnight-disconnect.jpg" })),
@@ -299,20 +299,20 @@ export const profileSets = [
         new Background("Scarlet in the Rain", { gems: 800 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/sanguine-reflections/scarlet-in-the-rain.gif", url: "https://i.ibb.co/PGtTHSvM/scarlet-in-the-rain.gif" }), { delay: 100 }),
     ]),
 
-    new ProfileSet("Easter Slumber", 24, { jades: 900, gems: 1000 }, [
+    new ProfileSet("Easter Slumber", 24, { jades: 900, gems: 1000, season_keys: 70 }, [
         new Background("Bunnysolde", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/bunnysolde.jpg", url: "https://i.ibb.co/ZRJntm4h/bunnysolde.jpg" })),
         new Background("Easterei", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/easterei.jpg", url: "https://i.ibb.co/JWFBg2nN/easterei.jpg" })),
         new Background("Bunny Neko", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/bunny-neko.jpg", url: "https://i.ibb.co/Mxx8kpV9/bunny-neko.jpg" })),
         new Background("Tanya Onesie", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/tanya-onesie.jpg", url: "https://i.ibb.co/m56gjBgk/tanya-onesie.jpg" })),
     ]),
 
-    new ProfileSet("Eternal Petals", 25, { jades: 1200, gems: 1200 }, [
+    new ProfileSet("Eternal Petals", 25, { jades: 1200, gems: 1200, season_keys: 70 }, [
         new Background("Easter Beyond Journey's End", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/easter-beyond-journeys-end.gif", url: "https://i.ibb.co/n8P5R9HJ/easter-beyond-journeys-end.gif" }), { delay: 80 }),
         new Background("The Language of Irises", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/the-language-of-irises.gif", url: "https://i.ibb.co/gbrGB4BK/the-language-of-irises.gif" }), { delay: 80 }),
         new Background("Himmel's Promise", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/himmels-promise.gif", url: "https://i.ibb.co/8gDwTfKj/himmels-promise.gif" }), { delay: 80 }),
     ]),
 
-    new ProfileSet("Petals and Promises", 26, { jades: 1500, gems: 1800 }, [
+    new ProfileSet("Petals and Promises", 26, { jades: 1500, gems: 1800, season_keys: 70 }, [
         new Background("Quiet Commute", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/quiet-commute.gif", url: "https://i.ibb.co/Psbg2CPy/quiet-commute.gif" }), { delay: 66 }),
         new Background("Midnight Promise", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/midnight-promise.gif", url: "https://i.ibb.co/2YMFTzD5/midnight-promise.gif" }), { delay: 90 }),
         new Background("Petals of a Memory", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/petals-of-a-memory.gif", url: "https://i.ibb.co/gZ05Rb7K/petals-of-a-memory.gif" }), { delay: 66 }),

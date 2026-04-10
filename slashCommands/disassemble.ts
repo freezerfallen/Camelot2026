@@ -14,7 +14,7 @@ const exportCommand: SlashCommand = {
         const exclude = [...new Set((interaction.options.getString('exclude') || "").split(",").map((e) => e.trim()))].filter(Boolean);
         const sellGrade = interaction.options.getString('grade') || false;
         const sellType = interaction.options.getString('type') || false;
-        const sellDupes = interaction.options.getBoolean('dupes') || (interaction.options.getSubcommand() === 'all');
+        const sellDupes = interaction.options.getBoolean('dupes') ?? (interaction.options.getSubcommand() === 'all');
 
         const userItems = await getUserWeapons(interaction.user.id);
         if (!userItems.length) return interaction.reply(`You don't have any items.`);
