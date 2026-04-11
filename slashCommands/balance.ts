@@ -26,7 +26,7 @@ const exportCommand: SlashCommand = {
         else if (choice === "jades") Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`<:eternal_jade:1256124504141201428>\nUse \`/convert jades\` to get gems <:genesis_gems:1034179687720681492>`);
         else if (choice === "lilies") Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`<:lilium:974057059618291732>\nCan be traded for items in the </monthly shop:1224116997575671889>`);
         else if (choice === "stamps") Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`🎟️\nCan be earned by contributing through [Taskalot](<https://discord.gg/zCbXtNVNtw>)`);
-        else Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`<:guild_mark:1317944450814840923>\nCan be traded for items in the </raid shop:1317944450814840923>`);
+        else Embed.setDescription(`**Balance**: \`${formatNumberWithQuotes(stats[choice])}\`<:guild_mark:1317944450814840923>\nCan be traded for items in the </guild shop:1090742470708563988>`);
 
         return interaction.reply({ embeds: [Embed] });
     },

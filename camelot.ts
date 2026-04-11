@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Create Client
-const client = new Client({
+const client = new Client({ // GatewayIntentBits.GuildMembers
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages],
     partials: [Partials.Channel],
     makeCache: Options.cacheWithLimits({

@@ -1059,7 +1059,7 @@ export const skills: skillInfo[] = [
         //mybuff.md.push(new buffInfo("+", Math.floor(myStats.md * 0.2), 9999));
         //myStats.md += Math.floor(myStats.md * 0.2);
 
-        eStats.burntype ??= 1;
+        eStats.burntype = 2;
         if (typeof eStats.burnduration !== "number") {// Trigger burn every round
             eStats.burnduration = 0;
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {

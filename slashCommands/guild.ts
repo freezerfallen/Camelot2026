@@ -1315,7 +1315,7 @@ const exportCommand: SlashCommand = {
 
                                     // Return if balance not enough
                                     if (tempStats.guild_marks < cost) {
-                                        ms.edit({ content: `You don't have enough season keys (**${tempStats.guild_marks}**/${cost} ${currencyEmojis.guild_marks})`, components: [] });
+                                        ms.edit({ content: `You don't have enough guild marks (**${tempStats.guild_marks}**/${cost} ${currencyEmojis.guild_marks})`, components: [] });
                                         return;
                                     };
 

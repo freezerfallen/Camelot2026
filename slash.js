@@ -285,10 +285,10 @@ const commands = [
 		// valentines-chocolate: Indulge in a sweet treat! 🍫 🎀
 		// egg-hunt: See what you find! 🧺 🐰
 		data: new SlashCommandBuilder()
-			.setName('valentines-chocolate')
-			.setDescription('Indulge in a sweet treat! 🍫 🎀')
-			.addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
-			.addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
+			.setName('egg-hunt')
+			.setDescription('See what you find! 🧺 🐰')
+		// .addUserOption(option => option.setName('give').setDescription('Gift someone some valentine\'s chocolate! Can only be used once!'))
+		// .addStringOption(option => option.setName('message').setDescription('Send a message together with your valentine\'s chocolate!')),
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
@@ -739,6 +739,15 @@ const commands = [
 						{ name: 'dupes', value: 'dupes' },
 						// { name: 'skins', value: 'skins' },
 						{ name: 'chronological', value: 'chronological' },
+					)
+			)
+			.addStringOption(option =>
+				option.setName('filter')
+					.setDescription('Filter your inventory')
+					.setRequired(false)
+					.addChoices(
+						{ name: 'ability', value: 'ability' },
+						{ name: 'non-ability', value: 'non-ability' },
 					)
 			)
 			.addIntegerOption(option => option.setName('page').setDescription('Choose a page to jump to').setRequired(false))
