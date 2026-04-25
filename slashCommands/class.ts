@@ -8,7 +8,6 @@ import { getUserSchema, getCachedUserSchema, updateUsersAndCache } from "../Modu
 
 const exportCommand: SlashCommand = {
     name: 'class',
-    skipUserRefetch: true,
     skipServerRefetch: true,
     async execute({ interaction, author }) {
 

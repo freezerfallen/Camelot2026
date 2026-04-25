@@ -22,7 +22,6 @@ function rollItems(p: number, n: number, c: number = 0) {
 
 const exportCommand: SlashCommand = {
     name: 'lootbox',
-    skipUserRefetch: true,
     skipServerRefetch: true,
     async execute({ interaction, author }) {
 
