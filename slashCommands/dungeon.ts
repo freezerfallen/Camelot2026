@@ -9,14 +9,22 @@ import { armorInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/ite
 import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
-import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, formatNumberWithQuotes } from "../Modules/functions";
+
+import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, formatNumberWithQuotes, getClassLvl, classLevelToXP } from "../Modules/functions";
+
 import { requestVerification, dungeonTempBan, AbilityResponse, isEventOngoing } from "../Modules/components";
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { addGuildDonation, getCachedUserSchema, getGuildSchema, getUserSchema, updateUsersAndCache } from '../Modules/queries';
+
+import { addGuildDonation, getCachedUserSchema, getGuildSchema, getUserSchema, updateUsersAndCache, insertNewWeapon, updateUsers } from '../Modules/queries';
+
 import { skillTree } from '../Modules/skillTree';
 import { customHpBars } from '../Modules/customHpBars';
+
+import { hasExtremeItemDrop, getExtremeItemDrop, hasExtremeWeaponDrop, getExtremeWeaponId } from "../Modules/extremeWeaponDrops";
+
+
 
 const dungeonInProgress = new Set();
 const captchaCooldown = new Map();
@@ -113,16 +121,16 @@ const exportCommand: SlashCommand = {
         if (!stats.tutorial.includes(8)) await waitForTutorial(interaction, stats);
 
         let floor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
-        if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 300) stats.dungeon_floors[++floor] = 0;
+        if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 330) stats.dungeon_floors[++floor] = 0;
         if (floorDiff === -1) floorDiff = Math.floor((floor - 1) / 100);
-        if (floorDiff > 2) floorDiff = 2;
+        if (floorDiff > 3) floorDiff = 3;
 
         if (choice) {
             if (choice < 1) return interaction.editReply(`There is no floor ${choice} <:EmiliaWot:868996542080622603>`);
-            if (choice + (floorDiff * 100) > floor) return interaction.editReply(`You haven't unlocked Floor ${choice} yet. You need ${floors[floor]?.winsNeeded} ${floors[floor]?.winsNeeded === 1 ? "win" : "wins"} on floor \`${Math.min(floor, 100)}/${floor <= 100 ? 0 : Math.min(floor - 100, 100)}/${Math.max(floor - 200, 0)}\` to unlock the next one.`);
+            if (choice + (floorDiff * 100) > floor) return interaction.editReply(`You haven't unlocked Floor ${choice} yet. You need ${floors[floor]?.winsNeeded} ${floors[floor]?.winsNeeded === 1 ? "win" : "wins"} on floor \`${Math.min(floor, 100)}/${floor <= 100 ? 0 : Math.min(floor - 100, 100)}/${Math.max(floor - 200, 0)}/${Math.max(floor - 300, 0)}\` to unlock the next one.`);
             floor = Math.round(choice + (floorDiff * 100));
         };
-        if (floor > 300) floor = 300;
+        if (floor > 330) floor = 330;
 
         // Increase limit
         let dunLim = [10, 20, 500]; // [0] -> loot, [1] -> progress, [2] -> 2nd loot limit
@@ -142,6 +150,15 @@ const exportCommand: SlashCommand = {
         // Check if user can skip
         if (flag === "all" && stats.premium < 3) return interaction.editReply("This is a `/premium` feature. If you like the bot and want to help us out we'd appreciate your support <:RaphiSmile:868998036645380197>");
         if ((flag === "skip" || flag === "all") && dunLim[0] - stats.dungeon_limit <= 0) return interaction.editReply("You've already used up all your skips for this interval.");
+
+        // Progressive skip limit - can only skip floors that have been manually cleared
+        if (floor > 300 && (flag === "skip" || flag === "all")) {
+            // Check if user has completed this floor and moved to the next one
+            const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
+            const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
+            const hasMovedBeyond = currentFloor > floor;
+            if (!hasCompletedFloor || !hasMovedBeyond) return interaction.editReply(`You can only skip floors that you have manually cleared and progressed beyond. Complete Floor ${floor} first to unlock skipping for this floor!`);
+        };
 
         // Captcha
         if (!requestVerification.has(interaction.user.id) && stats.dungeon_limit > 100 && Math.random() < 0.005 && !captchaCooldown.has(interaction.user.id)) requestVerification.set(interaction.user.id, { repeats: 0 });
@@ -173,7 +190,7 @@ const exportCommand: SlashCommand = {
         if (dungeonTempBan.has(interaction.user.id)) return interaction.editReply(`You have failed to enter the captcha many times in a row.\nYou have been temporarily banned from using \`/dungeon\` for the next **${Math.ceil((dungeonTempBan.get(interaction.user.id)?.ends - Date.now()) / (60 * 1000))}** min\nYou can check how much time is left with </cd:1010317417840390158>`);
         if (dungeonInProgress.has(stats.id)) return interaction.editReply("You already have a run in progress, please finish it before attempting to start a new round.");
         dungeonInProgress.add(stats.id);
-        const userTimeout = setTimeout(() => dungeonInProgress.delete(stats.id), 120000);
+        const userTimeout = setTimeout(() => dungeonInProgress.delete(stats.id), 300000);
 
         // Increase run count
         let skipRounds = 1;
@@ -195,10 +212,20 @@ const exportCommand: SlashCommand = {
 
         // User stats
         let myChar = characters[stats.battlechar];
-        let myStats = await getDetailedStats(myChar.id, stats, stats.dungeon_classlevels);
 
-        myStats.thumbnail = myChar.getImage(stats.premium, stats.custom_skins[myChar.id], stats.char_skin[myChar.id]);
+        // Determine if level caps should be applied (floor 300+ and not manually cleared)
+        let applyLevelCaps = false;
+        if (floor >= 300) {
+            const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
+            const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
+            // Apply caps only if floor hasn't been manually cleared
+            applyLevelCaps = !hasCompletedFloor;
+        };
 
+        const charLevelCap = applyLevelCaps ? 1000 : undefined;
+        const classLevelCap = applyLevelCaps ? 3000 : undefined;
+
+        let myStats = await getDetailedStats(myChar.id, stats, stats.dungeon_classlevels, 0, false, charLevelCap, classLevelCap);
         let myStatsC: DetailedStats = { ...myStats };
         let myClass = myStats.class !== -1 ? classes[myStats.class] : undefined;
         let skill = myStats.class !== -1 ? _.cloneDeep(skills[myStats.class]) : undefined;
@@ -213,9 +240,27 @@ const exportCommand: SlashCommand = {
         };
 
         // Enemy Stats
+        if (!floors[floor]) {
+            return interaction.editReply(`Invalid floor ${floor}. Please try again.`);
+        };
+
         let enemy = floors[floor].monster;
-        const curseRar = enemy.boss ? curses.filter((e) => e.tier) : curses.filter((e) => e.tier === 0);
-        const curse = curseRar[Math.floor(Math.random() * curseRar.length)];
+
+        if (!enemy) {
+            return interaction.editReply(`No enemy found for floor ${floor}. Please contact an administrator.`);
+        };
+
+        const curseRar = floor > 300 ? curses.filter((e) => e.tier === 1 || e.tier === 2) : (enemy.boss ? curses.filter((e) => e.tier) : curses.filter((e) => e.tier === 0));
+        let curse = curseRar[Math.floor(Math.random() * curseRar.length)];
+        if (floor > 300) switch (floor) {
+            case 302: curse = curseRar[5]; break; // Scorched Earth
+            case 305: curseRar[6]; break; // Dragon Manipulation
+            case 306: curse = curseRar[7]; break; // Mermaid Murmur
+            case 307: curse = curseRar[9]; break; // Malevolent Shrine
+            case 308: curse = curseRar[8]; break; // Chilling Cold
+            //case 319: curse = curseRar[10]; break; // Bane of the Powerful
+        };
+
         let eAbility = enemy.boss ? bossAbilities.find((e) => e.list[0] === floor) : undefined;
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
@@ -269,7 +314,9 @@ const exportCommand: SlashCommand = {
             if (dunLim[1] - stats.dungeon_limit >= 0 || stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded) stats.dungeon_floors[floor] += ((skipRounds > 0 && skipRounds < 30) ? skipRounds : 1);
 
             let unlocked = `<a:arrow_green:916716811842621450> Floor ${floor} progress: **${stats.dungeon_floors[floor]}**/${floors[floor]?.winsNeeded}`;
-            if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 300) {
+
+            if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 330) {
+
                 if (stats.dungeon_floors[floor] === floors[floor]?.winsNeeded) {
                     unlocked = `🔑 Floor **${floor + 1}** has been unlocked`;
                     stats.dungeon_floors[floor + 1] = 0;
@@ -320,7 +367,9 @@ const exportCommand: SlashCommand = {
                 if (dunLim[0] >= stats.dungeon_limit) boost *= 5;
 
                 boost = Math.round(boost * 100) / 100;
-                let cxp = Math.floor(((floor < 100 ? floor : 100 + (floor / 3)) + (Math.floor(Math.random() * 8))) * boost) + 12;
+
+                let cxp = Math.floor(((floor < 100 ? floor : 100 + (Math.min(floor, 300) / 3)) + (Math.floor(Math.random() * 8))) * boost) + 12;
+
                 cxp = Math.floor(cxp * 1.33);
                 if (enemy.boss) cxp = Math.floor(cxp * 1.5);
                 cxp = Math.floor(cxp * skipRounds);
@@ -538,9 +587,41 @@ const exportCommand: SlashCommand = {
 
             let xpleft = myClass
                 ? (myStats.clvl * 50) - (stats.dungeon_classlevels[myClass.id] - (myStats.clvl * (myStats.clvl - 1) * 25))
-                : 0;
 
-            Embed.setDescription(`<:stars_v2:917023655840591963> **${myChar.name}** won${flag === "all" ? ` ${skipRounds}/${skippedTotal} fights` : ""}! <:stars_v2:917023655840591963>\n${unlocked}\n${runsLeftStr}\n<a:arrow_yellow:916716780045619200> ${cxpmsg}\n\n<:npbag:929428030554787892> Loot\n${loot ? `${loot}<:coins:872926669055356939>, ` : ""}${chestRarities.reduce((total, e, i) => total += chestDrops[i] ? `${items[e].emoji}x${chestDrops[i]}, ` : "", "")}${craftCount ? `${craftItem.emoji}x${craftCount}, ` : ""}${craftCount2 ? `${craftItem2.emoji}x${craftCount2}, ` : ""}${ascCount ? `${ascItem.emoji}x${ascCount}, ` : ""}${Object.entries(levelupMats).filter((e) => e[1]).map((e) => `${items[e[0] as any].emoji}x${e[1]}, `).join("")}\n${lootArr.join(", ")}${xpPotions[784] ? `, ${items[784].emoji}x${xpPotions[784]}` : ""}${xpPotions[783] ? `, ${items[783].emoji}x${xpPotions[783]}` : ""}${xpPotions[782] ? `, ${items[782].emoji}x${xpPotions[782]}` : ""}`);
+                : 0;
+            // Check for extreme item drop (floors 301-330)
+            let drop = "\n";
+            if (hasExtremeItemDrop(floor)) {
+                const itemDrop = getExtremeItemDrop(floor);
+                if (itemDrop) {//&& Math.random() < 0.0005) {
+                    try {
+                        // Add the item directly to player's inventory
+                        if (itemDrop.itemType !== "rune") {
+                            await insertNewWeapon(interaction.user.id, itemDrop.itemId, itemDrop.itemType, undefined, 1, 0);
+                        } else {
+                            await updateUsersAndCache(interaction.client, interaction.user.id, {
+                                updates: {
+                                    items: { type: "merge_json", value: { [itemDrop.itemId]: 1 } },
+                                },
+                            });
+                        };
+                        // Get item info for notification
+                        const item = items[itemDrop.itemId];
+                        if (item) {
+                            const itemTypeText = itemDrop.itemType === "weapon" ? "WEAPON" :
+                                itemDrop.itemType === "armor" ? "ARMOR" :
+                                    itemDrop.itemType === "ring" ? "RING" : "RUNE";
+                            drop += `<:barm:1398660875740647464> **EXTREME ${itemTypeText} DROP!** You received **__${item.name}__** ${item.emoji}!`;
+                        }
+                    } catch (error) {
+                        console.error(`Error adding extreme item ${itemDrop.itemId} (${itemDrop.itemType}) to user ${interaction.user.id}:`, error);
+                    };
+                };
+            };
+
+
+            Embed.setDescription(`<:stars_v2:917023655840591963> **${myChar.name}** won${flag === "all" ? ` ${skipRounds}/${skippedTotal} fights` : ""}! <:stars_v2:917023655840591963>\n${unlocked}\n${runsLeftStr}\n<a:arrow_yellow:916716780045619200> ${cxpmsg}\n\n<:npbag:929428030554787892> Loot${drop}\n${loot ? `${loot}<:coins:872926669055356939>, ` : ""}${chestRarities.reduce((total, e, i) => total += chestDrops[i] ? `${items[e].emoji}x${chestDrops[i]}, ` : "", "")}${craftCount ? `${craftItem.emoji}x${craftCount}, ` : ""}${craftCount2 ? `${craftItem2.emoji}x${craftCount2}, ` : ""}${ascCount ? `${ascItem.emoji}x${ascCount}, ` : ""}${Object.entries(levelupMats).filter((e) => e[1]).map((e) => `${items[e[0] as any].emoji}x${e[1]}, `).join("")}\n${lootArr.join(", ")}${xpPotions[784] ? `, ${items[784].emoji}x${xpPotions[784]}` : ""}${xpPotions[783] ? `, ${items[783].emoji}x${xpPotions[783]}` : ""}${xpPotions[782] ? `, ${items[782].emoji}x${xpPotions[782]}` : ""}`);
+
             if (dunLim[0] - stats.dungeon_limit >= 0 || !myClass) Embed.setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins + loot)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
             else Embed.setFooter({ text: `${myClass.name} level: ${xpleft < 1 ? myStats.clvl + 1 : myStats.clvl} | XP left: ${xpleft < 1 ? (((myStats.clvl + 1) * 50) - (stats.dungeon_classlevels[myClass.id] - (myStats.clvl * (myStats.clvl + 1) * 25))) : xpleft}`, iconURL: xpleft < 1 ? "https://i.ibb.co/Y8k36J1/Nks94u8.gif" : myClass.image });
             return Embed;
@@ -550,17 +631,22 @@ const exportCommand: SlashCommand = {
         let notice = ["", "", "", ""];
 
         // Apply passives
+
+        if (eAbility) await eAbility.passive(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user, interaction.commandName);
+
         if (skill && myChar.id !== 4767) await skill.passive(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user, interaction.commandName);
         if (myAbility?.passive) await myAbility.passive(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.weapon !== -1) await (items[myStats.weapon] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.cuirass] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.gloves] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.boots] as armorInfo)?.setname) await (items?.[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        if (myStats.rune) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+        if (myStats.rune && floor !== 318) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
-        if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
-        if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+        if (floor !== 318) {
+            if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+            if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+        }
 
         // Apply skill tree
         for (const [skill, level] of Object.entries(stats.skill_tree)) {
@@ -588,6 +674,17 @@ const exportCommand: SlashCommand = {
 
         // Skip Fight
         if ((flag === "skip" || flag === "all") && stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded) {
+            if (floor > 300) {
+                // Check if user has completed this floor and moved to the next one
+                const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
+                const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
+                const hasMovedBeyond = currentFloor > floor;
+                if (!hasCompletedFloor || !hasMovedBeyond) {
+                    notice.push(`\n<:info:1131679799207796756> You can only skip floors that you have manually cleared and progressed beyond. Complete Floor ${floor} first to unlock skipping for this floor!`);
+                    return;
+                };
+            };
+
             if (myStats.ep > eStats.ep) {
                 const result = await matchResult("w");
                 if (result) interaction.editReply({ embeds: [result] });
@@ -604,6 +701,7 @@ const exportCommand: SlashCommand = {
         };
 
         const isCompactEmbed = !!author.schema.user_settings.compact_battle_embeds;
+        const showEnemyStats = !!author.schema.user_settings.display_enemy_stats;
         const threatLevelWarning = isCompactEmbed ? "" : `You encountered ${enemy.title.split(" ")[0]} **${enemy.title.split(" ").slice(1).join(" ")}**!\n${difficulty}\n\n`;
 
         async function newFight() {
@@ -614,15 +712,15 @@ const exportCommand: SlashCommand = {
                     .setThumbnail(isCompactEmbed ? eImage : myStatsC.thumbnail)
                     .setFooter({ text: `Enemy EP: ${eStatsC.ep} | round 1 | time left: 120s` })
                     .setTitle(`Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`)
-                    .setDescription(`${threatLevelWarning}${curse.emblem}${enemy.name}'s Stats (**${eStatsC.hp}**/${eStats.hp}\\💖${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStats.hp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStats.hp}\\💖${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}`)
+                    .setDescription(`${threatLevelWarning}${curse.emblem}${enemy.name}'s Stats (**${eStatsC.hp}**/${eStats.hp}\\💖${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStats.hp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStats.hp}\\💖${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}`)
                     .setImage(isCompactEmbed ? null : eImage);
                 interaction.editReply({ embeds: [Embed], components: [row] }).then(msg => {
 
-                    const atk = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ATK", componentType: ComponentType.Button, time: 120000 });
-                    const def = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "DEF", componentType: ComponentType.Button, time: 120000 });
-                    const ability = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ABILITY", componentType: ComponentType.Button, time: 120000 });
-                    const cskill = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "SKILL", componentType: ComponentType.Button, time: 120000 });
-                    const skip = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "SKIP", componentType: ComponentType.Button, time: 120000 });
+                    const atk = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ATK", componentType: ComponentType.Button, time: 300000 });
+                    const def = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "DEF", componentType: ComponentType.Button, time: 300000 });
+                    const ability = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ABILITY", componentType: ComponentType.Button, time: 300000 });
+                    const cskill = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "SKILL", componentType: ComponentType.Button, time: 300000 });
+                    const skip = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "SKIP", componentType: ComponentType.Button, time: 300000 });
                     matchStats.collector = { "atk": atk, "def": def, "ability": ability, "cskill": cskill, "skip": skip };
 
 
@@ -631,8 +729,8 @@ const exportCommand: SlashCommand = {
 
                     let timeout: NodeJS.Timeout | undefined;
                     async function editEmbed() {
-                        Embed.setDescription(`${threatLevelWarning}${curse.emblem}${enemy.name}'s Stats (**${eStatsC.hp}**/${eStatsC.maxhp}${eStatsC.hp === 0 ? "\\💔" : "\\💖"}${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStatsC.maxhp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStatsC.maxhp}${myStatsC.hp === 0 ? "\\💔" : "\\💖"}${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\n-----------------------------------${notice.slice(-(parseInt(author.schema.user_settings.battle_log_length || "4") || 4)).join("")}`);
-                        Embed.setFooter({ text: `Enemy EP: ${eStatsC.ep} | round ${matchStats.round} | time left: ${120 + Math.floor((timestart - new Date().getTime()) / 1000)}s` });
+                        Embed.setDescription(`${threatLevelWarning}${curse.emblem}${enemy.name}'s Stats (**${eStatsC.hp}**/${eStatsC.maxhp}${eStatsC.hp === 0 ? "\\💔" : "\\💖"}${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStatsC.maxhp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStatsC.maxhp}${myStatsC.hp === 0 ? "\\💔" : "\\💖"}${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\n-----------------------------------${notice.slice(-(parseInt(author.schema.user_settings.battle_log_length || "4") || 4)).join("")}`);
+                        Embed.setFooter({ text: `Enemy EP: ${eStatsC.ep} | round ${matchStats.round} | time left: ${Math.max(0, 120 + Math.floor((timestart - new Date().getTime()) / 1000))}s` });
                         // await msg.edit({ embeds: [Embed] });
 
                         // Debounce
@@ -709,15 +807,30 @@ const exportCommand: SlashCommand = {
                         Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                     };
 
+                    function checkPlayerFrozen() {
+                        if (matchStats.ended) return false;
+                        if (myStatsC.timeFrozen && matchStats.turn === 1) {
+                            if (myStatsC.frozenMessage) notice.push(`\n✨ **${myChar.name}** ${myStatsC.frozenMessage} and skips their turn!`);
+                            if (matchStats.ended) return true;
+                            editEmbed();
+                            Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                            matchStats.turn = 0;
+                            attack();
+                            return true;
+                        };
+
+                        return false;
+                    };
+
                     function attack() {
                         if (matchStats.turn === 1) return;
-                        if (eStatsC.timeFrozen) {
+                        if (eStatsC.timeFrozen && eStats.name !== "McBurn") {
                             if (eStatsC.frozenMessage) notice.push(`\n✨ **${enemy.name}** ${eStatsC.frozenMessage}.`);
-                            if (!(matchStats.playerPausingRounds > 0)) matchStats.turn = 1;
                             matchStats.turn = 1;
                             matchStats.round++;
                             startNextRound();
                             editEmbed();
+
                             if (matchStats.playerPausingRounds > 0) {
                                 matchStats.playerPausingRounds--;
                                 attack();
@@ -727,18 +840,41 @@ const exportCommand: SlashCommand = {
                                 if (matchStats.blockAbilities-- <= 0 && myChar.id !== 4767 && eStatsC.sm >= curse.cost && Math.random() < 0.3) {
                                     curse.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     eStatsC.sm -= curse.cost;
+                                    matchStats.trigger("curse", eStatsC, myStatsC, eBuffs, buffs);
                                     editEmbed();
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
                                 } else if (matchStats.blockAbilities-- < 0 && myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.5) {
                                     eAbility.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
+                                    matchStats.trigger("ABILITY", eStatsC, myStatsC, eBuffs, buffs);
                                     editEmbed();
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     attack();
+
+                                } else if (eStatsC.refuseATK) {
+                                    let notif = `✨ **${enemy.name}** refuses to ATK`;
+                                    if (eStatsC.refuseATKMessage) {
+                                        if (Array.isArray(eStatsC.refuseATKMessage)) {
+                                            notif = `${eStatsC.refuseATKMessage[Math.floor(Math.random() * eStatsC.refuseATKMessage.length)]}`;
+                                        } else {
+                                            notif = eStatsC.refuseATKMessage;
+                                        };
+                                    };
+                                    notice.push(`\n${notif}`);
+
+                                    matchStats.turn = 1;
+                                    matchStats.round++;
+                                    startNextRound();
+                                    editEmbed();
+                                    if (matchStats.playerPausingRounds > 0) {
+                                        matchStats.playerPausingRounds--;
+                                        attack();
+                                    };
                                 } else {
-                                    dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `⚔️ **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                                    if (eStatsC.replaceButton?.atk?.run !== undefined) {
+                                        eStatsC.replaceButton.atk.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
+                                    } else dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `⚔️ **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
-                                    if (!(matchStats.playerPausingRounds > 0)) matchStats.turn = 1;
                                     matchStats.turn = 1;
                                     matchStats.round++;
                                     startNextRound();
@@ -756,19 +892,28 @@ const exportCommand: SlashCommand = {
                     // Write passive actions if any
                     if (notice.length > 4) {
                         Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
-                        editEmbed();
+                        if (!matchStats.ended) editEmbed();
                     };
-
+                    checkPlayerFrozen();
                     atk.on('collect', async () => {
                         if (matchStats.turn === 1) {
+                            if (myStatsC.timeFrozen) {
+                                if (myStatsC.frozenMessage) notice.push(`\n✨ **${myChar.name}** ${myStatsC.frozenMessage} and can't act!`);
+                                editEmbed();
+                                matchStats.turn = 0;
+                                attack();
+                                return;
+                            };
                             matchStats.turn = 0;
 
                             // If attack was replaced
-                            if (myStatsC.replaceButton.atk?.run) {
+                            if (myStatsC.replaceButton.atk?.run && floor !== 318) {
                                 myStatsC.replaceButton.atk.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
 
                                 // Event Triggers
+                                matchStats.actionSequence.push("ATK");
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
                                 Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
@@ -780,11 +925,12 @@ const exportCommand: SlashCommand = {
                                 dealDamage(eStatsC, myStatsC, eBuffs, buffs, matchStats, notice, `⚔️ **${myChar.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
                                 // Event Triggers
+                                matchStats.actionSequence.push("ATK");
                                 matchStats.trigger("ATK", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
 
                                 editEmbed();
                                 Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
-
                                 attack();
                             }
 
@@ -793,6 +939,14 @@ const exportCommand: SlashCommand = {
 
                     def.on('collect', async () => {
                         if (matchStats.turn === 1) {
+                            if (myStatsC.timeFrozen) {
+                                if (myStatsC.frozenMessage) notice.push(`\n✨ **${myChar.name}** ${myStatsC.frozenMessage} and can't act!`);
+                                editEmbed();
+                                matchStats.turn = 0;
+                                attack();
+                                return;
+                            };
+
                             matchStats.turn = 0;
                             myStatsC.attackStreak = 0;
 
@@ -801,7 +955,10 @@ const exportCommand: SlashCommand = {
                                 myStatsC.replaceButton.def.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
 
                                 // Event Triggers
+                                matchStats.actionSequence.push("DEF");
                                 matchStats.trigger("DEF", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
+
 
                                 editEmbed();
                                 Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
@@ -823,19 +980,27 @@ const exportCommand: SlashCommand = {
                                     notice.push(`\n🛡️ **${myChar.name}** has increased DEF by **${adddef}** and MR by **${addmr}**`);
                                 };
                                 myStatsC.usedBlockRound = matchStats.round;
-
                                 // Event Triggers
+                                matchStats.actionSequence.push("DEF");
                                 matchStats.trigger("DEF", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
 
-                                attack();
                                 editEmbed();
                                 Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
+                                attack();
                             }
                         } else interaction.followUp({ content: "Please wait a moment", ephemeral: true });
                     });
 
                     ability.on('collect', async () => {
                         if (myStatsC.isAbilityBlocked) return interaction.followUp({ content: `You currently can't use your character ability`, ephemeral: true });
+                        if (myStatsC.timeFrozen) {
+                            if (myStatsC.frozenMessage) notice.push(`\n✨ **${myChar.name}** ${myStatsC.frozenMessage} and can't act!`);
+                            editEmbed();
+                            matchStats.turn = 0;
+                            attack();
+                            return;
+                        };
 
                         // If ability was replaced
                         if (myStatsC.replaceButton.ability?.run && matchStats.turn === 1) {
@@ -845,7 +1010,9 @@ const exportCommand: SlashCommand = {
 
                             // Event Triggers
                             if (response === AbilityResponse.SUCCESS) {
+                                matchStats.actionSequence.push("ABILITY");
                                 matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
                             };
 
                             editEmbed();
@@ -867,7 +1034,9 @@ const exportCommand: SlashCommand = {
 
                                         // Event Triggers
                                         if (response === AbilityResponse.SUCCESS) {
+                                            matchStats.actionSequence.push("ABILITY");
                                             matchStats.trigger("ABILITY", myStatsC, eStatsC, buffs, eBuffs);
+                                            matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
                                         };
 
                                         editEmbed();
@@ -880,6 +1049,14 @@ const exportCommand: SlashCommand = {
                     });
 
                     cskill.on('collect', async () => {
+                        if (myStatsC.timeFrozen) {
+                            if (myStatsC.frozenMessage) notice.push(`\n✨ **${myChar.name}** ${myStatsC.frozenMessage} and can't act!`);
+                            editEmbed();
+                            matchStats.turn = 0;
+                            attack();
+                            return;
+                        };
+
                         // If class active was replaced
                         if (myStatsC.replaceButton.cskill?.run && matchStats.turn === 1) {
                             matchStats.turn = 0;
@@ -888,7 +1065,9 @@ const exportCommand: SlashCommand = {
 
                             // Event Triggers
                             if (response === AbilityResponse.SUCCESS) {
+                                matchStats.actionSequence.push("CSKILL");
                                 matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                                matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
                             };
 
                             editEmbed();
@@ -909,7 +1088,9 @@ const exportCommand: SlashCommand = {
 
                                     // Event Triggers
                                     if (response === AbilityResponse.SUCCESS) {
+                                        matchStats.actionSequence.push("CSKILL");
                                         matchStats.trigger("CSKILL", myStatsC, eStatsC, buffs, eBuffs);
+                                        matchStats.trigger("action", myStatsC, eStatsC, buffs, eBuffs);
                                     };
 
                                     editEmbed();
@@ -926,6 +1107,7 @@ const exportCommand: SlashCommand = {
                             notice.push(`\n⏩ Skipping to results...`);
                             editEmbed();
                             matchStats.turn = 0;
+                            matchStats.actionSequence.push("SKIP");
                             while (eStatsC.hp > 0 && myStatsC.hp > 0) {
                                 if (Math.random() > 0.02 + (0.1 * (eStatsC.ep / myStatsC.ep))) eStatsC.hp -= Math.floor((myStatsC.atk * Math.pow(0.99895, eStatsC.def)) * (1 - (0.2 * Math.random())));
                                 if (eStatsC.hp < 0) eStatsC.hp = 0;

@@ -1,7 +1,7 @@
 import { EmbedBuilder, ComponentType } from "discord.js";
 import { armorInfo, itemInfo, items, lootInfo, weaponInfo } from "../Modules/items";
 import { PageRow, OfferRow } from "../Modules/components";
-import { showPage, customEmojis, getAscensionMaterial, searchItem } from "../Modules/functions";
+import { showPage, customEmojis, getAscensionMaterial, searchItem, getForgeMaterialCosts } from "../Modules/functions";
 import { ItemRarity, SlashCommand } from "../types";
 import { getUserSchema, insertNewWeapon, updateUsers } from "../Modules/queries";
 
@@ -13,12 +13,17 @@ function forgeryEmbed(elements: (itemInfo)[]) {
         .setDescription("Welcome, honored one. What would you like me to do today?\n(Use `/forge <item>` to forge an item)\n");
     for (let i = 0; i < elements.length; i++) {
         const item = elements[i] as weaponInfo | armorInfo;
-        const ascItem = getAscensionMaterial(item.id, ascMaterials);
+        const costs = getForgeMaterialCosts(item.id);
+        const ascItem = costs.ascensionMaterialId ? items[costs.ascensionMaterialId] as lootInfo : getAscensionMaterial(item.id, ascMaterials);
         const craftItem = items.find((e) => e.type === "crafting material" && e.grade === item.grade) as lootInfo;
+        const isExtreme = costs.ascension > 36; // Check if it's an extreme weapon
+
+        // Skip items with invalid materials
+        if (!ascItem || !craftItem) continue;
 
         Embed.addFields(
-            { name: `${item.gradeEmote}`, value: `${item.bar} ${item.emoji} | ${item.name}`, inline: true },
-            { name: `Cost: ${craftItem.emoji}x24 ${ascItem.emoji}x36`, value: `\`${item.psmin}-${item.psmax}\` ${customEmojis[item.primaryStat] || item.primaryStat}${item instanceof weaponInfo ? ` and \`${item.ssmin.endsWith("%") ? item.ssmin.slice(0, -1) : item.ssmin}-${item.ssmax}\` ${customEmojis[item.secondaryStat] || item.secondaryStat}` : ""}`, inline: true },
+            { name: `${item.gradeEmote}`, value: `${item.bar} ${item.emoji} | ${item.name}${isExtreme ? " ⚡" : ""}`, inline: true },
+            { name: `Cost: ${craftItem.emoji}x${costs.crafting} ${ascItem.emoji}x${costs.ascension}`, value: `\`${item.psmin}-${item.psmax}\` ${customEmojis[item.primaryStat] || item.primaryStat}${item instanceof weaponInfo ? ` and \`${item.ssmin.endsWith("%") ? item.ssmin.slice(0, -1) : item.ssmin}-${item.ssmax}\` ${customEmojis[item.secondaryStat] || item.secondaryStat}` : ""}`, inline: true },
             { name: '_ _', value: '_ _', inline: true },
         );
     };
@@ -77,18 +82,20 @@ const exportCommand: SlashCommand = {
 
         const stats = author.schema;
 
-        const ascItem = getAscensionMaterial(fItem.id, ascMaterials);
+        const costs = getForgeMaterialCosts(fItem.id);
+        const ascItem = costs.ascensionMaterialId ? items[costs.ascensionMaterialId] as lootInfo : getAscensionMaterial(fItem.id, ascMaterials);
         const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade);
         if (!craftItem) return interaction.reply(`Error: Unknown crafting material`);
+        if (!ascItem) return interaction.reply(`Error: Unknown ascension material`);
 
         // Check if the user has the required mats
-        if ((stats.items[ascItem.id] || 0) < 36) return interaction.reply(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${36})`);
-        if ((stats.items[craftItem.id] || 0) < 24) return interaction.reply(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${24})`);
+        if ((stats.items[ascItem.id] || 0) < costs.ascension) return interaction.reply(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
+        if ((stats.items[craftItem.id] || 0) < costs.crafting) return interaction.reply(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
 
         const Embed = new EmbedBuilder()
             .setTitle("Gaius' Forgery")
             .setColor(0xbbffff)
-            .setDescription(`Let me confirm your order:\n**1x** ${fItem.emoji} **__${fItem.name}__**\nfor ${craftItem.emoji}**x24** & ${ascItem.emoji}**x36**?`)
+            .setDescription(`Let me confirm your order:\n**1x** ${fItem.emoji} **__${fItem.name}__**\nfor ${craftItem.emoji}**x${costs.crafting}** & ${ascItem.emoji}**x${costs.ascension}**?`)
             .setThumbnail("https://i.imgur.com/WbPCBqR.png");
         return interaction.reply({ embeds: [Embed], components: [OfferRow] }).then(msg => {
 
@@ -104,18 +111,18 @@ const exportCommand: SlashCommand = {
                 };
 
                 // Check if the user has the required mats
-                if ((stats.items[ascItem.id] || 0) < 36) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${36})`);
+                if ((stats.items[ascItem.id] || 0) < costs.ascension) {
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
                     return;
                 };
-                if ((stats.items[craftItem.id] || 0) < 24) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${24})`);
+                if ((stats.items[craftItem.id] || 0) < costs.crafting) {
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
                     return;
                 };
 
                 // Update users table
                 await updateUsers(interaction.user.id, {
-                    items: { type: "merge_json", value: { [ascItem.id]: -36, [craftItem.id]: -24 } },
+                    items: { type: "merge_json", value: { [ascItem.id]: -costs.ascension, [craftItem.id]: -costs.crafting } },
                 });
 
                 // Insert new weapon

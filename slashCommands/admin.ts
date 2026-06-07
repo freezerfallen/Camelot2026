@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, ComponentType, AttachmentBuilder, User } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder, User } from "discord.js";
 import { characters } from "../Modules/chars";
 import { classLevelToXP, search, searchItem, showPage } from "../Modules/functions";
 import { OfferRow, PageRow, cowSettings } from "../Modules/components";
@@ -29,7 +29,7 @@ const exportCommand: SlashCommand = {
 
         // List all actions
         if (cmd === "list" || cmd === "ls") {
-            return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
+            return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`reset phantasmagoria`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
         };
 
         // DB size
@@ -157,6 +157,45 @@ const exportCommand: SlashCommand = {
                 dungeon_limit: { type: "set", value: 0 }
             });
             return interaction.reply({ content: `Action Successful: Reset dungeon for ${user ? user.toString() : "all users"}`, ephemeral });
+        };
+
+        // Reset Phantasmagoria
+        if (action === "reset phantasmagoria") {
+            const confirmRow = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder().setCustomId('confirm').setLabel('Confirm').setStyle(ButtonStyle.Danger),
+                    new ButtonBuilder().setCustomId('cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary),
+                );
+            const targetLabel = user ? user.toString() : "**All Users**";
+            const promptEmbed = new EmbedBuilder()
+                .setColor(0xff4444)
+                .setTitle("⚠️ Confirm Phantasmagoria Reset")
+                .setDescription(`This will reset the following for ${targetLabel}:\n\n• Damage → \`0\`\n• Phases → \`0\`\n• Purchase History → \`Cleared\`\n• Strategy → \`None\``)
+                .setFooter({ text: `Requested by ${interaction.user.tag}` });
+            const msg = await interaction.reply({ embeds: [promptEmbed], components: [confirmRow], ephemeral, fetchReply: true });
+            const btn = await msg.awaitMessageComponent({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 30000 }).catch(() => null);
+            if (!btn || btn.customId === 'cancel') {
+                return interaction.editReply({ embeds: [new EmbedBuilder().setColor(0x888888).setTitle("Cancelled").setDescription("Reset was not performed.")], components: [] });
+            };
+            const target = user ? user.id : "*";
+            await updateUsers(target, {
+                phantasmagoria_best_damage: { type: "set", value: 0 },
+                phantasmagoria_best_phases: { type: "set", value: 0 },
+                echo_purchases: { type: "set", value: {} },
+                phantasmagoria_strategy: { type: "set", value: 0 },
+            });
+            const resultEmbed = new EmbedBuilder()
+                .setColor(0xbbffff)
+                .setTitle("Phantasmagoria Reset")
+                .addFields(
+                    { name: "Target", value: targetLabel, inline: true },
+                    { name: "Damage", value: "`0`", inline: true },
+                    { name: "Phases", value: "`0`", inline: true },
+                    { name: "Purchase History", value: "`Cleared`", inline: true },
+                    { name: "Strategy", value: "`None`", inline: true },
+                )
+                .setFooter({ text: `Executed by ${interaction.user.tag}` });
+            return interaction.editReply({ embeds: [resultEmbed], components: [] });
         };
 
         // List Guilds

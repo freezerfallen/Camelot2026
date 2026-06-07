@@ -1,7 +1,9 @@
 import { ClassAbility } from "../types";
 import buffInfo from "./buffs";
 import { AbilityResponse } from "./components";
-import { addHeal } from "./functions";
+import delayedBuffs from "./delayedBuffs";
+import { dealDamage, addHeal, procburn } from "./functions";
+import { getUserSchema } from "./queries";
 
 export default class curseInfo {
     private _name: string;
@@ -246,4 +248,161 @@ export const curses = [
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         return AbilityResponse.SUCCESS;
     }, "https://i.ibb.co/kHW18jq/Absorb.png", "The monster steals 10% of your max HP and adds it to itself.", "None"),
+    new curseInfo("Scorched Earth", 15, "<:Scorched_Earth:1502126250594930831>", 2, 40, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        if (eStats.negateHeal === 1) {
+            myStats.burnduration += 3;
+            notice.push(`\n${curses[15].emblem} **${enemy.name}** has inflicted **+3** rounds of burn`);
+        } else {
+            eStats.negateHeal = 1;
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 3, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                eStats.negateHeal = 0;
+                return AbilityResponse.SUCCESS;
+            }));
+            notice.push(`\n${curses[15].emblem} **${enemy.name}** has prevented any heals on you for **2** rounds.`);
+        };
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.negateHeal ??= 0;
+        mybuff.hp.push(new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 9999));
+
+        // Burn SETUP
+        myStats.burntype ??= 1;
+        if (typeof myStats.burnduration !== "number") {// Trigger burn every round
+            myStats.burnduration = 0;
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                procburn(myStats, eStats, mybuff, ebuff, matchStats, notice, ``, {});
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/v4HqPk5R/Scorched-Earth.png", "Disables any healing instances for **2** rounds. If already disabled, instead applies **3** rounds of burn on the player.", "Deals **5%** max HP burn damage every round (DoT)"),
+    new curseInfo("Dragon Manipulation", 16, "<:Dragon_Manipulation:1502126144080838749>", 2, 25, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.burnbonus += 0.05;
+        myStats.burnduration += 2;
+        notice.push(`\n${curses[16].emblem} **${eStats.name}**'s boosted their burn damage by **5%** permanently and inflicted **+2** burn`);
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.burnbonus ?? - 0;
+        // Burn SETUP
+        myStats.burntype ??= 1;
+        if (typeof myStats.burnduration !== "number") {// Trigger burn every round
+            myStats.burnduration = 0;
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                procburn(myStats, eStats, mybuff, ebuff, matchStats, notice, ``, {});
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+        };
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 5 === 0) {
+                eStats.shield += Math.floor(eStats.maxhp * 0.05);
+                myStats.burnduration += 2;
+                notice.push(`\n${curses[16].emblem} **${eStats.name}** summoned a dragon and inflicted **+2** rounds of burn`);
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/xSbCKt0Y/c.png", "Permanently increases burn damage by **5%**, then applies **2** rounds of burn.", "Every **5** rounds, summons a dragon, gaining a **5%** max HP shield and inflicting **+2** rounds of burn."),
+    new curseInfo("Mermaid Murmur", 17, "<:Mermaid_Murmur:1502126075117834310>", 2, 30, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        // Get user inventory to check for megalodon
+        const inv = await getUserSchema(matchStats.user);
+        if (!inv) {
+            eStats.sm += 30;
+            return AbilityResponse.FAILURE;
+        };
+
+        // Count megalodon in user's inventory
+        const megalodonCount = inv.items[684] || 0; // 684 is the ID for megalodon
+        let atkScale = 0.8 + Math.min(0.1 * megalodonCount, 0.3);
+        dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `${curses[17].emblem} **${eStats.name}**`, { atkMultiplier: atkScale, magicDamage: true });
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.mg += 4;
+        ebuff.mg.push(new buffInfo("+", 4, 9999));
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 6 === 0) {
+                eStats.shield += Math.floor((eStats.maxhp - eStats.hp) * 0.08);
+                notice.push(`\n${curses[17].emblem} **${eStats.name}** gained a shield equal to **8%** of missing HP`);
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/N2rqxdnq/content.png", "Deals **80%** damage (**+10%** damage scaling for every Megalodon owned, up to 30%)", "Regenerates **+4** mana every round, and generates a shield equal to **8%** of missing HP every **6** rounds"),
+    new curseInfo("Chilling Cold", 18, "<:Chilling_Cold:1503414323857330357>", 2, 30, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `${curses[18].emblem} **${eStats.name}**`, { atkMultiplier: 0.8, magicDamage: true });
+        myStats.atk -= Math.floor(myStats.atk * 0.2);
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.dodge = 0;
+        myStats.counter = 0;
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.dodge = 0;
+            myStats.counter = 0;
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/V00vC39f/Chilling-Cold.png", "Deals **80%** damage and reduces opponent's ATK by **20%** for **1** round", "The opponent is slowed, unable to dodge, and have counter attempts removed at the start of a round."),
+    new curseInfo("Malevolent Shrine", 19, "<:Malevolent_Shrine:1509926471643299880>", 2, 80, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        if (myStats.rev > 0) {
+            myStats.rev = 0;
+            notice.push(`\n<:Malevolent_Shrine:1509926471643299880> **${char.name}** can no longer revive`);
+        } else {
+            eStats.atk += Math.floor(eStats.atk * 0.12);
+            eStats.md += Math.floor(eStats.md * 0.12);
+            ebuff.atk.push(new buffInfo("*", 1.12, 9999));
+            ebuff.md.push(new buffInfo("*", 1.12, 9999));
+            notice.push(`\n<:Malevolent_Shrine:1509926471643299880> **${enemy.name}** gains **12%** ATK & MD`);
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round === 15) {
+                myStats.hp = 0;
+                myStats.forceLoose = true;
+                notice.push(`\n<:Malevolent_Shrine:1509926471643299880> **${enemy.name}** cuts the battle short...`);
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/HTjy80NQ/image0-1.png", "Removes any revival attempts on the opponent. If they have none, instead boosts ATK & MD by **12%** permanently", "Unleashes a sure-hit domain on round **15**, instantly killing the opponent"),
+    // new curseInfo("Bane of the Powerful", 20, "<:Bane_of_the_Powerful:EMOJI>", 2, 60, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //     const baneClvl = matchStats.baneClvl ?? myStats.clvl;
+    //     const dmg = baneClvl * 100;
+    //     if (dmg >= myStats.maxhp) {
+    //         myStats.hp = 1;
+    //     } else {
+    //         myStats.hp -= dmg;
+    //     }
+    //     notice.push(`\n<:Bane_of_the_Powerful:EMOJI> **${enemy.name}** judges your power — **${dmg}** true damage`);
+    //     return AbilityResponse.SUCCESS;
+    // }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //     matchStats.baneClvl ??= myStats.clvl;
+    //     matchStats.baneLvl ??= myStats.lvl;
+    //     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    //         if (matchStats.round % 10 === 0) {
+    //             const baneLvl = matchStats.baneLvl ?? myStats.lvl;
+    //             const dmg = baneLvl * 100;
+    //             myStats.hp -= dmg;
+    //             if (myStats.hp < 0) myStats.hp = 0;
+    //             notice.push(`\n<:Bane_of_the_Powerful:EMOJI> The weight of your power crushes you — **${dmg}** true damage`);
+    //         };
+    //         return AbilityResponse.SUCCESS;
+    //     }, 9999));
+    //     return AbilityResponse.SUCCESS;
+    // }, "https://i.ibb.co/bXW0gcv/examiner.png", "Deals **clvl × 100** true, undodgeable, unblockable, absolute damage. If it would kill, leaves the player at **1 HP**.", "Deals **profile level × 100** true, undodgeable, unblockable, absolute damage once every **10** rounds. Can kill."),
 ];

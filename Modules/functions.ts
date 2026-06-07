@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import { EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, User } from "discord.js";
 import imagesize from 'imagesize';
 import axios from 'axios';
@@ -146,7 +146,7 @@ const lvlupStats = {
 
 const retainItemStats = new Map<string, { timeout: NodeJS.Timeout, stats: WeaponSchema; }>();
 
-export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false) => {
+export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false, lvlcap?: number, clvlcap?: number) => {
 
     let dStats: DetailedStats = {
         "id": id,
@@ -210,7 +210,7 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         "heap1": 0,
         "timeout": true,
         "defUsed": 0,
-        "lvl": (inv.level ?? 1) + lu,
+        "lvl": lvlcap ? Math.min((inv.level ?? 1) + lu, lvlcap) : (inv.level ?? 1) + lu,
         "ref": Math.min(6, ((inv.char_ref[id] ?? 0) + (refine ? 1 : 0))),
         "class": -1,
         "clvl": 1,
@@ -226,6 +226,7 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
         "rune": inv.equipment[`rune:${id}`],
         "runeicon": inv.equipment[`rune:${id}`] === undefined ? "<:rune_empty:1034507494539669635>" : items[parseInt(inv.equipment[`rune:${id}`])].emoji,
     };
+
 
     // Expertise change
     if (dStats.ref === 6) dStats.expertise = "any";
@@ -243,7 +244,7 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
     let clsStats: ClassStats;
     if (inv.class !== null) {
         dStats.class = inv.class;
-        dStats.clvl = getClassLvl(dStats.class, classLevels);
+        dStats.clvl = clvlcap ? Math.min(getClassLvl(dStats.class, classLevels), clvlcap) : getClassLvl(dStats.class, classLevels);
         clsStats = classes[dStats.class].stats;
         (Object.keys(clsStats) as (keyof ClassStats)[]).forEach((s) => dStats[s] = dStats[s] * clsStats[s][0] + clsStats[s][1]);
         ["mana", "mg", "sm"].forEach((s) => dStats[s] = Math.floor(dStats[s]));
@@ -252,7 +253,7 @@ export const getDetailedStats = async (id: number, inv: UserSchemaForStats, clas
     };
 
     // Add level bonus
-    const bankup = Math.max(0, Math.floor((Math.sqrt((2 * (inv.bank)) + (100 * (dStats.lvl * dStats.lvl)) + (700 * dStats.lvl) + 1225) / 10) - 3.5 - dStats.lvl));
+    const bankup = lvlcap ? Math.min(lvlcap - dStats.lvl, Math.max(0, Math.floor((Math.sqrt((2 * (inv.bank)) + (100 * (dStats.lvl * dStats.lvl)) + (700 * dStats.lvl) + 1225) / 10) - 3.5 - dStats.lvl))) : Math.max(0, Math.floor((Math.sqrt((2 * (inv.bank)) + (100 * (dStats.lvl * dStats.lvl)) + (700 * dStats.lvl) + 1225) / 10) - 3.5 - dStats.lvl));
     dStats.hp = Math.floor((1 + (0.3333 * dStats.ref)) * dStats.hp) + Math.round((lvlupStats[characters[id].rarity].hp.base + (lvlupStats[characters[id].rarity].hp.add * ((strCode(id) % 10) / 9))) * (dStats.lvl - 1 + bankup));
     dStats.atk = Math.floor((1 + (0.3333 * dStats.ref)) * dStats.atk) + Math.round((lvlupStats[characters[id].rarity].atk.base + (lvlupStats[characters[id].rarity].atk.add * ((dStats.atk - 50) / 30))) * (dStats.lvl - 1 + bankup));
     dStats.md = Math.floor((1 + (0.3333 * dStats.ref)) * dStats.md) + Math.round((lvlupStats[characters[id].rarity].atk.base + (lvlupStats[characters[id].rarity].atk.add * ((dStats.md - 50) / 30))) * (dStats.lvl - 1 + bankup));
@@ -605,7 +606,7 @@ export const getDamage = (target: DetailedStats, attacker: DetailedStats, target
         damage = options.overwriteDamage || Math.floor(((options.atkMultiplier * attacker.atk * ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1)) * Math.max(Math.pow(0.99895, options.defMultiplier * target.def), (target.removeDefCap ? 0 : 0.1))) * (1 - (0.2 * Math.random())) * ((options.canCrit && options.critChance < (attacker.cr + options.critBuff)) ? (options.critMultiplier * attacker.cd) : 1));
     };
 
-    return damage;
+    return Math.max(damage, 0);
 };
 
 
@@ -639,10 +640,12 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         damageFormula: attacker.damageFormula ?? matchStats.damageFormula,
         canTwinshot: true,
         isLightning: false,
+        isBurn: false,
         isPyro: false,
         canCounter: true,
         normalATK: false,
         flexibleDmg: false,
+        element: attacker.element ?? 0,
         turn: 0,
 
         preventRetaliation: false,
@@ -697,6 +700,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             const steal = Math.min(attacker.sm, target.stealManaOnDodge);
             attacker.sm -= steal;
             target.sm += steal;
+            if (typeof target.manaGained !== undefined) target.manaGained += steal;
             if (target.sm > target.mana) target.sm = target.mana;
         };
 
@@ -721,8 +725,10 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         crit: ((isCrit || attacker.shorekeeperUsedActive) ? (options.critMultiplier * attacker.cd) : 1),
         combo: ((options.combodmg && attacker.combodmg) ? (1 + Math.min(1.4, attacker.attackStreak * attacker.combodmg)) : 1),
         lightning: options.isLightning ? ((1 + (attacker.lightningMultiplier || 0) + ((attacker.tempLightningBuff && attacker.tempLightningBuffActive) ? attacker.tempLightningBuff : 0)) * (1 - (target.lightningResistance || 0))) : 1,
+        burn: options.isBurn ? (1 + (attacker.burnbonus || 0)) * (1 - (target.burnResistance || 0)) : 1,
         rng: (1 - (0.2 * Math.random())),
     };
+
     // Removed redundant line: crit scaling now handled in multipliers.crit
     if (options.magicDamage && options.mdChance < attacker.mdChance) {
         damage = options.overwriteDamage || Math.floor(multipliers.md * multipliers.mr * multipliers.crit * multipliers.combo * multipliers.lightning * multipliers.rng);
@@ -733,6 +739,23 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     attacker.crittedTotal ||= 0;
     attacker.crittedTotal++;
 
+    if (options.element && !options.isLightning) {
+        switch (options.element) {
+            case 1: if (attacker.frostbonus) damage = Math.floor(damage * (1 + attacker.frostbonus)); break;
+            default: break;
+        };
+    };
+
+    if (attacker.critExtreme) {// Phantasma Strategy
+        if (attacker.cr >= 0.5) {
+            if (isCrit) { damage = Math.floor(damage * 1.5); } else damage = 0;
+        } else {
+            if (isCrit) { damage = 0; } else damage = Math.floor(damage * 1.5);
+        };
+    };
+
+    if (attacker.coupDeGrace) damage += Math.floor(damage * Math.min((target.maxhp - target.hp) / target.maxhp, 0.8));
+    if (attacker.execBeyondLight) damage += Math.floor(damage * Math.min(target.hp / target.maxhp, 0.6));
 
     // Other Damage Formulas
     if (options.damageFormula.startsWith("log_scale_")) {
@@ -745,6 +768,9 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             if (attacker.damageRescaling) damage = Math.floor(damage * attacker.damageRescaling);
         };
     };
+
+    // Overwrite damage (moved before mitigation so overwritten damage gets mitigated)
+    damage = options.overwriteDamage || damage;
 
     // Damage Reduction
     if (target.damageReduction) {
@@ -786,15 +812,12 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         damage = Math.floor(damage * target.vulnerabilityDynamic);
     };
 
-    // Overwrite damage
-    damage = options.overwriteDamage || damage;
-
     //* RETURN IF TEST
     if (options.isTest) return damage;
 
     // Counter the attack
-    if (options.canCounter && target.counter > 0 && (!isNaN(target.counterchance) ? target.counterchance : 1) > Math.random() && !attacker.blockCounter) {
-        target.counter--;
+    if (options.canCounter && (target.counter > 0 || Math.random() < target.counterChanceDynamic) && (!isNaN(target.counterchance) ? target.counterchance : 1) > Math.random() && !attacker.blockCounter) {
+        if (target.counter >= 1) target.counter--;
         notice.push(`\n<:counter:1340459549374546032> **${target.name}** countered the attack!`);
         /*if (target.soulfistAtkStack !== undefined) {
             if (target.soulfistAtkStack++ < 5) {
@@ -844,7 +867,27 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     }
 
     // Apply damage to target
-    if (!options.ignoreShield && target.shield > 0) {
+
+    // Special Shield
+    if (target.SPshield) {
+        switch (target.SPshieldType) {
+            case 1: {// NereID
+                damage = Math.floor(damage / 2);
+                attacker.hp -= Math.floor(options.ignoreShield ? damage * 4 : damage * 2);
+                target.SPshield = Math.floor(target.SPshield - damage);
+                if (target.SPshield < 0 || options.shieldBreak) {
+                    notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : options.element === 1 ? " <a:frost1:1504497507185725473><a:frost2:1504497408233705512>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage${target.shield === 0 ? `. **${target.name}**'s special shield broke down!` : ""}`);
+                    matchStats.trigger("shieldBreak", attacker, target, attackerBuff, targetBuff, { special: true });
+                    target.SPshield = 0;
+                };
+                break;
+            };
+            default: break;
+        };
+    };
+
+    // Normal Shield
+    if (!options.ignoreShield && target.shield > 0 && damage > 0) {
         target.shield = Math.floor(target.shield - damage);
 
         // if shield broken
@@ -867,11 +910,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
             };
         };
 
-        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage${target.shield === 0 ? `. **${target.name}**'s shield broke down!` : ""}`);
+        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : options.element === 1 ? " <a:frost1:1504497507185725473><a:frost2:1504497408233705512>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage${target.shield === 0 ? `. **${target.name}**'s shield broke down!` : ""}`);
     } else {
         target.hp = Math.floor(target.hp - damage);
         if (target.hp < 1) target.hp = 0;
-        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage`);
+        notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : options.element === 1 ? " <a:frost1:1504497507185725473><a:frost2:1504497408233705512>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage`);
     };
 
     // Reflect damage
@@ -889,7 +932,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         // Event Triggers
         matchStats.trigger("execute", attacker, target, attackerBuff, targetBuff, { damage });
 
-        return damage;
+        return Math.max(damage, 0);
     };
 
     // Passives
@@ -899,7 +942,11 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         const bleedPercentage = attacker.critbleedAmount ?? 0.05;
         targetBuff.hp.push(new buffInfo("+", -Math.floor(Math.min(target.maxhp, attacker.maxhp * 2) * bleedPercentage), attacker.critbleedlast));
     };
-    if (attacker.critmana && isCrit) attacker.sm = Math.min(attacker.sm + attacker.critmana, attacker.mana);
+    if (attacker.critmana && isCrit) {
+        attacker.sm += attacker.critmana;
+        if (attacker.sm > attacker.mana) attacker.sm = attacker.mana;
+        if (typeof attacker.manaGained !== undefined) attacker.manaGained += attacker.critmana;
+    };
     if (options.selfheal && attacker.selfheal && attacker.lastSelfHealRoundCapped !== matchStats.round) {
         let selfHealedTotal = 0;
 
@@ -926,7 +973,8 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     };
 
     if (options.isLightning) attacker.lightningcount = (attacker.lightningcount ?? 0) + 1;
-    if (options.isLightning && attacker.lightningBuff && attacker.lightningBuffActive) attacker.lightningBuffActive--;
+    if (options.isLightning && attacker.tempLightningBuff && attacker.tempLightningBuffActive) attacker.tempLightningBuffActive--;
+
     // if (attacker.sjwUsedActive) {
     //     if (damage) targetBuff.hp.push(new buffInfo("+", Math.floor(damage * 0.07), 2)); // Beru
     //     if (isCrit) { // Igris
@@ -943,7 +991,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
 
     // Twinshot
     if (options.canTwinshot && attacker.twinshot > Math.random()) {
-        return damage + dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, log, { ...flags, canTwinshot: false });
+        return Math.max(damage, 0) + dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, log, { ...flags, canTwinshot: false });
     };
 
     // Event Triggers
@@ -952,12 +1000,20 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         magicDamage: (options.magicDamage && options.mdChance < attacker.mdChance),
         isLightning: options.isLightning,
         isPyro: options.isPyro,
+        element: options.element,
         preventRetaliation: options.preventRetaliation,
     });
     if (isCrit) matchStats.trigger("crit", attacker, target, attackerBuff, targetBuff, { damage, normalATK: options.normalATK });
     else matchStats.trigger("noncrit", attacker, target, attackerBuff, targetBuff, { damage, normalATK: options.normalATK });
 
-    return damage;
+    if (options.element && !options.isLightning) {
+        switch (options.element) {
+            case 1: target.frost ??= 0; target.frost++; break;
+            default: break;
+        };
+    };
+
+    return Math.max(damage, 0);
 };
 
 export const noTimeout = (matchStats: MatchStats, attacker: DetailedStats) => {
@@ -974,12 +1030,13 @@ export const imageChange = (embed: EmbedBuilder, matchStats: MatchStats, caster:
 
 export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, amount: number, flags = {}) => {
     const options = { // true = enabled, false = disabled
+        showNotif: false,
         bypassBoL: false,
     };
     Object.keys(flags).forEach((e) => (options as any)[e] = (flags as any)[e]);
 
     if (attacker.negateHeal && amount > 0 && target === caster && attacker !== caster) {
-        // notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
+        if (options.showNotif) notice.push(`\n<:negated_heal:1341346312699904044> **${attacker.name}** has negated the heal!`);
     } else {
         // Check for any heal reduction
         // 1: Bond of Life
@@ -992,14 +1049,16 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
 
         // 2: General Heal addition/reduction
         if (attacker.reduceHealing || target.increaseHealing) amount *= (1 - (attacker.reduceHealing ? attacker.reduceHealing : 0) + (target.increaseHealing ? target.increaseHealing : 0));
-        if (amount > 0) target.hp += Math.floor(amount);
+        if (attacker.invertHealing > Math.random()) attacker.invertHealCrit ? amount = -amount * attacker.cd : amount = -amount;
+        amount = Math.floor(amount);
+        target.hp += amount;
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
 
         matchStats.trigger("heal", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
     };
-    if (log && amount > 0) notice.push(`\n💖 **${target.name}** has healed **${amount}** HP`);
-    if (log && amount < 0) notice.push(`\n💔 **${target.name}** has lost **${amount}** HP`);
+    if (log && amount > 0) notice.push(`\n${log} **${target.name}** has healed **${amount}** HP`);
+    if (log && amount < 0) notice.push(`\n${log} **${target.name}** has lost **${amount}** HP`);
 };
 
 export const procburn = (target: DetailedStats, attacker: DetailedStats, targetBuff: Buffs, attackerBuff: Buffs, matchStats: MatchStats, notice: string[], log: string, flags = {}) => {
@@ -1013,21 +1072,21 @@ export const procburn = (target: DetailedStats, attacker: DetailedStats, targetB
     const critChance = (options.burncrit || attacker.burncrit) ? 0 : Math.random();
     switch (options.type) {
         case 1: {
-            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance });
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance, isBurn: true });
             target.burnduration--;
             matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
             break;
         };
         case 2: {
             const total = (attacker.lightningcount ?? 0) + (attacker.burncount ?? 0);
-            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:plasma:1480572957788082267> **${target.name}**'s plasma`, { atkMultiplier: 0.2 + Math.min(0.01 * Math.floor(total / 5), 0.5), magicDamage: true, flexibleDmg: true, critChance: critChance });
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:plasma:1480572957788082267> **${target.name}**'s plasma`, { atkMultiplier: 0.2 + Math.min(0.01 * Math.floor(total / 5), 0.5), magicDamage: true, flexibleDmg: true, critChance: critChance, isBurn: true });
             target.burnduration--;
             matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
             break;
         };
         case 3: {
             const atkScale = Math.min(0.01 * target.burnduration, 0.5), critBuff = Math.min(0.01 * Math.floor(matchStats.round / 4), 0.2);
-            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:vivium:1480572908496490710> **${target.name}**'s vivium`, { atkMultiplier: atkScale, critBuff: critBuff, magicDamage: true, critChance: critChance });
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:vivium:1480572908496490710> **${target.name}**'s vivium`, { atkMultiplier: atkScale, critBuff: critBuff, magicDamage: true, critChance: critChance, isBurn: true });
             target.sm -= 5;
             if (target.sm < 0) target.sm = 0;
             target.burnduration--;
@@ -1035,7 +1094,7 @@ export const procburn = (target: DetailedStats, attacker: DetailedStats, targetB
             break;
         };
         default: {
-            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance });
+            dealDamage(target, attacker, targetBuff, attackerBuff, matchStats, notice, `<a:burn:1475075402295803914> **${target.name}**'s burn`, { atkMultiplier: 0.2, magicDamage: true, flexibleDmg: true, critChance: critChance, isBurn: true });
             target.burnduration--;
             matchStats.trigger("burn", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
             break;
@@ -1087,13 +1146,48 @@ export const procburn = (target: DetailedStats, attacker: DetailedStats, targetB
 // };
 
 export const getAscensionMaterial = (id: string | number, ascItems: lootInfo[]) => {
+    // Cap to first 28 original ascension materials to preserve existing recipes
+    const originalMaterialCount = 28;
+    const originalMaterials = ascItems.slice(0, Math.min(originalMaterialCount, ascItems.length));
+
     id = `${id}camelot`;
     let hash = 3;
     for (let i = 0; i < id.length; i++) {
         hash = ((hash << 5) - hash) + id.charCodeAt(i);
         hash |= 0;
     };
-    return ascItems[Math.abs(hash) % ascItems.length];
+    return originalMaterials[Math.abs(hash) % originalMaterials.length];
+};
+
+export const getForgeMaterialCosts = (itemId: number): { ascension: number, crafting: number, ascensionMaterialId?: number; } => {
+    // Import extreme weapon functions
+    const { isExtremeWeapon, getExtremeWeaponConfig } = require('./extremeWeaponDrops');
+    const isExtreme = isExtremeWeapon(itemId);
+
+    // Default costs for normal weapons
+    let ascension = 36;
+    let crafting = 24;
+    let ascensionMaterialId: number | undefined = undefined;
+
+    // Apply extreme weapon configuration if applicable
+    if (isExtreme) {
+        const config = getExtremeWeaponConfig(itemId);
+        if (config) {
+            ascension = config.ascensionAmount ?? (54);  // Use custom or default extreme amount
+            crafting = config.craftingAmount ?? (36);   // Use custom or default extreme amount
+            ascensionMaterialId = config.ascensionMaterialId;
+        } else {
+            // Fallback for extreme weapons without config
+            ascension = 54;  // 50% increase
+            crafting = 36;   // 50% increase
+        }
+    }
+
+    return {
+        ascension,
+        crafting,
+        ascensionMaterialId
+    };
 };
 
 export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude: string[] = [], sellGrade: string | boolean = false, sellType: string | false = false, stats?: CompactUserSchema) => {
@@ -1406,7 +1500,7 @@ export const getRingSlotsTotal = (stats: Pick<CompactUserSchema, "xp" | "dungeon
     // Beat floor 300
     if ("300" in stats.dungeon_floors && stats.dungeon_floors["300"] > 0) total++;
 
-    return total;
+    return 3; //total;
 };
 
 export const formatNumberWithQuotes = (num: number) => {
@@ -1749,26 +1843,47 @@ export const numberToRoman = (n: number): string => {
     return result;
 };
 
-export const customEmojis: Record<PrimaryStat, string> = {
-    "hp": "<:HP:1062043800979116143>",
-    "hp%": "<:HP:1062043800979116143>",
-    "atk": "<:ATK:1063214925528440832>",
-    "atk%": "<:ATK:1063214925528440832>",
-    "def": "<:DEF:1047269141662417037>",
-    "def%": "<:DEF:1047269141662417037>",
-    "md": "<:magic_dmg:948568336621527040>",
-    "md%": "<:magic_dmg:948568336621527040>",
-    "mr": "<:magic_resistance:1047269149237334086>",
-    "cr": "<:crit_rate:1047269144195776512>",
-    "cd": "<:crit_damage:1047269146511016046>",
-    "dodge": "<:dodge_chance:1047269150948606063>",
-    "br": "<:block_rate:1217949026281066599>",
-    "mana": "<:mana:1047269152957661255>",
-    "sm": "<:mana:1047269152957661255>",
-    "mg": "<:mana_generation:1063215562349629570>",
-    "shield": "<:shield:1062050038211166310>",
+// export const customEmojis: Record<PrimaryStat, string> = {
+//     "hp": "<:HP:1062043800979116143>",
+//     "hp%": "<:HP:1062043800979116143>",
+//     "atk": "<:ATK:1063214925528440832>",
+//     "atk%": "<:ATK:1063214925528440832>",
+//     "def": "<:DEF:1047269141662417037>",
+//     "def%": "<:DEF:1047269141662417037>",
+//     "md": "<:magic_dmg:948568336621527040>",
+//     "md%": "<:magic_dmg:948568336621527040>",
+//     "mr": "<:magic_resistance:1047269149237334086>",
+//     "cr": "<:crit_rate:1047269144195776512>",
+//     "cd": "<:crit_damage:1047269146511016046>",
+//     "dodge": "<:dodge_chance:1047269150948606063>",
+//     "br": "<:block_rate:1217949026281066599>",
+//     "mana": "<:mana:1047269152957661255>",
+//     "sm": "<:mana:1047269152957661255>",
+//     "mg": "<:mana_generation:1063215562349629570>",
+//     "shield": "<:shield:1062050038211166310>",
 
-    // "coins": "<:coins:872926669055356939>",
+//     // "coins": "<:coins:872926669055356939>",
+// };
+export const customEmojis: Record<PrimaryStat, string> = {
+    "hp": "💖",
+    "hp%": "💖",
+    "atk": "⚔️",
+    "atk%": "⚔️",
+    "def": "🛡️",
+    "def%": "🛡️",
+    "md": "🪄",
+    "md%": "🪄",
+    "mr": "🎽",
+    "cr": "🎯",
+    "cd": "💥",
+    "dodge": "💨",
+    "br": "🛡️",
+    "mana": "💧",
+    "sm": "💧",
+    "mg": "💦",
+    "shield": "💠",
+
+    // "coins": ":coins:",
 };
 
 export const RoK = new Map<string, IRoK>();
@@ -1838,6 +1953,28 @@ export const getLetterRank = (score: number) => {
 
 export const isStampedeMonth = () => {
     return (new Date().getMonth() % 2) === 0;
+};
+
+export const displayCharge = (charge: number): string => {
+    const supercharged = "<a:supercharged:1511024840897728703>";
+    const charged = "<a:charged:1511024813714571506>";
+    const nocharge = "<a:nocharge:1511024867116322967>";
+
+    const base = Math.min(charge, 100);
+    const overflow = Math.max(0, charge - 100);
+    const overflowSegments = Math.floor(overflow / 25);
+
+    const segments: string[] = [];
+    for (let i = 0; i < 4; i++) {
+        if (i < overflowSegments) {
+            segments.push(supercharged);
+        } else if (base >= (i + 1) * 25) {
+            segments.push(charged);
+        } else {
+            segments.push(nocharge);
+        }
+    }
+    return segments.join("·");
 };
 
 // Export CSV

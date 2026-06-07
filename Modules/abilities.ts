@@ -604,7 +604,7 @@ export const abilities: Record<number, Ability> = {
             // Shalltear drains the equivalent of 20% of her max HP from the enemy and adds it to herself.
             const drain = Math.floor(myStats.maxhp * 0.2);
             eStats.hp -= drain;
-            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, {});
+            addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, drain, { showNotif: true });
             if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
             if (eStats.hp < 0) eStats.hp = 0;
             notice.push(`\n✨ **${char.name}** has drained **${drain}**HP from **${enemy.name}**`);
@@ -669,7 +669,7 @@ export const abilities: Record<number, Ability> = {
     //         myStats.counter ??= 0;
     //         myStats.defCD = 0;
     //         myStats.executeHP = Math.max(0.1, myStats.executeHP); // Execute enemy when they are below 10% HP
-    //         myStats.negateHeal = 1;
+    //         eStats.negateHeal = 1;
 
     //         if (matchStats.interaction.commandName === "stampede") {
     //             const names = matchStats.partyChars.map((e: IcharInfo) => e.name);
@@ -708,6 +708,7 @@ export const abilities: Record<number, Ability> = {
     //                 } else {
     //                     myStats.sm += manaGain;
     //                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+    //                     if (typeof myStats.manaGained !== undefined) myStats.manaGained += manaGain;
     //                     notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** gained **${manaGain}** 💧.`);
     //                 };
 
@@ -1157,6 +1158,8 @@ export const abilities: Record<number, Ability> = {
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
                 if (matchStats.round < 6) {
                     myStats.sm += 25;
+                    if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 25;
                 } else if (matchStats.round === 6) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 2, shieldBreak: true, magicDamage: false, dodge: false, block: false });
                     ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
@@ -1596,8 +1599,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 100,
-        desc: "**Total Uses:** `4 (CD: 10 rounds)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** DMG with **+25%** critical rate\n> Inflicts **1x** `Frost`\n\nAt the start of her turn, when the enemy has **8** or more `Frost`, consumes **8x** to freeze the enemy for **1** round. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** rounds, lowers body temperature to absolute zero, inflicting **4x** `Frost` every round, in return losing **10%** current HP every round, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** rounds, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing absolute DMG (Ignores DEF/MR) equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`.\n\nWhen in a party, she intervenes every **5** rounds, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** round, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
-        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 rounds`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\nATTACK is altered:\n- Deal **90%** DMG with **+25%** critical rate\n- Inflicts **1x** `Frost`\n\nAt the start of the turn:\n- When the enemy has **8x** `Frost` or more: Consumes **8x** and freezes the enemy for **1** round\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** rounds:\n- Loses **10%** current HP every round\n- Inflicts **4x** `Frost` every round\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** rounds:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** rounds and freezes the enemy for **1** round\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
+        desc: "**Total Uses:** `4 (CD: 10 rounds)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n> Frost hit inflict **1x** `Frost`\n\nAt the start of her turn, when the enemy has **8** or more `Frost`, consumes **8x** to freeze the enemy for **1** round. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** rounds, lowers body temperature to absolute zero, inflicting **4x** `Frost` every round, in return losing **10%** current HP every round, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** rounds, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing absolute DMG (Ignores DEF/MR) equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`.\n\nWhen in a party, she intervenes every **5** rounds, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** round, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
+        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 rounds`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\nATTACK is altered:\n- Deal **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n- Frost hit inflicts **1x** `Frost`\n\nAt the start of the turn:\n- When the enemy has **8x** `Frost` or more: Consumes **8x** and freezes the enemy for **1** round\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** rounds:\n- Loses **10%** current HP every round\n- Inflicts **4x** `Frost` every round\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** rounds:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** rounds and freezes the enemy for **1** round\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rukia Kuchiki
             noTimeout(matchStats, myStats);
@@ -1656,7 +1659,7 @@ export const abilities: Record<number, Ability> = {
         passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
 
             myStats.rukiaUsedActive = false;
-            eStats.frost = 0;
+            eStats.frost ??= 0;
             eStats.frozenwounds = 0;
             eStats.vulnerability ??= 1;
             myStats.counter ??= 0;
@@ -1665,16 +1668,16 @@ export const abilities: Record<number, Ability> = {
             myStats.replaceButton.atk = {
                 emoji: "❄️",
                 run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25 });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `༒︎ **${char.name}**`, { atkMultiplier: 0.9, critBuff: 0.25, element: 1 });
 
                     return AbilityResponse.SUCCESS;
                 },
             };
 
-            // Inflict Frost On Attack
-            matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-                if (caster === myStats) eStats.frost += 1;
-            });
+            // Inflict Frost On Attack - Removed, done in functions.ts as a Frost hit.
+            // matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+            //     if (caster === myStats) eStats.frost += 1;
+            // });
 
             // 8x Frost => Freeze enemy for 1 turn
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -2194,6 +2197,7 @@ export const abilities: Record<number, Ability> = {
                     eStats.sm -= 3;
                     myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -2206,6 +2210,7 @@ export const abilities: Record<number, Ability> = {
                 eStats.sm -= 3;
                 myStats.sm += 3;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
             };
 
             return AbilityResponse.SUCCESS;
@@ -2410,7 +2415,7 @@ export const abilities: Record<number, Ability> = {
                     notice.push(`\n<:dream3:1449747554517389413> ${char.name} entered a __??? Dream__ for **10** rounds`);
                     myStats.hp -= Math.floor(myStats.hp * 0.18);
                     myStats.dreamState = 2;
-                    myStats.hp = myStats.maxhp;
+                    addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, myStats.maxhp, {});
                     const dalusDoT = new buffInfo("+", -Math.floor(myStats.maxhp * 0.05), 9999);
                     this.buffID = dalusDoT.id;
                     mybuff.hp.push(dalusDoT);
@@ -2526,6 +2531,7 @@ export const abilities: Record<number, Ability> = {
                                     if (eStats.sm < 0) eStats.sm = 0;
                                     myStats.sm += 10;
                                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
                                     break;
                                 case 4:
                                     const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
@@ -2573,6 +2579,7 @@ export const abilities: Record<number, Ability> = {
                         if (eStats.sm < 0) eStats.sm = 0;
                         myStats.sm += 10;
                         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
                         break;
                     case 5:
                         const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
@@ -2734,15 +2741,15 @@ export const abilities: Record<number, Ability> = {
         appliedIce: 0,
         buffer: undefined,
         messageEditTimeout: undefined,
-        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her active's damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%**. Moreover, the action will be considered Timeout false, allowing Aneira to make another action that round.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `no`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** DMG\n- Increases this attack's DMG scaling by **25%** (Up to **175%**) for every round it wasn't used\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the round unchanged as well",
+        desc: "**Total Usage**: `unlimited`\n**Mana**: `30`\\💧\n**Timeout**: `no`\n**Role**: `DPS`\n\nAneira, wielding her ancient frost magic, has an ability that leaves her enemies frozen in fear and ice. Once activated, her ability delivers a chilling attack. Starting with **50%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> damage, Aneira gains 1 additional icicle every round (up to 7), each adding **+25%** more to her active's damage.\n\nTrying to block her freezing attacks is futile, but if her opponent can miraculously dodge her frozen fury, the spell simply fizzles out. Should the attack land however, Aneira's enemy gets encased in ice, decreasing their defense by **20%**. Moreover, the action will be considered Timeout false, allowing Aneira to make another action that round.\n\nAdditionally, Aneira gains **+25%** class xp from her battles.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `30 💧`\n**Timeout**: `no`\n**Role**: `DPS (Freeze, Progressive DMG-boost)`\n\n__**Passive**__\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **50%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG\n- Increases this attack's DMG scaling by **25%** (Up to **175%**) for every round it wasn't used\n- If the attack hits, the enemy is frozen (**-20%** DEF & MR)\n-# This will leave the round unchanged as well",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
 
             //! Slow ability, have to use mana early to prevent bugs
             myStats.sm -= this.cost;
 
             // Aneira
-            const dmg = (!eStats.dodge && Math.random() < eStats.br) ? notice.push(`\n💨 **${enemy.name}** dodged the attack!`) : dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.5 + Math.min(0.25 * (matchStats.round - this.roundUsed), 1.75), magicDamage: true, block: false });
+            const dmg = (!eStats.dodge && Math.random() < eStats.br) ? notice.push(`\n💨 **${enemy.name}** dodged the attack!`) : dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}**`, { atkMultiplier: 0.5 + Math.min(0.25 * (matchStats.round - this.roundUsed), 1.75), magicDamage: true, block: false, element: 1 });
             this.roundUsed = matchStats.round;
             const appliedIce = this.appliedIce++;
 
@@ -3417,8 +3424,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         pause: 0,
         cost: 50, // 5% current HP on Passive, 50 Mana on Active
-        desc: "**Total Usage**: `unlimited` (5 rounds cooldown)\n**Cost**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMarch 7th is an enthusiastic girl who was saved from eternal ice by the Astral Express Crew. Following the path of Preservation, she's going to make sure that she keeps her allies and herself stay longer in the fight.\n\nEvery **5** rounds, she converts **5%** of her current HP into a shield equivalent to **5%** of her max HP. While this shield is up, her DEF and MR are increased by **20%** and her ATK and MD gain a **30%** increase.\n\nHer active ability will cast her ultimate, Glacial Cascade, which deals **110%** damage and has a **75%** chance of freezing the enemy for 1 round. The enemy is more vulnerable while the enemy is veiled by her ice, taking **20%** extra damage. Only the highest vulnerability takes effect.\n\nIn a party, she shares her defensive passive to her allies, converting **5%** of their current HP into a shield equivalent to **5%** of their max HP every **7** rounds. While this shield is up, they get a **20%** DEF and MR boost, and a **15%** boost in ATK and MD.",
-        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `5 rounds`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Shield, Freeze)`\n\n__**Passive**__\n- Every **5** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of her max HP\n- When she has a shield (The SH stat): **+20%** DEF & MR, **+30%** ATK\n\n__**Active**__ (✨)\n- Deals **110%** DMG\n- Has a **75%** chance of freezing the enemy\n- If successful, applies **20%** vulnerability to the enemy (Only the highest effect takes place)\n\n__**Party**__ (👥)\n- Every **7** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of max HP\n- While having shield (The SH stat): **+20%** DEF & MR, **+15%** ATK & MD",
+        desc: "**Total Usage**: `unlimited` (5 rounds cooldown)\n**Cost**: `50`\\💧\n**Timeout**: `yes`\n**Role**: `Support`\n\nMarch 7th is an enthusiastic girl who was saved from eternal ice by the Astral Express Crew. Following the path of Preservation, she's going to make sure that she keeps her allies and herself stay longer in the fight.\n\nEvery **5** rounds, she converts **5%** of her current HP into a shield equivalent to **5%** of her max HP. While this shield is up, her DEF and MR are increased by **20%** and her ATK and MD gain a **30%** increase.\n\nHer active ability will cast her ultimate, Glacial Cascade, which deals **110%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> damage and has a **75%** chance of freezing the enemy for 1 round. The enemy is more vulnerable while the enemy is veiled by her ice, taking **20%** extra damage. Only the highest vulnerability takes effect.\n\nIn a party, she shares her defensive passive to her allies, converting **5%** of their current HP into a shield equivalent to **5%** of their max HP every **7** rounds. While this shield is up, they get a **20%** DEF and MR boost, and a **15%** boost in ATK and MD.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cooldown**: `5 rounds`\n**Cost**: `50 💧`\n**Timeout**: `Yes`\n**Role**: `Support (Shield, Freeze)`\n\n__**Passive**__\n- Every **5** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of her max HP\n- When she has a shield (The SH stat): **+20%** DEF & MR, **+30%** ATK\n\n__**Active**__ (✨)\n- Deals **110%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG\n- Has a **75%** chance of freezing the enemy\n- If successful, applies **20%** vulnerability to the enemy (Only the highest effect takes place)\n\n__**Party**__ (👥)\n- Every **7** rounds: Loses **5%** current HP and gains a shield equivalent to **5%** of max HP\n- While having shield (The SH stat): **+20%** DEF & MR, **+15%** ATK & MD",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // March 7th
             if (this.pause > matchStats.round) {
@@ -3429,7 +3436,7 @@ export const abilities: Record<number, Ability> = {
                 return AbilityResponse.FAILURE;
             };
             this.pause = matchStats.round + 5;
-            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** uses Glacial Cascade! She`, { atkMultiplier: 1.1, magicDamage: true });
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** uses Glacial Cascade! She`, { atkMultiplier: 1.1, magicDamage: true, element: 1 });
             if (Math.random() < 0.75) {
                 eStats.timeFrozen = true;
                 if (eStats.vulnerability < 1.2) eStats.vulnerability = 1.2;
@@ -3798,7 +3805,7 @@ export const abilities: Record<number, Ability> = {
                 if (myStats.bloodDirective > 0) {
                     myStats.bloodDirective--;
                     // Cannot heal for 6 rounds
-                    myStats.negateHeal = 1;
+                    eStats.negateHeal = 1;
 
                     // Take DMG equivalent to 7.5% of BoL
                     eStats.hp -= Math.floor(myStats.bondOfLife * 0.075);
@@ -3810,7 +3817,7 @@ export const abilities: Record<number, Ability> = {
                     if (consumableBOL > 0) addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, consumableBOL, { bypassBoL: true });
                     if (myStats.bondOfLife < 0) myStats.bondOfLife = 0;
                 } else {
-                    myStats.negateHeal = 0;
+                    eStats.negateHeal = 0;
                 };
                 return AbilityResponse.SUCCESS;
             }, 9999));
@@ -3848,7 +3855,7 @@ export const abilities: Record<number, Ability> = {
                             clearedBDD = true;
                             notice.push(`\n⚜️ **${char.name}** cleared Blood-Debt Directive`);
                             myStats.bloodDirective = 0;
-                            myStats.negateHeal = 0;
+                            eStats.negateHeal = 0;
                         };
                         if (myStats.bondOfLife > myStats.maxhp * 2) myStats.bondOfLife = myStats.maxhp * 2;
 
@@ -3979,6 +3986,7 @@ export const abilities: Record<number, Ability> = {
                     myStats.sm += 6;
                     if (myStats.temple > 0) myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += (myStats.temple > 0) ? 6 : 3;
                 };
             });
 
@@ -4008,6 +4016,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (eStats.marked) {
                     myStats.sm += 9;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 9;
                 };
             });
 
@@ -4674,6 +4683,7 @@ export const abilities: Record<number, Ability> = {
                 eStats.sm -= stealMana;
                 myStats.sm += stealMana;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                if (typeof myStats.manaGained !== undefined) myStats.manaGained += stealMana;
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
@@ -5623,6 +5633,7 @@ export const abilities: Record<number, Ability> = {
                     const drain = Math.floor(eStats.sm * 0.12);
                     eStats.sm -= drain;
                     myStats.sm += drain;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += drain;
                 };
             });
 
@@ -5960,6 +5971,7 @@ export const abilities: Record<number, Ability> = {
             // Burst mana
             myStats.sm += 10 * favcharref;
             if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+            if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10 * favcharref;
 
 
             return AbilityResponse.SUCCESS;
@@ -6222,6 +6234,7 @@ export const abilities: Record<number, Ability> = {
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hp, {});
                     const mana = Math.min(50, myStats.mana - myStats.sm);
                     myStats.sm += mana;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 50;
                     notice.push(`\n🍑 **${char.name}** has rejuvenated **${hp}** HP and **${mana}** mana!`);
                     //@ts-ignore
                     this._used++;
@@ -7335,6 +7348,7 @@ export const abilities: Record<number, Ability> = {
     //                     myStats.hp += options.damage;
     //                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
     //                     myStats.sm += 5;
+    //                     if (typeof myStats.manaGained !== undefined) myStats.manaGained += 5;
     //                     myStats.garouAbsorbedHits++;
     //                 };
     //             };
@@ -7342,117 +7356,117 @@ export const abilities: Record<number, Ability> = {
     //         return AbilityResponse.SUCCESS;
     //     },
     // },
-    // "24185": {
-    //     usage: 9999,
-    //     used: 0,
-    //     cost: 0,
-    //     pause: -15,
-    //     nsbTick: 0,
-    //     desc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit (😎)`\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the __All-Fire Armaments__ passed down through the line of human Archons (deals **25%** pyro damage every **4** rounds, effect expires when exiting NBS), before dealing **100%** Pyro DMG. After using this, Mavuika's Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__ – NBS:\n- When Mavuika has at least **5** Nightsoul points, enter this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** 🎯(Crit Rate)  and 💥(Crit Dmg) for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n- Pyro DMG: After an attack, inflicts burn on the opponent, dealing **3%** ATK as DoT over **3** rounds.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (😎).\n- When Mavuika is not in NBS and has ≥ **50** 😎, her active is altered to consume all the fighting spirit to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **120%** Pyro DMG, for each 😎 consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__ – Fighting Spirit:\nMavuika can obtain Fighting Spirit via the following methods (max 100):\n- Nightsoul points consumed are converted to Fighting Spirit.\n- When hitting opponents, Mavuika gains **1** Fighting Spirit.\n\n**__Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** Pyro DMG every fourth round.",
-    //     shortdesc: "Check fulldesc",
-    //     ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
-    //         // Mavuika
-    //         if (myStats.fightspirit < 50 || myStats.nbs > 0) {// Active (I)
-    //             if (this.pause > matchStats.round) {
-    //                 myStats.sm += this.cost;
-    //                 noTimeout(matchStats, myStats);
-    //                 matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-    //                 this.used--;
-    //                 return AbilityResponse.FAILURE;
-    //             };
+    "24185": {
+        usage: 9999,
+        used: 0,
+        cost: 0,
+        pause: -15,
+        nsbTick: 0,
+        desc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit (😎)`\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the __All-Fire Armaments__ passed down through the line of human Archons (deals **25%** pyro damage every **4** rounds, effect expires when exiting NBS), before dealing **100%** Pyro DMG. After using this, Mavuika's Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__ – NBS:\n- When Mavuika has at least **5** Nightsoul points, enter this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** 🎯(Crit Rate)  and 💥(Crit Dmg) for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n- Pyro DMG: After an attack, inflicts burn on the opponent, dealing **3%** ATK as DoT over **3** rounds.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (😎).\n- When Mavuika is not in NBS and has ≥ **50** 😎, her active is altered to consume all the fighting spirit to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **120%** Pyro DMG, for each 😎 consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__ – Fighting Spirit:\nMavuika can obtain Fighting Spirit via the following methods (max 100):\n- Nightsoul points consumed are converted to Fighting Spirit.\n- When hitting opponents, Mavuika gains **1** Fighting Spirit.\n\n**__Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** Pyro DMG every fourth round.",
+        shortdesc: "Check fulldesc",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Mavuika
+            if (myStats.fightspirit < 50 || myStats.nbs > 0) {// Active (I)
+                if (this.pause > matchStats.round) {
+                    myStats.sm += this.cost;
+                    noTimeout(matchStats, myStats);
+                    matchStats.interaction.followUp({ content: `**${char.name}** needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                    this.used--;
+                    return AbilityResponse.FAILURE;
+                };
 
-    //             if (myStats.sm < 75) {
-    //                 noTimeout(matchStats, myStats);
-    //                 matchStats.interaction.followUp({ content: `**${char.name}** does not have sufficient mana (**${myStats.sm}**/75 💧)`, ephemeral: true });
-    //                 this.used--;
-    //                 return AbilityResponse.FAILURE;
-    //             };
-    //             if (myStats.nbs <= 0) this.pause = matchStats.round + 15;
-    //             myStats.sm -= 75;
-    //             myStats.nsp = 40;
+                if (myStats.sm < 75) {
+                    noTimeout(matchStats, myStats);
+                    matchStats.interaction.followUp({ content: `**${char.name}** does not have sufficient mana (**${myStats.sm}**/75 💧)`, ephemeral: true });
+                    this.used--;
+                    return AbilityResponse.FAILURE;
+                };
+                if (myStats.nbs <= 0) this.pause = matchStats.round + 15;
+                myStats.sm -= 75;
+                myStats.nsp = 40;
 
-    //             notice.push(`\n✨ **${char.name}** restored Nightsoul Points to **40**!`);
-    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isPyro: true });
-    //         } else {
-    //             myStats.nsp += 20; if (myStats.nsp > 60) myStats.nsp = 60;
-    //             notice.push(`\n✨ Let the people's inner voices reach the divine throne in the heavens. **${char.name}** gained **20** Nightsoul Points and enterred NightSoul Blessing State!`);
-    //             // NBS entering
-    //             myStats.nsp -= 5; myStats.fightspirit += 5;
-    //             if (myStats.fightspirit > 100) myStats.fightspirit = 100;
-    //             myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
-    //             myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
-    //             myStats.nbs++;
+                notice.push(`\n✨ **${char.name}** restored Nightsoul Points to **40**!`);
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isPyro: true });
+            } else {
+                myStats.nsp += 20; if (myStats.nsp > 60) myStats.nsp = 60;
+                notice.push(`\n✨ Let the people's inner voices reach the divine throne in the heavens. **${char.name}** gained **20** Nightsoul Points and enterred NightSoul Blessing State!`);
+                // NBS entering
+                myStats.nsp -= 5; myStats.fightspirit += 5;
+                if (myStats.fightspirit > 100) myStats.fightspirit = 100;
+                myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
+                myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
+                myStats.nbs++;
 
-    //             if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
 
-    //             const flair = ["Wrath from the skies!", "Pyroclastic surge!", "Light of the blazing sun!"];
-    //             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.2 + 0.02 * (myStats.fightspirit - 50), isPyro: true });
-    //             myStats.fightspirit = 0;
-    //         };
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    //     passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
-    //         myStats.nbs ??= 0; // NightSoul Blessing State
-    //         myStats.nsp ??= 0; // NightSoul Points
-    //         myStats.fightspirit ??= 0; // Fighting Spirit
+                const flair = ["Wrath from the skies!", "Pyroclastic surge!", "Light of the blazing sun!"];
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.2 + 0.02 * (myStats.fightspirit - 50), isPyro: true });
+                myStats.fightspirit = 0;
+            };
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+            myStats.nbs ??= 0; // NightSoul Blessing State
+            myStats.nsp ??= 0; // NightSoul Points
+            myStats.fightspirit ??= 0; // Fighting Spirit
 
-    //         // Fun text
-    //         switch (matchStats.interaction.commandName) {
-    //             case "dungeon": notice.push(`\n😎 Dungeons? Heh, adventuring is right up my alley.`); break;
-    //             case "stampede": notice.push(`\n😎 I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
-    //             case "arena": notice.push(`\n😎 If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
-    //             default: notice.push(`\n😎 Ready to ride, any time, any place.`); break;
-    //         };
+            // Fun text
+            switch (matchStats.interaction.commandName) {
+                case "dungeon": notice.push(`\n😎 Dungeons? Heh, adventuring is right up my alley.`); break;
+                case "stampede": notice.push(`\n😎 I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
+                case "arena": notice.push(`\n😎 If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
+                default: notice.push(`\n😎 Ready to ride, any time, any place.`); break;
+            };
 
-    //         // Gain Fighting Spirit
-    //         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
-    //             if (caster === myStats && target === eStats && myStats.fightspirit < 100) myStats.fightspirit++;
-    //         });
+            // Gain Fighting Spirit
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
+                if (caster === myStats && target === eStats && myStats.fightspirit < 100) myStats.fightspirit++;
+            });
 
-    //         const nightsoulblessing = () => {
-    //             myStats.nsp -= 5; myStats.fightspirit += 5;
-    //             if (myStats.fightspirit > 100) myStats.fightspirit = 100;
-    //             myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
-    //             myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
-    //             myStats.nbs++;
+            const nightsoulblessing = () => {
+                myStats.nsp -= 5; myStats.fightspirit += 5;
+                if (myStats.fightspirit > 100) myStats.fightspirit = 100;
+                myStats.cr += Math.min(myStats.nbs * 0.005, 0.25);
+                myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
+                myStats.nbs++;
 
-    //             if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
-    //         };
+                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+            };
 
-    //         // NightSoul Blessing Mechanic
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             if (myStats.nbs > 0) {
-    //                 if (myStats.nsp < 5) { // Exit
-    //                     myStats.nbs = 0;
-    //                     notice.push(`\n<:NBS:1449333178765541491> **${char.name}** exited NightSoul Blessing State.`);
-    //                 } else {
-    //                     nightsoulblessing();
-    //                 };
-    //             } else {
-    //                 if (myStats.nsp >= 5) {
-    //                     notice.push(`\n<:NBS:1449333178765541491> **${char.name}** entered NightSoul Blessing State.`);
-    //                     nightsoulblessing();
-    //                 };
-    //             };
-    //             return AbilityResponse.SUCCESS;
-    //         }, 9999));
+            // NightSoul Blessing Mechanic
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.nbs > 0) {
+                    if (myStats.nsp < 5) { // Exit
+                        myStats.nbs = 0;
+                        notice.push(`\n<:NBS:1449333178765541491> **${char.name}** exited NightSoul Blessing State.`);
+                    } else {
+                        nightsoulblessing();
+                    };
+                } else {
+                    if (myStats.nsp >= 5) {
+                        notice.push(`\n<:NBS:1449333178765541491> **${char.name}** entered NightSoul Blessing State.`);
+                        nightsoulblessing();
+                    };
+                };
+                return AbilityResponse.SUCCESS;
+            }, 9999));
 
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    //     party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //         eStats.def -= Math.min(Math.round(eStats.def * 0.12), 660);
-    //         ebuff.def.push(new buffInfo("+", -Math.min(Math.round(eStats.def * 0.12), 660), 9999));
+            return AbilityResponse.SUCCESS;
+        },
+        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.def -= Math.min(Math.round(eStats.def * 0.12), 660);
+            ebuff.def.push(new buffInfo("+", -Math.min(Math.round(eStats.def * 0.12), 660), 9999));
 
-    //         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //             if (matchStats.round % 4 === 0) {
-    //                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isPyro: true });
-    //             };
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (matchStats.round % 4 === 0) {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isPyro: true });
+                };
 
-    //             return AbilityResponse.SUCCESS;
-    //         }, 9999));
-    //         return AbilityResponse.SUCCESS;
-    //     },
-    // },
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+            return AbilityResponse.SUCCESS;
+        },
+    },
     "24256": {
         usage: 9999,
         used: 0,
@@ -8530,6 +8544,7 @@ export const abilities: Record<number, Ability> = {
                 if (myStats.onField === 1) {
                     myStats.mr += 200; // Fern's on-field passive
                     myStats.sm += 5; // Stark's off-field passive
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 5;
                 } else {
                     myStats.physMit += 0.04; // Stark's on-field passive
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -8567,7 +8582,7 @@ export const abilities: Record<number, Ability> = {
             if (this.pause > matchStats.round) {
                 this.used--;
                 matchStats.sendWarning({ content: `${char.name} needs to rest ${this.pause - matchStats.round} more ${this.pause - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
-                return AbilityResponse.SUCCESS;
+                return AbilityResponse.FAILURE;
             };
             this.pause = matchStats.round + 10;
 
@@ -8679,6 +8694,7 @@ export const abilities: Record<number, Ability> = {
                             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2 + atkbuff, magicDamage: true, isLightning: true });
                             myStats.sm += 3;
                             if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                            if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
                             if (myStats.lunarDomain && Math.random() < 0.33) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2 + atkbuff, magicDamage: true, isLightning: true });
                         };
 
@@ -8720,6 +8736,7 @@ export const abilities: Record<number, Ability> = {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2, magicDamage: true, isLightning: true });
                     myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
+                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
                 } else if (lunarIndex === 1) {// Lunar Bloom
                     myStats.tempLightningBuff += 0.4;
                     myStats.tempLightningBuffActive += 1;
@@ -8733,6 +8750,314 @@ export const abilities: Record<number, Ability> = {
                     let shieldGain = Math.min(Math.round(myStats.maxhp * 0.025), 5000);
                     myStats.shield += shieldGain;
                     notice.push(`\n<a:columult:1480218976184176847> **Lunar Crystallize** granted ${char.name} **${shieldGain}** 💠`);
+                };
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+    },
+    "1": {
+        usage: 9999,
+        used: 0,
+        pause: 0,
+        cost: 0,
+        desc: "To be added later.",
+        shortdesc: "__Core Mechanic: Glacio Synergy__\n- All of her + her allies' attacks, if they don't carry an element (e.g. Fire / Lightning), are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]).\n- `❄️` : when attacked with a Frost hit, deals **4%** damage for every stack, up to **40%** (once per round)\n\n__Default state__\n- Upon entering battle, uses ATK on the enemy **twice**\n- Every ATK grants **50** `Dedication`, while every third grants **200** `Dedication`\n- When owning **300** `Dedication`, ATK instead consumes **300** `Dedication` to deal **50%** damage with no timeout, before entering her __Foreclaimed self__ state (once)\n\nDuring the __Foreclaimed self__ state:\n- Using ATK or Class skill grants **100** `Frostheart` (Max: 900)\n- has **+20%** counter chance, normal attacks deal **+20%** damage\n- When reaching **600** `Frostheart`, :sparkles: becomes available (Timeout true). Using her active consumes **600** `Frostheart` to extend all buff durations on self by **1** round, counter the next hit, and enter __Iai__ state (once)\n\nDuring __Iai__ state:\n- Next three ATK are altered to deal **150%** undodgeable damage and apply **3x** `❄️`. If the enemy has **10** or more `❄️`, consumes it to freeze them for **1** round\n- When all three are used up, :sparkles: becomes available again (Timeout true). Using her active deals **400%** undodgeable damage, and converts any `Frostheart` to `Dedication`, then exits the __Iai__ state.",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Hiyuki EX
+            if (myStats.hiyukiState === 2 && myStats.frostheart >= 600) {// Enter Iai stance
+                myStats.frostheart -= 600;
+                myStats.counter++;
+                myStats.hiyukiState = 3;
+                myStats.Iaicount = 0;
+                Object.keys(mybuff).forEach((stat) => {
+                    mybuff[stat as keyof Buffs].forEach((buff) => {
+                        if (!buff.isDebuff) {
+                            buff.last += 1;
+                        };
+                    });
+                });
+                notice.push(`\n<a:hiyukiabil:1504285592404627526> **${char.name}** entered __Iai__ state [ <a:Iai:1504133875813584996> ]`);
+            } else if (myStats.hiyukiState === 3 && myStats.Iaicount === 3) {// Liberation
+                const flair2 = ["May the Sakura incinerate...", "Burn this self away.", "For all wishes spoken...", "This vessel I offer.", "Roam above the Inferno...", "Gazing at the snow."];
+                notice.push(`\n<a:flut1:1504306163167002655><a:flut2:1504306260303151234> ***${flair2[Math.round(Math.random() * 2)]}*** <a:flut3:1504306344390430841><a:flut4:1504306445888524318>`);
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:hiyukiabil:1504285592404627526> **${char.name}**`, { atkMultiplier: 4, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, dodge: false });
+                myStats.hiyukiState = 1;
+                notice.push(`\n**${char.name}** returns to her default state.`);
+            } else {
+                noTimeout(matchStats, myStats);
+                if (myStats.hiyukiState === 1) {
+                    matchStats.sendWarning({ content: `${char.name} does not have an active in her default state`, ephemeral: true });
+                } else if (myStats.hiyukiState === 2) {
+                    matchStats.sendWarning({ content: `${char.name} does not have sufficient Frostheart (${myStats.frostheart}/ 600)`, ephemeral: true });
+                } else if (myStats.hiyukiState === 3) {
+                    matchStats.sendWarning({ content: `${char.name} has not finished her Iaido strikes (${myStats.Iaicount}/ 3)`, ephemeral: true });
+                };
+                this.used--;
+                return AbilityResponse.FAILURE;
+            };
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            eStats.frost ??= 0; // Glacio Chafe
+            myStats.element = 1; // 1 = Frost
+            myStats.hiyukiState = 1; // 1 = Default, 2 = Foreclaimed Self, 3 = Iai
+            myStats.frostheart = 0;
+            myStats.atkcount = 0;
+            myStats.Iaicount = 0;
+            myStats.counter ??= 0;
+            myStats.lastGlacio ??= -1;
+            const flair1 = ["Let there be snow.", "Take your final dive... into Naraka.", "A life as fleeting as the first snow."];
+
+            // Alters ATK depending on state
+            myStats.replaceButton.atk = {
+                "emoji": "<a:hiyukiATK:1504297578731405504>",
+                "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    if (myStats.hiyukiState === 1) {
+                        if (myStats.frostheart >= 300) {
+                            myStats.frostheart -= 300;
+                            noTimeout(matchStats, myStats);
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Foreclaimed:1504133701737517208> **${char.name}**'s Frost Splinter`, { atkMultiplier: 0.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                            myStats.hiyukiState = 2;
+                            notice.push(`\n<:Foreclaimed:1504133701737517208> ${flair1[Math.round(Math.random() * 2)]}. **${char.name}** entered __Foreclaimed Self__ state`);
+                        } else {
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                            myStats.atkcount++;
+                            if (myStats.atkcount % 3 === 0) { myStats.frostheart += 200; } else { myStats.frostheart += 50; };
+                        };
+                    } else if (myStats.hiyukiState === 2 || myStats.hiyukiState === 3 && myStats.Iaicount >= 3) {// Foreclaimed Self
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:hiyukiATK:1504297578731405504> **${char.name}**`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                        myStats.frostheart += 100;
+                        if (myStats.frostheart >= 900) myStats.frostheart = 900;
+                    } else if (myStats.hiyukiState === 3) {// Iai
+                        myStats.Iaicount++;
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:hiyukiATK:1504297578731405504> **${char.name}**'s Iaido strike`, { atkMultiplier: 1.5, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, dodge: false });
+                        eStats.frost += 2;
+                        if (eStats.frost >= 10 && !eStats.timeFrozen) {
+                            eStats.frost -= 10;
+                            notice.push(`\n🧊 Consumed **10x** Glacio Chafe to freeze the enemy!`);
+                            eStats.timeFrozen = true;
+                            eStats.frozenMessage = "was frozen";
+
+                            // When freeze is over
+                            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                                eStats.timeFrozen = false;
+
+                                return AbilityResponse.SUCCESS;
+                            }));
+                        };
+                    };
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && caster.hiyukiState === 2) myStats.frostheart += 100;
+            });
+
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && options.element === 1 && target.frost && myStats.lastGlacio !== matchStats.round) {
+                    myStats.lastGlacio = matchStats.round;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `❄️ **Glacio Chafe**`, { atkMultiplier: Math.min(0.04 * eStats.frost, 0.4), magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                };
+            });
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.hiyukiState === 2 && Math.random() < 0.2) myStats.counter++;
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            // Use ATK twice upon entering battle
+            if (myStats.replaceButton.atk?.run) {
+                myStats.replaceButton.atk.run(myStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user);
+                myStats.replaceButton.atk.run(myStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user);
+            } else {
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `⚔️ **${char.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+            };
+
+            myStats.replaceButton.ability = { "emoji": "<a:hiyukiabil:1504285592404627526>" };
+
+            return AbilityResponse.SUCCESS;
+        },
+    },
+    "2": {
+        usage: 9999,
+        used: 0,
+        pause: 0,
+        cost: 0,
+        lastUsed: -1,
+        singingUsed: 0,
+        superchargeUsed: 0,
+        cd: -7,
+        desc: "Check compact desc",
+        shortdesc: "__**Passive**__:\n> Lloyd summons a new companion every **15** rounds, starting from the **10th**.\n- 10th: **+10%** ATK\n- 25th: **+10%** DEF\n- 40th: **+10%** critical rate\n- 55th: **+10%** dodge rate\n- 70th: **+10%** critical damage\n- 95th: **+10%** ATK\n\n__**Core Mechanic**__:\n- For every **250** (non-raid battles) / **450** (raid battles) mana gained (includes overflow), he gets a new mana circle [ <a:manacircle:1505922588277477540> ], giving him **12%** ATK\n\n__**Active**__\n`Uses`: `Unlimited`\n`Cost`: `60 💧`\n`Timeout`: `False`\n> Lloyd may choose a skill to utilize by using ATK, DEF or ACTIVE (:sparkles:) again. However if he doesn't have at least **1** <a:manacircle:1505922588277477540>, he can only use his ACTIVE again.\n\n:crossed_swords: : Mana Blast\n`Timeout`: `True`\n- Deals **15%** damage. This is repeated for every <a:manacircle:1505922588277477540> he currently has (Max: 5 hits).\n\n:shield: : Demon Possessed Singer\n`Timeout`: `True`\n- Stuns the enemy for **1** round\n- Decreases their dodge chance by **10%** for every time this skill was used\n\n:sparkles: Supercharge\n`Max Uses` : `2`\n`Timeout`: `False`\n- **+20** mana regeneration for **5** rounds\n- Boosts the damage scaling of __Mana Blast__ by **10%** permanently\n\n__**Side passives**__:\n- Every **10** rounds: Increases critical rate to **100%** for **1** round, and reduces the enemy's DEF & MR by **33%**\n- Receives **20%** less damage from physical and magical hits when below **50%** hp. This stacks with general damage mitigation\n- Revives once with **60%** of this HP",
+        ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
+            // Lloyd Frontera EX
+            if (matchStats.round < this.cd) {
+                noTimeout(matchStats, myStats);
+                this.used--;
+                matchStats.sendWarning({ content: `${char.name} needs to rest ${this.cd - matchStats.round} more ${this.cd - matchStats.round === 1 ? "round" : "rounds"}`, ephemeral: true });
+                return AbilityResponse.FAILURE;
+            };
+
+            if (this.lastUsed !== matchStats.round) {
+                // First active use
+                if (myStats.sm < 60) {// Return if has less than 60 mana
+                    noTimeout(matchStats, myStats);
+                    matchStats.sendWarning({ content: `You don't have enough mana (${myStats.sm}/60).`, ephemeral: true });
+                    return AbilityResponse.FAILURE;
+                };
+                myStats.sm -= 60;
+                noTimeout(matchStats, myStats);
+                this.lastUsed = matchStats.round;
+                notice.push(`\n✨ Almost there! **${char.name}** prepares his active`);
+                if (!myStats.manaCircle) return AbilityResponse.SUCCESS; // Return if no mana circles
+            } else if (this.superchargeUsed === 2) {// Return if using active again (proccing supercharge)
+                noTimeout(matchStats, myStats);
+                matchStats.sendWarning({ content: `Supercharge can only be used twice in battle.`, ephemeral: true });
+                return AbilityResponse.FAILURE;
+            } else {// Using supercharge
+                noTimeout(matchStats, myStats);
+                this.superchargeUsed++;
+                myStats.mg += 20;
+                mybuff.mg.push(new buffInfo("+", 20, 5));
+                notice.push(`\n✨ **${char.name}** activated Supercharge`);
+                delete myStats.replaceButton.atk;
+                delete myStats.replaceButton.def;
+                this.cd = this.lastUsed + 6;
+                return AbilityResponse.SUCCESS;
+            };
+
+            myStats.replaceButton.atk = {// Mana Blast
+                run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    this.cd = this.lastUsed + 6;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `💦 **${char.name}**'s **Mana Blast**`, { atkMultiplier: 0.5 + 0.05 * this.superchargeUsed, magicDamage: true });
+                    //const atkScale = 0.15 + 0.1 * this.superchargeUsed;
+                    for (let i = 0; i < Math.min(myStats.manaCircle, 5); i++) {
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `💦 **${char.name}**'s **Mana Blast**`, { atkMultiplier: 0.2, magicDamage: true });
+                    };
+                    delete myStats.replaceButton.atk;
+                    delete myStats.replaceButton.def;
+
+                    notice.push(`\n✨ My retirement of fun and merriment!`);
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            myStats.replaceButton.def = {// Singing
+                run: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    this.cd = this.lastUsed + 6;
+                    this.singingUsed++;
+                    let used = Math.min(this.singingUsed, 10);
+
+                    eStats.dodge -= 0.1 * used;
+                    if (eStats.dodge < 0) eStats.dodge = 0;
+                    eStats.timeFrozen = true;
+                    eStats.frozenMessage = "was stunned";
+
+                    // When stun is over
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        eStats.timeFrozen = false;
+
+                        return AbilityResponse.SUCCESS;
+                    }));
+
+                    delete myStats.replaceButton.atk;
+                    delete myStats.replaceButton.def;
+
+                    notice.push(`\n✨ So LET ME HEAR IT!`);
+                    return AbilityResponse.SUCCESS;
+                },
+            };
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.manaGained ??= 0; // Store mana gained
+            myStats.manaCircle ??= 0;
+            myStats.physMit ??= 0;
+            myStats.mdMit ??= 0;
+            myStats.maxRevivals ??= 0;
+            myStats.maxRevivals++;
+            myStats.revhp = 0.6;
+            myStats.rev += 1;
+            const circlereq = matchStats.interaction.commandName === "raid" ? 450 : 250;
+
+            if (myStats.manaGained > circlereq) {
+                myStats.manaGained -= circlereq;
+                myStats.manaCircle++;
+                myStats.atk += Math.floor(myStats.atk * 0.12);
+                mybuff.atk.push(new buffInfo("*", 1.12, 9999));
+
+                notice.push(`\n<a:manacircle:1505922588277477540> **${char.name}** gained a new Mana Circle and now have **${myStats.manaCircle}** <a:manacircle:1505922588277477540>`);
+            };
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.manaGained > circlereq) {
+                    myStats.manaGained -= circlereq;
+                    myStats.manaCircle++;
+                    myStats.atk += Math.floor(myStats.atk * 0.12);
+                    mybuff.atk.push(new buffInfo("*", 1.12, 9999));
+                    notice.push(`\n<a:manacircle:1505922588277477540> **${char.name}** gained a new Mana Circle and now have **${myStats.manaCircle}** <a:manacircle:1505922588277477540>`);
+                };
+                if (matchStats.round % 10 === 0) {// Surveying
+                    myStats.cr = 1;
+                    eStats.def *= 0.67;
+                    eStats.mr *= 0.67;
+                };
+                if (myStats.hp / myStats.maxhp < 0.5) {
+                    myStats.physMit += 0.2;
+                    myStats.mdMit += 0.2;
+                } else {
+                    myStats.physMit -= 0.2;
+                    myStats.mdMit -= 0.2;
+                };
+
+                // Companions
+                switch (matchStats.round) {
+                    case 10: {
+                        myStats.atk += Math.floor(myStats.atk * 0.1);
+                        mybuff.atk.push(new buffInfo("*", 1.1, 9999));
+                        notice.push(`\n✨ Ppodong granted **${char.name}** **10%** ATK`);
+                        break;
+                    };
+                    case 25: {
+                        myStats.def += Math.floor(myStats.def * 0.1);
+                        mybuff.def.push(new buffInfo("*", 1.1, 9999));
+                        notice.push(`\n✨ Hamang granted **${char.name}** **10%** DEF`);
+                        break;
+                    };
+                    case 40: {
+                        myStats.cr += 0.1;
+                        if (myStats.cr > 1) myStats.cr = 1;
+                        mybuff.cr.push(new buffInfo("+", 0.1, 9999));
+                        notice.push(`\n✨ Bangul granted **${char.name}** **10%** critical rate`);
+                        break;
+                    };
+                    case 55: {
+                        myStats.dodge += 0.1;
+                        if (myStats.dodge > 1) myStats.dodge = 1;
+                        mybuff.dodge.push(new buffInfo("+", 0.1, 9999));
+                        notice.push(`\n✨ Ggoming granted **${char.name}** **10%** dodge rate`);
+                        break;
+                    };
+                    case 70: {
+                        myStats.cd += 0.1;
+                        mybuff.cd.push(new buffInfo("+", 0.1, 9999));
+                        notice.push(`\n✨ Bibeong granted **${char.name}** **10%** critical damage`);
+                        break;
+                    };
+                    case 95: {
+                        myStats.atk += Math.floor(myStats.atk * 0.1);
+                        mybuff.atk.push(new buffInfo("*", 1.1, 9999));
+                        notice.push(`\n✨ Bone Dragon granted **${char.name}** **10%** ATK`);
+                        break;
+                    };
                 };
 
                 return AbilityResponse.SUCCESS;
