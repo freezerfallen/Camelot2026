@@ -299,25 +299,45 @@ export const profileSets = [
         new Background("Scarlet in the Rain", { gems: 800 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/sanguine-reflections/scarlet-in-the-rain.gif", url: "https://i.ibb.co/PGtTHSvM/scarlet-in-the-rain.gif" }), { delay: 100 }),
     ]),
 
-    new ProfileSet("Easter Slumber", 24, { jades: 900, gems: 1000, season_keys: 70 }, [
+    new ProfileSet("Easter Slumber", 24, { jades: 900, gems: 1000 }, [
         new Background("Bunnysolde", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/bunnysolde.jpg", url: "https://i.ibb.co/ZRJntm4h/bunnysolde.jpg" })),
         new Background("Easterei", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/easterei.jpg", url: "https://i.ibb.co/JWFBg2nN/easterei.jpg" })),
         new Background("Bunny Neko", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/bunny-neko.jpg", url: "https://i.ibb.co/Mxx8kpV9/bunny-neko.jpg" })),
         new Background("Tanya Onesie", { gems: 300 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/easter-slumber/tanya-onesie.jpg", url: "https://i.ibb.co/m56gjBgk/tanya-onesie.jpg" })),
     ]),
 
-    new ProfileSet("Eternal Petals", 25, { jades: 1200, gems: 1200, season_keys: 70 }, [
+    new ProfileSet("Eternal Petals", 25, { jades: 1200, gems: 1200 }, [
         new Background("Easter Beyond Journey's End", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/easter-beyond-journeys-end.gif", url: "https://i.ibb.co/n8P5R9HJ/easter-beyond-journeys-end.gif" }), { delay: 80 }),
         new Background("The Language of Irises", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/the-language-of-irises.gif", url: "https://i.ibb.co/gbrGB4BK/the-language-of-irises.gif" }), { delay: 80 }),
         new Background("Himmel's Promise", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/eternal-petals/himmels-promise.gif", url: "https://i.ibb.co/8gDwTfKj/himmels-promise.gif" }), { delay: 80 }),
     ]),
 
-    new ProfileSet("Petals and Promises", 26, { jades: 1500, gems: 1800, season_keys: 70 }, [
+    new ProfileSet("Petals and Promises", 26, { jades: 1500, gems: 1800 }, [
         new Background("Quiet Commute", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/quiet-commute.gif", url: "https://i.ibb.co/Psbg2CPy/quiet-commute.gif" }), { delay: 66 }),
         new Background("Midnight Promise", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/midnight-promise.gif", url: "https://i.ibb.co/2YMFTzD5/midnight-promise.gif" }), { delay: 90 }),
         new Background("Petals of a Memory", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/petals-of-a-memory.gif", url: "https://i.ibb.co/gZ05Rb7K/petals-of-a-memory.gif" }), { delay: 66 }),
         new Background("The Corridor of Spring", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/petals-and-promises/the-corridor-of-spring.gif", url: "https://i.ibb.co/qYzmSjdB/the-corridor-of-spring.gif" }), { delay: 90 }),
     ]),
 
+    new ProfileSet("Silken Currents", 27, { jades: 1200, gems: 1200, season_keys: 70 }, [
+        new Background("Summer's Shimmer", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/silken-currents/summers-shimmer.jpg", url: "https://i.ibb.co/6R2DcX7j/IMG-0735.jpg" })),
+        new Background("Liquid Veil", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/silken-currents/liquid-veil.jpg", url: "https://i.ibb.co/dJp3q2cX/IMG-0782.jpg" })),
+        new Background("Tidal Bloom", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/silken-currents/tidal-bloom.jpg", url: "https://i.ibb.co/LzbKQ7fW/IMG-0806.jpg" })),
+        new Background("Luminous Shore", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/silken-currents/luminous-shore.jpg", url: "https://i.ibb.co/cSxzd3Pr/c.jpg" })),
+    ]),
+
+    new ProfileSet("Project: SUN", 28, { jades: 1200, gems: 1200, season_keys: 70 }, [
+        new Background("Stardust & Saltwater", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/project-sun/stardust-saltwater.webp", url: "https://i.ibb.co/j998vQq8/stardust-saltwater.webp" })),
+        new Background("Shore.exe", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/project-sun/shore-exe.webp", url: "https://i.ibb.co/99KWK7Yc/shore-exe.webp" })),
+        new Background("Beachside Blitz", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/project-sun/beachside-blitz.webp", url: "https://i.ibb.co/jP0YH413/beachside-blitz.webp" })),
+        new Background("Summer Smiles", { gems: 400 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/project-sun/summer-smiles.webp", url: "https://i.ibb.co/sp0v8TBT/summer-smiles.webp" })),
+    ]),
+
+    new ProfileSet("Summer Fun", 29, { jades: 1500, gems: 1800, season_keys: 90 }, [
+        new Background("Point & Laugh", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/summer-fun/point-laugh.gif", url: "https://i.ibb.co/SDWTdmjM/point-laugh.gif" }), { delay: 20 }),
+        new Background("Nom", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/summer-fun/nom.gif", url: "https://i.ibb.co/4RRdHh6d/nom.gif" }), { delay: 55 }),
+        new Background("Ocean Reverie", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/summer-fun/ocean-reverie.gif", url: "https://i.ibb.co/cXcBGHjn/ocean-reverie.gif" }), { delay: 100 }),
+        new Background("On the Other Side of the Ocean", { gems: 500 }, ["shop"], new Asset({ path: "Images/ui/profile/backgrounds/summer-fun/on-the-other-side-of-the-ocean.gif", url: "https://i.ibb.co/qL78vjqx/on-the-other-side-of-the-ocean.gif" }), { delay: 100 }),
+    ]),
 
 ];

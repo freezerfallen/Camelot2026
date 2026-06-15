@@ -9,7 +9,6 @@ import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers, updateUsersAndCache } from '../Modules/queries';
 import { query } from '../postgres';
 import { createResponseGraph, getResponseData } from '../Modules/responseGraph';
-import { query as sqliteQuery } from '../db_handler';
 
 const exportCommand: SlashCommand = {
     name: 'admin',
@@ -62,29 +61,6 @@ const exportCommand: SlashCommand = {
 
             // Return table size
             return interaction.editReply({ content: `**Total**: ${sum_pretty}\n\n**Breakdown**:\n>>> ` + res.filter((e) => e.bytes !== null).slice(0, 30).map((e) => `${e.column_name}: ${e.total_size}`).join("\n") });
-        };
-
-        // Check refunded shard amount
-        if (action === "refunded") {
-            if (!user) return interaction.reply({ content: "missing user object", ephemeral });
-
-            const charactersFromDb = await sqliteQuery('SELECT rowid, * FROM characters');
-
-            const charData = charactersFromDb.find((c: any) => c.id === user?.id) || {
-                chars: '[]',
-                ref: '{}',
-                level: '{}',
-                class: '{}',
-                skin: '{}',
-                equipment: '{}'
-            };
-
-            const shards = Object.entries(JSON.parse(charData.ref) as Record<string, number>)
-                .filter(([key,]) => characters[key as any].rarity === "SS" || characters[key as any].rarity === "EX")
-                .filter(([, value]) => value > 2)
-                .reduce((a, [, b]) => a + (b > 3 ? 4 : 1), 0);
-
-            return interaction.reply({ content: `${shards} shards have been refunded to ${user.toString()}`, ephemeral });
         };
 
         if (cmd === "repair") {

@@ -1,4 +1,3 @@
-import { ColorResolvable } from "discord.js";
 
 type hpBarComponents = {
     start: {
@@ -172,6 +171,11 @@ export const customHpBars: CustomHpBar[] = [
         end: { empty: "<:dbr:1415266560745934848>", hp_only: "<a:dbrh:1490348691394007061>", mana_only: "<:dbrm:944322995135086602>", full: "<a:dbrhm:1490348694153723966>" },
     }),
 
+    new CustomHpBar("Beach Break", 16, 0x71c9ff, {
+        start: { empty: "<:dbl:1415266537748828203>", hp_only: "<:dblh:1516036453832986724>", mana_only: "<:dblm:1516036468005667127>", full: "<:dblhm:1516036461298843760>" },
+        middle: { empty: "<:db:1415266524532314272>", hp_only: "<:dbh:1516036494320468039>", mana_only: "<:dbm:1516036475429585019>", full: "<:dbhm:1516036499924062238>" },
+        end: { empty: "<:dbr:1415266560745934848>", hp_only: "<:dbrh:1516036477870669934>", mana_only: "<:dbrm:1516036492366053486>", full: "<:dbrhm:1516036484669505597>" }
+    }),
 
 
 ];

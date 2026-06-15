@@ -8,7 +8,7 @@ const pool = new Pool({
     database: process.env.PG_DATABASE,
     password: process.env.PG_PASSWORD,
     port: parseInt(process.env.PG_PORT || '5432'),
-    max: 20,                       // Maximum pool size
+    max: 20,                          // Maximum pool size
     // idleTimeoutMillis: 30000,      // Close idle clients after 30s
     // connectionTimeoutMillis: 2000, // Return error after 2s if no connection available
     // statement_timeout: 30000,      // Cancel queries after 30 seconds
@@ -583,7 +583,7 @@ async function resetDatabase(migrate: boolean = false) {
 
         const [{ size }] = await query(`SELECT pg_size_pretty(pg_database_size('${process.env.PG_DATABASE}')) AS size;`) as [{ size: string; }];
 
-        console.log(`Database initialization complete\nDatabase size: ${size}`);
+        console.log(`Database initialization complete (db size: ${size})`);
     } catch (error) {
         console.error('Database initialization failed:', error);
     };

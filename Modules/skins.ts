@@ -292,6 +292,28 @@ export const skins: skinInfo[] = [
     new skinInfo("Hwaryun (Easter 2026)", 3412, "easter season 2026", "reixier", "", { season_keys: 35 }, "https://i.ibb.co/C5nYvMzM/c.png", 207),
     new skinInfo("Fei Xiao (Easter 2026)", 23193, "easter season 2026", "youalreadylost7799", "", { season_keys: 40 }, "https://i.ibb.co/Q76XsbdP/c.png", 208),
 
+    /* Summer 2026 */
+    new skinInfo("Lucy EX (Summer 2026)", 21930, "summer season 2026", "mercy4afool", "", { season_keys: 50 }, "https://i.ibb.co/kg8Z0L0C/c.gif", 209),
+    new skinInfo("Houshou Marine (Summer 2026)", 5829, "summer season 2026", "kidsad", "", { season_keys: 35 }, "https://i.ibb.co/ksfdR7cq/c.png", 210),
+    new skinInfo("Rin Tohsaka (Summer 2026)", 412, "summer season 2026", "kaito.1412", "", { season_keys: 30 }, "https://i.ibb.co/C3tXj99g/c.png", 211),
+    new skinInfo("Kafka (Summer 2026)", 14904, "summer season 2026", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/5VNZDNK/c.png", 212),
+    new skinInfo("Miyu Suzuki (Summer 2026)", 26055, "summer season 2026", "reixier", "", { season_keys: 25 }, "https://i.ibb.co/ynx25V2m/c.png", 213),
+    new skinInfo("Yuki Sorimachi (Summer 2026)", 26201, "summer season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/hRtRPtfN/c.png", 214),
+    new skinInfo("Asuna Yuuki (Summer 2026)", 72, "summer season 2026", "mercy4afool", "", { season_keys: 25 }, "https://i.ibb.co/SDjKww6y/c.png", 215),
+    new skinInfo("Alisa Kujou (Summer 2026)", 22054, "summer season 2026", "youalreadylost7799", "", { season_keys: 30 }, "https://i.ibb.co/wZ7fJ9GG/c.png", 216),
+    new skinInfo("Carlotta (Summer 2026)", 24169, "summer season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/GvxZLPR2/c.png", 217),
+    new skinInfo("Changli (Summer 2026)", 22303, "summer season 2026", "truleho", "", { season_keys: 30 }, "https://i.ibb.co/QF08CBPn/c.png", 218),
+    new skinInfo("Ellen Joe (Summer 2026)", 24978, "summer season 2026", "kidsad", "", { season_keys: 30 }, "https://i.ibb.co/4wRNtrVn/c.png", 219),
+    new skinInfo("Lucina (Summer 2026)", 9677, "summer season 2026", "freezerfallen._", "", { season_keys: 35 }, "https://i.ibb.co/dwY93h5d/c.png", 220),
+    new skinInfo("Shikimori (Summer 2026)", 6335, "summer season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/0VFMXHr7/c.png", 221),
+    new skinInfo("Yuki Suou (Summer 2026)", 22055, "summer season 2026", "snowflake.ex", "", { season_keys: 30 }, "https://i.ibb.co/JRrQ32BQ/c.png", 222),
+    new skinInfo("Apollo EX (Summer 2026)", 17688, "summer season 2026", "kaito.1412", "", { season_keys: 40 }, "https://i.ibb.co/7JybZjY2/c.png", 223),
+    new skinInfo("Kiyotaka Ayanokouji (Summer 2026)", 8521, "summer season 2026", "ranahunter", "", { season_keys: 35 }, "https://i.ibb.co/3yk9QxQy/c.png", 224),
+    new skinInfo("Nobara Kugisaki (Summer 2026)", 920, "summer season 2026", "kaito.1412", "", { season_keys: 35 }, "https://i.ibb.co/pv72k2pg/c.png", 225),
+    new skinInfo("A2 (Summer 2026)", 13781, "summer season 2026", "reixier", "", { season_keys: 30 }, "https://i.ibb.co/V07DJf8w/c.png", 226),
+    new skinInfo("Kana Arima (Summer 2026)", 4932, "summer season 2026", "ranahunter", "", { season_keys: 30 }, "https://i.ibb.co/B2J5GRDP/c.png", 227),
+    new skinInfo("Raviel Ivansia (Summer 2026)", 24463, "summer season 2026", "mercy4afool", "", { season_keys: 30 }, "https://i.ibb.co/gZDVcqB3/c.png", 228),
+
 
 ];
 
