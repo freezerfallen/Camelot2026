@@ -602,6 +602,33 @@ export interface RaidSchema {
     end_date: Date | null;
 }
 
+export interface CharacterSchema {
+    rowid: number;
+    id: string;
+    charid: number;
+    print: number;
+    rarity: number;
+    is_tradeable: boolean;
+}
+
+export interface AuctionSchema {
+    rowid: number;
+    type: string;
+    itemid: number;
+    print: number | null;
+    starts_at: Date;
+    ends_at: Date | null;
+}
+
+export interface AuctionBidSchema {
+    rowid: number;
+    auctionid: number;
+    userid: string;
+    amount: number;
+    created_at: Date;
+}
+
+
 export type RankShopTransaction = {
     authorization?: string;
     txn_id: string;

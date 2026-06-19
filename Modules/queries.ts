@@ -1,6 +1,6 @@
 import { Client } from "discord.js";
 import { query } from "../postgres";
-import { CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdatePartyOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
+import { AuctionBidSchema, AuctionSchema, CharacterSchema, CompactUserSchema, FAQSchema, GuildDonationSchema, GuildSchema, PartySchema, RaidSchema, ServerSchema, StampedeSchema, TradeSchema, UpdateGuildOptions, UpdatePartyOptions, UpdateStampedeOptions, UpdateUserOptions, UpdateWeaponOptions, UserSchema, UserSchemaForStats, WeaponSchema } from "../types";
 import { donationWeekStart } from "./components";
 
 function fixBigintForUser(value: Partial<UserSchema>) {
@@ -477,6 +477,41 @@ export const getUserTransaction = async (userId: string): Promise<Pick<UserSchem
     return transactions;
 };
 
+export const getCharacterSchemasOfUser = async (userId: string): Promise<CharacterSchema[]> => {
+    const characters = await query(`SELECT * FROM characters WHERE id = $1`, [userId]) as CharacterSchema[];
+    return characters;
+};
+
+export const getCharacterSchema = async (charId: number, print: number): Promise<CharacterSchema | undefined> => {
+    const [character] = await query(`SELECT * FROM characters WHERE charid = $1 AND print = $2`, [charId, print]) as [CharacterSchema];
+    return character;
+};
+
+export const getAuctionSchema = async (auctionId: number): Promise<AuctionSchema | undefined> => {
+    const [auction] = await query(`SELECT * FROM auctions WHERE rowid = $1`, [auctionId]) as [AuctionSchema];
+    return auction;
+};
+
+export const getLatestAuction = async (): Promise<AuctionSchema | undefined> => {
+    const [auction] = await query(`SELECT * FROM auctions ORDER BY rowid DESC LIMIT 1`, []) as [AuctionSchema];
+    return auction;
+};
+
+export const getActiveAuctions = async (): Promise<AuctionSchema[]> => {
+    const auctions = await query(`SELECT * FROM auctions WHERE ends_at > NOW()`, []) as AuctionSchema[];
+    return auctions;
+};
+
+export const getAuctionWinner = async (auctionId: number): Promise<(AuctionBidSchema & { coins: number, bank: number; }) | undefined> => {
+    const bids = await query(`SELECT * FROM auction_bids WHERE auctionid = $1 ORDER BY amount DESC`, [auctionId]) as AuctionBidSchema[];
+
+    // Highest bidder with enough coins
+    for (const bid of bids) {
+        const [user] = await query(`SELECT coins, bank FROM users WHERE id = $1`, [bid.userid]) as { coins: number; bank: number; }[];
+        if (user && (user.coins + user.bank) >= bid.amount) return { ...bid, coins: user.coins, bank: user.bank };
+    };
+};
+
 
 //--------------------------------------------//
 //              CHECK STATEMENTS              //
@@ -628,6 +663,30 @@ export const insertNewFAQ = async (id: string, name: string, body: string): Prom
     return faq;
 };
 
+export const insertNewCharacter = async (userid: string, charId: number, rarity: number, is_tradeable?: boolean): Promise<CharacterSchema> => {
+    const { rows: [character] } = await query(`INSERT INTO characters (id, charid, rarity, is_tradeable) VALUES ($1, $2, $3, $4) RETURNING *`, [userid, charId, rarity, is_tradeable ?? true]) as { rows: CharacterSchema[]; };
+    return character;
+};
+
+export const insertNewAuction = async (type: "char", itemid: number, ends_at: Date, print?: number): Promise<AuctionSchema> => {
+    const { rows: [auction] } = await query(`INSERT INTO auctions (type, itemid, ends_at, print) VALUES ($1, $2, $3, $4) RETURNING *`, [type, itemid, ends_at, print ?? null]) as { rows: AuctionSchema[]; };
+    return auction;
+};
+
+export const insertNewAuctionBid = async (auctionid: number, userid: string, amount: number): Promise<AuctionBidSchema> => {
+    const { rows: [bid] } = await query(
+        `INSERT INTO auction_bids (auctionid, userid, amount) 
+        VALUES ($1, $2, $3) 
+        ON CONFLICT (auctionid, userid) 
+        DO UPDATE SET amount = EXCLUDED.amount
+        WHERE auction_bids.amount < EXCLUDED.amount
+        RETURNING *`,
+        [auctionid, userid, amount]
+    ) as { rows: AuctionBidSchema[]; };
+    return bid;
+};
+
+
 //-------------------------------------------//
 //             DELETE STATEMENTS             //
 //-------------------------------------------//
@@ -708,6 +767,11 @@ export const transferAccount = async (oldId: string, newId: string): Promise<voi
             });
         };
     };
+};
+
+export const transferCharacter = async (userid: string, charId: number, print: number): Promise<CharacterSchema | undefined> => {
+    const { rows: [character] } = await query(`UPDATE characters SET id = $1 WHERE charid = $2 AND print = $3 RETURNING *`, [userid, charId, print]) as { rows: CharacterSchema[]; };
+    return character;
 };
 
 //-------------------------------------------//

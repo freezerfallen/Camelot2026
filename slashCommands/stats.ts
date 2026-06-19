@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import charInfo, { characters, auniq, charactersF, charactersM, charactersVIP, charactersEX, charactersSS, charactersS, charactersA, charactersB, charactersC, charactersD } from "../Modules/chars";
 import { SlashCommand } from '../types';
-import { getCachedUserSchema } from '../Modules/queries';
+import { getCachedUserSchema, getCharacterSchemasOfUser } from '../Modules/queries';
 
 function padCollected(chars: charInfo[]) {
     let collVIP = chars.filter((e) => e.rarity === "VIP").length;
@@ -36,7 +36,9 @@ const exportCommand: SlashCommand = {
         const stats = user.id === interaction.user.id ? author.schema : await getCachedUserSchema(user.id, interaction.client);
         if (!stats) return interaction.reply("User not found");
 
-        const chars = [...new Set(stats.chars)].map((e: any) => characters[e]);
+        const vipChars = await getCharacterSchemasOfUser(user.id);
+
+        const chars = [...new Set(stats.chars), ...new Set(vipChars.map((e) => e.charid))].map((e) => characters[e]);
         const padded = padCollected(chars);
 
         // Anime Completed

@@ -1,20 +1,41 @@
 import { EmbedBuilder, ComponentType } from "discord.js";
 import charInfo, { characters } from "../Modules/chars";
 import { abilities } from "../Modules/abilities";
-import { showPage, getSingleRefinement } from "../Modules/functions";
+import { showPage, getSingleRefinement, rarityEmoji } from "../Modules/functions";
 import { PageRow } from "../Modules/components";
 import { CompactUserSchema, SlashCommand } from '../types';
-import { getUserSchema } from '../Modules/queries';
+import { getCharacterSchemasOfUser, getUserSchema } from '../Modules/queries';
 
-const headers = { EX: "\n\n<a:EXTRA:1138530846144462968> **Tier**\n", SS: "\n\n<:SSTier:869316489931546644> **Tier**\n", S: "\n\n<:STier:869316518675095552> **Tier**\n", A: "\n\n<:ATier:869316558013464627> **Tier**\n", B: "\n\n<:BTier:869316586803179571> **Tier**\n", C: "\n\n<:CTier:869316602858991657> **Tier**\n", D: "\n\n<:DTier:869316616071032843> **Tier**\n" };
-function formatPage(showChars: [charInfo[], string[]], sort: string, invd: Map<number, number>, stats: CompactUserSchema) {
+type InventoryEntry = {
+    char: charInfo;
+    print?: number;
+};
+
+function formatCharacterName(entry: InventoryEntry) {
+    return `${entry.char.name}${entry.print !== undefined ? `\`#${entry.print}\`` : ""}`;
+};
+
+function formatPage(showChars: [InventoryEntry[], string[]], sort: string, invd: Map<number, number>, stats: CompactUserSchema) {
     // if (!(sort === "rarity" || sort === "dupes")) return showChars.join('\n');
     if (showChars[0].length < 1) return showChars[1].join('\n');
 
     let desc = "";
-    Object.entries(headers).forEach(([rarity, header]) => {
-        if (showChars[0].find((e) => e.rarity === rarity)) desc += header + showChars[0].filter((e) => e.rarity === rarity).map((c) => sort === "dupes" ? `> ${c.name} | **x${invd.get(c.id)}**` : `> ${(stats.charlock.includes(c.id) || stats.animelock.includes(c.animeInfo.id)) ? "🔒 " : ""}${c.name}${c.id in abilities ? " ✨" : ""}${c.id in stats.char_ref ? ` ${getSingleRefinement(stats.char_ref[c.id])}` : ""}`).join("\n");
+
+    (["VIP", "EX", "SS", "S", "A", "B", "C", "D"] as const).forEach((rarity) => {
+        const entries = showChars[0].filter((e) => e.char.rarity === rarity);
+        if (entries.length > 0) {
+            desc +=
+                `\n\n**${rarityEmoji(rarity)} Tier**\n` +
+                entries.map((entry) => {
+                    const c = entry.char;
+                    const name = formatCharacterName(entry);
+                    return sort === "dupes"
+                        ? `> ${name} | **x${entry.print !== undefined ? 1 : invd.get(c.id)}**`
+                        : `> ${(stats.charlock.includes(c.id) || stats.animelock.includes(c.animeInfo.id)) ? "🔒 " : ""}${name}${c.id in abilities ? " ✨" : ""}${c.id in stats.char_ref ? ` ${getSingleRefinement(stats.char_ref[c.id])}` : ""}`;
+                }).join("\n");
+        };
     });
+
     return desc;
 };
 
@@ -31,7 +52,8 @@ const exportCommand: SlashCommand = {
         const stats = (user.id === interaction.user.id) ? author.schema : await getUserSchema(user.id);
         if (!stats || stats.chars.length === 0) return interaction.reply({ content: `${user.id === interaction.user.id ? "You don't have any" : `**${user.username}** has no`} characters.`, ephemeral: ephemeral === "true" });
 
-        const invd = new Map<number, number>();
+        const vipChars = await getCharacterSchemasOfUser(user.id);
+        // stats.chars.push(...vipChars.map((e) => e.charid));
 
         if (filter) {
             if (filter === "ability") {
@@ -42,18 +64,24 @@ const exportCommand: SlashCommand = {
         };
 
         let uniq = [...new Set(stats.chars)];
-        let charNames = uniq.map((e) => characters[e].name);
-        let chars: charInfo[] = [];
+        const vipEntries: InventoryEntry[] = vipChars.map((e) => ({ char: characters[e.charid], print: e.print }));
+        const entries: InventoryEntry[] = [...uniq.map((e) => ({ char: characters[e] })), ...vipEntries];
+        let charNames = entries.map(formatCharacterName);
+        let chars: InventoryEntry[] = [];
+        const invd = new Map<number, number>();
 
         // Sort
         if (sort === "alphabetical") charNames.sort();
         if (sort === "rarity") {
-            chars = uniq.map((e) => characters[e]).sort((a, b) => {
+            chars = [...entries].sort((aEntry, bEntry) => {
+                const a = aEntry.char;
+                const b = bEntry.char;
                 if (b.rarityValue === a.rarityValue) {
                     if (stats.charlock.includes(b.id) === stats.charlock.includes(a.id)) {
                         if (stats.animelock.includes(b.animeInfo.id) === stats.animelock.includes(a.animeInfo.id)) {
                             if ((stats.char_ref[b.id] ?? 0) === (stats.char_ref[a.id] ?? 0)) {
-                                return a.name.localeCompare(b.name);
+                                const nameSort = a.name.localeCompare(b.name);
+                                return nameSort === 0 ? (aEntry.print ?? 0) - (bEntry.print ?? 0) : nameSort;
                             };
                             return (stats.char_ref[b.id] ?? 0) - (stats.char_ref[a.id] ?? 0);
                         };
@@ -65,24 +93,33 @@ const exportCommand: SlashCommand = {
             });
         };
         if (sort === "dupes") {
-            let names = stats.chars.sort();
-            let len = names.length - 1;
-            while (len--) if (names[len - 1] === names[len]) invd.set(names[len], (invd.get(names[len]) ?? 1) + 1);
+            stats.chars.forEach((e) => invd.set(e, (invd.get(e) ?? 0) + 1));
 
-            uniq = [...invd.keys()];
-            chars = uniq.map((e) => characters[e]).sort((a, b) => b.rarityValue === a.rarityValue ? (invd.get(b.id) ?? 1) - (invd.get(a.id) ?? 1) : (b.rarityValue - a.rarityValue));
+            const dupeEntries: InventoryEntry[] = [...invd.entries()].filter(([, count]) => count > 1).map(([id]) => ({ char: characters[id] }));
+            chars = [...dupeEntries, ...vipEntries].sort((aEntry, bEntry) => {
+                const a = aEntry.char;
+                const b = bEntry.char;
+                if (b.rarityValue === a.rarityValue) {
+                    const countSort = (bEntry.print !== undefined ? 1 : invd.get(b.id) ?? 1) - (aEntry.print !== undefined ? 1 : invd.get(a.id) ?? 1);
+                    if (countSort !== 0) return countSort;
+                    const nameSort = a.name.localeCompare(b.name);
+                    return nameSort === 0 ? (aEntry.print ?? 0) - (bEntry.print ?? 0) : nameSort;
+                };
+                return b.rarityValue - a.rarityValue;
+            });
         };
 
-        let thumbnail = characters[uniq[Math.floor(Math.random() * uniq.length)]].image;
+        const pageItems = (sort === "rarity" || sort === "dupes") ? chars.length : charNames.length;
+        let thumbnail = entries[Math.floor(Math.random() * entries.length)].char.image;
         if (stats.favchar !== null) thumbnail = characters[stats.favchar].getImage(stats.premium, stats.custom_skins[stats.favchar], stats.char_skin[stats.favchar]);
 
-        let pagesTotal = Math.ceil(uniq.length / 15);
+        let pagesTotal = Math.ceil(pageItems / 15);
         let currPage = 1;
         if (page <= pagesTotal && page > 0) {
             currPage = page;
         };
 
-        let showChars: [charInfo[], string[]] = [showPage(currPage, chars), showPage(currPage, charNames)];
+        let showChars: [InventoryEntry[], string[]] = [showPage(currPage, chars), showPage(currPage, charNames)];
 
         const Embed = new EmbedBuilder()
             .setColor(0xbbffff)

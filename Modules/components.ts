@@ -64,6 +64,10 @@ export const isEventOngoing = () => seasonalEventStart.getTime() <= Date.now() &
 export const requestVerification = new Map();
 export const dungeonTempBan = new Map();
 
+// Auctions
+export const auctionChannelId = "1516111752528396448";
+export const activeAuctions = new Map<number, Date>(); // auctionid -> ends_at
+
 export const botPfp = "https://i.ibb.co/mDX54t4/Ta2YDBN.png";
 export const embedColor = 0xbbffff;
 
@@ -95,7 +99,7 @@ export const currencyEmojis = {
     "lilies": "<:lilium:974057059618291732>",
     "jades": "<:eternal_jade:1256124504141201428>",
     "guild_marks": "<:guild_mark:1317944450814840923>",
-    "season_keys": seasonalKeys.easter,
+    "season_keys": seasonalKeys.summer,
     "eventpts": "🌙",
 } as const;
 

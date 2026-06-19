@@ -16,6 +16,19 @@ const event: BotEvent = {
 
         // Defer Buttons
         if (interaction.isButton()) {
+            if (interaction.customId?.startsWith("auction_help")) {
+                return interaction.reply({
+                    content: `## Auction Rules` +
+                        `\n1. You can bid any amount of coins by using the \`/auction bid\` command` +
+                        `\n2. Your highest bid will be binding and cannot be withdrawn` +
+                        `\n3. Your bids will be hidden from other players` +
+                        `\n4. There will be a **3%** fee on your bids regardless of whether you win or lose` +
+                        `\n5. Only the fee is paid upfront when bidding. The full amount will only be deducted from the winner` +
+                        `\n  - If the highest bidder does not have enough coins in their balance + bank at the end of the auction, it will go to the 2nd highest bidder etc.`
+                    , ephemeral: true
+                });
+            };
+
             if (interaction.customId?.startsWith("ignore_defer")) return;
             await interaction.deferUpdate().catch(() => {
                 console.log(`ERROR Interaction Failed 'deferUpdate()' on "${interaction.customId}"`);

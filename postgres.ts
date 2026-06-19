@@ -312,6 +312,41 @@ async function createTables() {
         start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         end_date TIMESTAMP
     )`);
+
+    // Characters table
+    await query(`CREATE TABLE IF NOT EXISTS characters (
+        rowid BIGSERIAL PRIMARY KEY,
+        id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        charid INT NOT NULL,
+        print INT NOT NULL,
+        rarity INT NOT NULL, -- { D: 0, C: 1, B: 2, A: 3, S: 4, SS: 5, EX: 6, VIP: 7 }
+        is_tradeable BOOLEAN DEFAULT TRUE NOT NULL,
+
+        CONSTRAINT unique_charid_print UNIQUE(charid, print)
+    )`);
+
+    // Auctions table
+    await query(`CREATE TABLE IF NOT EXISTS auctions (
+        rowid BIGSERIAL PRIMARY KEY,
+        type TEXT NOT NULL, -- "char"
+        itemid INT NOT NULL, -- currently only character ID
+        print INT, -- only for VIP characters
+        
+        starts_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        ends_at TIMESTAMP
+    )`);
+
+    // Auction bids table
+    await query(`CREATE TABLE IF NOT EXISTS auction_bids (
+        rowid BIGSERIAL PRIMARY KEY,
+        auctionid BIGINT NOT NULL REFERENCES auctions(rowid) ON DELETE CASCADE ON UPDATE CASCADE,
+        userid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        amount BIGINT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT unique_auctionid_userid UNIQUE(auctionid, userid)
+    )`);
+
 };
 
 async function createIndexes() {
@@ -325,7 +360,6 @@ async function createIndexes() {
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_battlechar ON users(battlechar) WHERE battlechar IS NOT NULL`);
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_battlechar_rowid ON users(rowid, battlechar) WHERE battlechar IS NOT NULL`);
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_stampedeenergy ON users(stampedeenergy)`);
-
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_servers_id ON servers(id)`);
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_weapons_id ON weapons(id)`);
     await query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_guild_donations_userid ON guild_donations(userid)`);
@@ -494,51 +528,55 @@ async function createTriggerPartyId() {
     `);
 };
 
+async function createCharacterPrintTrigger() {
+    await query(`-- Create trigger function to automatically set print value
+    CREATE OR REPLACE FUNCTION set_character_print_value()
+    RETURNS TRIGGER AS $$
+    DECLARE
+        next_print INT;
+    BEGIN
+        -- Find the smallest missing print value for the given charid
+        SELECT MIN(a.print + 1) 
+        INTO next_print
+        FROM (
+            SELECT t1.print
+            FROM characters t1
+            LEFT JOIN characters t2 ON t1.charid = t2.charid AND t1.print = t2.print - 1
+            WHERE t1.charid = NEW.charid AND t2.print IS NULL
+        ) a;
+
+        -- If no missing print value found, set it to the max print + 1 for the given charid
+        IF next_print IS NULL THEN
+            SELECT COALESCE(MAX(print), 0) + 1 INTO next_print FROM characters WHERE charid = NEW.charid;
+        END IF;
+
+        -- Set the new print value
+        NEW.print := next_print;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+    `);
+
+    // Create the trigger
+    await query(`
+        DROP TRIGGER IF EXISTS set_character_print_value_trigger ON characters;
+        CREATE TRIGGER set_character_print_value_trigger
+        BEFORE INSERT ON characters
+        FOR EACH ROW EXECUTE FUNCTION set_character_print_value()
+    `);
+};
+
 async function createTriggers() {
     await createTriggerWeaponUniqueId();
     await createTriggerGuildId();
     await createTriggerPartyId();
+    await createCharacterPrintTrigger();
 };
 
 async function alterTables() {
     // Example:
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
-    // add genesisdupepity INT DEFAULT 0 NOT NULL,
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS genesisdupepity INT DEFAULT 0 NOT NULL');
-    // await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS user_settings JSONB DEFAULT '{}' NOT NULL`);
-
-    // New with seasonal shop update
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastonline TIMESTAMP;');
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS season_keys INT DEFAULT 0 NOT NULL;');
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbars INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hpbar INT;');
-
-    // await query('ALTER TABLE guilds ADD COLUMN IF NOT EXISTS raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL;');
-
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreak INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreakhighest INT DEFAULT 0 NOT NULL');
-
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discovered_via TEXT;');
-
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
-    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_skins JSONB DEFAULT '{}' NOT NULL;`);
-
-    // Frostbound Yule event
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter_failed BOOLEAN DEFAULT FALSE NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_timestamp TIMESTAMP;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fire INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fragments INT DEFAULT 0 NOT NULL;');
-
-
-
-    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS image_credits INT DEFAULT 0 NOT NULL');
-    // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_tree JSONB DEFAULT '{}' NOT NULL");
-    // await query("ALTER TABLE users ADD COLUMN IF NOT EXISTS skill_points INT DEFAULT 0 NOT NULL");
-    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS atkbuff INT DEFAULT 0 NOT NULL");
-    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS hpbuff INT DEFAULT 0 NOT NULL");
-    // await query("ALTER TABLE guilds ADD COLUMN IF NOT EXISTS defbuff INT DEFAULT 0 NOT NULL");
 };
 
 async function dropTables() {
@@ -579,7 +617,7 @@ async function resetDatabase(migrate: boolean = false) {
         await createTables();
         await createIndexes();
         await alterTables();
-        // await createTriggers();
+        await createTriggers();
 
         const [{ size }] = await query(`SELECT pg_size_pretty(pg_database_size('${process.env.PG_DATABASE}')) AS size;`) as [{ size: string; }];
 

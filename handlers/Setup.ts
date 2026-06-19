@@ -1,8 +1,9 @@
 import fs from "fs";
 import { Client, Collection } from "discord.js";
 import { BotHandler } from "../types";
-import { loadPullResets, loadRanking, updateUsersAndCache } from "../Modules/queries";
+import { getActiveAuctions, loadPullResets, loadRanking, updateUsersAndCache } from "../Modules/queries";
 import { getDetailedStats, pullsToResetList, RoK, sleep } from "../Modules/functions";
+import { activeAuctions } from "../Modules/components";
 
 async function indexRanking() {
     let pass = 0, batchSize = 500;
@@ -29,6 +30,12 @@ const handler: BotHandler = {
         // Load Blacklist
         const blacklist = JSON.parse(fs.readFileSync('Storage/blacklist.json', 'utf8')) as Record<string, string>;
         client.blacklist = new Collection(Object.entries(blacklist));
+
+        // Load Active Auctions
+        const auctions = await getActiveAuctions();
+        for (const auction of auctions) {
+            if (auction.ends_at) activeAuctions.set(auction.rowid, new Date(auction.ends_at));
+        };
 
         // Load Pull Resets
         const users = await loadPullResets();
