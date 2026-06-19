@@ -900,6 +900,8 @@ declare global {
 
             GEMINI_API_KEY: string,
 
+            OPENROUTER_API_KEY: string,
+
             RUNWARE_SOURCE: string,
             RUNWARE_API_KEY: string,
 

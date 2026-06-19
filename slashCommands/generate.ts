@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, Me
 import { characters } from "../Modules/chars";
 import { formatNumberWithQuotes } from "../Modules/functions";
 import { getUserSchema, updateUsers } from "../Modules/queries";
-import { generateText } from '../Modules/gemini';
+import { generateText } from '../Modules/openrouter';
 import { generateImages, removeBackground } from '../Modules/runwareDirectApi';
 
 type GenType = "weapon" | "armor" | "ring" | "item" | "character";
