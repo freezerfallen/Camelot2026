@@ -1424,7 +1424,7 @@ export const formatNumberWithQuotes = (num: number) => {
 };
 
 export const searchClass = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false): classInfo | undefined => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {
@@ -1470,7 +1470,7 @@ export const searchClass = (name: string | number, interaction: ChatInputCommand
 };
 
 export const searchCurse = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false) => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {
@@ -1516,7 +1516,7 @@ export const searchCurse = (name: string | number, interaction: ChatInputCommand
 };
 
 export const searchItem = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false, options: { returnSet: boolean; } = { returnSet: false }) => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {

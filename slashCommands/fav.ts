@@ -2,7 +2,13 @@ import { EmbedBuilder } from "discord.js";
 import { achievements } from "../Modules/achievements";
 import { search, rarityColor } from "../Modules/functions";
 import { SlashCommand } from '../types';
-import { updateUsersAndCache } from '../Modules/queries';
+import { getCharacterSchemasOfUser, updateUsersAndCache } from '../Modules/queries';
+
+function parsePrintChoice(choice: string) {
+    const match = choice.trim().match(/^(.*?)`?\s*#\s*(\d+)`?$/);
+    if (!match) return { name: choice.trim() };
+    return { name: match[1].trim(), print: Number(match[2]) };
+};
 
 const exportCommand: SlashCommand = {
     name: 'fav',
@@ -16,13 +22,29 @@ const exportCommand: SlashCommand = {
 
         const char = search(choice, stats.chars, interaction);
         if (!char) return;
-        if (!stats.chars.includes(char.id)) return interaction.reply(`You don't have a copy of **${char.name}**`);
+
+        const parsed = parsePrintChoice(choice);
+
+        if (char.rarity === "VIP") {
+            const vipChars = await getCharacterSchemasOfUser(interaction.user.id);
+            if (parsed.print !== undefined) {
+                const owned = vipChars.find((e) => e.charid === char.id && e.print === parsed.print);
+                if (!owned) return interaction.reply(`You don't have a copy of **${char.name}#${parsed.print}**`);
+            } else {
+                const owned = vipChars.find((e) => e.charid === char.id);
+                if (!owned) return interaction.reply(`You don't have a copy of **${char.name}**`);
+            };
+        } else {
+            if (!stats.chars.includes(char.id)) return interaction.reply(`You don't have a copy of **${char.name}**`);
+        };
+
+        const displayName = parsed.print !== undefined ? `${char.name}#${parsed.print}` : char.name;
 
         const thumbnail = char.getImage(stats.premium, stats.custom_skins[char.id], stats.char_skin[char.id]);
 
         const Embed = new EmbedBuilder()
             .setColor(rarityColor(char.rarity))
-            .setDescription(`Favourite character set to \n**${char.name}**`)
+            .setDescription(`Favourite character set to \n**${displayName}**`)
             .setImage(thumbnail);
         interaction.reply({ embeds: [Embed] });
 

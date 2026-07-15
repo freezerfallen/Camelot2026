@@ -5053,7 +5053,7 @@ export const items = [
         matchStats.trigger("shieldBreak", eStats, myStats, ebuff, mybuff);
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `The wearer creates and immediately breaks a shield ${["every **2** rounds", "every **2** rounds", "every round"][level - 1]}. Deals **${[10, 12.5, 15][level - 1]}%** damage to the enemy on every shield break.`, "Forged from the remnants of an ancient frost titan’s crown, the Fractured Whisper hums with the echoes of a winter long lost. Its crystalline shards shimmer with spectral whispers, promising power to those who dare to listen.", "genesis", 709),
+    }, (level) => `The wearer creates and immediately breaks a shield ${["every **2** rounds", "every **2** rounds", "every round"][level - 1]}. Deals **${[10, 12.5, 15][level - 1]}%** damage to the enemy on every shield break.`, "Forged from the remnants of an ancient frost titan's crown, the Fractured Whisper hums with the echoes of a winter long lost. Its crystalline shards shimmer with spectral whispers, promising power to those who dare to listen.", "genesis", 709),
     new ringInfo("Eclipse Gem", "ring", "ring", ["chest"], "<:eclipse_gem:1338658011560018002>", "https://i.ibb.co/h19dPqqh/Eclipse-Gem.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.eclipseGemStacks = 0;
@@ -5267,7 +5267,7 @@ export const items = [
         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:sneak_attack:1334561501540909100> **${char.name}**`, { atkMultiplier, magicDamage: true });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `At the start of the battle, the wearer hits the enemy with an attack dealing **${[60, 70, 80, 90, 100, 110, 120][level - 1]}%** damage.`, "The Sneak Attack ring whispers the promise of irrationality and cunning. Its band features a textured design that mimics the surface of a leather-bound path, sleek and unobtrusive. Atop, a cunningly crafted dagger-shaped ornament points outward, encrusted with dim orichalcum. Impulsive, this ring lashes out indiscriminately afront, sacrificing the bearer’s stealth for a self-determined lethal strike.", "rare", 721),
+    }, (level) => `At the start of the battle, the wearer hits the enemy with an attack dealing **${[60, 70, 80, 90, 100, 110, 120][level - 1]}%** damage.`, "The Sneak Attack ring whispers the promise of irrationality and cunning. Its band features a textured design that mimics the surface of a leather-bound path, sleek and unobtrusive. Atop, a cunningly crafted dagger-shaped ornament points outward, encrusted with dim orichalcum. Impulsive, this ring lashes out indiscriminately afront, sacrificing the bearer's stealth for a self-determined lethal strike.", "rare", 721),
     new ringInfo("Verdant Melody", "ring", "ring", ["guild"], "<:verdant_melody:1334561565935931465>", "https://i.ibb.co/Jj1qG9nh/Verdant-Melody.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         const atkDebuff = [0.3, 0.275, 0.25, 0.225, 0.2][level - 1];
@@ -5344,7 +5344,7 @@ export const items = [
         mybuff.dodge.push(new buffInfo("=", 0, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Increases the wearer's max HP by **${[8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1]}%** but reduces dodge rate to **0%**.`, "The Amber's Dawn ring radiates warmth and a sense of inner light. Its intricately designed golden band is embellished with delicate, flower-like motifs that cradle a radiant amber gem, sparkling with a gentle glow reminiscent of a rising sun. When worn, this ring provides its bearer with the blessings of vitality, alike the lively blossoming. Life may be fleeting, but the soft petals will always infuse light into the bearer’s surroundings, banishing shadows and inspiring hope.", "rare", 724),
+    }, (level) => `Increases the wearer's max HP by **${[8, 9, 10, 11, 12, 13, 14, 15, 16][level - 1]}%** but reduces dodge rate to **0%**.`, "The Amber's Dawn ring radiates warmth and a sense of inner light. Its intricately designed golden band is embellished with delicate, flower-like motifs that cradle a radiant amber gem, sparkling with a gentle glow reminiscent of a rising sun. When worn, this ring provides its bearer with the blessings of vitality, alike the lively blossoming. Life may be fleeting, but the soft petals will always infuse light into the bearer's surroundings, banishing shadows and inspiring hope.", "rare", 724),
     new ringInfo("Barbed Glory", "ring", "ring", ["raid"], "<:barbed_glory:1334561550379515955>", "https://i.ibb.co/jvT4P74T/Barbed-Glory.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Dusty
 
         // Reflects 5/7.5/10/12.5/15% damage taken back to the enemy
@@ -5654,7 +5654,7 @@ export const items = [
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Actions on every **4th** round grant the wearer additional effects:\n- **ATK**: Increases ATK & MD by **${[10, 12.5, 15, 17.5, 20, 22.5, 25][level - 1]}%** for **2** turns.\n- **DEF**: Increase Block Rate by **${[10, 12, 14, 16, 18, 19, 20][level - 1]}%** for **2** turns.\n- **ABILITY**: Does an additional attack dealing **${[15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1]}%** damage.\n- **SKILL**: Heals **${[5, 5.5, 6, 6.5, 7, 7.5, 8][level - 1]}%** of max HP.`, "Crafted from intertwining translucent vines, Harmony's Edge glimmers softly in hues of red and blue under the light. Uncut extensions roam the ring’s surface, infused with emerald hues reminiscent of tranquil forests. Delicate filigree patterns spiral around the band, symbolizing unity and balance, yet always seemingly on the edge of overloading. This ring offers protection against chaos, enhancing the wearer's affinity for nature and harmony. While druids speak of its ability to soothe conflicts, rumors has it that its innate tolerance to dissonance is not limitless, adding a mysterious layer behind its majestic beauty and profound significance.", "legendary", 738),
+    }, (level) => `Actions on every **4th** round grant the wearer additional effects:\n- **ATK**: Increases ATK & MD by **${[10, 12.5, 15, 17.5, 20, 22.5, 25][level - 1]}%** for **2** turns.\n- **DEF**: Increase Block Rate by **${[10, 12, 14, 16, 18, 19, 20][level - 1]}%** for **2** turns.\n- **ABILITY**: Does an additional attack dealing **${[15, 17.5, 20, 22.5, 25, 27.5, 30][level - 1]}%** damage.\n- **SKILL**: Heals **${[5, 5.5, 6, 6.5, 7, 7.5, 8][level - 1]}%** of max HP.`, "Crafted from intertwining translucent vines, Harmony's Edge glimmers softly in hues of red and blue under the light. Uncut extensions roam the ring's surface, infused with emerald hues reminiscent of tranquil forests. Delicate filigree patterns spiral around the band, symbolizing unity and balance, yet always seemingly on the edge of overloading. This ring offers protection against chaos, enhancing the wearer's affinity for nature and harmony. While druids speak of its ability to soothe conflicts, rumors has it that its innate tolerance to dissonance is not limitless, adding a mysterious layer behind its majestic beauty and profound significance.", "legendary", 738),
     new ringInfo("Tenebris Diadem", "ring", "ring", ["raid"], "<:tenebris_diadem:1336487284861698128>", "https://i.ibb.co/mF9ZPwyJ/Tenebris-Diadem.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => { //* Nekro
 
         // Decrease DEF/MR by 30%; Increase ATK/MD by 20/22.5/25/27.5/30%
@@ -6037,13 +6037,20 @@ export const items = [
     }, (level) => `After not having used ability ✨ for **${[15, 14, 13, 12, 11, 10][level - 1]}** turns straight, the wearer recovers **${[30, 34, 38, 42, 46, 50][level - 1]}**💧 mana and attacks start healing **${[1, 1.1, 1.2, 1.3, 1.4, 1.5][level - 1]}%** of the damage dealt.`, "The Galaxy's Embrace ring is a splendid marvel of arcane craftsmanship, featuring a sleek obsidian band adorned with intricate golden filigree resembling swirling galaxies. Nestled in its heart is a staggering starstone, a luminous gem that radiates an otherworldly glow, shifting colors as if capturing the essence of the cosmos itself. Surrounding the central stone are twinkling smaller jewels that appear like distant stars. Worn by cosmic mages and celestial knights, this ring enhances the wearer's ability to tap into cosmic energy, allowing them to manipulate time and space. Legends tell of those who, while donning this ring, have glimpsed the fabric of reality itself.", "legendary", 757),
     new ringInfo("Radiant Spike", "ring", "ring", ["guild"], "<:radiant_spike:1338627362119487529>", "https://i.ibb.co/8WWHKJq/Radiant-Spike.png", 5, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
-        const buffScale = [2.5, 2.75, 3, 3.25, 3.5][level - 1] / 100;
+        const buffScale = [2.5, 3, 3.5, 4, 4.5][level - 1] / 100;
         myStats.rsBuffs = [];
+        myStats.rsRound = 0;
+        myStats.rsTotalAtk = 0;
+        myStats.rsTotalMd = 0;
 
         // On Crit: raise ATk/MD
         // Else: Deal damage and reset stacks
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats) {
+                // Triggers only once per round
+                if (myStats.rsRound === matchStats.round) return;
+                myStats.rsRound = matchStats.round;
+
                 const stackedBuffs = myStats.rsBuffs.length;
 
                 if (!options.isCrit) {
@@ -6052,6 +6059,11 @@ export const items = [
                         mybuff.atk = mybuff.atk.filter((buff) => !myStats.rsBuffs.includes(buff.id));
                         mybuff.md = mybuff.md.filter((buff) => !myStats.rsBuffs.includes(buff.id));
                         myStats.rsBuffs = [];
+
+                        myStats.atk -= myStats.rsTotalAtk;
+                        myStats.md -= myStats.rsTotalMd;
+                        myStats.rsTotalAtk = 0;
+                        myStats.rsTotalMd = 0;
 
                         dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:radiant_spike:1338627362119487529> **${char.name}**`, { atkMultiplier: stackedBuffs * buffScale, magicDamage: true });
                     };
@@ -6065,14 +6077,18 @@ export const items = [
                     mybuff.atk.push(atkBuff);
                     mybuff.md.push(mdBuff);
 
-                    myStats.atk += Math.floor(myStats.atk * buffScale);
-                    myStats.md += Math.floor(myStats.md * buffScale);
+                    const atkAmount = Math.floor(myStats.atk * buffScale);
+                    myStats.atk += atkAmount;
+                    myStats.rsTotalAtk += atkAmount;
+                    const mdAmount = Math.floor(myStats.md * buffScale);
+                    myStats.md += mdAmount;
+                    myStats.rsTotalMd += mdAmount;
                 };
             };
         });
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `After a critical hit, the wearer raises their attack and magic damage by **${[2.5, 2.75, 3, 3.25, 3.5][level - 1]}%** (up to **8** times). If a non-critical strike is dealt, or when the wearer misses, fires an attack at the enemy dealing damage worth twice the amount of previously stacked buffs, before resetting them.`, "The Radiant Spike is a striking ring crafted from darkened metal, its surface sharply contoured with protruding spikes that evoke a sense of fierceness. At its center sits a vibrant, multifaceted gemstone radiating brilliant hues of blue and purple, glimmering like the evening sky. This ring is imbued with powers of protection; it boosts the wearer's defenses against magical attacks. Legends say that those who wear the Radiant Spike are shielded from harm, as its sharp edges deter malevolent forces. Adorning it grants the user a commanding presence, making them the center of attention in any realm.", "genesis", 758),
+    }, (level) => `After a critical hit, the wearer raises their attack and magic damage by **${[2.5, 3, 3.5, 4, 4.5][level - 1]}%** (up to **4** times). If a non-critical strike is dealt, or when the wearer misses, fires an attack at the enemy dealing damage worth twice the amount of previously stacked buffs, before resetting them. Triggers only once per round.`, "The Radiant Spike is a striking ring crafted from darkened metal, its surface sharply contoured with protruding spikes that evoke a sense of fierceness. At its center sits a vibrant, multifaceted gemstone radiating brilliant hues of blue and purple, glimmering like the evening sky. This ring is imbued with powers of protection; it boosts the wearer's defenses against magical attacks. Legends say that those who wear the Radiant Spike are shielded from harm, as its sharp edges deter malevolent forces. Adorning it grants the user a commanding presence, making them the center of attention in any realm.", "genesis", 758),
     new ringInfo("Punishing Grace's Grasp", "ring", "ring", ["chest"], "<:punishing_graces_grasp:1338637021031436338>", "https://i.ibb.co/GvBnXXrh/Punishing-Grace-s-Grasp.png", 6, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         // Debuff on miss
@@ -6384,7 +6400,7 @@ export const items = [
         }, 9999, 1));
 
         return AbilityResponse.SUCCESS;
-    }, (level) => `Once under **30%** HP, the wearer consumes **${[30, 25, 20, 15, 10][level - 1]}** mana to generate a shield equal to **${[5, 10, 15, 20, 25][level - 1]}%** of their max HP.`, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer’s physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
+    }, (level) => `Once under **30%** HP, the wearer consumes **${[30, 25, 20, 15, 10][level - 1]}** mana to generate a shield equal to **${[5, 10, 15, 20, 25][level - 1]}%** of their max HP.`, "The Ferocious Overflow is a masterwork of muted olive and collards, embodying the essence of the ocean. Its smooth band twists and curls like crashing waves, shimmering under light. A rigorous outburst of elixir occurs at its zenith, akin to a seismic wave, yet glistening with the fluidity of water. The design evokes the tranquility of the sea, while also hinting at its enigmatic depths. This ring grants the ability to control and manipulate all types of emergencies, providing protection against fiery adversaries. Amidst the bearer's physical and mental overloads, the sapphire glows brightly, summoning a protective wave that can shield the wearer from stress and harm momentarily. It is a favored ring among ocean mages and water elementals.", "legendary", 773),
     new ringInfo("Vermillion Vow", "ring", "ring", ["raid"], "<:vermillion_vow:1371784821281652736>", "https://i.ibb.co/Swgkb8KT/c.png", 4, (level) => async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
 
         myStats.vermillionVowStacks = 0;
@@ -6522,7 +6538,7 @@ export const items = [
     }, (level) => `Normal attacks hit once, dealing **100%** damage. After every counter, reflects damage back to the attacker. On death, revives when possible.`, "A ring said to be once worn by Phoebus until its novelty wore off. Having no further use for it, the Weaver corrupted its image before tossing it out of the Afterthought. Ever since, scholars have vigorously debated the utility of this oddity, unaware that its state of perpetual potential, forever on the cusp of revealing something amazing but never actually doing it, might be precisely what Phoebus intended.", "genesis", 777),
 
     // New loot - Liminal Descent (Summer 2025)
-    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "As Juliette's strength begins to fade, the pendant at her chest glows — not with power, but with longing.\n\nUrashima’s presence stirs within, answering the silent call of the one he once cherished. The pendant cracks, and stardust flows into her — a quiet promise, a final embrace.\n\nThe sea accepts the stars.\nShe rises again, reborn as Twilight Juliette —\nnot alone, but fused with the will of Urashima, her guardian and guide.\n\nOcean and cosmos move as one.\nAnd together, they will not fall.\n\n~ Liminal Descent | Summer 2025"),
+    new lootInfo("Finality", "loot", "event exclusive item", ["Liminal Descent - Summer 2025"], "<:finality:1405573239018881107>", "https://i.ibb.co/spDSxHMB/finality.png", "mythical", 778, false, false, false, "As Juliette's strength begins to fade, the pendant at her chest glows — not with power, but with longing.\n\nUrashima's presence stirs within, answering the silent call of the one he once cherished. The pendant cracks, and stardust flows into her — a quiet promise, a final embrace.\n\nThe sea accepts the stars.\nShe rises again, reborn as Twilight Juliette —\nnot alone, but fused with the will of Urashima, her guardian and guide.\n\nOcean and cosmos move as one.\nAnd together, they will not fall.\n\n~ Liminal Descent | Summer 2025"),
 
     // Potions
     new potionInfo("Small XP Potion", "xp", [], "<:small_xp_potion:1411700662898528396>", "https://i.ibb.co/dsdw6jqC/c.png", "flair text", "rare", 779),
@@ -6827,7 +6843,7 @@ export const items = [
     //         return AbilityResponse.SUCCESS;
     //     }, 9999));
     //     return AbilityResponse.SUCCESS;
-    // }, "Reduces the wielders **DEF|MR by 50%**, but increases the wielders attack and magic damage by **40%**.", "*\"To wield it is to bleed for strength.\"* Forged from the remains of a shattered mirror said to reflect the soul’s hunger, Glassteeth was never meant to protect. Its jagged surface bites into the bearer’s aura, splintering their defenses in exchange for raw, unbridled aggression. It does not guard. It goads.", "genesis", 780),    
+    // }, "Reduces the wielders **DEF|MR by 50%**, but increases the wielders attack and magic damage by **40%**.", "*\"To wield it is to bleed for strength.\"* Forged from the remains of a shattered mirror said to reflect the soul's hunger, Glassteeth was never meant to protect. Its jagged surface bites into the bearer's aura, splintering their defenses in exchange for raw, unbridled aggression. It does not guard. It goads.", "genesis", 780),    
 ];
 
 export const fishing = items.filter((e) => e.obtain.includes("fishing"));

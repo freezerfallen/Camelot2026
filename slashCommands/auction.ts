@@ -58,7 +58,7 @@ const exportCommand: SlashCommand = {
         if (bidAmount < 100) return interaction.reply({ ephemeral: true, content: `You can't bid less than ${formatNumberWithQuotes(100)} coins` });
         const feeAmount = Math.ceil(bidAmount * 0.03);
 
-        return interaction.reply({ ephemeral: true, content: `Are you sure you want to bid **${formatNumberWithQuotes(bidAmount)}**<:coins:872926669055356939> on **${auctionedChar.name}**${auction.print ? `#${auction.print}` : ""}?\n-# Fee: **${formatNumberWithQuotes(feeAmount)}**<:coins:872926669055356939> (**8%** of your bid)`, components: [OfferRow] }).then((msg) => {
+        return interaction.reply({ ephemeral: true, content: `Are you sure you want to bid **${formatNumberWithQuotes(bidAmount)}**<:coins:872926669055356939> on **${auctionedChar.name}**${auction.print ? `#${auction.print}` : ""}?\n-# Fee: **${formatNumberWithQuotes(feeAmount)}**<:coins:872926669055356939> (**3%** of your bid)`, components: [OfferRow] }).then((msg) => {
             const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 60_000 });
 
             collector.on('collect', async (r) => {
@@ -67,7 +67,7 @@ const exportCommand: SlashCommand = {
 
                 // Check user balance again
                 const stats = await getUserSchema(interaction.user.id);
-                if (!stats || stats.coins < feeAmount) return interaction.followUp({ ephemeral: true, content: `You don't have enough coins to bid\n-# Fee: **${formatNumberWithQuotes(feeAmount)}**<:coins:872926669055356939> (**8%** of your bid)` });
+                if (!stats || stats.coins < feeAmount) return interaction.followUp({ ephemeral: true, content: `You don't have enough coins to bid\n-# Fee: **${formatNumberWithQuotes(feeAmount)}**<:coins:872926669055356939> (**3%** of your bid)` });
 
                 // Place the bid
                 try {
