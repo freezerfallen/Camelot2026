@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { EmbedBuilder, ComponentType, AttachmentBuilder, User, ContainerBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { EmbedBuilder, ComponentType, AttachmentBuilder, User, ContainerBuilder, MessageFlags, ButtonStyle } from "discord.js";
 import { characters } from "../Modules/chars";
 import { classLevelToXP, rarityColor, search, searchItem, showPage } from "../Modules/functions";
 import { OfferRow, PageRow, activeAuctions, auctionChannelId, cowSettings } from "../Modules/components";
@@ -636,7 +636,7 @@ const exportCommand: SlashCommand = {
 
         // Ban Players
         if (cmd === "ban" || cmd === "blacklist" || cmd === "suspend") {
-            if (!user || user.bot || user.id === "489490486734880774") return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
 
             const reason = args.length ? ` ${args.join(" ")}` : "";
 
@@ -651,7 +651,7 @@ const exportCommand: SlashCommand = {
 
         // Unban Players
         if (cmd === "unban") {
-            if (!user || user.bot || user.id === "489490486734880774") return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
 
             interaction.client.blacklist.delete(user.id);
 

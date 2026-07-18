@@ -223,8 +223,8 @@ const exportCommand: SlashCommand = {
 
             const stats = [author.schema, stats2];
 
-            // If the gifter has no T3+ and isn't Apollo return
-            if (stats[0].premium < 3 && interaction.user.id !== "489490486734880774") return interaction.reply("You need to have at least T3 Premium to gift others premium. See our `/patreon` for more information.");
+            // If the gifter has no T3+ and isn't an admin return
+            if (stats[0].premium < 3 && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply("You need to have at least T3 Premium to gift others premium. See our `/patreon` for more information.");
             if (!premiumGifted[interaction.user.id]) premiumGifted[interaction.user.id] = 0;
             let giftLimit = 0;
             let giftTier = 1;
@@ -237,8 +237,8 @@ const exportCommand: SlashCommand = {
                 case 7: giftLimit = 2, giftTier = 2; break;
                 default: false; break;
             };
-            if (interaction.user.id === "489490486734880774") giftLimit = 999999;
-            if (tier !== giftTier && interaction.user.id !== "489490486734880774") return interaction.reply(`You can't gift **T${tier}** premium. Try gifting **T${giftTier}**`);
+            if (process.env.ADMINS.split(",").includes(interaction.user.id)) giftLimit = 999999;
+            if (tier !== giftTier && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply(`You can't gift **T${tier}** premium. Try gifting **T${giftTier}**`);
 
             if (premiumGifted[interaction.user.id] >= giftLimit) return interaction.reply(`You can only give ${giftLimit} premium away. Premium gifts are resetted on every 1st of the month.${giftLimit === 5 ? "" : ` You can look up our \`/patreon\` if you need more.`}`);
 
@@ -246,11 +246,11 @@ const exportCommand: SlashCommand = {
             if (tier < 1 || tier > 7) return interaction.reply("Invalid tier");
 
             if (stats[1].premium > tier) return interaction.reply(`**${user.username}** already has premium.`);
-            if (stats[1].premium >= tier && interaction.user.id !== "489490486734880774") return interaction.reply(`**${user.username}** already has premium.`);
+            if (stats[1].premium >= tier && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply(`**${user.username}** already has premium.`);
 
             // Stack if Apollo is gifting
             let isStack = false;
-            if (stats[1].premium === tier && interaction.user.id === "489490486734880774") {
+            if (stats[1].premium === tier && process.env.ADMINS.split(",").includes(interaction.user.id)) {
                 if (premiumGift[user.id]?.date && ((new Date().getTime() - premiumGift[user.id].date) < 1000 * 60 * 60 * 24 * 30)) {
                     premiumGift[user.id] = { "method": "gift", "date": (premiumGift[user.id].date + 1000 * 60 * 60 * 24 * 30) };
                     isStack = true;

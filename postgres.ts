@@ -619,7 +619,7 @@ async function resetDatabase(migrate: boolean = false) {
         await alterTables();
         await createTriggers();
 
-        const [{ size }] = await query(`SELECT pg_size_pretty(pg_database_size('${process.env.PG_DATABASE}')) AS size;`) as [{ size: string; }];
+        const [{ size }] = await query(`SELECT pg_size_pretty(pg_database_size(current_database())) AS size;`) as [{ size: string; }];
 
         console.log(`Database initialization complete (db size: ${size})`);
     } catch (error) {

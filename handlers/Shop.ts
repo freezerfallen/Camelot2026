@@ -18,6 +18,12 @@ const handler: BotHandler = {
     name: "Shop",
     execute: (client: Client) => {
 
+        const rankAuth = process.env.RANK_AUTH?.trim();
+        if (!rankAuth) {
+            console.warn('[Rank.top] Shop webhook disabled: RANK_AUTH is not configured.');
+            return;
+        };
+
         const app = express();
         app.use(express.json());
         app.listen(3010);
@@ -26,7 +32,7 @@ const handler: BotHandler = {
             const donation = req.body as RankShopTransaction;
 
             // Check if authorization is valid
-            if (req.headers.authorization !== process.env.RANK_AUTH && donation.authorization !== process.env.RANK_AUTH) {
+            if (req.headers.authorization !== rankAuth && donation.authorization !== rankAuth) {
                 return res.status(401).send('Unauthorized');
             };
 

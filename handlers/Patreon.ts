@@ -8,6 +8,11 @@ const handler: BotHandler = {
     name: "Autoposter",
     execute: async (client: Client) => {
 
+        if (!process.env.PATREON_TOKEN?.trim() || !process.env.PATREON_CAMPAIGN_ID?.trim()) {
+            console.warn('[Patreon] Sync disabled: PATREON_TOKEN and PATREON_CAMPAIGN_ID are not configured.');
+            return;
+        };
+
         const myCampaign = new Campaign({
             patreonToken: process.env.PATREON_TOKEN,
             campaignId: process.env.PATREON_CAMPAIGN_ID,

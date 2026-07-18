@@ -10,10 +10,6 @@ const event: BotEvent = {
     name: "interactionCreate",
     execute: async (interaction: Interaction) => {
 
-        // if (interaction.user.id === "489490486734880774") {
-        //     interaction.user.id = "447160532286570509";
-        // };
-
         // Defer Buttons
         if (interaction.isButton()) {
             if (interaction.customId?.startsWith("auction_help")) {
@@ -50,15 +46,6 @@ const event: BotEvent = {
             };
             return;
         };
-
-        // return setTimeout(async () => {
-        //     try {
-        //         await interaction.reply({content:"test failed messages", ephemeral:true});
-        //     } catch (err) {
-        //         console.log("err");
-        //         interaction.channel.send("There has been an error sending the response")
-        //     };
-        // }, 5000);
 
         if (interaction.isChatInputCommand()) {
             // Exit and stop if it's not there

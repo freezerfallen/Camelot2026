@@ -108,29 +108,3 @@ const exportCommand: SlashCommand = {
 };
 
 export default exportCommand;
-
-
-
-// import { characters } from "../Modules/chars.js";
-// (async () => {
-//     const ids = ["489490486734880774", "386942536314519552", "557223261209886730"];
-
-//     for (const id of ids) {
-//         const inv = await getUserSchema(id);
-//         if (inv) {
-//             console.log(inv.name);
-//             // console.log("Total Refinements:", Object.values(inv.char_ref).reduce((a, b) => a + b, 0));
-//             // console.log("Reduced Refinements:", Object.values(inv.char_ref).filter(x => x > 1).reduce((a, b) => a + b, 0));
-//             // console.log("Reduced Refinements:", Object.values(inv.char_ref).filter(x => x > 2).map(x => x > 4 ? 5 : (x < 4 ? 1 : x)).reduce((a, b) => a + b, 0));
-
-//             const chars = Object.entries(inv.char_ref)
-//                 .filter(([key,]) => characters[key as any].rarity === "SS" || characters[key as any].rarity === "EX")
-//                 .filter(([, value]) => value > 2)
-//                 .reduce((a, [, b]) => a + (b > 3 ? 4 : 1), 0);
-
-//             console.log(`${chars} (${chars / 21})`);
-//         };
-//     };
-// })();
-
-

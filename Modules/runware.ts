@@ -1,6 +1,6 @@
 import { IOutputFormat, Runware, TPromptWeighting } from "@runware/sdk-js";
 
-const runware = new Runware({ apiKey: process.env.RUNWARE_API_KEY });
+const runware = new Runware({ apiKey: process.env.RUNWARE_API_KEY ?? '' });
 
 type RunwareModel = "FLUX.1 (Schnell)" | "FLUX.1 (Dev)" | "Anything V3" | "PrimeMix";
 
