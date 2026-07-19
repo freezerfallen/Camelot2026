@@ -10,7 +10,7 @@ import { items } from "../Modules/items";
 import { Asset } from "../Modules/assets";
 import { CompactUserSchema, ProfileImageArguments, SlashCommand } from '../types';
 import { getGuildSchema, getPartySchema, getUserSchema, insertNewWeapon, updateUsers } from '../Modules/queries';
-import { botPfp, profileColors } from '../Modules/components';
+import { ExternalLinks, profileColors } from '../Modules/components';
 import path from 'path';
 
 const workerPath = path.join(__dirname, '../Modules/profileWorker.js');
@@ -526,7 +526,7 @@ const exportCommand: SlashCommand = {
             let padded = padCollected(chars);
             Embed = new EmbedBuilder()
                 .setColor(0xbbffff)
-                .setThumbnail(profileArguments.thumbnail ?? botPfp)
+                .setThumbnail(profileArguments.thumbnail ?? ExternalLinks.BotPfp)
                 .setAuthor({ name: `${user.username}'s profile${stats.premium ? " 💎" : ""}`, iconURL: user.displayAvatarURL({ size: 512 }) })
                 .setDescription(
                     `**Level**: \`${userLevel(stats.xp)}\`ㅤ**Coins**: \`${stats.coins}\`<:coins:872926669055356939>ㅤ**Gems**: \`${stats.gems}\`<:genesis_gems:1034179687720681492>\n` +

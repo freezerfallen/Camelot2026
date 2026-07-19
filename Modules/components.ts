@@ -68,7 +68,11 @@ export const dungeonTempBan = new Map();
 export const auctionChannelId = "1516111752528396448";
 export const activeAuctions = new Map<number, Date>(); // auctionid -> ends_at
 
-export const botPfp = "https://i.ibb.co/mDX54t4/Ta2YDBN.png";
+export enum ExternalLinks {
+    BotPfp = "https://i.ibb.co/mDX54t4/Ta2YDBN.png",
+    GitHub = "https://github.com/Apollo24K/Camelot",
+}
+
 export const embedColor = 0xbbffff;
 
 export const donationWeekStart = new Date('2024-02-12T00:00:00');
@@ -124,23 +128,6 @@ export enum AbilityResponse {
     SUCCESS = 1,
     FAILURE = 0,
 };
-
-// export const newProfileColors = {
-//     creme: { text: '#FDE8FF', floor: '#a89aa8', gradStart: '#FDE8FF', gradEnd: '#000000' },
-//     red: { text: '#FF2626', floor: '#761113', gradStart: '#FF2626', gradEnd: '#000000' },
-//     orange: { text: '#FF7C26', floor: '#a24f19', gradStart: '#FF7C26', gradEnd: '#000000' },
-//     gold: { text: '#FFE103', floor: '#a89500', gradStart: '#FFE103', gradEnd: '#000000' },
-//     mint: { text: '#C4FF03', floor: '#729201', gradStart: '#C4FF03', gradEnd: '#000000' },
-//     green: { text: '#82FF03', floor: '#509e00', gradStart: '#82FF03', gradEnd: '#000000' },
-//     emerald: { text: '#0DDF09', floor: '#068103', gradStart: '#0DDF09', gradEnd: '#000000' },
-//     turquoise: { text: '#49DAE6', floor: '#006e6d', gradStart: '#3CCEDA', gradEnd: '#000000' }, // '#1CB1BE' },
-//     blue: { text: '#09B8DF', floor: '#066e86', gradStart: '#09B8DF', gradEnd: '#000000' },
-//     sky_blue: { text: '#17E6FB', floor: '#0e8c98', gradStart: '#17E6FB', gradEnd: '#000000' },
-//     indigo: { text: '#1A70FF', floor: '#10469f', gradStart: '#1A70FF', gradEnd: '#000000' },
-//     violet: { text: '#AE57FF', floor: '#69369b', gradStart: '#AE57FF', gradEnd: '#000000' },
-//     purple: { text: '#C957FF', floor: '#773599', gradStart: '#C957FF', gradEnd: '#000000' },
-//     pink: { text: '#FF46BB', floor: '#9f2b74', gradStart: '#FF46BB', gradEnd: '#000000' },
-// };
 
 export const rankProgression: RaidRank[] = ["F-", "F", "F+", "E-", "E", "E+", "D-", "D", "D+", "C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S-", "S", "S+", "SS-", "SS", "SS+", "SSS-", "SSS", "SSS+", "EX-", "EX", "EX+"];
 

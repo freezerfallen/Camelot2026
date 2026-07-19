@@ -43,7 +43,7 @@ const handler: BotHandler = {
             if (user.lastpull) {
                 let pullTimer = 45 * 60 * 1000;
                 switch (user.premium) {
-                    case 0: false; break;
+                    case 0: break;
                     case 1: pullTimer = 40 * 60 * 1000; break;
                     case 2: pullTimer = 40 * 60 * 1000; break;
                     case 3: pullTimer = 40 * 60 * 1000; break;
@@ -51,7 +51,7 @@ const handler: BotHandler = {
                     case 5: pullTimer = 30 * 60 * 1000; break;
                     case 6: pullTimer = 30 * 60 * 1000; break;
                     case 7: pullTimer = 30 * 60 * 1000; break;
-                    default: false; break;
+                    default: break;
                 };
 
                 pullsToResetList.add(user.id);
@@ -63,7 +63,7 @@ const handler: BotHandler = {
                     });
 
                     pullsToResetList.delete(user.id);
-                }, Math.abs(pullTimer + user.lastpull.getTime() - new Date().getTime()));
+                }, Math.max(0, pullTimer + user.lastpull.getTime() - Date.now()));
             };
         };
 

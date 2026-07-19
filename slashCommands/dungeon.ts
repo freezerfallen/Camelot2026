@@ -532,6 +532,9 @@ const exportCommand: SlashCommand = {
             // David versus Goliath
             achievements[88].check(interaction, interaction.user, eStats.ep >= myStats.ep * 5);
 
+            // No Rest for the Strong
+            for (const id of [104, 105, 106, 107, 108]) await achievements[id].check(interaction, interaction.user, stats.dungeon_limit);
+
             //* Daily Quests
             // Increasing Danger
             dailies[2].update(interaction, interaction.client, skipRounds);

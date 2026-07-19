@@ -636,7 +636,7 @@ const exportCommand: SlashCommand = {
 
         // Ban Players
         if (cmd === "ban" || cmd === "blacklist" || cmd === "suspend") {
-            if (!user || user.bot || process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(user.id)) return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
 
             const reason = args.length ? ` ${args.join(" ")}` : "";
 
@@ -651,7 +651,7 @@ const exportCommand: SlashCommand = {
 
         // Unban Players
         if (cmd === "unban") {
-            if (!user || user.bot || process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(user.id)) return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
 
             interaction.client.blacklist.delete(user.id);
 

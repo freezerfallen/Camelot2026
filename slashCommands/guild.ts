@@ -1,7 +1,7 @@
 import { EmbedBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, ContainerBuilder, AttachmentBuilder, MessageFlags } from "discord.js";
 import { dailies } from "../Modules/dailyQuests";
 import { showPage, searchGuild, getDonationsPageWeek, lastActive, formatNumberWithQuotes, customEmojis, getLetterRank } from "../Modules/functions";
-import { PageRow, OfferRow, donationWeekStart, embedColor, botPfp, currencyEmojis } from "../Modules/components";
+import { PageRow, OfferRow, donationWeekStart, embedColor, ExternalLinks, currencyEmojis } from "../Modules/components";
 import { CompactUserSchema, GuildSchema, SlashCommand } from "../types";
 import { addGuildDonation, deleteGuild, getGuildDonationSchemas, getGuildSchema, getGuildSchemas, getUserSchema, getUserSchemas, insertNewGuild, insertNewWeapon, updateGuildDonationsGuildId, updateGuilds, updateRaidsGuildId, updateUsersAndCache } from "../Modules/queries";
 import { achievements } from "../Modules/achievements";
@@ -94,7 +94,7 @@ const getShopPage = (currentTab: GuildShopTab, stats: CompactUserSchema): Contai
                     `Welcome to the guild shop! You can earn guild marks by regularly participating in a guild </raid:1385675097678942314>, then use them here to purchase exclusive items`
                 ),
             )
-            .setThumbnailAccessory(thumbnail => thumbnail.setURL(botPfp))
+            .setThumbnailAccessory(thumbnail => thumbnail.setURL(ExternalLinks.BotPfp))
         )
         .addSeparatorComponents(separator => separator);
 

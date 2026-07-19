@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ContainerBuilder, MessageFlags, AttachmentBuilder } from "discord.js";
 import { CompactUserSchema, SlashCommand } from "../types";
-import { botPfp, currencyEmojis, OfferRow } from "../Modules/components";
+import { ExternalLinks, currencyEmojis, OfferRow } from "../Modules/components";
 import { customHpBars } from "../Modules/customHpBars";
 import { profileSets } from "../Modules/profileDecorations";
 import { skins } from "../Modules/skins";
@@ -194,7 +194,7 @@ const getShopPage = (currentTab: SeasonalShopTab, stats: CompactUserSchema): Con
                     `Welcome to the seasonal shop, available for a limited time! You can earn seasonal keys by: </quests:1087099255652622433> (5x ${currencyEmojis.season_keys}), [vote for Camelot](<https://rank.top/bot/camelot/vote>) (5x ${currencyEmojis.season_keys}, once per day), [vote for Camelot OS](<https://rank.top/server/camelot/vote>) (5x ${currencyEmojis.season_keys}, once per day)`
                 ),
             )
-            .setThumbnailAccessory(thumbnail => thumbnail.setURL(botPfp))
+            .setThumbnailAccessory(thumbnail => thumbnail.setURL(ExternalLinks.BotPfp))
         )
         .addSeparatorComponents(separator => separator);
 

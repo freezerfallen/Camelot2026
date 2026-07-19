@@ -3,10 +3,14 @@ import { search, getDetailedStats, rarityColor } from "../Modules/functions";
 import { OfferRow } from "../Modules/components";
 import { SlashCommand } from "../types";
 import { getUserSchema, updateUsers } from '../Modules/queries';
+import { achievements } from '../Modules/achievements';
 
 const exportCommand: SlashCommand = {
     name: 'refine',
     async execute({ interaction, author }) {
+
+        const maxRefinedCount = Object.values(author.schema.char_ref).filter(refinement => refinement >= 6).length;
+        for (const id of [109, 110, 111, 112]) await achievements[id].check(interaction, interaction.user, maxRefinedCount);
 
         const choice = interaction.options.getString('character') ?? "";
 
@@ -90,6 +94,9 @@ const exportCommand: SlashCommand = {
                     [shardType]: { type: 'increment', value: -shardAmount },
                     char_ref: { type: 'merge_json', value: { [char.id]: 1 } },
                 });
+
+                const updatedMaxRefinedCount = Object.values(invCheck.char_ref).filter(refinement => refinement >= 6).length;
+                for (const id of [109, 110, 111, 112]) await achievements[id].check(interaction, interaction.user, updatedMaxRefinedCount);
 
                 if (interaction.channel?.isSendable()) interaction.channel.send(`Raised **${char.name}**'s refinement level successfully!`);
             });

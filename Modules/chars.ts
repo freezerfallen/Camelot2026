@@ -24103,7 +24103,7 @@ export const characters: charInfo[] = [
     new charInfo("Megumi Ooumi", [], anime[631], "F", "https://i.ibb.co/7xnLhh5K/c.png", 23984, "S"),
     new charInfo("Umamon", [], anime[631], "M", "https://i.ibb.co/Ng0Nq26H/c.png", 23985, "S"),
     new charInfo("Brago", [], anime[631], "M", "https://i.ibb.co/v467DFmq/c.png", 23986, "S"),
-    new charInfo("KanchomÃ©", [], anime[631], "M", "https://i.ibb.co/JjqsQBbR/c.png", 23987, "A"),
+    new charInfo("Kanchomé", ["Kanchome"], anime[631], "M", "https://i.ibb.co/JjqsQBbR/c.png", 23987, "A"),
     new charInfo("Sherry Bellmont", [], anime[631], "F", "https://i.ibb.co/Jj017kbN/c.png", 23988, "A"),
     new charInfo("Riya", [], anime[631], "M", "https://i.ibb.co/QvcdKzFv/c.png", 23989, "A"),
     new charInfo("Momon", [], anime[631], "M", "https://i.ibb.co/Rkkjr963/c.png", 23990, "A"),
