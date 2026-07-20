@@ -708,7 +708,7 @@ export const abilities: Record<number, Ability> = {
     //                 } else {
     //                     myStats.sm += manaGain;
     //                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-    //                     if (typeof myStats.manaGained !== undefined) myStats.manaGained += manaGain;
+    //                     if (typeof myStats.manaGained !== "undefined") myStats.manaGained += manaGain;
     //                     notice.push(`\n<:akameDEF:1459446152469418004> **${char.name}** gained **${manaGain}** 💧.`);
     //                 };
 
@@ -1159,7 +1159,7 @@ export const abilities: Record<number, Ability> = {
                 if (matchStats.round < 6) {
                     myStats.sm += 25;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 25;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 25;
                 } else if (matchStats.round === 6) {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}** used Gungnir! He`, { atkMultiplier: 2, shieldBreak: true, magicDamage: false, dodge: false, block: false });
                     ebuff.atk.push(new buffInfo("+", -Math.floor(eStats.atk * 0.2), 9999));
@@ -1599,8 +1599,8 @@ export const abilities: Record<number, Ability> = {
         usage: 4,
         used: 0,
         cost: 100,
-        desc: "**Total Uses:** `4 (CD: 10 rounds)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n> Frost hit inflict **1x** `Frost`\n\nAt the start of her turn, when the enemy has **8** or more `Frost`, consumes **8x** to freeze the enemy for **1** round. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** rounds, lowers body temperature to absolute zero, inflicting **4x** `Frost` every round, in return losing **10%** current HP every round, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** rounds, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing absolute DMG (Ignores DEF/MR) equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`.\n\nWhen in a party, she intervenes every **5** rounds, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** round, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
-        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 rounds`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\nATTACK is altered:\n- Deal **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n- Frost hit inflicts **1x** `Frost`\n\nAt the start of the turn:\n- When the enemy has **8x** `Frost` or more: Consumes **8x** and freezes the enemy for **1** round\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** rounds:\n- Loses **10%** current HP every round\n- Inflicts **4x** `Frost` every round\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** rounds:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as fixed DMG to the enemy\n- Frozen Wounds will not crit, but ignores DEF/MR, and cannot be dodged/blocked/countered\n\n__**Party**__ (👥)\n- Intervenes every **5** rounds and freezes the enemy for **1** round\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
+        desc: "**Total Uses:** `4 (CD: 10 rounds)`\n**Mana Cost:** `100 💧` \n**Timeout:** `No`\n**Tags:** `DPS/Support`\n\nGoing through the cycles of loneliness and regret, Rukia finds a sense of belonging and comfort by gaining unwavering resolve through new encounters and allies.\n\nHer normal attack is altered to __Sode No Shirayuki__ :\n> Deals **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n> Frost hit inflict **1x** `Frost`\n\nAt the start of her turn, when the enemy has **8** or more `Frost`, consumes **8x** to freeze the enemy for **1** round. When the enemy is frozen, they take **+20%** DMG.\n\nUsing her active, she consumes **100** 💧 to utilize __Hakka no Togame__, her bankai, overcoming her fear to gain the purity of ice and uncover the true form of her Sode No Shirayuki.\n\nFor **4** rounds, lowers body temperature to absolute zero, inflicting **4x** `Frost` every round, in return losing **10%** current HP every round, and halting mana regeneration. Moreover, non-DoT DMG dealt from her is stored up as `Frozen Wounds`.\n\nAfter **4** rounds, she unleashes a massive wave of freezing cold, dealing **200%** DMG. Then, cracks open `Frozen Wounds`, dealing undodgeable and uncounterable absolute true DMG (Ignores DEF/MR) equivalent to **1.5x** the DMG stored before resetting `Frozen Wounds`.\n\nWhen in a party, she intervenes every **5** rounds, releasing her Hakka no Togame in a wide range, freezing the enemy for **1** round, causing them to take **+20%** DMG.\n\nMoreover, if her party contains Ichigo Kurosaki / Byakuya Kuchiki, she evades the first **3** lethal hits (stackable), and helps them evade the first **3** lethal hits as well (stackable).",
+        shortdesc: "**Uses**: `4`\n**Cooldown:** `10 rounds`\n**Cost**: `100 💧`\n**Timeout**: `No`\n**Role**: `DPS (Frost, Freeze, DMG-delay)`\n\n__**Passive**__\nATTACK is altered:\n- Deal **90%** <a:frost1:1504497507185725473><a:frost2:1504497408233705512> DMG with **+25%** critical rate\n- Frost hit inflicts **1x** `Frost`\n\nAt the start of the turn:\n- When the enemy has **8x** `Frost` or more: Consumes **8x** and freezes the enemy for **1** round\n- Frozen enemies take **+20%** DMG\n\n__**Active**__ (✨)\nFor **4** rounds:\n- Loses **10%** current HP every round\n- Inflicts **4x** `Frost` every round\n- Non-DoT DMG dealt by her is not dealt but stored as `Frozen Wounds`\n\nAfter **4** rounds:\n- Deals **200%** DMG\n- Deals **1.5x** `Frozen Wounds` as undodgeable uncounterable absolute true DMG to the enemy\n-# Absolute dmg: Ignores DEF/MR\n\n__**Party**__ (👥)\n- Intervenes every **5** rounds and freezes the enemy for **1** round\n- Frozen enemies this way receive **+20%** DMG\n\nIf party contains Ichigo Kurosaki/Byakuya Kuchiki:\n- She evades first **3** lethal hits\n- They evade first **3** lethal hits",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Rukia Kuchiki
             noTimeout(matchStats, myStats);
@@ -1643,9 +1643,10 @@ export const abilities: Record<number, Ability> = {
                 dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Hakka no Togame! **${char.name}**`, { atkMultiplier: 2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
                 const shatterdmg = Math.floor(eStats.frozenwounds * 1.5);
-                eStats.hp -= shatterdmg;
-                notice.push(`\n❄️ Frozen wounds shattered and dealt **${shatterdmg}** damage!`);
-                if (eStats.hp < 0) eStats.hp = 0;
+                // eStats.hp -= shatterdmg;
+                // notice.push(`\n❄️ Frozen wounds shattered and dealt **${shatterdmg}** damage!`);
+                // if (eStats.hp < 0) eStats.hp = 0;
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `❄️ **Frozen wounds** shattered and`, { overwriteDamage: shatterdmg, magicDamage: true, dodge: false, ignoreShield: true, canCounter: false });
                 eStats.frozenwounds = 0;
 
                 imageChange(embed, matchStats, myStats, myStatsFixed.thumbnail);
@@ -2197,7 +2198,7 @@ export const abilities: Record<number, Ability> = {
                     eStats.sm -= 3;
                     myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 3;
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -2210,7 +2211,7 @@ export const abilities: Record<number, Ability> = {
                 eStats.sm -= 3;
                 myStats.sm += 3;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
+                if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 3;
             };
 
             return AbilityResponse.SUCCESS;
@@ -2531,7 +2532,7 @@ export const abilities: Record<number, Ability> = {
                                     if (eStats.sm < 0) eStats.sm = 0;
                                     myStats.sm += 10;
                                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
+                                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10;
                                     break;
                                 case 4:
                                     const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
@@ -2579,7 +2580,7 @@ export const abilities: Record<number, Ability> = {
                         if (eStats.sm < 0) eStats.sm = 0;
                         myStats.sm += 10;
                         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
+                        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10;
                         break;
                     case 5:
                         const heal = Math.floor((myStats.maxhp - myStats.hp) * 0.06);
@@ -3037,7 +3038,7 @@ export const abilities: Record<number, Ability> = {
             myStats.counter = 2;
 
             // Tomori Kick
-            dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `✨ Tomori Kick! She`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ Tomori Kick! She`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
 
             return AbilityResponse.SUCCESS;
         },
@@ -3557,8 +3558,8 @@ export const abilities: Record<number, Ability> = {
         cost: 80,
         pause: 0,
         bladeUsedActive: false,
-        desc: "**Total Usage**: `10 (CD: 4)`\n**Cost**: `80`\\💧\n**Timeout**: `Yes`\n**Role**: `DPS`\n\nCursed with self-healing immortality, Blade works with Kafka and Silverwolf as a stellaron hunter, while seeking to end his own suffering by eternal death. When he is below **50%** HP in battle, he takes **28%** less DMG from damage instances. This is unstackable with other damage mitigation effects, where only the strongest one takes effect.\n\nUpon taking damage from damage instances or countering a hit, gains **1x** `Charge`. Upon having **6x** or more `Charge`, consumes **6x** to unleash Shuhu's Gift. This increases his ATK by **15%** of recorded DMG taken (Up to 40%) for that turn, and recovers his HP by **15%** of recorded DMG taken (Up to 40%), before dealing **80%** undodgeable DMG. (Up to once every round)\n\nUsing his active deals **30%** missing HP to the enemy, before lowering max HP by **50%** for **4** turns. Moreover, he will also self-inflict **5%** DMG to himself for the next **4** rounds.\n\nIn a party, he intervenes every **4** rounds, dealing **60%** DMG to the enemy before lowering their DEF & MR by **20%** for that round (Max 2x damage). However, if the ally is Dan Heng, or the fight reaches round **40**, he becomes marastruck, additionally dealing **15%** DMG to the ally every **4th** turn. This marastruck effect however can be completely nullified if Kafka is in the team.",
-        shortdesc: "**Uses**: `10`\n**Cooldown**: `4 rounds`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Charge, Burst survival)`\n\n__**Passive**__\nWhen below **50%** HP:\n- **+28%** DMG mitigation (Unstackable : Only the strongest one takes effect) \n- Upon receiving a damage instance or countering a hit, gains **1x** `Charge`\n\nUpon reaching **6x** or more `Charge`, consumes **6x** to activate Shuhu's Gift (Up to once every round):\n- Increases ATK by **15%** of recorded DMG taken for that turn (Up to **40%**)\n- Recovers HP by **15%** of recorded DMG taken (Up to **40%** max HP)\n- Deals **80%** undodgeable DMG\n\n__**Active**__ (✨)\n- Deals **30%** missing HP\nFor **4** turns:\n- Decreases max HP by **50%**\n- Self-inflicts **5%** undodgeable DMG (counts as a damage instance)\n\n__**Party**__ (👥)\nIntervenes every **4** rounds\n- Deals **60%** DMG to the enemy\n- Decreases their DEF & MR by **20%** for that round (Max 2x damage)\n\nIf ally is Dan Heng, or the fight reaches round **40**:\n- Becomes Mara struck: additionally deals **15%** DMG to the ally every **4th** round\n- This marastruck effect can be nullified when Kafka is in the team",
+        desc: "**Total Usage**: `10 (CD: 4)`\n**Cost**: `80`\\💧\n**Timeout**: `Yes`\n**Role**: `DPS`\n\nCursed with self-healing immortality, Blade works with Kafka and Silverwolf as a stellaron hunter, while seeking to end his own suffering by eternal death. When he is below **50%** HP in battle, he takes **28%** less DMG from damage instances. This is unstackable with other damage mitigation effects, where only the strongest one takes effect.\n\nUpon taking damage from damage instances or countering a hit, gains **1x** `Charge`. Upon having **6x** or more `Charge`, consumes **6x** to unleash Shuhu's Gift. This increases his ATK by **15%** of recorded DMG taken (Up to 40%) for that turn, and recovers his HP by **15%** of recorded DMG taken (Up to 40%), before dealing **80%** undodgeable DMG. (Up to once every round)\n\nUsing his active deals **30%** missing HP to the enemy as absolute damage, before lowering max HP by **50%** for **4** turns. Moreover, he will also self-inflict **5%** DMG to himself for the next **4** rounds.\n\nIn a party, he intervenes every **4** rounds, dealing **60%** DMG to the enemy before lowering their DEF & MR by **20%** for that round (Max 2x damage). However, if the ally is Dan Heng, or the fight reaches round **40**, he becomes marastruck, additionally dealing **15%** DMG to the ally every **4th** turn. This marastruck effect however can be completely nullified if Kafka is in the team.",
+        shortdesc: "**Uses**: `10`\n**Cooldown**: `4 rounds`\n**Cost**: `80 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Sacrificial, Charge, Burst survival)`\n\n__**Passive**__\nWhen below **50%** HP:\n- **+28%** DMG mitigation (Unstackable : Only the strongest one takes effect) \n- Upon receiving a damage instance or countering a hit, gains **1x** `Charge`\n\nUpon reaching **6x** or more `Charge`, consumes **6x** to activate Shuhu's Gift (Up to once every round):\n- Increases ATK by **15%** of recorded DMG taken for that turn (Up to **40%**)\n- Recovers HP by **15%** of recorded DMG taken (Up to **40%** max HP)\n- Deals **80%** undodgeable DMG\n\n__**Active**__ (✨)\n- Deals **30%** missing HP as absolute damage\nFor **4** turns:\n- Decreases max HP by **50%**\n- Self-inflicts **5%** undodgeable DMG (counts as a damage instance)\n\n__**Party**__ (👥)\nIntervenes every **4** rounds\n- Deals **60%** DMG to the enemy\n- Decreases their DEF & MR by **20%** for that round (Max 2x damage)\n\nIf ally is Dan Heng, or the fight reaches round **40**:\n- Becomes Mara struck: additionally deals **15%** DMG to the ally every **4th** round\n- This marastruck effect can be nullified when Kafka is in the team",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Blade (HSR) || Bladie
             if (this.pause > matchStats.round) {
@@ -3763,8 +3764,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 40,
         pause: -6,
-        desc: "**Total Usage**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧 [✨] // All the “BoL” currently stacked [❌]`\n**Timeout**: `No / Yes` \n**Role**: `DPS`\n\nArlecchino replaces the class active button with her elemental burst: “Balemoon Rising”, while her ability functions around “Bond of Life”, shortened to `BoL`\n\nBond of Life (BoL): `BoL` is a mechanic that prevents healing from other sources. Every **1%** max HP is equivalent to **1%** BoL. Maximum **200%** `BoL` (200% max HP) can be stacked at any given moment.\n\nArlecchino’s ATTACK is altered, empowering it with bloodlust to deal extra damage, specifically **+1%** DMG for every **5%** `BoL` owned. Up to **5%** of `BoL` is consumed afterwards.\n\nHer active (✨) – All Is Ash, summons forth Balemoon Bloodfire, granting her `BoL` equal to **75%** of her max HP, before inflicting *Blood-Debt Directive* on the opponent for **6** rounds.\n\nBlood-Debt Directive: When inflicted, the opponent cannot heal. At the start of every round, takes **7.5%** of `BoL` on Arlecchino as DMG, while also spending **5%** `BoL` in the process.\n\nUpon using her Class skill (❌) : Balemoon Rising, the great wing of Balemoon Bloodfire beats as she gathers and clears *Blood-Debt Directives* around her if any. She then deals unamplified absolute undodgeable DMG (ignores DEF/MR) equal to all `BoL` owned, and resets `BoL` owned. If she has gathered Directive previously, she gains `BoL` equivalent to **125%** of her Max HP\n\nArlecchino has two side passives to her arsenal.\n\nFirstly, Arlecchino gains **1%** DMG mitigation for every **10%** `BoL` she has. Secondly, The Balemoon Alone May Know: Only Arlecchino can heal herself, heals equal to the amount of `BoL` consumed/lost, up to **50%** of max HP can be healed this way at once.",
-        shortdesc: "**Uses**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧[✨] // All the “BoL” currently stacked [❌]`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Bond of Life, Burst heal)`\n\n__**Core Mechanic**__:\n- Bond of Life (`BoL`) prevents healing from other sources\n- Every **1%** `BoL` is equal to **1%** of your max HP\n- You can have **200%** `BoL` at most anytime\n- Consuming any `BoL` allows you heal the equivalent, up to **50%** max HP\n- For every **10%** `BoL`, you have **+1%** DMG mitigation\n\n__**Active**__ (✨)\n- Gain `BoL` equivalent to **75%** of max HP\n- Inflict Blood-Debt Directive* on the enemy for **6** rounds\n\n*Blood-Debt Directive* : The inflicted cannot heal. At the start of every round, they take **7.5%** of her `BoL` as unamplified absolute undodgeable DMG (ignores DEF/MR). This also consumes **5%** `BoL` in the process.\n\n__**Passive**__\nHer ATTACK (🚫) is altered:\n- Deals **100%** damage, scaling increased by **1%** for every **5%** `BoL` owned. Afterwards, consumes up to **5%** `BoL`.\n\nHer class skill (❌) is altered:\n- Clears any *Blood-Debt Directive*.\n- Then, deals unamplified absolute undodgeable DMG (ignores DEF/MR) equal to all of her `BoL`\n- Alas, resets all `BoL` owned. If Blood-Debt Directive was cleared previously, immediately gains `BoL` equal to **125%** max HP",
+        desc: "**Total Usage**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧 [✨] // All the “BoL” currently stacked [❌]`\n**Timeout**: `No / Yes` \n**Role**: `DPS`\n\nArlecchino replaces the class active button with her elemental burst: “Balemoon Rising”, while her ability functions around “Bond of Life”, shortened to `BoL`\n\nBond of Life (BoL): `BoL` is a mechanic that prevents healing from other sources. Every **1%** max HP is equivalent to **1%** BoL. Maximum **200%** `BoL` (200% max HP) can be stacked at any given moment.\n\nArlecchino’s ATTACK is altered, empowering it with bloodlust to deal extra damage, specifically **+1%** DMG for every **5%** `BoL` owned. Up to **5%** of `BoL` is consumed afterwards.\n\nHer active (✨) – All Is Ash, summons forth Balemoon Bloodfire, granting her `BoL` equal to **75%** of her max HP, before inflicting *Blood-Debt Directive* on the opponent for **6** rounds.\n\nBlood-Debt Directive: When inflicted, the opponent cannot heal. At the start of every round, takes **7.5%** of `BoL` on Arlecchino as DMG, while also spending **5%** `BoL` in the process.\n\nUpon using her Class skill (❌) : Balemoon Rising, the great wing of Balemoon Bloodfire beats as she gathers and clears *Blood-Debt Directives* around her if any. She then deals absolute undodgeable DMG (ignores DEF/MR) equal to all `BoL` owned, and resets `BoL` owned. If she has gathered Directive previously, she gains `BoL` equivalent to **125%** of her Max HP\n\nArlecchino has two side passives to her arsenal.\n\nFirstly, Arlecchino gains **1%** DMG mitigation for every **10%** `BoL` she has. Secondly, The Balemoon Alone May Know: Only Arlecchino can heal herself, heals equal to the amount of `BoL` consumed/lost, up to **50%** of max HP can be healed this way at once.",
+        shortdesc: "**Uses**: `Unlimited (CD: 6) [✨] // Unlimited (CD: 6) [❌]`\n**Cost**: `40 💧[✨] // All the “BoL” currently stacked [❌]`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Bond of Life, Burst heal)`\n\n__**Core Mechanic**__:\n- Bond of Life (`BoL`) prevents healing from other sources\n- Every **1%** `BoL` is equal to **1%** of your max HP\n- You can have **200%** `BoL` at most anytime\n- Consuming any `BoL` allows you heal the equivalent, up to **50%** max HP\n- For every **10%** `BoL`, you have **+1%** DMG mitigation\n\n__**Active**__ (✨)\n- Gain `BoL` equivalent to **75%** of max HP\n- Inflict Blood-Debt Directive* on the enemy for **6** rounds\n\n*Blood-Debt Directive* : The inflicted cannot heal. At the start of every round, they take **7.5%** of her `BoL` as absolute undodgeable DMG (ignores DEF/MR). This also consumes **5%** `BoL` in the process.\n\n__**Passive**__\nHer ATTACK (🚫) is altered:\n- Deals **100%** damage, scaling increased by **1%** for every **5%** `BoL` owned. Afterwards, consumes up to **5%** `BoL`.\n\nHer class skill (❌) is altered:\n- Clears any *Blood-Debt Directive*.\n- Then, deals absolute undodgeable DMG (ignores DEF/MR) equal to all of her `BoL`\n- Alas, resets all `BoL` owned. If Blood-Debt Directive was cleared previously, immediately gains `BoL` equal to **125%** max HP",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Arlecchino
             noTimeout(matchStats, myStats);
@@ -3864,9 +3865,11 @@ export const abilities: Record<number, Ability> = {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, consumableBOL, { bypassBoL: true });
 
                         // Deals BoL as direct unamplified DMG
-                        eStats.hp -= Math.floor(myStats.bondOfLife);
-                        if (eStats.hp < 0) eStats.hp = 0;
-                        notice.push(`\n❌ **${char.name}** consumed all Bond of Life and dealt **${Math.floor(myStats.bondOfLife)}** damage.`);
+                        // eStats.hp -= Math.floor(myStats.bondOfLife);
+                        // if (eStats.hp < 0) eStats.hp = 0;
+                        //notice.push(`\n❌ **${char.name}** consumed all Bond of Life and dealt **${Math.floor(myStats.bondOfLife)}** damage.`);
+
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `❌ **${char.name}**`, { overwriteDamage: Math.floor(myStats.bondOfLife), magicDamage: true, dodge: false });
 
                         // Reset BoL
                         myStats.bondOfLife = 0;
@@ -3986,7 +3989,7 @@ export const abilities: Record<number, Ability> = {
                     myStats.sm += 6;
                     if (myStats.temple > 0) myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += (myStats.temple > 0) ? 6 : 3;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += (myStats.temple > 0) ? 6 : 3;
                 };
             });
 
@@ -4016,7 +4019,7 @@ export const abilities: Record<number, Ability> = {
             matchStats.on("crit", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
                 if (eStats.marked) {
                     myStats.sm += 9;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 9;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 9;
                 };
             });
 
@@ -4083,8 +4086,8 @@ export const abilities: Record<number, Ability> = {
         usage: 3,
         used: 0,
         cost: 60,
-        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nIsolde's character embodies the archetype of a risk-reward DPS with abilities that grow stronger as she becomes more vulnerable. The pain she endures becomes the bane of her adversaries. The lower her health, the higher the damage she can deal, providing her with a damage boost of up to **40%**. When her HP is dwindling, she can leverage **60%** of her missing HP to deal damage. After she vents her pain onto the enemy, Isolde regains **33%** of her missing HP.\n\nIsolde is not just a powerhouse, she's also quick on her feet. She has a **14-28%** chance to counter any attack aimed at her depending on her HP, which also decreases enemy DEF and MR by **8%** for **3** rounds if successful, making her not only a major threat offensively but also a character that can surprise her adversaries with unexpected retaliation. Moreover, her drive and dedication in dungeons reflect as she gains **25%** more class XP.\n\nIsolde's presence on the battlefield is not only motivating but also enhancing. For the first 10 rounds, she pushes her allies, gradually increasing their ATK and MD by **2.5%** every round. This culminates in a significant **25%** boost by the 10th round, making the entire party a force to be reckoned with as the battle progresses.\n\nIn essence, Isolde is a character of defiance. The closer she is to defeat, the stronger she becomes, and her ability to turn the tables in dire situations makes her an invaluable asset to any team.",
-        shortdesc: "**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Counter, Burst survival)`\n\n__**Passive**__\n- Deals more DMG the lower her HP is (Up to **40%**)\n- Has **14%** base counter rate, increased the lower her HP is (Up to **28%** counter chance)\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **60%** of missing HP to the enemy\n- Restores **33%** of lost HP  \n\n__**Party**__ (👥)\n- Increases ATK & MD by **2.5%** every round during the first **10** rounds.",
+        desc: "**Total Usage**: `3`\n**Mana**: `60`\\💧\n**Timeout**: `yes`\n**Role**: `DPS`\n\nIsolde's character embodies the archetype of a risk-reward DPS with abilities that grow stronger as she becomes more vulnerable. The pain she endures becomes the bane of her adversaries. The lower her health, the higher the damage she can deal, providing her with a damage boost of up to **40%**. When her HP is dwindling, she can leverage **60%** of her missing HP to deal absolute damage. After she vents her pain onto the enemy, Isolde regains **33%** of her missing HP.\n\nIsolde is not just a powerhouse, she's also quick on her feet. She has a **14-28%** chance to counter any attack aimed at her depending on her HP, which also decreases enemy DEF and MR by **8%** for **3** rounds if successful, making her not only a major threat offensively but also a character that can surprise her adversaries with unexpected retaliation. Moreover, her drive and dedication in dungeons reflect as she gains **25%** more class XP.\n\nIsolde's presence on the battlefield is not only motivating but also enhancing. For the first 10 rounds, she pushes her allies, gradually increasing their ATK and MD by **2.5%** every round. This culminates in a significant **25%** boost by the 10th round, making the entire party a force to be reckoned with as the battle progresses.\n\nIn essence, Isolde is a character of defiance. The closer she is to defeat, the stronger she becomes, and her ability to turn the tables in dire situations makes her an invaluable asset to any team.",
+        shortdesc: "**Uses**: `3`\n**Cost**: `60 💧`\n**Timeout**: `Yes`\n**Role**: `DPS (Counter, Burst survival)`\n\n__**Passive**__\n- Deals more DMG the lower her HP is (Up to **40%**)\n- Has **14%** base counter rate, increased the lower her HP is (Up to **28%** counter chance)\n- Gains **+25%** class XP\n\n__**Active**__ (✨)\n- Deals **60%** of missing HP to the enemy as absolute damage\n- Restores **33%** of lost HP  \n\n__**Party**__ (👥)\n- Increases ATK & MD by **2.5%** every round during the first **10** rounds.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Isolde
             const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor((myStats.maxhp - myStats.hp) * 0.6) : 0;
@@ -4683,7 +4686,7 @@ export const abilities: Record<number, Ability> = {
                 eStats.sm -= stealMana;
                 myStats.sm += stealMana;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                if (typeof myStats.manaGained !== undefined) myStats.manaGained += stealMana;
+                if (typeof myStats.manaGained !== "undefined") myStats.manaGained += stealMana;
 
                 return AbilityResponse.SUCCESS;
             }, 9999));
@@ -5411,8 +5414,8 @@ export const abilities: Record<number, Ability> = {
         cost: 60,
         weaponType: "none",
         activatedRound: -1,
-        desc: "**Total Usage**: `2`\n**Mana**: `60`\\💧 Ei, `100`\\💧 Puppet Shogun\n**Timeout**: `no`\n**Role**: `DPS`\n\nThe Raiden Shogun is comprised of two beings in one body: Ei, the Electro Archon; and the Shogun, the puppet created by Ei. When she is equipped a __sword__, Ei will take over, otherwise the Shogun has control.\n\nWhen Ei is on the field, her normal attacks deal **18%** more damage, but she loses **3%** of her current HP per round. Once her HP falls below **50%** however, she no longer loses those **3%** current HP per round, and makes an attack dealing **180%** true damage. Instead, for the next 4 rounds, she will heal **10%** of missing HP and regenerate **+5** mana.\nUsing her active, Ei will use Musou no Hitotachi to deal **120%** true damage and decrease enemy DEF and MR by **12%** for the rest of battle (on first usage only).\n\nWhen the puppet Shogun is on stage, she gains **16%** ATK, MD, CR, CD and dodge chance for the rest of battle, and is immune to HP debuffs.\nUsing her active, the Shogun enters the domain of Baleful Shadowlord for the rest of the fight. While in this domain, she has **15%** increased DEF and **+5%** ATK and MD every round (up to a **30%** increase). Additionally, lowers enemy DEF and MR by **2%** every round (up to a **10%** reduction). If her HP drops below **25%** of max, she can recover **30%** of missing HP for **90**\\💧 once.\n\nIn a party, Ei will deal **14%** true damage to the enemy and recover **+3** mana for her allies every round.",
-        shortdesc: "**Role**: `DPS (Versatile)`\nRaiden Shogun EX is split into **2** modes which you may use.\n\n# Ei\n-# (Equip a SWORD to use)\n**Uses**: `2`\n**Cost**: `60 💧`\n**Timeout**: `No`\n**Role**: `DPS (Anti-shield, True DMG)`\n\n__**Passive**__\n- ATTACK is altered to deal **118%** true DMG\n- Loses **3%** current HP every round\nOnce her HP falls below **50%** HP:\n- No longer loses **3%** current HP every round\n- Immediately deals **180%** true DMG\n- Restores **10%** missing HP + regenerate **+5** 💧 for **4** rounds\n\n__**Active**__ (✨)\n- Deals **120%** true DMG\n- **-12%** enemy’s DEF & MR (once)\n\n__**Party**__ (👥)\n- Deals **14%** true DMG every round\n- Regenerates **+3** 💧 every round\n\n# Puppet\n-# (Don’t equip a SWORD to use)\n**Uses**: `2`\n**Cost**: `100, then 90 💧`\n**Timeout**: `No`\n**Role**: `DPS/Tank (Anti-shield, True DMG)`\n\n__**Passive**__\n- **+16%** ATK, MD, CR, CD, and Dodge rate\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+15%** DEF & MR\n- **+5%** ATK & MD every round (Up to 30%)\n- **-2%** enemy’s DEF/MR every round (Up to -10%)\n- When below **25%** HP: May use active (✨) again to restore **30%** missing HP",
+        desc: "**Total Usage**: `2`\n**Mana**: `60`\\💧 Ei, `100`\\💧 Puppet Shogun\n**Timeout**: `no`\n**Role**: `DPS`\n\nThe Raiden Shogun is comprised of two beings in one body: Ei, the Electro Archon; and the Shogun, the puppet created by Ei. When she is equipped a __sword__, Ei will take over, otherwise the Shogun has control.\n\nWhen Ei is on the field, her normal attacks deal **118%** damage, but she loses **3%** of her current HP per round. Once her HP falls below **50%** however, she no longer loses those **3%** current HP per round, and makes an attack dealing **180%** true lightning damage. Instead, for the next 4 rounds, she will heal **10%** of missing HP and regenerate **+5** mana.\nUsing her active, Ei will use Musou no Hitotachi to deal **120%** true lightningdamage and decrease enemy DEF and MR by **12%** for the rest of battle (on first usage only).\n\nWhen the puppet Shogun is on stage, she gains **16%** ATK, MD, CR, CD and dodge chance for the rest of battle, and is immune to HP debuffs.\nUsing her active, the Shogun enters the domain of Baleful Shadowlord for the rest of the fight. While in this domain, she has **15%** increased DEF and **+5%** ATK and MD every round (up to a **30%** increase). Additionally, lowers enemy DEF and MR by **2%** every round (up to a **10%** reduction). If her HP drops below **25%** of max, she can recover **30%** of missing HP for **90**\\💧 once.\n\nIn a party, Ei will deal **14%** true damage to the enemy and recover **+3** mana for her allies every round.",
+        shortdesc: "**Role**: `DPS (Versatile)`\nRaiden Shogun EX is split into **2** modes which you may use.\n\n# Ei\n-# (Equip a SWORD to use)\n**Uses**: `2`\n**Cost**: `60 💧`\n**Timeout**: `No`\n**Role**: `DPS (Anti-shield, True DMG)`\n\n__**Passive**__\n- ATTACK is altered to deal **118%** true DMG\n- Loses **3%** current HP every round\nOnce her HP falls below **50%** HP:\n- No longer loses **3%** current HP every round\n- Immediately deals **180%** true lightning DMG\n- Restores **10%** missing HP + regenerate **+5** 💧 for **4** rounds\n\n__**Active**__ (✨)\n- Deals **120%** true lightning DMG\n- **-12%** enemy’s DEF & MR (once)\n\n__**Party**__ (👥)\n- Deals **14%** true lightning DMG every round\n- Regenerates **+3** 💧 every round\n\n# Puppet\n-# (Don’t equip a SWORD to use)\n**Uses**: `2`\n**Cost**: `100, then 90 💧`\n**Timeout**: `No`\n**Role**: `DPS/Tank (Anti-shield, True DMG)`\n\n__**Passive**__\n- **+16%** ATK, MD, CR, CD, and Dodge rate\n- Immune to HP-debuffs\n\n__**Active**__ (✨)\n- **+15%** DEF & MR\n- **+5%** ATK & MD every round (Up to 30%)\n- **-2%** enemy’s DEF/MR every round (Up to -10%)\n- When below **25%** HP: May use active (✨) again to restore **30%** missing HP",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Raiden EX
 
@@ -5420,7 +5423,7 @@ export const abilities: Record<number, Ability> = {
                 // Ei
                 noTimeout(matchStats, myStats);
 
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used Musou no Hitotachi! She`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, ignoreShield: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** used Musou no Hitotachi! She`, { atkMultiplier: 1.2, magicDamage: true, combodmg: true, isLightning: true, selfdmg: true, selfheal: true, ignoreShield: true });
 
                 if (this.used === 1) {
                     ebuff.def.push(new buffInfo("+", -Math.floor(eStats.def * 0.12), 9999));
@@ -5492,7 +5495,7 @@ export const abilities: Record<number, Ability> = {
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, -Math.floor(0.03 * myStats.hp), {});
                     } else {
                         if (!myStats.raidenHpDownRound) {
-                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** fell below 50% HP! She`, { atkMultiplier: 1.8, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, ignoreShield: true });
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${char.name}** fell below 50% HP! She`, { atkMultiplier: 1.8, isLightning: true, magicDamage: true, combodmg: true, selfdmg: true, selfheal: true, ignoreShield: true });
                             myStats.raidenHpDownRound = matchStats.round;
                             mybuff.mg.push(new buffInfo("+", 5, 4));
                         };
@@ -5541,9 +5544,9 @@ export const abilities: Record<number, Ability> = {
         party: async function (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             if (pStats.weapon !== -1 && items[pStats.weapon].type === "sword") {
                 const name = pStats.name;
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 0.14, ignoreShield: true, magicDamage: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 0.14, isLightning: true, ignoreShield: true, magicDamage: true });
                 myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 0.14, ignoreShield: true, magicDamage: true });
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `✨ **${name}**`, { atkMultiplier: 0.14, isLightning: true, ignoreShield: true, magicDamage: true });
 
                     return AbilityResponse.SUCCESS;
                 }, 9999));
@@ -5633,7 +5636,7 @@ export const abilities: Record<number, Ability> = {
                     const drain = Math.floor(eStats.sm * 0.12);
                     eStats.sm -= drain;
                     myStats.sm += drain;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += drain;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += drain;
                 };
             });
 
@@ -5971,7 +5974,7 @@ export const abilities: Record<number, Ability> = {
             // Burst mana
             myStats.sm += 10 * favcharref;
             if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-            if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10 * favcharref;
+            if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10 * favcharref;
 
 
             return AbilityResponse.SUCCESS;
@@ -6234,7 +6237,7 @@ export const abilities: Record<number, Ability> = {
                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, hp, {});
                     const mana = Math.min(50, myStats.mana - myStats.sm);
                     myStats.sm += mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 50;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 50;
                     notice.push(`\n🍑 **${char.name}** has rejuvenated **${hp}** HP and **${mana}** mana!`);
                     //@ts-ignore
                     this._used++;
@@ -6759,8 +6762,8 @@ export const abilities: Record<number, Ability> = {
         cost: 20,
         pause: 0,
         selfhealidx: 0,
-        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\n-# Being YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+15%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To view programmes, do `item equip item:prog info`. To reset programmes, do `/item equip item:prog remove` instead.\n\nIn combat, using ATTACK allows 2B to spring into the air, losing **7%** current HP (doesn't lose after reviving) before dealing **80%** DMG, before slamming them in a strike, dealing an additional instance of **10%** DMG, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **6** rounds.\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to **+33%**. Moreover, non-critical hits cause him to lose **4%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit, gaining **+15%** ATK & DEF for **15** rounds.\n\n The Second use causes self-destruction, colliding their black boxes, dealing **100%** max HP as a critical hit to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team.",
-        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+15%** max HP\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`. To reset, do `/item equip item:prog remove`.\n\nATTACK is altered:\n> - Loses **7%** current HP (doesn't lose after reviving)\n> - Deals **80%** DMG, before dealing another instance of **10%**, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **6** rounds.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +33%.\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: Gain **15%** ATK & DEF for **15** rounds\n\n__Second use__: Deals **100%** max HP as a critical hit to the enemy before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party",
+        desc: "**Total Usage**: `1 (CD: 10) + 1`\n**Cost**: `20 💧+ 0💧`\n**Timeout**: `No/Yes`\n\n-# Being YorHa androids, 2B and 9S complement each other in combat as a duo, cleaving through machines, fighting for a future where humanity on the moon could regain control over the world.\n\nSpecifically programmed to operate indefinitely, androids are especially resistant to damage, having **+15%** max HP. Moreover, they may upload their data to their headquarters, allowing them a **100%** chance to revive with **50%** HP upon death.\n\nThey are equipped with their pods, allowing them to equip up to **2** programmes which take effect in battles via `/item equip item:prog <ID>`. To view programmes, do `item equip item:prog info`. To reset programmes, do `/item equip item:prog remove` instead.\n\nIn combat, using ATTACK allows 2B to spring into the air, losing **7%** current HP (doesn't lose after reviving) before dealing **80%** DMG, before slamming them in a strike, dealing an additional instance of **10%** DMG, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\nEvery critical hit allows 9S to analyze the foe, granting **1x** [ɪɴꜱɪɢʜᴛ]. At the start of a round, when 9S is not HACKING but owns **8x** or more [ɪɴꜱɪɢʜᴛ], 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins HACKING for **6** rounds.\n\nHACKING: 9S initiates hacking on the enemy while 2B supports by distracting the foe. Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to **+33%**. Moreover, non-critical hits cause him to lose **4%** current HP.\n\nThe duo’s active is split into 2 parts. The First use allows 2B & 9S to enter their respective flight unit, gaining **+15%** ATK & DEF for **15** rounds.\n\n The Second use causes self-destruction, colliding their black boxes, dealing **100%** max HP as critical absolute damage to the enemy before *dying*.\n\nIn a party, the duo shares their pod passives with the entire team.",
+        shortdesc: "**Uses**: `1+1`\n**Cooldown**: `10 rounds`\n**Cost**: `20 💧 // 0 💧`\n**Timeout**: `No / Yes`\n**Role**: `DPS (Sacrificial, Critical, Revival)`\n__**Passive**__\n- Upon death, has a **100%** chance of reviving with **50%** HP.\n- **+15%** max HP\n- They may equip **2** programmes on pod for battle effects. To view available options, do `/item equip item: prog info`. To equip, do `/item equip item:prog <ID>`. To reset, do `/item equip item:prog remove`.\n\nATTACK is altered:\n> - Loses **7%** current HP (doesn't lose after reviving)\n> - Deals **80%** DMG, before dealing another instance of **10%**, further increased by **1%** for every **1%** HP missing from the enemy (Up to 40% in total).\n\n- Every critical hit grants **1x** [ɪɴꜱɪɢʜᴛ].\n\n__Core Mechanic__: HACKING\n- At the start of the round, when owning **8x** [ɪɴꜱɪɢʜᴛ] while not *HACKING*: 9S consumes **8x** [ɪɴꜱɪɢʜᴛ] and begins *HACKING* for **6** rounds.\n\nDuring *HACKING*:\n- Critical hits deal **+1%** DMG for every **1** percentage point of remaining HP% difference between you and the enemy, up to +33%.\n- Non-critical hits cause him to lose **7%** current HP\n\n__**Active**__:\n__First use__: Gain **15%** ATK & DEF for **15** rounds\n\n__Second use__: Deals **100%** max HP as a critical hit to the enemy as absolute damage before *dying*.\n\n__**Party**__:\n- Shares equipped pod passive with entire party",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // 2B & 9S EX | 2B&9S EX
 
@@ -7348,7 +7351,7 @@ export const abilities: Record<number, Ability> = {
     //                     myStats.hp += options.damage;
     //                     addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor((myStats.maxhp - myStats.hp) * 0.05), {});
     //                     myStats.sm += 5;
-    //                     if (typeof myStats.manaGained !== undefined) myStats.manaGained += 5;
+    //                     if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 5;
     //                     myStats.garouAbsorbedHits++;
     //                 };
     //             };
@@ -7362,8 +7365,8 @@ export const abilities: Record<number, Ability> = {
         cost: 0,
         pause: -15,
         nsbTick: 0,
-        desc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit (😎)`\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the __All-Fire Armaments__ passed down through the line of human Archons (deals **25%** pyro damage every **4** rounds, effect expires when exiting NBS), before dealing **100%** Pyro DMG. After using this, Mavuika's Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__ – NBS:\n- When Mavuika has at least **5** Nightsoul points, enter this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** 🎯(Crit Rate)  and 💥(Crit Dmg) for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n- Pyro DMG: After an attack, inflicts burn on the opponent, dealing **3%** ATK as DoT over **3** rounds.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (😎).\n- When Mavuika is not in NBS and has ≥ **50** 😎, her active is altered to consume all the fighting spirit to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **120%** Pyro DMG, for each 😎 consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__ – Fighting Spirit:\nMavuika can obtain Fighting Spirit via the following methods (max 100):\n- Nightsoul points consumed are converted to Fighting Spirit.\n- When hitting opponents, Mavuika gains **1** Fighting Spirit.\n\n**__Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** Pyro DMG every fourth round.",
-        shortdesc: "Check fulldesc",
+        desc: "**Total Usage**: `Unlimited`\n**Cost**: `75 💧` / `All fighting spirit` (<a:fighting_spirit:1519896326882594957>)\n**Timeout**: `Yes / Yes`\n**Cooldown**: `15 rounds (None if in NBS)` / `None`\n**Tags**: `DPS (DoT, Burst)`\n\n## NBS - Nightsoul Blessing state:\nWhen Mavuika has at least **5** Nightsoul points, enters this state. This consumes **5** Nightsoul points each round, granting her **0.5%** crit. rate and crit. damage for each nightsoul point consumed (capped at 25% each). This state ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n## Active (I) : The Named Moment\nCalling upon her authority over conflict, Mavuika summons the All-Fire Armaments passed down through the line of human Archons (deals **25%** burn damage every **3** rounds, effect expires when exiting NBS), before dealing **100%** burn DMG. After which, her Nightsoul points are restored to **40**.\n\n## Active (II) : Hour of Burning Skies\nMavuika's burst is not dependent on mana, but Fighting Spirit (<a:fighting_spirit:1519896326882594957>). When Mavuika is not in NBS and has ≥ **50** <a:fighting_spirit:1519896326882594957>, her active is altered to consume all the fighting spirit to unleash her Elemental Burst: Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **180%** burn DMG, for each :fighting_spirit: consumed in excess of **50**, increases burst DMG by **2%**.\n\n## Fighting Spirit (<a:fighting_spirit:1519896326882594957>):\nMavuika can obtain <a:fighting_spirit:1519896326882594957> via the following methods (max 100): Nightsoul points consumed are converted to <a:fighting_spirit:1519896326882594957>.\nWhen hitting opponents, Mavuika gains **1** <a:fighting_spirit:1519896326882594957>.\n\nIn a party, she provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** burn DMG every **3rd** round.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `75 💧 / All fighting spirit` (<a:fighting_spirit:1519896326882594957>)\n**Timeout**: `Yes / Yes` \n**Cooldown**: `15 rounds (None if in NBS) / None`\n**Role**: `DPS (DoT, Burst)`\n\n**__Active (I)__** : The Named Moment\n- Deals **25%** burn damage every **3** rounds, effect expires when exiting NBS), before dealing **100%** burn DMG. After which her Nightsoul points are restored to **40**.\n\n__**Core Mechanic (I)**__\n`NBS`:\n- When Mavuika has at least **5** Nightsoul points, enters this state.\n- Consumes **5** Nightsoul points each round, granting her **0.5%** crit. rate and crit. damage for each nightsoul point consumed (capped at 25% each).\n- NBS ends once her Nightsoul points are exhausted, also expiring the buffs thus gained.\n\n**__Active (II)__** : Hour of Burning Skies\n- Mavuika's burst is not dependent on mana, but Fighting Spirit (<a:fighting_spirit:1519896326882594957>).\n- When Mavuika is not in NBS and has ≥ **50** <a:fighting_spirit:1519896326882594957>, her active is altered to consume all <a:fighting_spirit:1519896326882594957> to unleash her Elemental Burst:\n- Mavuika gains **20** Nightsoul points and enters NBS. Riding her Flamestrider high in the air, she uses a powerful Sunfell Slice, dealing **180%** burn DMG, for each <a:fighting_spirit:1519896326882594957> consumed in excess of 50, increases burst DMG by **2%**.\n\n__**Core Mechanic (II)**__\n`Fighting Spirit` (<a:fighting_spirit:1519896326882594957>):\n> Mavuika can obtain <a:fighting_spirit:1519896326882594957> via the following methods (max 100):\n- Nightsoul points consumed are converted to <a:fighting_spirit:1519896326882594957>.\n- When hitting opponents, Mavuika gains **1** <a:fighting_spirit:1519896326882594957>.\n\n__**Party Ability**__:\n- Provides a **12%** DEF/MR reduction (Up to 2x damage), and deals **25%** burn DMG every **3rd** round.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Mavuika
             if (myStats.fightspirit < 50 || myStats.nbs > 0) {// Active (I)
@@ -7386,7 +7389,7 @@ export const abilities: Record<number, Ability> = {
                 myStats.nsp = 40;
 
                 notice.push(`\n✨ **${char.name}** restored Nightsoul Points to **40**!`);
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isPyro: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${char.name}**`, { atkMultiplier: 1, isBurn: true });
             } else {
                 myStats.nsp += 20; if (myStats.nsp > 60) myStats.nsp = 60;
                 notice.push(`\n✨ Let the people's inner voices reach the divine throne in the heavens. **${char.name}** gained **20** Nightsoul Points and enterred NightSoul Blessing State!`);
@@ -7397,10 +7400,10 @@ export const abilities: Record<number, Ability> = {
                 myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
                 myStats.nbs++;
 
-                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+                if (matchStats.round % 3 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isBurn: true });
 
                 const flair = ["Wrath from the skies!", "Pyroclastic surge!", "Light of the blazing sun!"];
-                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.2 + 0.02 * (myStats.fightspirit - 50), isPyro: true });
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 ${flair[Math.round(Math.random() * 2)]} **${char.name}**`, { atkMultiplier: 1.8 + 0.02 * (myStats.fightspirit - 50), isBurn: true });
                 myStats.fightspirit = 0;
             };
             return AbilityResponse.SUCCESS;
@@ -7412,10 +7415,10 @@ export const abilities: Record<number, Ability> = {
 
             // Fun text
             switch (matchStats.interaction.commandName) {
-                case "dungeon": notice.push(`\n😎 Dungeons? Heh, adventuring is right up my alley.`); break;
-                case "stampede": notice.push(`\n😎 I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
-                case "arena": notice.push(`\n😎 If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
-                default: notice.push(`\n😎 Ready to ride, any time, any place.`); break;
+                case "dungeon": notice.push(`\n<a:fighting_spirit:1519896326882594957> Dungeons? Adventuring is right up my alley.`); break;
+                case "stampede": notice.push(`\n<a:fighting_spirit:1519896326882594957> I'm going to take it easy and wrap up some work. Oh, don't worry — I see keeping busy as a great way to relax.`); break;
+                case "arena": notice.push(`\n<a:fighting_spirit:1519896326882594957> If you want to reach your full potential, you need to be willing to become the weakest link.`); break;
+                default: notice.push(`\n<a:fighting_spirit:1519896326882594957> Ready to ride, any time, any place.`); break;
             };
 
             // Gain Fighting Spirit
@@ -7430,7 +7433,7 @@ export const abilities: Record<number, Ability> = {
                 myStats.cd += Math.min(myStats.nbs * 0.005, 0.25);
                 myStats.nbs++;
 
-                if (matchStats.round % 4 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isPyro: true });
+                if (matchStats.round % 3 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 Divine Name Unleashed... **${char.name}**`, { atkMultiplier: 0.25, isBurn: true });
             };
 
             // NightSoul Blessing Mechanic
@@ -7458,8 +7461,8 @@ export const abilities: Record<number, Ability> = {
             ebuff.def.push(new buffInfo("+", -Math.min(Math.round(eStats.def * 0.12), 660), 9999));
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (matchStats.round % 4 === 0) {
-                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isPyro: true });
+                if (matchStats.round % 3 === 0) {
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `🔥 **${pStats.name}**`, { atkMultiplier: 0.25, isBurn: true });
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -8103,11 +8106,12 @@ export const abilities: Record<number, Ability> = {
         usage: 1,
         used: 0,
         cost: 60,
-        desc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n**Role**: `DPS (Progressive, Nuke, Freeze)`\n\n-# Aneira, the queen of frost, commands ice to move fluidly with her hands, able to pierce through armor and glide through flesh, staining the ice with red.\n\nShe passively gains **1** icicle ( <:icicle:1446880458498375701> ) every round, up to **40**. Using her active (:sparkles:), she no longer gains <:icicle:1446880458498375701>, permanently. Her ATK is altered to consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701>  >  20, the damage scaling is increased to **150%**. Her class skill is also altered, consuming **5** to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice. \n\nWhen <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, dealing **60%**, **80%** and alas **220%** damage, before freezing the enemy for **3** rounds, ensuring they remain in place for her brutal wrath of chill to any that oppose her.",
-        shortdesc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n\n**__Passive__**: Gain **1** `Icicle` (<:icicle:1446880458498375701>) every round (Up to 40).\n\n**__Active (✨)__ - <Cross not my path>**\n> ?? enters a special state, utilizing her Icicles.\n- Stop gaining <:icicle:1446880458498375701> permanently.\n- ATK (:crossed_swords:) is altered: Consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701> > 20, the damage scaling is increased to **150%**.\n- Class Skill (:fleur_de_lis:) is altered: Consume **5** <:icicle:1446880458498375701> to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice.\n- When <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, hitting **3** times (**60+80+220%** damage), then freezes the enemy for **3** rounds.",
+        desc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n**Role**: `DPS (Progressive, Nuke, Freeze)`\n\n-# Aneira, the queen of frost, commands ice to move fluidly with her hands, able to pierce through armor and glide through flesh, staining the ice with red.\n\nAll of her + her allies' attacks, if they don't carry an element (e.g. Fire / Lightning), are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]).\n- `❄️` : when attacked with a Frost hit, deals **4%** damage for every stack, up to **40%** (once per round). She passively gains **1** icicle ( <:icicle:1446880458498375701> ) every round, up to **40**. Using her active (:sparkles:), she no longer gains <:icicle:1446880458498375701>, permanently. Her ATK is altered to consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701>  >  20, the damage scaling is increased to **150%**. Her class skill is also altered, consuming **5** to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice. \n\nWhen <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, dealing **60%**, **80%** and alas **220%** damage, before freezing the enemy for **3** rounds, ensuring they remain in place for her brutal wrath of chill to any that oppose her.\n\nIn a party, she extends her manipulation of ice, allowing frost hits to deal **20%** more damage, and apply **1** additional Frost.",
+        shortdesc: "**Uses**: `1`\n**Cost**: `60 💧`\n**Timeout**: `True`\n\n**__Passive__**: All of her + her allies' attacks, if they don't carry an element (e.g. Fire / Lightning), are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]).\n- `❄️` : when attacked with a Frost hit, deals **4%** damage for every stack, up to **40%** (once per round). Gain **1** `Icicle` (<:icicle:1446880458498375701>) every round (Up to 40).\n\n**__Active (✨)__ - <Cross not my path>**\n> ?? enters a special state, utilizing her Icicles.\n- Stop gaining <:icicle:1446880458498375701> permanently.\n- ATK (:crossed_swords:) is altered: Consume **1** <:icicle:1446880458498375701> to deal **60%** damage. If <:icicle:1446880458498375701> > 20, the damage scaling is increased to **150%**.\n- Class Skill (:fleur_de_lis:) is altered: Consume **5** <:icicle:1446880458498375701> to deal **200%** damage. If <:icicle:1446880458498375701> ≤ 20, the skill hits twice.\n- When <:icicle:1446880458498375701> falls to **0** at the start of a round, she unveils her mask, hitting **3** times (**60+80+220%** damage), then freezes the enemy for **3** rounds.\n\n**__Party (👥)__ \n- Frost hits deal **20%** more damage and apply **1** more Frost.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Aneira EX
             myStats.aneiraUsedActive = true;
+            myStats.element = 1; // Frost damage
 
             myStats.replaceButton.atk = {
                 "emoji": "<:AneiraATK:1448861017659539630>",
@@ -8186,6 +8190,15 @@ export const abilities: Record<number, Ability> = {
                 };
                 return AbilityResponse.SUCCESS;
             }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+        party: async (pStats, myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            // Frost hits deal 20% more damage, and apply 1 extra Frost
+            myStats.frostbonus ??= 0;
+            myStats.frostbonus += 0.2;
+            myStats.extraFrost ??= 0;
+            myStats.extraFrost += 1;
 
             return AbilityResponse.SUCCESS;
         },
@@ -8422,8 +8435,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         cost: 0,
         pause: -8,
-        desc: "**Total Usage**: `Unlimited (CD: 8)`\n**Cost**: `140 💧 (reduced by 20 every use, can be substituted with 25% max HP 💖)`\n**Timeout**: `False`\n**Tags**: `DPS (Flexible ATK/MD, DPS/Tank)`\n\n-# Fern and Stark together are not only bickering allies, but also a mix of both physical and magical force, tearing down waves of enemies with their collaborative efforts.\n\nPassively, `Fern` enters the battle as the front-liner if MD is higher than ATK, else `Stark` enters. This activates their [Upon entry] effect respectively. When either member is [On-field], the other activates their [Off-field] passive. Upon being switched to, activates their own [Upon entry] effect.\n\n`Fern`'s ability:\n- ATK is altered to Zoltraak, dealing **25%** magical damage. If she has **15** :droplet:, spends it to follow-up with **25%** MD, up to **3** times per ATK action. When [On-field], she has **+200** MR. When [Off-field], she has a **1%** chance to detect mana-instability for every **1** mana-regen, granting `Stark` **+4%** additional mitigation against physical damage, and another **+8%** mitigation against magical damage as well. [Upon entry], she inflicts **+5%** vulnerability on the enemy for **8** rounds, after that she gains **+20%** vulnerability.\n\n`Stark`'s ability:\n- ATK is altered. First four ATKs deal **60%** physical damage and allows him to store the mitigated amount. The **8th** ATK deals the mitigated amount (Up to 20% max HP) to the enemy as *lightning* physical damage, before resetting mitigation recorded. When [On-field], he gains **4%** mitigation against physical damage. When [Off-field], he grants **5** 💧 every round. [Upon entry], he has **+10%** ATK for **8** rounds, after that he has **-10%** ATK.\n\nUsing their active, they switch between `Fern`/`Stark`. Loses **2%** current HP every round permanently. If below **30%** HP, additionally launches a collaborative strike, dealing **40%** damage. For every time this active is used, lowers its cost by **20** (down to at most 0). On this round, passives of both characters are briefly applied.",
-        shortdesc: "__**Passive**__:\n- Enters the battle as `Fern` if MD is higher than ATK, else enters as `Stark`. This activates their [Upon entry] effect.\n- When either member is [On-field], the other activates their [Off-field] passive. Upon being switched to, activates their own [Upon entry] effect.\n\n`Fern`:\n- ATK - Zoltraak: Deals **25%** magical damage. If she has **15** :droplet:, spends it to follow-up with **25%** MD, up to **3** times per ATK action.\n- [On-field] : **+200** MR\n- [Off-field] : For every **1** mana regen, has a **1%** chance to detect mana-instability, allowing Stark to gain **+4%** additional mitigation against physical damage, and another **+8%** mitigation against magical damage as well.\n- [Upon entry] : **+5%** vulnerability on the enemy for **8** rounds, after that she gains **+20%** vulnerability.\n\n`Stark`:\n- ATK: First **7** ATKs deal **60%** physical damage and allow him to store the mitigated amount. The **8th** ATK deals the mitigated amount (Up to 20% max HP) to the enemy as *lightning* physical damag, before resetting mitigation recorded.\n- [On-field] : Gains **4%** mitigation against physical damage.\n- [Off-field] : Grants **+5** 💧 every round.\n- [Upon entry] : Has **+10%** ATK for **8** rounds, after that he has **-10%** ATK.\n\n__**Active** (:sparkles:)__:\nUses: `Unlimited (CD: 8)`\nCost: `140 💧 (can be substituted with 25% max HP, at most dropping HP to 1)`\nTimeout: `False`\n- Switches between `Fern`/`Stark`.\n- Loses **2%** current HP every round permanently\n- If below **30%** HP, additionally launches a collaborative strike, dealing **40%** damage.\n- For every time this active is used, lowers its cost by **20** (down to at most 0). On this round, passives of both characters are briefly applied.",
+        desc: "**Total Usage**: `Unlimited (CD: 8)`\n**Cost**: `140 💧 (reduced by 20 every use, can be substituted with 25% max HP 💖)`\n**Timeout**: `False`\n**Tags**: `DPS (Flexible ATK/MD, DPS/Tank)`\n\n-# Fern and Stark together are not only bickering allies, but also a mix of both physical and magical force, tearing down waves of enemies with their collaborative efforts.\n\nPassively, `Fern` enters the battle as the front-liner if MD is higher than ATK, else `Stark` enters. This activates their [Upon entry] effect respectively. When either member is [On-field], the other activates their [Off-field] passive. Upon being switched to, activates their own [Upon entry] effect.\n\n`Fern`'s ability:\n- ATK is altered to Zoltraak, dealing **25%** magical damage. If she has **15** :droplet:, spends it to follow-up with **25%** MD, up to **3** times per ATK action. When [On-field], she has **+200** MR. When [Off-field], she has a **1%** chance to detect mana-instability for every **1** mana-regen, granting `Stark` **+4%** additional mitigation against physical damage, and another **+8%** mitigation against magical damage as well. [Upon entry], she inflicts **+5%** vulnerability on the enemy for **8** rounds, after that she gains **+20%** vulnerability.\n\n`Stark`'s ability:\n- ATK is altered. First four ATKs deal **60%** physical damage and allows him to store the mitigated amount. The **8th** ATK deals the mitigated amount (Up to 20% max HP) to the enemy as *lightning* physical absolute damage, before resetting mitigation recorded. When [On-field], he gains **4%** mitigation against physical damage. When [Off-field], he grants **5** 💧 every round. [Upon entry], he has **+10%** ATK for **8** rounds, after that he has **-10%** ATK.\n\nUsing their active, they switch between `Fern`/`Stark`. Loses **2%** current HP every round permanently. If below **30%** HP, additionally launches a collaborative strike, dealing **40%** damage. For every time this active is used, lowers its cost by **20** (down to at most 0). On this round, passives of both characters are briefly applied.",
+        shortdesc: "__**Passive**__:\n- Enters the battle as `Fern` if MD is higher than ATK, else enters as `Stark`. This activates their [Upon entry] effect.\n- When either member is [On-field], the other activates their [Off-field] passive. Upon being switched to, activates their own [Upon entry] effect.\n\n`Fern`:\n- ATK - Zoltraak: Deals **25%** magical damage. If she has **15** :droplet:, spends it to follow-up with **25%** MD, up to **3** times per ATK action.\n- [On-field] : **+200** MR\n- [Off-field] : For every **1** mana regen, has a **1%** chance to detect mana-instability, allowing Stark to gain **+4%** additional mitigation against physical damage, and another **+8%** mitigation against magical damage as well.\n- [Upon entry] : **+5%** vulnerability on the enemy for **8** rounds, after that she gains **+20%** vulnerability.\n\n`Stark`:\n- ATK: First **7** ATKs deal **60%** physical damage and allow him to store the mitigated amount. The **8th** ATK deals the mitigated amount (Up to 20% max HP) to the enemy as *lightning* physical absolute damage, before resetting mitigation recorded.\n- [On-field] : Gains **4%** mitigation against physical damage.\n- [Off-field] : Grants **+5** 💧 every round.\n- [Upon entry] : Has **+10%** ATK for **8** rounds, after that he has **-10%** ATK.\n\n__**Active** (:sparkles:)__:\nUses: `Unlimited (CD: 8)`\nCost: `140 💧 (can be substituted with 25% max HP, at most dropping HP to 1)`\nTimeout: `False`\n- Switches between `Fern`/`Stark`.\n- Loses **2%** current HP every round permanently\n- If below **30%** HP, additionally launches a collaborative strike, dealing **40%** damage.\n- For every time this active is used, lowers its cost by **20** (down to at most 0). On this round, passives of both characters are briefly applied.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Fern & Stark EX
 
@@ -8544,7 +8557,7 @@ export const abilities: Record<number, Ability> = {
                 if (myStats.onField === 1) {
                     myStats.mr += 200; // Fern's on-field passive
                     myStats.sm += 5; // Stark's off-field passive
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 5;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 5;
                 } else {
                     myStats.physMit += 0.04; // Stark's on-field passive
                     myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
@@ -8694,7 +8707,7 @@ export const abilities: Record<number, Ability> = {
                             dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2 + atkbuff, magicDamage: true, isLightning: true });
                             myStats.sm += 3;
                             if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                            if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
+                            if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 3;
                             if (myStats.lunarDomain && Math.random() < 0.33) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2 + atkbuff, magicDamage: true, isLightning: true });
                         };
 
@@ -8736,7 +8749,7 @@ export const abilities: Record<number, Ability> = {
                     dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:columult:1480218976184176847> **Lunar-Charged**`, { atkMultiplier: 0.2, magicDamage: true, isLightning: true });
                     myStats.sm += 3;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += 3;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 3;
                 } else if (lunarIndex === 1) {// Lunar Bloom
                     myStats.tempLightningBuff += 0.4;
                     myStats.tempLightningBuffActive += 1;
@@ -8763,8 +8776,8 @@ export const abilities: Record<number, Ability> = {
         used: 0,
         pause: 0,
         cost: 0,
-        desc: "To be added later.",
-        shortdesc: "__Core Mechanic: Glacio Synergy__\n- All of her + her allies' attacks, if they don't carry an element (e.g. Fire / Lightning), are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]).\n- `❄️` : when attacked with a Frost hit, deals **4%** damage for every stack, up to **40%** (once per round)\n\n__Default state__\n- Upon entering battle, uses ATK on the enemy **twice**\n- Every ATK grants **50** `Dedication`, while every third grants **200** `Dedication`\n- When owning **300** `Dedication`, ATK instead consumes **300** `Dedication` to deal **50%** damage with no timeout, before entering her __Foreclaimed self__ state (once)\n\nDuring the __Foreclaimed self__ state:\n- Using ATK or Class skill grants **100** `Frostheart` (Max: 900)\n- has **+20%** counter chance, normal attacks deal **+20%** damage\n- When reaching **600** `Frostheart`, :sparkles: becomes available (Timeout true). Using her active consumes **600** `Frostheart` to extend all buff durations on self by **1** round, counter the next hit, and enter __Iai__ state (once)\n\nDuring __Iai__ state:\n- Next three ATK are altered to deal **150%** undodgeable damage and apply **3x** `❄️`. If the enemy has **10** or more `❄️`, consumes it to freeze them for **1** round\n- When all three are used up, :sparkles: becomes available again (Timeout true). Using her active deals **400%** undodgeable damage, and converts any `Frostheart` to `Dedication`, then exits the __Iai__ state.",
+        desc: "**Total Usage**: `Unlimited`\n**Cost**: `600 Frostheart / None`\n**Timeout**: `True`\n**Tags**: `DPS`\n\n-# A veteran miko (shrine maiden) and member of the Special Response Force who has served for over a century, Hiyuki wields the Suzu, allowing her to perceive and harness endless *possibilities* of herself.\n\nUnder glacio synergy, all elementless attacks in battle are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]). When the enemy has `❄️` and is attacked by a Frost hit, they take **4%** damage for every stack (Max: 40%, once per round).\n\nUpon entering battle, she uses ATK on the enemy **twice** (procs normal attack effects). Every ATK grants **50** `Dedication`, while every **3rd** grants **200** `Dedication`. When owning **300** of such, ATK instead consumes **300** to deal **50%** damage with no timeout, before entering her __Foreclaimed self__ state (once).\n\n-# Manipulation of parallel dimensions and alternative timelines.\nDuring the __Foreclaimed self__ state, using ATK or class skill grants **100** `Frostheart` (Max: 900). She has **+20%** counter chance, normal attacks also deal **120%** damage. When reaching **600** or more `Frostheart`, she may use :sparkles:, consuming **600** to extend all buff durations on self by **1** round, counter the next hit, and enter the __Iai state__ (once)\n\n-# The absolute convergence of all parallel timelines into a single, fatal moment of execution.\nDuring the __Iai__ state, her next three ATKs are altered to deal **150%** undodgeable damage and apply **3x** `❄️`. If the enemy has **10** or more `❄️`, consumes it to freeze them for **1** round. When all three are used up, she may use :sparkles: again to deal **400%** undodgeable damage, converting any `Frostheart` to `Dedication`, then exits the __Iai__ state.",
+        shortdesc: "**Uses**: `Unlimited`\n**Cost**: `600 Frostheart / None`\n**Timeout**: `True`\n**Role**: `DPS (Frost), progressive, combo`\n\n__Core Mechanic: Glacio Synergy__\n- All of her + her allies' attacks, if they don't carry an element (e.g. Fire / Lightning), are identified as <a:frost1:1504497507185725473><a:frost2:1504497408233705512>, and apply **1x** Glacio Chafe (considered as Frost [`❄️`]).\n- `❄️` : when attacked with a Frost hit, deals **4%** damage for every stack, up to **40%** (once per round)\n\n__Default state__\n- Upon entering battle, uses ATK on the enemy **twice**\n- Every ATK grants **50** `Dedication`, while every third grants **200** `Dedication`\n- When owning **300** `Dedication`, ATK instead consumes **300** `Dedication` to deal **50%** damage with no timeout, before entering her __Foreclaimed self__ state (once)\n\nDuring the __Foreclaimed self__ state:\n- Using ATK or Class skill grants **100** `Frostheart` (Max: 900)\n- has **+20%** counter chance, normal attacks deal **+20%** damage\n- When reaching **600** `Frostheart`, :sparkles: becomes available (Timeout true). Using her active consumes **600** `Frostheart` to extend all buff durations on self by **1** round, counter the next hit, and enter __Iai__ state (once)\n\nDuring __Iai__ state:\n- Next three ATK are altered to deal **150%** undodgeable damage and apply **3x** `❄️`. If the enemy has **10** or more `❄️`, consumes it to freeze them for **1** round\n- When all three are used up, :sparkles: becomes available again (Timeout true). Using her active deals **400%** undodgeable damage, and converts any `Frostheart` to `Dedication`, then exits the __Iai__ state.",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Hiyuki EX
             if (myStats.hiyukiState === 2 && myStats.frostheart >= 600) {// Enter Iai stance
@@ -8894,8 +8907,8 @@ export const abilities: Record<number, Ability> = {
         singingUsed: 0,
         superchargeUsed: 0,
         cd: -7,
-        desc: "Check compact desc",
-        shortdesc: "__**Passive**__:\n> Lloyd summons a new companion every **15** rounds, starting from the **10th**.\n- 10th: **+10%** ATK\n- 25th: **+10%** DEF\n- 40th: **+10%** critical rate\n- 55th: **+10%** dodge rate\n- 70th: **+10%** critical damage\n- 95th: **+10%** ATK\n\n__**Core Mechanic**__:\n- For every **250** (non-raid battles) / **450** (raid battles) mana gained (includes overflow), he gets a new mana circle [ <a:manacircle:1505922588277477540> ], giving him **12%** ATK\n\n__**Active**__\n`Uses`: `Unlimited`\n`Cost`: `60 💧`\n`Timeout`: `False`\n> Lloyd may choose a skill to utilize by using ATK, DEF or ACTIVE (:sparkles:) again. However if he doesn't have at least **1** <a:manacircle:1505922588277477540>, he can only use his ACTIVE again.\n\n:crossed_swords: : Mana Blast\n`Timeout`: `True`\n- Deals **15%** damage. This is repeated for every <a:manacircle:1505922588277477540> he currently has (Max: 5 hits).\n\n:shield: : Demon Possessed Singer\n`Timeout`: `True`\n- Stuns the enemy for **1** round\n- Decreases their dodge chance by **10%** for every time this skill was used\n\n:sparkles: Supercharge\n`Max Uses` : `2`\n`Timeout`: `False`\n- **+20** mana regeneration for **5** rounds\n- Boosts the damage scaling of __Mana Blast__ by **10%** permanently\n\n__**Side passives**__:\n- Every **10** rounds: Increases critical rate to **100%** for **1** round, and reduces the enemy's DEF & MR by **33%**\n- Receives **20%** less damage from physical and magical hits when below **50%** hp. This stacks with general damage mitigation\n- Revives once with **60%** of this HP",
+        desc: "**Total Usage**: `Unlimited`\n**Cost**: `60 💧`\n**Timeout**: `False`\n**Tags**: `DPS / Support`\n\n## New companions\nEvery **15** rounds, starting from the 10th. **+10%** ATK -> **+10%** DEF -> **+10%** critical rate -> **+10%** dodge rate -> **+10%** critical damage -> **+10%** ATK\n\n## Mana Circles\nFor every **250** (non-raid battles) / **450** (raid battles) mana gained (includes overflow), he gets a new mana circle [ <a:manacircle:1505922588277477540> ], giving him **12%** ATK.\n\n## Ability\nUsing his ability, Lloyd may choose a skill to utilize by using ATK, DEF or ACTIVE (:sparkles:) again. However if he doesn't have at least **1** <a:manacircle:1505922588277477540>, he can only use his ACTIVE again.\n\n- :crossed_swords: : Mana Blast\n> Timeout true. Deals **15%** damage. This is repeated for every <a:manacircle:1505922588277477540> he currently has (Max: **5** hits).\n\n- :shield: : Demon Possessed Singer\n> Timeout true. Stuns the enemy for **1** round. Decreases their dodge chance by **10%** for every time this skill was used\n\n- :sparkles: : Supercharge\n> Can be used up to **2** times. Timeout false.  **+20** mana regeneration for **5** rounds. Boosts the damage scaling of Mana Blast by **10%** permanently\n\n## Additional passives\nHe has an array of passives to aid his performance. To start, he increases critical rate to **100%** for **1** round and reduces the enemy's DEF & MR by **33%** every **10** rounds. Moreover, he receives **20%** less damage from physical and magical hits when below **50%** hp. This stacks with general damage mitigation. At last, he revives once with **60%** of this HP, ensuring a window of final strikes under high threats.",
+        shortdesc: "__**Passive**__:\n> Gains companion buffs every **15** rounds, starting from the **10th**.\n- 10th: **+10%** ATK\n- 25th: **+10%** DEF\n- 40th: **+10%** critical rate\n- 55th: **+10%** dodge rate\n- 70th: **+10%** critical damage\n- 95th: **+10%** ATK\n\n__**Core Mechanic**__:\n- For every **250** (non-raid battles) / **450** (raid battles) mana gained (includes overflow), he gets a new mana circle [ <a:manacircle:1505922588277477540> ], giving him **12%** ATK\n\n__**Active**__\n`Uses`: `Unlimited`\n`Cost`: `60 💧`\n`Timeout`: `False`\n> Lloyd may choose a skill to utilize by using ATK, DEF or ACTIVE (:sparkles:) again. However if he doesn't have at least **1** <a:manacircle:1505922588277477540>, he can only use his ACTIVE again.\n\n:crossed_swords: : Mana Blast\n`Timeout`: `True`\n- Deals **15%** damage. This is repeated for every <a:manacircle:1505922588277477540> he currently has (Max: 5 hits).\n\n:shield: : Demon Possessed Singer\n`Timeout`: `True`\n- Stuns the enemy for **1** round\n- Decreases their dodge chance by **10%** for every time this skill was used\n\n:sparkles: Supercharge\n`Max Uses` : `2`\n`Timeout`: `False`\n- **+20** mana regeneration for **5** rounds\n- Boosts the damage scaling of __Mana Blast__ by **10%** permanently\n\n__**Side passives**__:\n- Every **10** rounds: Increases critical rate to **100%** for **1** round, and reduces the enemy's DEF & MR by **33%**\n- Receives **20%** less damage from physical and magical hits when below **50%** hp. This stacks with general damage mitigation\n- Revives once with **60%** of this HP",
         ability: async function (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) {
             // Lloyd Frontera EX
             if (matchStats.round < this.cd) {
@@ -8988,8 +9001,7 @@ export const abilities: Record<number, Ability> = {
             myStats.rev += 1;
             const circlereq = matchStats.interaction.commandName === "raid" ? 450 : 250;
 
-            if (myStats.manaGained > circlereq) {
-                myStats.manaGained -= circlereq;
+            if (myStats.manaGained >= (circlereq * (myStats.manaCircle + 1))) {
                 myStats.manaCircle++;
                 myStats.atk += Math.floor(myStats.atk * 0.12);
                 mybuff.atk.push(new buffInfo("*", 1.12, 9999));
@@ -8998,8 +9010,7 @@ export const abilities: Record<number, Ability> = {
             };
 
             myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (myStats.manaGained > circlereq) {
-                    myStats.manaGained -= circlereq;
+                if (myStats.manaGained >= (circlereq * (myStats.manaCircle + 1))) {
                     myStats.manaCircle++;
                     myStats.atk += Math.floor(myStats.atk * 0.12);
                     mybuff.atk.push(new buffInfo("*", 1.12, 9999));
@@ -9013,9 +9024,21 @@ export const abilities: Record<number, Ability> = {
                 if (myStats.hp / myStats.maxhp < 0.5) {
                     myStats.physMit += 0.2;
                     myStats.mdMit += 0.2;
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        myStats.physMit -= 0.2;
+                        myStats.mdMit -= 0.2;
+
+                        return AbilityResponse.SUCCESS;
+                    }));
                 } else {
                     myStats.physMit -= 0.2;
                     myStats.mdMit -= 0.2;
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        myStats.physMit += 0.2;
+                        myStats.mdMit += 0.2;
+
+                        return AbilityResponse.SUCCESS;
+                    }));
                 };
 
                 // Companions

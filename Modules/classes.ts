@@ -41,7 +41,7 @@ const skillDescs: SkillDescription[] = [
     },
     { // Asura
         "active": `Heals and increases max HP by **10%**. (Uses: 12, Timeout true)`,
-        "passive": `Normal attacks reduce max HP by **5%**, but increase ATK by **8%** permanently. Asuras can't block or dodge, nor can they use character abilities.`
+        "passive": `Normal attacks deal physical damage, reduce max HP by **5%**, but increase ATK by **8%** permanently. Asuras can't block or dodge, nor can they use character abilities.`
     },
 
     { "active": `Steals the equivalent of **10%** of his stats from the enemy for **3** rounds. (Timeout true)`, "passive": `Has a **33%** chance of healing for **10%** of damage dealt.` },

@@ -4,8 +4,8 @@ import { abilities, Ability } from "../Modules/abilities";
 import { achievements } from "../Modules/achievements";
 import { classes } from "../Modules/classes";
 import { curses } from "../Modules/curses";
-import { floors } from "../Modules/enemies";
-import { armorInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items";
+import { floors, hiddenFloors } from "../Modules/enemies";
+import { armorInfo, entryInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items";
 import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
@@ -113,6 +113,7 @@ const exportCommand: SlashCommand = {
         let flag = interaction.options.getString('flag');
 
         const stats = author.schema;
+        if (!stats.hidden_dungeon) (stats as any).hidden_dungeon = {};
         if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.editReply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
 
         const guild = stats.guild ? await getGuildSchema(stats.guild) : undefined;
@@ -120,17 +121,33 @@ const exportCommand: SlashCommand = {
         // Tutorial
         if (!stats.tutorial.includes(8)) await waitForTutorial(interaction, stats);
 
-        let floor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
-        if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 330) stats.dungeon_floors[++floor] = 0;
-        if (floorDiff === -1) floorDiff = Math.floor((floor - 1) / 100);
-        if (floorDiff > 3) floorDiff = 3;
+        let floor = 0;
+        let isHiddenFloor = false;
+        let hiddenFloorKey = "0";
 
-        if (choice) {
-            if (choice < 1) return interaction.editReply(`There is no floor ${choice} <:EmiliaWot:868996542080622603>`);
-            if (choice + (floorDiff * 100) > floor) return interaction.editReply(`You haven't unlocked Floor ${choice} yet. You need ${floors[floor]?.winsNeeded} ${floors[floor]?.winsNeeded === 1 ? "win" : "wins"} on floor \`${Math.min(floor, 100)}/${floor <= 100 ? 0 : Math.min(floor - 100, 100)}/${Math.max(floor - 200, 0)}/${Math.max(floor - 300, 0)}\` to unlock the next one.`);
-            floor = Math.round(choice + (floorDiff * 100));
+        // Check for equipped entry item → hidden dungeon override
+        if (stats.equipment["entry"]) {
+            const entryItem = items[parseInt(stats.equipment["entry"])];
+            if (entryItem instanceof entryInfo && entryItem.floor >= 1 && entryItem.floor <= 20) {
+                floor = entryItem.floor;
+                hiddenFloorKey = floor.toString();
+                isHiddenFloor = true;
+            };
         };
-        if (floor > 330) floor = 330;
+
+        if (!isHiddenFloor) {
+            floor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
+            if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor < 300) stats.dungeon_floors[++floor] = 0;
+            if (floorDiff === -1) floorDiff = Math.floor((floor - 1) / 100);
+            if (floorDiff > 3) floorDiff = 3;
+
+            if (choice) {
+                if (choice < 1) return interaction.editReply(`There is no floor ${choice} <:EmiliaWot:868996542080622603>`);
+                if (choice + (floorDiff * 100) > floor) return interaction.editReply(`You haven't unlocked Floor ${choice} yet. You need ${floors[floor]?.winsNeeded} ${floors[floor]?.winsNeeded === 1 ? "win" : "wins"} on floor \`${Math.min(floor, 100)}/${floor <= 100 ? 0 : Math.min(floor - 100, 100)}/${Math.max(floor - 200, 0)}/${Math.max(floor - 300, 0)}\` to unlock the next one.`);
+                floor = Math.round(choice + (floorDiff * 100));
+            };
+            if (floor > 300) floor = 300;
+        };
 
         // Increase limit
         let dunLim = [10, 20, 500]; // [0] -> loot, [1] -> progress, [2] -> 2nd loot limit
@@ -152,7 +169,10 @@ const exportCommand: SlashCommand = {
         if ((flag === "skip" || flag === "all") && dunLim[0] - stats.dungeon_limit <= 0) return interaction.editReply("You've already used up all your skips for this interval.");
 
         // Progressive skip limit - can only skip floors that have been manually cleared
-        if (floor > 300 && (flag === "skip" || flag === "all")) {
+        if (isHiddenFloor && (flag === "skip" || flag === "all")) {
+            const hasCompletedFloor = stats.hidden_dungeon[hiddenFloorKey] >= hiddenFloors[floor]?.winsNeeded;
+            if (!hasCompletedFloor) return interaction.editReply(`You can only skip hidden floors that you have manually cleared. Complete Hidden Floor ${floor} first to unlock skipping!`);
+        } else if (floor > 300 && (flag === "skip" || flag === "all")) {
             // Check if user has completed this floor and moved to the next one
             const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
             const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
@@ -213,9 +233,11 @@ const exportCommand: SlashCommand = {
         // User stats
         let myChar = characters[stats.battlechar];
 
-        // Determine if level caps should be applied (floor 300+ and not manually cleared)
+        // Determine if level caps should be applied
         let applyLevelCaps = false;
-        if (floor >= 300) {
+        if (isHiddenFloor) {
+            applyLevelCaps = true;
+        } else if (floor >= 300) {
             const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
             const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
             // Apply caps only if floor hasn't been manually cleared
@@ -240,31 +262,39 @@ const exportCommand: SlashCommand = {
         };
 
         // Enemy Stats
-        if (!floors[floor]) {
-            return interaction.editReply(`Invalid floor ${floor}. Please try again.`);
+        if (isHiddenFloor) {
+            if (!hiddenFloors[floor]) {
+                return interaction.editReply(`Invalid hidden floor ${floor}. Please try again.`);
+            };
+        } else {
+            if (!floors[floor]) {
+                return interaction.editReply(`Invalid floor ${floor}. Please try again.`);
+            };
         };
 
-        let enemy = floors[floor].monster;
+        let enemy = isHiddenFloor ? hiddenFloors[floor].monster : floors[floor].monster;
 
         if (!enemy) {
             return interaction.editReply(`No enemy found for floor ${floor}. Please contact an administrator.`);
         };
 
-        const curseRar = floor > 300 ? curses.filter((e) => e.tier === 1 || e.tier === 2) : (enemy.boss ? curses.filter((e) => e.tier) : curses.filter((e) => e.tier === 0));
+        const curseRar = isHiddenFloor ? curses.filter((e) => e.tier === 1 || e.tier === 2) : (enemy.boss ? curses.filter((e) => e.tier) : curses.filter((e) => e.tier === 0));
         let curse = curseRar[Math.floor(Math.random() * curseRar.length)];
-        if (floor > 300) switch (floor) {
-            case 302: curse = curseRar[5]; break; // Scorched Earth
-            case 305: curseRar[6]; break; // Dragon Manipulation
-            case 306: curse = curseRar[7]; break; // Mermaid Murmur
-            case 307: curse = curseRar[9]; break; // Malevolent Shrine
-            case 308: curse = curseRar[8]; break; // Chilling Cold
-            //case 319: curse = curseRar[10]; break; // Bane of the Powerful
+        if (isHiddenFloor) switch (floor) {
+            case 2: curse = curseRar[5]; break;  // Scorched Earth
+            case 5: curse = curseRar[6]; break;  // Dragon Manipulation
+            case 6: curse = curseRar[7]; break;  // Mermaid Murmur
+            case 7: curse = curseRar[9]; break;  // Malevolent Shrine
+            case 8: curse = curseRar[8]; break;  // Chilling Cold
+            case 9: curse = curseRar[10]; break; // Omni Barrier
+            case 18: curse = curseRar[12]; break; // Trial of Sagacity
+            case 19: curse = curseRar[13]; break; // Bane of the Powerful
         };
 
-        let eAbility = enemy.boss ? bossAbilities.find((e) => e.list[0] === floor) : undefined;
+        let eAbility = enemy.boss ? bossAbilities.find((e) => e.list[0] === (isHiddenFloor ? floor + 300 : floor)) : undefined;
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
-        let eStats = floors[floor].stats(enemy);
+        let eStats = isHiddenFloor ? hiddenFloors[floor].stats(enemy) : floors[floor].stats(enemy);
         eStats.image = eImage;
         let eStatsC = { ...eStats };
 
@@ -294,6 +324,7 @@ const exportCommand: SlashCommand = {
 
             const stats = await getUserSchema(interaction.user.id);
             if (!stats) return;
+            if (!stats.hidden_dungeon) (stats as any).hidden_dungeon = {};
 
             // Clear restrictions
             clearTimeout(userTimeout);
@@ -306,24 +337,42 @@ const exportCommand: SlashCommand = {
             const Embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setThumbnail(myStatsC.thumbnail)
-                .setTitle(`Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`);
+                .setTitle(isHiddenFloor ? `Hidden Dungeon Floor ${floor} ${enemy.boss ? "(Boss)" : ""}` : `Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`);
             if (dunLim[0] - stats.dungeon_limit >= 0 || !myClass) Embed.setFooter({ text: `Balance: ${stats.coins} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
             else Embed.setFooter({ text: `${myClass.name} level: ${myStats.clvl} | XP left: ${(myStats.clvl * 50) - (stats.dungeon_classlevels[myClass.id] - (myStats.clvl * (myStats.clvl - 1) * 25))}`, iconURL: myClass.image });
-            if (r === "l") return Embed.setDescription(`💀 **${myChar.name}** lost 💀\n<a:arrow_green:916716811842621450> Floor ${floor} progress: **${stats.dungeon_floors[floor]}**/${floors[floor]?.winsNeeded}\n${runsLeftStr}\n<a:arrow_red:916716702618767401> ${eStats.ep > myStats.ep ? `**${enemy.name}** was ${Math.floor((eStats.ep / myStats.ep) * 10000) / 100}% stronger` : "Better luck next time"}`);
 
-            if (dunLim[1] - stats.dungeon_limit >= 0 || stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded) stats.dungeon_floors[floor] += ((skipRounds > 0 && skipRounds < 30) ? skipRounds : 1);
+            if (r === "l") {
+                const progress = isHiddenFloor ? (stats.hidden_dungeon[hiddenFloorKey] ?? 0) : stats.dungeon_floors[floor];
+                const winsNeeded = isHiddenFloor ? hiddenFloors[floor]?.winsNeeded : floors[floor]?.winsNeeded;
+                return Embed.setDescription(`💀 **${myChar.name}** lost 💀\n<a:arrow_green:916716811842621450> Floor ${floor} progress: **${progress}**/${winsNeeded}\n${runsLeftStr}\n<a:arrow_red:916716702618767401> ${eStats.ep > myStats.ep ? `**${enemy.name}** was ${Math.floor((eStats.ep / myStats.ep) * 10000) / 100}% stronger` : "Better luck next time"}`);
+            };
 
-            let unlocked = `<a:arrow_green:916716811842621450> Floor ${floor} progress: **${stats.dungeon_floors[floor]}**/${floors[floor]?.winsNeeded}`;
+            let unlocked: string;
+            if (isHiddenFloor) {
+                const hiddenIncrement = (skipRounds > 0 && skipRounds < 30) ? skipRounds : 1;
+                const prevProgress = stats.hidden_dungeon[hiddenFloorKey] ?? 0;
+                if (dunLim[1] - stats.dungeon_limit >= 0 || prevProgress >= hiddenFloors[floor]?.winsNeeded) stats.hidden_dungeon[hiddenFloorKey] = prevProgress + hiddenIncrement;
+                const progress = stats.hidden_dungeon[hiddenFloorKey] ?? 0;
+                unlocked = `<a:arrow_green:916716811842621450> Hidden Floor ${floor} progress: **${progress}**/${hiddenFloors[floor]?.winsNeeded}`;
 
-            if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor !== 330) {
-
-                if (stats.dungeon_floors[floor] === floors[floor]?.winsNeeded) {
-                    unlocked = `🔑 Floor **${floor + 1}** has been unlocked`;
-                    stats.dungeon_floors[floor + 1] = 0;
+                if (progress >= hiddenFloors[floor]?.winsNeeded && prevProgress < hiddenFloors[floor]?.winsNeeded) {
+                    unlocked = `🔑 Hidden Floor **${floor}** Cleared!`;
                 };
+            } else {
+                if (dunLim[1] - stats.dungeon_limit >= 0 || stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded) stats.dungeon_floors[floor] += ((skipRounds > 0 && skipRounds < 30) ? skipRounds : 1);
 
-                // Achievements
-                achievements[34].check(interaction, interaction.user, floor + 1), achievements[35].check(interaction, interaction.user, floor + 1), achievements[36].check(interaction, interaction.user, floor + 1), achievements[37].check(interaction, interaction.user, floor + 1), achievements[38].check(interaction, interaction.user, floor + 1); // Challenger
+                unlocked = `<a:arrow_green:916716811842621450> Floor ${floor} progress: **${stats.dungeon_floors[floor]}**/${floors[floor]?.winsNeeded}`;
+
+                if (stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded && floor < 300) {
+
+                    if (stats.dungeon_floors[floor] === floors[floor]?.winsNeeded) {
+                        unlocked = `🔑 Floor **${floor + 1}** has been unlocked`;
+                        stats.dungeon_floors[floor + 1] = 0;
+                    };
+
+                    // Achievements
+                    achievements[34].check(interaction, interaction.user, floor + 1), achievements[35].check(interaction, interaction.user, floor + 1), achievements[36].check(interaction, interaction.user, floor + 1), achievements[37].check(interaction, interaction.user, floor + 1), achievements[38].check(interaction, interaction.user, floor + 1); // Challenger
+                };
             };
 
 
@@ -511,6 +560,7 @@ const exportCommand: SlashCommand = {
                     dshard: { type: 'increment', value: dShards },
                     items: { type: 'merge_json', value: addNewItems },
                     dungeon_floors: { type: 'set', value: stats.dungeon_floors },
+                    hidden_dungeon: { type: 'set', value: stats.hidden_dungeon },
                     dungeon_classlevels: { type: 'set', value: stats.dungeon_classlevels },
                     tutorial: { type: 'append_unique', value: [9] },
                     donatedtotal: { type: "increment", value: tax },
@@ -589,11 +639,12 @@ const exportCommand: SlashCommand = {
                 ? (myStats.clvl * 50) - (stats.dungeon_classlevels[myClass.id] - (myStats.clvl * (myStats.clvl - 1) * 25))
 
                 : 0;
-            // Check for extreme item drop (floors 301-330)
+            // Check for extreme item drop (hidden floors 1-20)
             let drop = "\n";
-            if (hasExtremeItemDrop(floor)) {
-                const itemDrop = getExtremeItemDrop(floor);
-                if (itemDrop) {//&& Math.random() < 0.0005) {
+            const extremeDropFloor = isHiddenFloor ? parseInt(hiddenFloorKey) : 0;
+            if (isHiddenFloor && hasExtremeItemDrop(extremeDropFloor)) {
+                const itemDrop = getExtremeItemDrop(extremeDropFloor);
+                if (itemDrop && Math.random() < 0.0005) {
                     try {
                         // Add the item directly to player's inventory
                         if (itemDrop.itemType !== "rune") {
@@ -640,9 +691,9 @@ const exportCommand: SlashCommand = {
         if (myStats.shieldid) await (items[myStats.shieldid] as weaponInfo).buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
         if (myStats.helmet && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.cuirass] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.gloves] as armorInfo)?.setname && (items?.[myStats.helmet] as armorInfo).setname === (items?.[myStats.boots] as armorInfo)?.setname) await (items?.[myStats.boots] as armorInfo)?.buff?.(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        if (myStats.rune && floor !== 318) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
+        if (myStats.rune && !(isHiddenFloor && parseInt(hiddenFloorKey) === 18)) await (items[parseInt(myStats.rune)] as runeInfo)?.buff(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
 
-        if (floor !== 318) {
+        if (!(isHiddenFloor && parseInt(hiddenFloorKey) === 18)) {
             if (myStats.ring1) await (items[myStats.ring1] as ringInfo).getBuff(myStats.ring1info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
             if (myStats.ring2) await (items[myStats.ring2] as ringInfo).getBuff(myStats.ring2info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
             if (myStats.ring3) await (items[myStats.ring3] as ringInfo).getBuff(myStats.ring3info?.level)(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, new EmbedBuilder(), interaction.user);
@@ -673,8 +724,11 @@ const exportCommand: SlashCommand = {
             );
 
         // Skip Fight
-        if ((flag === "skip" || flag === "all") && stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded) {
-            if (floor > 300) {
+        const skipCompleted = isHiddenFloor ? (stats.hidden_dungeon[hiddenFloorKey] ?? 0) >= hiddenFloors[floor]?.winsNeeded : stats.dungeon_floors[floor] >= floors[floor]?.winsNeeded;
+        if ((flag === "skip" || flag === "all") && skipCompleted) {
+            if (isHiddenFloor) {
+                // Hidden floors allow skip if cleared
+            } else if (floor > 300) {
                 // Check if user has completed this floor and moved to the next one
                 const currentFloor = parseInt(Object.keys(stats.dungeon_floors)[Object.keys(stats.dungeon_floors).length - 1]);
                 const hasCompletedFloor = stats.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
@@ -711,7 +765,7 @@ const exportCommand: SlashCommand = {
                     .setColor(embedColor)
                     .setThumbnail(isCompactEmbed ? eImage : myStatsC.thumbnail)
                     .setFooter({ text: `Enemy EP: ${eStatsC.ep} | round 1 | time left: 120s` })
-                    .setTitle(`Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`)
+                    .setTitle(isHiddenFloor ? `Hidden Dungeon Floor ${floor} ${enemy.boss ? "(Boss)" : ""}` : `Dungeon Floor ${(floor - 1) % 100 + 1} ${enemy.boss ? "(Boss)" : ""}`)
                     .setDescription(`${threatLevelWarning}${curse.emblem}${enemy.name}'s Stats (**${eStatsC.hp}**/${eStats.hp}\\💖${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStats.hp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStats.hp}\\💖${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}`)
                     .setImage(isCompactEmbed ? null : eImage);
                 interaction.editReply({ embeds: [Embed], components: [row] }).then(msg => {
@@ -906,8 +960,16 @@ const exportCommand: SlashCommand = {
                             };
                             matchStats.turn = 0;
 
+                            if (matchStats.costForAction > 0) {
+                                if (myStatsC.sm < matchStats.costForAction) {
+                                    myStats.maxhp -= Math.floor(myStatsC.maxhp * 0.08);
+                                    if (myStatsC.hp > myStats.maxhp) myStatsC.hp = myStats.maxhp;
+                                    notice.push(`\n<:mana:872926668803358218> **${myChar.name}** doesn't have enough mana and loses 8% of their max HP instead!`);
+                                } else myStats.sm -= matchStats.costForAction;
+                            };
+
                             // If attack was replaced
-                            if (myStatsC.replaceButton.atk?.run && floor !== 318) {
+                            if (myStatsC.replaceButton.atk?.run && !(isHiddenFloor && parseInt(hiddenFloorKey) === 18)) {
                                 myStatsC.replaceButton.atk.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
 
                                 // Event Triggers
@@ -949,6 +1011,14 @@ const exportCommand: SlashCommand = {
 
                             matchStats.turn = 0;
                             myStatsC.attackStreak = 0;
+
+                            if (matchStats.costForAction > 0) {
+                                if (myStatsC.sm < matchStats.costForAction) {
+                                    myStats.maxhp -= Math.floor(myStatsC.maxhp * 0.08);
+                                    if (myStatsC.hp > myStats.maxhp) myStatsC.hp = myStats.maxhp;
+                                    notice.push(`\n<:mana:872926668803358218> **${myChar.name}** doesn't have enough mana and loses 8% of their max HP instead!`);
+                                } else myStats.sm -= matchStats.costForAction;
+                            };
 
                             // If defense was replaced
                             if (myStatsC.replaceButton.def?.run) {
@@ -1000,6 +1070,14 @@ const exportCommand: SlashCommand = {
                             matchStats.turn = 0;
                             attack();
                             return;
+                        };
+
+                        if (matchStats.costForAction > 0) {
+                            if (myStatsC.sm < matchStats.costForAction) {
+                                myStats.maxhp -= Math.floor(myStatsC.maxhp * 0.08);
+                                if (myStatsC.hp > myStats.maxhp) myStatsC.hp = myStats.maxhp;
+                                notice.push(`\n<:mana:872926668803358218> **${myChar.name}** doesn't have enough mana and loses 8% of their max HP instead!`);
+                            } else myStats.sm -= matchStats.costForAction;
                         };
 
                         // If ability was replaced
@@ -1057,6 +1135,14 @@ const exportCommand: SlashCommand = {
                             return;
                         };
 
+                        if (matchStats.costForAction > 0) {
+                            if (myStatsC.sm < matchStats.costForAction) {
+                                myStats.maxhp -= Math.floor(myStatsC.maxhp * 0.08);
+                                if (myStatsC.hp > myStats.maxhp) myStatsC.hp = myStats.maxhp;
+                                notice.push(`\n<:mana:872926668803358218> **${myChar.name}** doesn't have enough mana and loses 8% of their max HP instead!`);
+                            } else myStats.sm -= matchStats.costForAction;
+                        };
+
                         // If class active was replaced
                         if (myStatsC.replaceButton.cskill?.run && matchStats.turn === 1) {
                             matchStats.turn = 0;
@@ -1104,6 +1190,15 @@ const exportCommand: SlashCommand = {
 
                     skip.on('collect', () => {
                         if (matchStats.turn == 1) {
+
+                            if (matchStats.costForAction > 0) {
+                                if (myStatsC.sm < matchStats.costForAction) {
+                                    myStats.maxhp -= Math.floor(myStatsC.maxhp * 0.08);
+                                    if (myStatsC.hp > myStats.maxhp) myStatsC.hp = myStats.maxhp;
+                                    notice.push(`\n<:mana:872926668803358218> **${myChar.name}** doesn't have enough mana and loses 8% of their max HP instead!`);
+                                } else myStats.sm -= matchStats.costForAction;
+                            };
+
                             notice.push(`\n⏩ Skipping to results...`);
                             editEmbed();
                             matchStats.turn = 0;

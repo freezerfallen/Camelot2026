@@ -4,26 +4,51 @@ import { PageRow, OfferRow } from "../Modules/components";
 import { showPage, customEmojis, getAscensionMaterial, searchItem, getForgeMaterialCosts } from "../Modules/functions";
 import { ItemRarity, SlashCommand } from "../types";
 import { getUserSchema, insertNewWeapon, updateUsers } from "../Modules/queries";
+import { runeMergeRecipes } from "../Modules/runeMergeRecipes";
 
 function forgeryEmbed(elements: (itemInfo)[]) {
     const Embed = new EmbedBuilder()
         .setColor(0xbbffff)
         .setTitle("Gaius' Forgery")
         .setThumbnail("https://i.imgur.com/WbPCBqR.png")
-        .setDescription("Welcome, honored one. What would you like me to do today?\n(Use `/forge <item>` to forge an item)\n");
+        .setDescription("Welcome, honored one. What would you like me to do today?\n(Use `/forge craft <item>` to forge an item)\n");
     for (let i = 0; i < elements.length; i++) {
         const item = elements[i] as weaponInfo | armorInfo;
         const costs = getForgeMaterialCosts(item.id);
         const ascItem = costs.ascensionMaterialId ? items[costs.ascensionMaterialId] as lootInfo : getAscensionMaterial(item.id, ascMaterials);
         const craftItem = items.find((e) => e.type === "crafting material" && e.grade === item.grade) as lootInfo;
-        const isExtreme = costs.ascension > 36; // Check if it's an extreme weapon
+        const isExtreme = costs.ascension > 36;
 
-        // Skip items with invalid materials
         if (!ascItem || !craftItem) continue;
 
         Embed.addFields(
             { name: `${item.gradeEmote}`, value: `${item.bar} ${item.emoji} | ${item.name}${isExtreme ? " ⚡" : ""}`, inline: true },
             { name: `Cost: ${craftItem.emoji}x${costs.crafting} ${ascItem.emoji}x${costs.ascension}`, value: `\`${item.psmin}-${item.psmax}\` ${customEmojis[item.primaryStat] || item.primaryStat}${item instanceof weaponInfo ? ` and \`${item.ssmin.endsWith("%") ? item.ssmin.slice(0, -1) : item.ssmin}-${item.ssmax}\` ${customEmojis[item.secondaryStat] || item.secondaryStat}` : ""}`, inline: true },
+            { name: '_ _', value: '_ _', inline: true },
+        );
+    };
+    return Embed;
+};
+
+function mergeEmbed(elements: { recipe: typeof runeMergeRecipes[0]; owned: Record<string, number>; }[]) {
+    const Embed = new EmbedBuilder()
+        .setColor(0xbbffff)
+        .setTitle("Rune Merging")
+        .setThumbnail("https://i.imgur.com/WbPCBqR.png")
+        .setDescription("Combine runes to create new ones.\n(Use `/forge merge <rune>` to see details for a specific rune)");
+    for (const { recipe, owned } of elements) {
+        const outItem = items[recipe.output];
+        if (!outItem) continue;
+        const hasCoin = recipe.coinCost ? owned["coins"] ?? 0 : 0;
+        const hasAll = Object.entries(recipe.inputs).every(([id, qty]) => (owned[id] ?? 0) >= qty) && (!recipe.coinCost || hasCoin >= recipe.coinCost);
+        const inputStr = Object.entries(recipe.inputs).map(([id, qty]) => {
+            const inp = items[parseInt(id)];
+            return inp ? `${inp.emoji} **${owned[id] ?? 0}**/${qty}` : `ID ${id} **${owned[id] ?? 0}**/${qty}`;
+        }).join(" ");
+        const coinStr = recipe.coinCost ? ` <:coins:872926669055356939>x **${hasCoin}**/${recipe.coinCost}` : "";
+        Embed.addFields(
+            { name: `${outItem.gradeEmote}`, value: `${hasAll ? "" : "❌ "}${outItem.bar} ${outItem.emoji} | ${outItem.name}${recipe.label ? ` (${recipe.label})` : ""}`, inline: true },
+            { name: "Inputs", value: `${inputStr}${coinStr}`, inline: true },
             { name: '_ _', value: '_ _', inline: true },
         );
     };
@@ -36,23 +61,20 @@ const exportCommand: SlashCommand = {
     name: 'forge',
     async execute({ interaction, author }) {
 
-        let item = interaction.options.getString('item');
-        let grade = interaction.options.getString('grade') as Omit<ItemRarity, "genesis" | "mythical"> | null;
-        let page = interaction.options.getInteger('page') || 1;
+        const subcommand = interaction.options.getSubcommand();
 
-        const itemsR = items.filter((e) => e.obtain.includes("crafting") && ((grade && !item) ? e.grade === grade : true));
-        itemsR.sort((a, b) => a.gradeValue - b.gradeValue);
+        if (subcommand === "catalog") {
+            let grade = interaction.options.getString('grade') as Omit<ItemRarity, "genesis" | "mythical"> | null;
+            let page = interaction.options.getInteger('page') || 1;
 
-        if (!item) {
-            // Setup Pages
+            const itemsR = items.filter((e) => e.obtain.includes("crafting") && (grade ? e.grade === grade : true));
+            itemsR.sort((a, b) => a.gradeValue - b.gradeValue);
+
             let elementsPerPage = 7;
             let pagesTotal = Math.ceil(itemsR.length / elementsPerPage);
             let currPage = 1;
-            if (page <= pagesTotal && page > 0) {
-                currPage = page;
-            };
+            if (page <= pagesTotal && page > 0) currPage = page;
 
-            // Filter items to show on the current page
             let showItems = showPage(currPage, itemsR, elementsPerPage);
 
             return interaction.reply({ embeds: [forgeryEmbed(showItems).setFooter({ text: `Page ${currPage}/${pagesTotal}` })], components: [PageRow] }).then(msg => {
@@ -73,70 +95,224 @@ const exportCommand: SlashCommand = {
             });
         };
 
-        // Find the item
-        const fItem = searchItem(item, interaction);
-        if (!fItem) return;
+        if (subcommand === "craft") {
+            let item = interaction.options.getString('item', true);
 
-        // Return if it's not craftable
-        if (!itemsR.includes(fItem)) return interaction.reply(`You can't craft ${fItem.emoji} **__${fItem.name}__**`);
+            const itemsR = items.filter((e) => e.obtain.includes("crafting"));
+            itemsR.sort((a, b) => a.gradeValue - b.gradeValue);
 
-        const stats = author.schema;
+            const fItem = searchItem(item, interaction);
+            if (!fItem) return;
 
-        const costs = getForgeMaterialCosts(fItem.id);
-        const ascItem = costs.ascensionMaterialId ? items[costs.ascensionMaterialId] as lootInfo : getAscensionMaterial(fItem.id, ascMaterials);
-        const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade);
-        if (!craftItem) return interaction.reply(`Error: Unknown crafting material`);
-        if (!ascItem) return interaction.reply(`Error: Unknown ascension material`);
+            if (!itemsR.includes(fItem)) return interaction.reply(`You can't craft ${fItem.emoji} **__${fItem.name}__**`);
 
-        // Check if the user has the required mats
-        if ((stats.items[ascItem.id] || 0) < costs.ascension) return interaction.reply(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
-        if ((stats.items[craftItem.id] || 0) < costs.crafting) return interaction.reply(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
+            const stats = author.schema;
 
-        const Embed = new EmbedBuilder()
-            .setTitle("Gaius' Forgery")
-            .setColor(0xbbffff)
-            .setDescription(`Let me confirm your order:\n**1x** ${fItem.emoji} **__${fItem.name}__**\nfor ${craftItem.emoji}**x${costs.crafting}** & ${ascItem.emoji}**x${costs.ascension}**?`)
-            .setThumbnail("https://i.imgur.com/WbPCBqR.png");
-        return interaction.reply({ embeds: [Embed], components: [OfferRow] }).then(msg => {
+            const costs = getForgeMaterialCosts(fItem.id);
+            const ascItem = costs.ascensionMaterialId ? items[costs.ascensionMaterialId] as lootInfo : getAscensionMaterial(fItem.id, ascMaterials);
+            const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade);
+            if (!craftItem) return interaction.reply(`Error: Unknown crafting material`);
+            if (!ascItem) return interaction.reply(`Error: Unknown ascension material`);
 
-            const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 30000 });
-            const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 30000 });
+            if ((stats.items[ascItem.id] || 0) < costs.ascension) return interaction.reply(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
+            if ((stats.items[craftItem.id] || 0) < costs.crafting) return interaction.reply(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
 
-            confirm.on('collect', async () => {
-                confirm.stop(), cancel.stop();
-                const stats = await getUserSchema(interaction.user.id);
-                if (!stats) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send("Couldn't find user");
-                    return;
-                };
+            const Embed = new EmbedBuilder()
+                .setTitle("Gaius' Forgery")
+                .setColor(0xbbffff)
+                .setDescription(`Let me confirm your order:\n**1x** ${fItem.emoji} **__${fItem.name}__**\nfor ${craftItem.emoji}**x${costs.crafting}** & ${ascItem.emoji}**x${costs.ascension}**?`)
+                .setThumbnail("https://i.imgur.com/WbPCBqR.png");
+            return interaction.reply({ embeds: [Embed], components: [OfferRow] }).then(msg => {
 
-                // Check if the user has the required mats
-                if ((stats.items[ascItem.id] || 0) < costs.ascension) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
-                    return;
-                };
-                if ((stats.items[craftItem.id] || 0) < costs.crafting) {
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
-                    return;
-                };
+                const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 30000 });
+                const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 30000 });
 
-                // Update users table
-                await updateUsers(interaction.user.id, {
-                    items: { type: "merge_json", value: { [ascItem.id]: -costs.ascension, [craftItem.id]: -costs.crafting } },
+                confirm.on('collect', async () => {
+                    confirm.stop(), cancel.stop();
+                    const stats = await getUserSchema(interaction.user.id);
+                    if (!stats) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send("Couldn't find user");
+                        return;
+                    };
+
+                    if ((stats.items[ascItem.id] || 0) < costs.ascension) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${ascItem.emoji} **__${ascItem.name}__** (**${stats.items[ascItem.id] || 0}**/${costs.ascension})`);
+                        return;
+                    };
+                    if ((stats.items[craftItem.id] || 0) < costs.crafting) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough of ${craftItem.emoji} **__${craftItem.name}__** (**${stats.items[craftItem.id] || 0}**/${costs.crafting})`);
+                        return;
+                    };
+
+                    await updateUsers(interaction.user.id, {
+                        items: { type: "merge_json", value: { [ascItem.id]: -costs.ascension, [craftItem.id]: -costs.crafting } },
+                    });
+
+                    await insertNewWeapon(interaction.user.id, fItem.id, fItem.category);
+
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`Successfully crafted ${fItem.emoji} **__${fItem.name}__**!`);
                 });
 
-                // Insert new weapon
-                await insertNewWeapon(interaction.user.id, fItem.id, fItem.category);
+                cancel.on('collect', () => {
+                    confirm.stop(), cancel.stop();
+                    if (interaction.channel?.isSendable()) interaction.channel.send("Action cancelled");
+                });
 
-                if (interaction.channel?.isSendable()) interaction.channel.send(`Successfully crafted ${fItem.emoji} **__${fItem.name}__**!`);
             });
+        };
 
-            cancel.on('collect', () => {
-                confirm.stop(), cancel.stop();
-                if (interaction.channel?.isSendable()) interaction.channel.send("Action cancelled");
+        if (subcommand === "merge") {
+            const rune = interaction.options.getString('rune');
+            const page = interaction.options.getInteger('page') || 1;
+
+            const stats = author.schema;
+
+            interface OwnedMap { [key: string]: number; };
+            const owned: OwnedMap = { ...stats.items, coins: stats.coins };
+
+            if (!rune) {
+                if (!runeMergeRecipes.length) return interaction.reply("No merge recipes available.");
+
+                let elementsPerPage = 7;
+                let pagesTotal = Math.ceil(runeMergeRecipes.length / elementsPerPage);
+                let currPage = 1;
+                if (page <= pagesTotal && page > 0) currPage = page;
+
+                let showRecipes = showPage(currPage, runeMergeRecipes, elementsPerPage);
+
+                const buildData = () => showRecipes.map(recipe => ({ recipe, owned: { ...stats.items, coins: stats.coins } }));
+
+                return interaction.reply({ embeds: [mergeEmbed(buildData()).setFooter({ text: `Page ${currPage}/${pagesTotal}` })], components: [PageRow] }).then(msg => {
+                    const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 120000 });
+
+                    collector.on('collect', async r => {
+                        if (r.customId === "prev") {
+                            if (currPage > 1) currPage--;
+                            else currPage = pagesTotal;
+                        } else {
+                            if (currPage < pagesTotal) currPage++;
+                            else currPage = 1;
+                        };
+
+                        showRecipes = showPage(currPage, runeMergeRecipes, elementsPerPage);
+                        interaction.editReply({ embeds: [mergeEmbed(buildData()).setFooter({ text: `Page ${currPage}/${pagesTotal}` })], components: [PageRow] });
+                    });
+                });
+            };
+
+            const fItem = searchItem(rune, interaction);
+            if (!fItem) return;
+
+            const matchingRecipes = runeMergeRecipes.filter(r => r.output === fItem.id);
+
+            if (!matchingRecipes.length) return interaction.reply(`No merge recipe produces ${fItem.emoji} **__${fItem.name}__**.`);
+
+            if (matchingRecipes.length > 1) {
+                let elementsPerPage = 7;
+                let pagesTotal = Math.ceil(matchingRecipes.length / elementsPerPage);
+                let currPage = 1;
+                if (page <= pagesTotal && page > 0) currPage = page;
+
+                let showRecipes = showPage(currPage, matchingRecipes, elementsPerPage);
+                const buildData = () => showRecipes.map(recipe => ({ recipe, owned: { ...stats.items, coins: stats.coins } }));
+
+                return interaction.reply({ embeds: [mergeEmbed(buildData()).setFooter({ text: `Page ${currPage}/${pagesTotal}` })], components: [PageRow] }).then(msg => {
+                    const collector = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 120000 });
+
+                    collector.on('collect', async r => {
+                        if (r.customId === "prev") {
+                            if (currPage > 1) currPage--;
+                            else currPage = pagesTotal;
+                        } else {
+                            if (currPage < pagesTotal) currPage++;
+                            else currPage = 1;
+                        };
+
+                        showRecipes = showPage(currPage, matchingRecipes, elementsPerPage);
+                        interaction.editReply({ embeds: [mergeEmbed(buildData()).setFooter({ text: `Page ${currPage}/${pagesTotal}` })], components: [PageRow] });
+                    });
+                });
+            };
+
+            const recipe = matchingRecipes[0];
+            const outItem = items[recipe.output];
+            if (!outItem) return interaction.reply("Invalid recipe: output item not found.");
+
+            // Build confirmation embed
+            const inputLines: string[] = [];
+            let canAfford = true;
+            for (const [id, qty] of Object.entries(recipe.inputs)) {
+                const inp = items[parseInt(id)];
+                const owned_qty = owned[id] ?? 0;
+                if (owned_qty < qty) canAfford = false;
+                inputLines.push(inp ? `${inp.emoji} **${inp.name}** x${owned_qty}/${qty}` : `ID ${id} x${owned_qty}/${qty}`);
+            };
+            if (recipe.coinCost) {
+                const hasCoins = owned["coins"] ?? 0;
+                if (hasCoins < recipe.coinCost) canAfford = false;
+                inputLines.push(`<:coins:872926669055356939>x **${hasCoins}**/${recipe.coinCost}`);
+            };
+
+            const Embed = new EmbedBuilder()
+                .setTitle("Rune Merging")
+                .setColor(0xbbffff)
+                .setThumbnail("https://i.imgur.com/WbPCBqR.png")
+                .setDescription(`Merge the following to create **${outItem.emoji} ${outItem.name}**?` + (canAfford ? "" : "\n\n❌ You don't have enough materials."))
+                .addFields(
+                    { name: "Inputs", value: inputLines.join("\n"), inline: true },
+                    { name: "Output", value: `${outItem.bar} ${outItem.emoji} | ${outItem.name}`, inline: true },
+                );
+
+            return interaction.reply({ embeds: [Embed], components: [OfferRow] }).then(msg => {
+                const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 30000 });
+                const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 30000 });
+
+                confirm.on('collect', async () => {
+                    confirm.stop(), cancel.stop();
+                    const stats = await getUserSchema(interaction.user.id);
+                    if (!stats) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send("Couldn't find user");
+                        return;
+                    };
+
+                    // Re-check inventory
+                    for (const [id, qty] of Object.entries(recipe.inputs)) {
+                        if ((stats.items[id] || 0) < qty) {
+                            const inp = items[parseInt(id)];
+                            if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough ${inp ? `${inp.emoji} **${inp.name}**` : `ID ${id}`}.`);
+                            return;
+                        };
+                    };
+                    if (recipe.coinCost && (stats.coins < recipe.coinCost)) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send(`You don't have enough <:coins:872926669055356939>. Need **${recipe.coinCost}**, have **${stats.coins}**.`);
+                        return;
+                    };
+
+                    // Deduct inputs and add output in one call
+                    const mergeValue: Record<string, number> = {};
+                    for (const [id, qty] of Object.entries(recipe.inputs)) {
+                        mergeValue[id] = -qty;
+                    };
+                    mergeValue[recipe.output] = 1;
+
+                    const updates: any = {
+                        items: { type: "merge_json", value: mergeValue },
+                    };
+                    if (recipe.coinCost) {
+                        updates.coins = { type: 'increment', value: -recipe.coinCost };
+                    };
+
+                    await updateUsers(interaction.user.id, updates);
+
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`Successfully merged into ${outItem.emoji} **__${outItem.name}__**!`);
+                });
+
+                cancel.on('collect', () => {
+                    confirm.stop(), cancel.stop();
+                    if (interaction.channel?.isSendable()) interaction.channel.send("Action cancelled");
+                });
             });
-
-        });
+        };
     },
 };
 

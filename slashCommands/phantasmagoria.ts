@@ -5,13 +5,13 @@ import { classes } from "../Modules/classes";
 import { armorInfo, itemInfo, items, ringInfo, runeInfo, weaponInfo } from "../Modules/items";
 import { skills } from "../Modules/skills";
 import { characters } from "../Modules/chars";
-import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, getLetterRank, formatNumberWithQuotes, displayCharge, classLevelToXP } from "../Modules/functions";
+import { getDetailedStats, customEmojis, dealDamage, getClassLvl, getRingSlotsTotal, search, searchClass, searchItem, getLetterRank, formatNumberWithQuotes, displayCharge, classLevelToXP, cacheItemStats } from "../Modules/functions";
 import { AbilityResponse, dungeonTempBan } from "../Modules/components";
 
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
+import { CompactUserSchema, DetailedStats, SlashCommand, WeaponSchema } from '../types';
 import { getUserSchemas, getWeaponSchemas, updateUsers, updateUsersAndCache, insertNewWeapon } from '../Modules/queries';
 import { query } from '../postgres';
 import { customHpBars } from '../Modules/customHpBars';
@@ -31,13 +31,10 @@ function getRaidButtonRow(tab: string, canPlay: boolean): ActionRowBuilder<Butto
         return [
             new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder().setCustomId('play').setLabel("Fight").setStyle(ButtonStyle.Danger).setDisabled(!canPlay),
-                new ButtonBuilder().setCustomId('ability').setLabel("Ability").setStyle(ButtonStyle.Primary),
-                new ButtonBuilder().setCustomId('ignore_defer-edit').setLabel("Edit Support").setStyle(ButtonStyle.Secondary),
-                new ButtonBuilder().setCustomId('ranking').setEmoji("1403331476916801566").setStyle(ButtonStyle.Primary),
-                new ButtonBuilder().setCustomId('rewards').setLabel("Rewards").setStyle(ButtonStyle.Success),
-            ),
-            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder().setCustomId('ignore_defer-edit').setLabel("Edit Build").setStyle(ButtonStyle.Secondary),
                 new ButtonBuilder().setCustomId('strategies').setLabel("Strategies").setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder().setCustomId('ranking').setEmoji("1403331476916801566").setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId('rewards').setEmoji("1514626264361861170").setStyle(ButtonStyle.Success),
             ),
         ];
     };
@@ -55,10 +52,28 @@ function getRaidButtonRow(tab: string, canPlay: boolean): ActionRowBuilder<Butto
     return [new ActionRowBuilder<ButtonBuilder>().addComponents(...backBtn)];
 };
 
+function getBossSelectRow(stats: CompactUserSchema): ActionRowBuilder<StringSelectMenuBuilder> {
+    const selectedBoss = stats.phantasmagoria_selected_boss ?? 0;
+    return new ActionRowBuilder<StringSelectMenuBuilder>()
+        .addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('select_boss')
+                .setPlaceholder('Select a boss to challenge...')
+                .addOptions(
+                    phantasmagoriaBosses.map((boss, i) => ({
+                        label: boss.name,
+                        description: boss.title ?? undefined,
+                        value: String(i),
+                        default: i === selectedBoss,
+                    }))
+                ),
+        );
+};
+
 function getModal(uid: string) {
     return new ModalBuilder()
         .setCustomId('edit_phantasmagoria_' + uid)
-        .setTitle('Edit Phantasm Support')
+        .setTitle('Edit Phantasm Build')
         .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
                 new TextInputBuilder()
@@ -78,6 +93,30 @@ function getModal(uid: string) {
                     // .setMinLength(16)
                     // .setMaxLength(20)
                     .setPlaceholder('E.g. Acheron EX (type "remove" to remove)')
+                    .setRequired(false)
+            ),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('phantasm_class')
+                    .setLabel("Class")
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder('E.g. Paladin (type "remove" to remove)')
+                    .setRequired(false)
+            ),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('weapon_shield')
+                    .setLabel("Weapon / Shield")
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder('E.g. Excalibur / Aegis (type "remove / remove" to remove)')
+                    .setRequired(false)
+            ),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('armor_set')
+                    .setLabel("Armor Set")
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder('E.g. Dragon (type "remove" to remove)')
                     .setRequired(false)
             ),
         );
@@ -100,49 +139,60 @@ const item1 = items[840] as weaponInfo;
 const item2 = items[841] as ringInfo;
 
 const echoShopItems: EchoShopItem[] = [
-    { id: "expull", name: "EX Pull", price: 100, maxPurchases: 10, emoji: "<a:EXTRA:1138530846144462968>", desc: "A chance to pull an EX-rated character" },
-    { id: "item_1", name: item1.name + ` (${item1.type})`, price: 1000, maxPurchases: 1, emoji: item1.emoji, desc: `${item1.buffdesc}`, grantItemId: 840, grantItemType: "weapon" },
-    { id: "item_2", name: item2.name, price: 1000, maxPurchases: 1, emoji: item2.emoji, desc: `${item2.getBuffDesc()}`, grantItemId: 841, grantItemType: "ring" },
+    { id: "expull", name: "EX Pull", price: 80, maxPurchases: 10, emoji: "<a:EXTRA:1138530846144462968>", desc: "A chance to pull an EX-rated character" },
+    { id: "item_1", name: item1.name + ` (${item1.type})`, price: 800, maxPurchases: 5, emoji: item1.emoji, desc: `${item1.buffdesc}`, grantItemId: 840, grantItemType: "weapon" },
+    { id: "item_2", name: item2.name, price: 300, maxPurchases: 10, emoji: item2.emoji, desc: `${item2.getBuffDesc()}`, grantItemId: 841, grantItemType: "ring" },
     { id: "cxp_small", name: "Small Instant XP Potion", price: 10, maxPurchases: 20, emoji: "<:small_instant_xp_potion:1411713377511800842>", desc: "Grants **800** class XP" },
     { id: "cxp_large", name: "Large Instant XP Potion", price: 25, maxPurchases: 10, emoji: "<:large_instant_xp_potion:1411713396260339873>", desc: "Grants **2,400** class XP" },
     { id: "cxp_huge", name: "Huge Instant XP Potion", price: 80, maxPurchases: 5, emoji: "<:huge_instant_xp_potion:1411713671977107496>", desc: "Grants **8,000** class XP" },
     { id: "coins_exchange", name: "10 Coins", price: 1, emoji: "<:coins:872926669055356939>", desc: "Exchange 1 echo for 10 coins (unlimited)" },
-    { id: "hpbar_liminal", name: "Liminal Clover", price: 2000, maxPurchases: 1, emoji: "🍀", desc: "A clover-themed HP bar for your battles!\n" + customHpBars[16].getHpBar(0.7, 0.4), hpbarId: 16 },
+    { id: "hpbar_liminal", name: "Liminal Clover", price: 1000, maxPurchases: 1, emoji: "🍀", desc: "Blade of Liminality, stylish for battles!\n" + customHpBars[16].getHpBar(0.7, 0.4), hpbarId: 16 },
 ];
 
 function raidOverview({ interaction, stats, userItems }: { interaction: ChatInputCommandInteraction, stats: CompactUserSchema, userItems: itemInfo[]; }): Promise<number> {
     return new Promise((resolve) => {
 
-        let tab: "overview" | "ability" | "ranking" | "rewards" | "strategies" = "overview";
+        let tab: "overview" | "ranking" | "rewards" | "strategies" = "overview";
         let rankingLines: string[] = [];
         let strategyIndex = 0;
 
         const getDesc = (): string => {
+            const bossIndex = stats.phantasmagoria_selected_boss ?? 0;
+            const boss = phantasmagoriaBosses[bossIndex] ?? phantasmagoriaBosses[0];
             if (tab === "overview") {
                 const curStrat = phantasmaStrategies.find((s) => s.id === stats.phantasmagoria_strategy);
-                return `### Phantasm Overview`
-                    + `\n**Enemy**: ${phantasmagoriaBosses[0].name}`
-                    + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${stats.class !== null ? classes[stats.class].name + classes[stats.class].emblem + `Lvl. ${getClassLvl(stats.class, stats.dungeon_classlevels)}` : "`None`"}`
-                    + `\n**Equipment**: ${userItems.find((e) => e.category === "weapon" && e.type !== "shield")?.emoji ?? "<:sword_empty:1034502134474997790>"}${userItems.find((e) => e.type === "shield")?.emoji ?? "<:shield_empty:1087089686809415730>"} ${userItems.find((e) => e.type === "helmet")?.emoji ?? "<:helmet_empty:1034499888878198885>"}${userItems.find((e) => e.type === "cuirass")?.emoji ?? "<:cuirass_empty:1034499890165858305>"}${userItems.find((e) => e.type === "gloves")?.emoji ?? "<:gloves_empty:1034499892409794570>"}${userItems.find((e) => e.type === "boots")?.emoji ?? "<:boots_empty:1034499893919764480>"}`
-
+                const displayClass = stats.phantasmagoria_class ?? stats.class;
+                const oe = stats.phantasmagoria_equipment ?? {};
+                const eqSlot = (slot: string, d: string) => oe[slot] != null && items[oe[slot]] ? items[oe[slot]].emoji + ' 📌' : d;
+                const defWeapon = userItems.find((e) => e.category === "weapon" && e.type !== "shield")?.emoji ?? "<:sword_empty:1034502134474997790>";
+                const defShield = userItems.find((e) => e.type === "shield")?.emoji ?? "<:shield_empty:1087089686809415730>";
+                const defHelmet = userItems.find((e) => e.type === "helmet")?.emoji ?? "<:helmet_empty:1034499888878198885>";
+                const defCuirass = userItems.find((e) => e.type === "cuirass")?.emoji ?? "<:cuirass_empty:1034499890165858305>";
+                const defGloves = userItems.find((e) => e.type === "gloves")?.emoji ?? "<:gloves_empty:1034499892409794570>";
+                const defBoots = userItems.find((e) => e.type === "boots")?.emoji ?? "<:boots_empty:1034499893919764480>";
+                return `### Phantasm — Overview`
+                    + `\n- Fight through multiple phases of the Phantasm Boss, and gain Echoes [ <a:echo:1510653732029857802>] for every phase defeated! (Max once per phase).`
+                    + `\n- You may later spend Echoes in shop [ <a:shop:1514626264361861170> ] for great rewards.`
+                    + `\n- Select a Strategy pre-battle to empower your build!`
+                    + `\n\n**Enemy**: ${boss.name}`
+                    + `\n- ${boss.ability?.list[0].join("\n- ")}`
+                    + `\n\n**Build**\n**Character**: ${characters[stats.battlechar ?? -1].name} Lvl. ${stats.level}\n**Class**: ${displayClass !== null ? classes[displayClass].name + classes[displayClass].emblem + `Lvl. ${getClassLvl(displayClass, stats.dungeon_classlevels)}` + (stats.phantasmagoria_class != null ? ' 📌' : '') : "`None`"}`
+                    + `\n**Equipment**: ${eqSlot('weapon', defWeapon)}${eqSlot('shield', defShield)} ${eqSlot('helmet', defHelmet)}${eqSlot('cuirass', defCuirass)}${eqSlot('gloves', defGloves)}${eqSlot('boots', defBoots)}`
                     + `\n**Items**: ${stats.equipment[`rune:${stats.battlechar}`] === undefined ? "<:rune_empty:1034507494539669635>" : items[parseInt(stats.equipment[`rune:${stats.battlechar}`])].emoji} `
                     + userItems.filter((e) => e.category === "ring").map((e) => e.emoji).concat(
                         Array(Math.max(0, getRingSlotsTotal(stats) - userItems.filter((e) => e.category === "ring").length)).fill("<:ring_empty:1034509903886299136>")
                     ).concat(["<:locked:1034511902417621002>", "<:locked:1034511902417621002>", "<:locked:1034511902417621002>"]).slice(0, 3).join("")
-
-                    + (`\n**Support 1**: ${(stats.phantasmagoria_supports[0] !== undefined && stats.phantasmagoria_supports[0] !== null) ? `${characters[stats.phantasmagoria_supports[0]].name}${stats.equipment[`rune:${stats.phantasmagoria_supports[0]}`] === undefined ? "" : (" " + items[parseInt(stats.equipment[`rune:${stats.phantasmagoria_supports[0]}`])].emoji)}` : "`None`"}`)
-                    + (`\n**Support 2**: ${(stats.phantasmagoria_supports[1] !== undefined && stats.phantasmagoria_supports[1] !== null) ? `${characters[stats.phantasmagoria_supports[1]].name}${stats.equipment[`rune:${stats.phantasmagoria_supports[1]}`] === undefined ? "" : (" " + items[parseInt(stats.equipment[`rune:${stats.phantasmagoria_supports[1]}`])].emoji)}` : "`None`"}`)
+                    + (`\n**Supports**: ${(stats.phantasmagoria_supports[0] !== undefined && stats.phantasmagoria_supports[0] !== null) ? `${characters[stats.phantasmagoria_supports[0]].name}${stats.equipment[`rune:${stats.phantasmagoria_supports[0]}`] === undefined ? "" : (" " + items[parseInt(stats.equipment[`rune:${stats.phantasmagoria_supports[0]}`])].emoji)}` : "`None`"}`)
+                    + (` ‖ ${(stats.phantasmagoria_supports[1] !== undefined && stats.phantasmagoria_supports[1] !== null) ? `${characters[stats.phantasmagoria_supports[1]].name}${stats.equipment[`rune:${stats.phantasmagoria_supports[1]}`] === undefined ? "" : (" " + items[parseInt(stats.equipment[`rune:${stats.phantasmagoria_supports[1]}`])].emoji)}` : "`None`"}`)
                     + `\n<a:strategy:1510907688169504788> **Strategy**: ${stats.phantasmagoria_strategy ? `${curStrat?.name ?? "`None`"}` : "`None`"}` + ` [ ${curStrat?.emoji ?? "❔"} ]`;
-                // + `\n\n-# <:info:1131679799207796756> ${tips[Math.floor(Math.random() * tips.length)]}`;
-            } else if (tab === "ability") {
-                return `### Phantasmagoria — Enemy Ability`
-                    + `\n**${phantasmagoriaBosses[0].name}**`
-                    + `\n\n- ${phantasmagoriaBosses[0].ability?.list[0].join("\n- ")}`;
             } else if (tab === "ranking") {
-                return `### Phantasm Ranking`
+                const bossId = stats.phantasmagoria_selected_boss ?? 0;
+                const bossName = phantasmagoriaBosses[bossId]?.name ?? "Unknown";
+                const myBossData = stats.phantasmagoria_boss_data?.[String(bossId)] ?? {};
+                return `### ${bossName} — Ranking`
                     + `\n_Hit "Show Overview" to go back_\n`
                     + rankingLines.join('\n')
-                    + `\n\n**Your Best**: ${formatNumberWithQuotes(stats.phantasmagoria_best_damage ?? 0)} damage (Phase ${stats.phantasmagoria_best_phases ?? 0})`;
+                    + `\n\n**Your Best**: ${formatNumberWithQuotes(myBossData.best_damage ?? 0)} damage (Phase ${myBossData.best_phases ?? 0})`;
             } else if (tab === "rewards") {
                 const itemsDesc = echoShopItems.map(item => {
                     const purchases = stats.echo_purchases?.[item.id] ?? 0;
@@ -152,7 +202,7 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                     const capStr = item.maxPurchases ? ` (${purchases}/${item.maxPurchases})` : "";
                     return `${item.emoji} **${item.name}** — **${item.price}** <a:echo:1510653732029857802>${capStr}\n> ${item.desc}`;
                 }).join("\n\n");
-                return `### Phantasm — Rewards Shop`
+                return `### Phantasm — Shop`
                     + `\nSpend your Echoes on exclusive rewards!\n`
                     + `\n${itemsDesc}`
                     + `\n\n**Your Balance**: **${stats.echo ?? 0}** <a:echo:1510653732029857802>`;
@@ -168,12 +218,11 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
 
         const Embed = new EmbedBuilder()
             .setColor(0x7A8CE6)
-            .setThumbnail(phantasmagoriaBosses[0].image[0])
+            .setThumbnail(phantasmagoriaBosses[stats.phantasmagoria_selected_boss ?? 0].image[0])
             .setDescription(getDesc());
-        interaction.editReply({ embeds: [Embed], components: getRaidButtonRow("overview", EVENT_ACTIVE) }).then((msg) => {
+        interaction.editReply({ embeds: [Embed], components: [...getRaidButtonRow("overview", EVENT_ACTIVE), getBossSelectRow(stats)] }).then((msg) => {
             const play = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "play", componentType: ComponentType.Button, time: 90000 });
             const overviewBtn = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "overview", componentType: ComponentType.Button, time: 90000 });
-            const ability = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ability", componentType: ComponentType.Button, time: 90000 });
             const ranking = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ranking", componentType: ComponentType.Button, time: 90000 });
             const edit = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "ignore_defer-edit", componentType: ComponentType.Button, time: 90000 });
             const rewards = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "rewards", componentType: ComponentType.Button, time: 90000 });
@@ -192,19 +241,24 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
 
             overviewBtn.on('collect', async (rr) => {
                 tab = "overview";
-                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: getRaidButtonRow(tab, EVENT_ACTIVE) });
-            });
-
-            ability.on('collect', async (rr) => {
-                tab = "ability";
-                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: getRaidButtonRow(tab, EVENT_ACTIVE) });
+                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [...getRaidButtonRow(tab, EVENT_ACTIVE), getBossSelectRow(stats)] });
             });
 
             ranking.on('collect', async (rr) => {
                 tab = "ranking";
-                const topPlayers = await getUserSchemas("*", "WHERE phantasmagoria_best_damage > 0 ORDER BY phantasmagoria_best_damage DESC LIMIT 20") as CompactUserSchema[];
-                rankingLines = topPlayers.length
-                    ? topPlayers.map((p, i) => `-# ${i + 1}. <@${p.id}> — **${formatNumberWithQuotes(p.phantasmagoria_best_damage)}** damage (Phase ${p.phantasmagoria_best_phases})`)
+                const bossId = String(stats.phantasmagoria_selected_boss ?? 0);
+                const rows = await query("SELECT id, name, phantasmagoria_boss_data FROM users WHERE phantasmagoria_boss_data != '{}'::jsonb") as { id: string; name: string; phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number }> }[];
+                const myFresh = rows.find((p) => p.id === interaction.user.id);
+                stats.phantasmagoria_boss_data = myFresh?.phantasmagoria_boss_data ?? {};
+                const ranked = rows
+                    .filter((p) => (p.phantasmagoria_boss_data?.[bossId]?.best_damage ?? 0) > 0)
+                    .sort((a, b) => ((b.phantasmagoria_boss_data?.[bossId]?.best_damage) ?? 0) - ((a.phantasmagoria_boss_data?.[bossId]?.best_damage) ?? 0))
+                    .slice(0, 20);
+                rankingLines = ranked.length
+                    ? ranked.map((p, i) => {
+                        const bossData = p.phantasmagoria_boss_data?.[bossId] ?? {};
+                        return `-# ${i + 1}. <@${p.id}> — **${formatNumberWithQuotes(bossData.best_damage ?? 0)}** damage (Phase ${bossData.best_phases ?? 0})`;
+                    })
                     : [`-# No participants yet`];
                 interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: getRaidButtonRow(tab, EVENT_ACTIVE) });
             });
@@ -217,6 +271,11 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                     if (r.customId !== 'edit_phantasmagoria_' + uid) return;
                     const support1 = r.fields.getTextInputValue('support1');
                     const support2 = r.fields.getTextInputValue('support2');
+                    const phantasmClass = r.fields.getTextInputValue('phantasm_class');
+                    const weaponShield = r.fields.getTextInputValue('weapon_shield');
+                    const armorSet = r.fields.getTextInputValue('armor_set');
+
+                    if (!stats.phantasmagoria_equipment) stats.phantasmagoria_equipment = {};
 
                     // Match character
                     if (support1) {
@@ -227,6 +286,7 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                             if (getChar?.name) {
                                 if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
                                 if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
+                                if (stats.phantasmagoria_supports.includes(getChar.id)) return r.reply({ content: `**${getChar.name}** is already set as a support!`, ephemeral: true });
                                 stats.phantasmagoria_supports[0] = getChar.id;
                             };
                         };
@@ -240,8 +300,71 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                             if (getChar?.name) {
                                 if (!stats.chars.includes(getChar.id)) return r.reply({ content: `You don't have a copy of **${getChar.name}**`, ephemeral: true });
                                 if (stats.battlechar === getChar.id) return r.reply({ content: `You can't use your equipped character as a support!`, ephemeral: true });
+                                if (stats.phantasmagoria_supports.includes(getChar.id)) return r.reply({ content: `**${getChar.name}** is already set as a support!`, ephemeral: true });
                                 if (stats.phantasmagoria_supports[0] != null) stats.phantasmagoria_supports[1] = getChar.id;
                                 else stats.phantasmagoria_supports[0] = getChar.id;
+                            };
+                        };
+                    };
+
+                    // Match class
+                    if (phantasmClass) {
+                        if (phantasmClass.toLowerCase() === "remove") {
+                            stats.phantasmagoria_class = null as any;
+                        } else {
+                            let getCls = searchClass(phantasmClass, interaction, true);
+                            if (getCls?.name) {
+                                stats.phantasmagoria_class = classes.indexOf(getCls);
+                            };
+                        };
+                    };
+
+                    // Match weapon / shield
+                    if (weaponShield) {
+                        const parts = weaponShield.split(" / ").map(s => s.trim());
+                        const weaponPart = parts[0];
+                        const shieldPart = parts[1];
+
+                        if (weaponPart && weaponPart.toLowerCase() === "remove") {
+                            delete stats.phantasmagoria_equipment.weapon;
+                        } else if (weaponPart) {
+                            let item = searchItem(weaponPart, interaction, true);
+                            if (item?.name) {
+                                if (item.category !== "weapon" || item.type === "shield") {
+                                    return r.reply({ content: `**${item.name}** is not a weapon!`, ephemeral: true });
+                                };
+                                stats.phantasmagoria_equipment.weapon = item.id;
+                            };
+                        };
+
+                        if (shieldPart && shieldPart.toLowerCase() === "remove") {
+                            delete stats.phantasmagoria_equipment.shield;
+                        } else if (shieldPart) {
+                            let item = searchItem(shieldPart, interaction, true);
+                            if (item?.name) {
+                                if (item.type !== "shield") {
+                                    return r.reply({ content: `**${item.name}** is not a shield!`, ephemeral: true });
+                                };
+                                stats.phantasmagoria_equipment.shield = item.id;
+                            };
+                        };
+                    };
+
+                    // Match armor set
+                    if (armorSet) {
+                        if (armorSet.toLowerCase() === "remove") {
+                            delete stats.phantasmagoria_equipment.helmet;
+                            delete stats.phantasmagoria_equipment.cuirass;
+                            delete stats.phantasmagoria_equipment.gloves;
+                            delete stats.phantasmagoria_equipment.boots;
+                        } else {
+                            const getSet = searchItem(armorSet, interaction, true, { returnSet: true });
+                            if (!getSet || !(getSet instanceof armorInfo)) {
+                                return r.reply({ content: `No armor set named **${armorSet}** found!`, ephemeral: true });
+                            };
+                            const setItems = items.filter((item) => item instanceof armorInfo && item.setname === getSet.setname) as armorInfo[];
+                            for (const piece of setItems) {
+                                if (piece.type) stats.phantasmagoria_equipment[piece.type] = piece.id;
                             };
                         };
                     };
@@ -249,9 +372,11 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                     // Update users table
                     await updateUsers(interaction.user.id, {
                         phantasmagoria_supports: { type: "set", value: stats.phantasmagoria_supports },
+                        phantasmagoria_class: { type: "set", value: stats.phantasmagoria_class },
+                        phantasmagoria_equipment: { type: "set", value: stats.phantasmagoria_equipment ?? {} },
                     });
 
-                    interaction.editReply({ embeds: [Embed.setDescription(getDesc())] });
+                    interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [...getRaidButtonRow("overview", EVENT_ACTIVE), getBossSelectRow(stats)] });
                     r.reply({ content: `Edited Successfully!`, ephemeral: true });
                 }).catch(() => null);
             });
@@ -290,6 +415,17 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                     };
                 };
                 interaction.editReply(getStrategyPageOptions());
+            });
+
+            const bossSelect = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "select_boss", componentType: ComponentType.StringSelect, time: 90000 });
+            bossSelect.on('collect', async (rr) => {
+                await rr.deferUpdate();
+                const bossId = parseInt(rr.values[0]);
+                stats.phantasmagoria_selected_boss = bossId;
+                await updateUsers(interaction.user.id, { phantasmagoria_selected_boss: { type: "set", value: bossId } });
+                tab = "overview";
+                Embed.setThumbnail(phantasmagoriaBosses[bossId].image[0]);
+                interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [...getRaidButtonRow(tab, EVENT_ACTIVE), getBossSelectRow(stats)] });
             });
 
             function getShopSelectRow() {
@@ -455,7 +591,7 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
             });
 
             play.on('end', () => {
-                overviewBtn.stop(); ability.stop(); edit.stop(); ranking.stop(); rewards.stop(); shopBuy.stop(); strategies.stop(); strategyNav.stop();
+                overviewBtn.stop(); edit.stop(); ranking.stop(); rewards.stop(); shopBuy.stop(); strategies.stop(); strategyNav.stop(); bossSelect.stop();
                 resolve(-1);
             });
         });
@@ -490,8 +626,8 @@ const exportCommand: SlashCommand = {
         stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
 
         //* Minimum level floor so even low-level players can participate
-        stats.level = Math.max(stats.level, 500);
-        stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(stats.dungeon_classlevels[i] ?? 0, classLevelToXP(1000))]));
+        stats.level = Math.max(stats.level, 1000);
+        stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(stats.dungeon_classlevels[i] ?? 0, classLevelToXP(3000))]));
 
         // Overview
         let start = skipOverview ? 1 : await raidOverview({ interaction, stats, userItems });
@@ -505,7 +641,28 @@ const exportCommand: SlashCommand = {
 
         // User stats
         let myChar = characters[stats.battlechar];
-        let myStats = await getDetailedStats(myChar.id, stats, stats.dungeon_classlevels);
+        const fightStats = { ...stats };
+        if (stats.phantasmagoria_class != null) fightStats.class = stats.phantasmagoria_class;
+        if (stats.phantasmagoria_equipment) {
+            fightStats.equipment = { ...stats.equipment };
+            for (const [slot, value] of Object.entries(stats.phantasmagoria_equipment)) {
+                if (value == null) continue;
+                const val = value as unknown as number;
+                const entry = items[val];
+                if (entry) {
+                    const uid = `${val}:${interaction.user.id}`;
+                    cacheItemStats(uid, {
+                        itemid: val,
+                        level: 80, ascension: 0,
+                        uniqueid: uid,
+                        id: interaction.user.id,
+                        item_type: entry instanceof weaponInfo ? "weapon" : "armor",
+                    } as WeaponSchema);
+                };
+                fightStats.equipment[slot] = `${val}:${interaction.user.id}`;
+            };
+        };
+        let myStats = await getDetailedStats(myChar.id, fightStats, stats.dungeon_classlevels);
         myStats.thumbnail = myChar.getImage(stats.premium, stats.custom_skins[myChar.id], stats.char_skin[myChar.id]);
 
 
@@ -524,15 +681,16 @@ const exportCommand: SlashCommand = {
         };
 
         // Enemy Stats
-        let enemy = phantasmagoriaBosses[0];
+        const bossIndex = stats.phantasmagoria_selected_boss ?? 0;
+        let enemy = phantasmagoriaBosses[bossIndex] ?? phantasmagoriaBosses[0];
         // const curse = curses[14];
-        let eAbility = phantasmagoriaBosses[0].ability;
+        let eAbility = enemy.ability;
         let eImage = enemy.image[Math.floor(Math.random() * enemy.image.length)];
 
         let eStats = {
             "name": enemy.name,
-            "hp": 5000,
-            "maxhp": 5000,
+            "hp": 3000,
+            "maxhp": 3000,
             "atk": 1500,
             "md": 1500,
             "def": 660,
@@ -594,27 +752,35 @@ const exportCommand: SlashCommand = {
             const damageDealt = Math.max(0, (eStatsC.cumulativePhaseHp ?? 0) + Math.max(0, eStatsC.maxhp - eStatsC.hp));
             const phasesCleared = Math.max(0, (eStatsC.phase ?? 1) - 1);
 
-            // Echo reward: 1 per new phase defeated (max 200 per battle)
-            const prevBestPhases = stats.phantasmagoria_best_phases ?? 0;
-            const newPhases = Math.max(0, phasesCleared - prevBestPhases);
+            // Echo reward: 100 per new phase defeated (max 200 phases per battle)
+            const bossId = stats.phantasmagoria_selected_boss ?? 0;
+            const [freshUser] = await query('SELECT phantasmagoria_boss_data, echo FROM users WHERE id = $1', [interaction.user.id]) as { phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number }>; echo: number }[];
+            const freshBossData = freshUser?.phantasmagoria_boss_data ?? {};
+            const freshEcho = freshUser?.echo ?? 0;
+            const prevBest = freshBossData[String(bossId)] ?? { best_damage: 0, best_phases: 0 };
+            const newPhases = Math.max(0, phasesCleared - (prevBest.best_phases ?? 0));
             const echoReward = 100 * Math.min(newPhases, 200);
-            const totalEcho = (stats.echo ?? 0) + echoReward;
 
             // Save best score & grant echo
+            const bossData = { ...freshBossData };
+            bossData[String(bossId)] = {
+                best_damage: Math.max(prevBest.best_damage ?? 0, damageDealt),
+                best_phases: Math.max(prevBest.best_phases ?? 0, phasesCleared),
+            };
             await updateUsersAndCache(interaction.client, interaction.user.id, {
                 updates: {
-                    phantasmagoria_best_damage: { type: "set", value: Math.max(stats.phantasmagoria_best_damage ?? 0, damageDealt) },
-                    phantasmagoria_best_phases: { type: "set", value: Math.max(prevBestPhases, phasesCleared) },
+                    phantasmagoria_boss_data: { type: "set", value: bossData },
                     echo: { type: "increment", value: echoReward },
                 },
             });
-            stats.echo = totalEcho;
+            stats.echo = freshEcho + echoReward;
+            stats.phantasmagoria_boss_data = bossData;
 
             return new EmbedBuilder()
                 .setColor(embedColor)
                 .setThumbnail(myStatsC.thumbnail)
                 .setTitle(`Phantasm Results`)
-                .setDescription(`${eStatsC.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${formatNumberWithQuotes(damageDealt)}**\n<a:arrow_orange:916716747623641210> Phases defeated: **${phasesCleared}**\n<a:arrow_orange:916716747623641210> Echo earned: **+${echoReward}** (Total: **${totalEcho}**)`)
+                .setDescription(`${eStatsC.hp <= 0 ? `<:stars_v2:917023655840591963> **${myChar.name}** won! <:stars_v2:917023655840591963>` : `💀 **${myChar.name}** lost 💀`}\n<a:arrow_red:916716702618767401> Damage: **${formatNumberWithQuotes(damageDealt)}**\n<a:arrow_orange:916716747623641210> Phases defeated: **${phasesCleared}**\n<a:arrow_orange:916716747623641210> Echo earned: **+${echoReward}** (Total: **${freshEcho + echoReward}**)`)
                 .setFooter({ text: `Balance: ${formatNumberWithQuotes(stats.coins)} coins`, iconURL: interaction.user.displayAvatarURL({ size: 512 }) });
         };
 
@@ -693,7 +859,7 @@ const exportCommand: SlashCommand = {
                     // .setThumbnail(null)
                     .setFooter({ text: `Phase ${eStatsC.phase} | round 1 | time left: ${FIGHT_DURATION}s` })
                     .setTitle(`Phantasm Battle  `)
-                    .setDescription(`${enemy.name}'s Stats (**${eStatsC.hp}**/${eStats.hp}\\💖${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStats.hp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStats.hp}\\💖${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\nEnergy: ${displayCharge(myStatsC.energy ?? 0)}`);
+                    .setDescription(`${enemy.name}'s Stats (**${eStatsC.hp}**/${eStats.hp}\\💖${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStats.hp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStats.hp}\\💖${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\n<:energy1:1518418164566982817><:energy2:1518418204337373194>: ${displayCharge(myStatsC.energy ?? 0)}`);
                 // .setImage(null);
                 interaction.editReply({ embeds: [Embed], components: [row] }).then(msg => {
 
@@ -711,7 +877,7 @@ const exportCommand: SlashCommand = {
                     let timeout: NodeJS.Timeout | undefined;
                     async function editEmbed() {
                         if (notice.length > 100) notice.splice(0, notice.length - 100);
-                        Embed.setDescription(`${enemy.name}'s Stats (**${eStatsC.hp}**/${eStatsC.maxhp}${eStatsC.hp === 0 ? "\\💔" : "\\💖"}${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStatsC.maxhp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStatsC.maxhp}${myStatsC.hp === 0 ? "\\💔" : "\\💖"}${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\n-----------------------------------\nEnergy: ${displayCharge(myStatsC.energy ?? 0)}\n-----------------------------------${notice.slice(-(parseInt(author.schema.user_settings.battle_log_length || "4") || 4)).join("")}`);
+                        Embed.setDescription(`${enemy.name}'s Stats (**${eStatsC.hp}**/${eStatsC.maxhp}${eStatsC.hp === 0 ? "\\💔" : "\\💖"}${eStatsC.shield > 0 ? `+ **${eStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${eStatsC.sm}**/${eStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(eStatsC.hp / eStatsC.maxhp, eStatsC.sm / eStatsC.mana, stats.hpbar)}${Avalon.statusIcon(eStatsC)}${showEnemyStats ? `\n${Avalon.padStats(eStatsC)}` : ""}\n${myClass ? myClass.emblem : ""}Your Stats (**${myStatsC.hp}**/${myStatsC.maxhp}${myStatsC.hp === 0 ? "\\💔" : "\\💖"}${myStatsC.shield > 0 ? `+ **${myStatsC.shield}** ${customEmojis["shield"]}` : ""}, **${myStatsC.sm}**/${myStatsC.mana}${customEmojis.mana})\n${Avalon.hpbar(myStatsC.hp / myStatsC.maxhp, myStatsC.sm / myStatsC.mana, stats.hpbar)}${Avalon.statusIcon(myStatsC)}\n${Avalon.padStats(myStatsC)}\n-----------------------------------\n<:energy1:1518418164566982817><:energy2:1518418204337373194>: ${displayCharge(myStatsC.energy ?? 0)}\n-----------------------------------${notice.slice(-(parseInt(author.schema.user_settings.battle_log_length || "4") || 4)).join("")}`);
                         Embed.setFooter({ text: `Phase ${eStatsC.phase} | round ${matchStats.round} | time left: ${FIGHT_DURATION + Math.floor((timestart - new Date().getTime()) / 1000)}s` });
                         // await msg.edit({ embeds: [Embed] });
 
@@ -826,10 +992,6 @@ const exportCommand: SlashCommand = {
                             matchStats.round++;
                             startNextRound();
                             editEmbed();
-                            if (matchStats.playerPausingRounds > 0) {
-                                matchStats.playerPausingRounds--;
-                                attack();
-                            };
                         } else {
                             setTimeout(() => {
                                 if (matchStats.playerPausingRounds > 0) {
@@ -839,17 +1001,20 @@ const exportCommand: SlashCommand = {
                                     editEmbed();
                                     matchStats.turn = 1;
                                     if (matchStats.counter > 0) matchStats.counter--;
-                                    attack();
                                     return;
                                 };
-                                if (matchStats.blockAbilities-- <= 0 && false) {
-                                } else if (matchStats.blockAbilities-- < 0 && myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.66) {
+
+                                // Enemy ability
+                                if (myChar.id !== 4767 && eAbility && eStatsC.sm >= eAbility.cost && Math.random() < 0.66) {
                                     eStatsC.sm -= eAbility.cost;
                                     eAbility.skill(myStatsC, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     editEmbed();
-                                    attack();
-                                } else if (eStatsC.refuseATK) {
+                                    if (matchStats.ended) return;
+                                };
+
+                                // Enemy ATK
+                                if (eStatsC.refuseATK) {
                                     let notif = `✨ **${enemy.name}** refuses to ATK`;
                                     if (eStatsC.refuseATKMessage) {
                                         if (Array.isArray(eStatsC.refuseATKMessage)) {
@@ -863,24 +1028,17 @@ const exportCommand: SlashCommand = {
                                     matchStats.round++;
                                     startNextRound();
                                     editEmbed();
-                                    if (matchStats.playerPausingRounds > 0) {
-                                        matchStats.playerPausingRounds--;
-                                        attack();
-                                    };
                                 } else {
                                     if (eStatsC.replaceButton?.atk?.run !== undefined) {
                                         eStatsC.replaceButton.atk.run(myStatsC, myStats, eStatsC, buffs, eBuffs, myChar, enemy, matchStats, notice, Embed, interaction.user);
-                                    } else dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `⚔️ **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
+                                    } else dealDamage(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, `<a:phanATK:1512108126109827172> **${enemy.name}**`, { magicDamage: true, combodmg: true, selfdmg: true, selfheal: true });
                                     Avalon.checkIfEnded(myStatsC, eStatsC, buffs, eBuffs, matchStats, notice, interaction, minionDefeated, editEmbed, endMatch);
                                     matchStats.turn = 1;
                                     matchStats.round++;
                                     startNextRound();
                                     editEmbed();
-                                    if (matchStats.playerPausingRounds > 0) {
-                                        matchStats.playerPausingRounds--;
-                                        attack();
-                                    };
                                 };
+
                                 if (matchStats.counter > 0) matchStats.counter--;
                             }, aDelay);
                         };

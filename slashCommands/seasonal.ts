@@ -21,6 +21,11 @@ const RUNES_FOR_SALE = [
     { name: "Hunt of the Leporine", item: items[795] as runeInfo, price: 80, isNew: true },
     { name: "Unravelling", item: items[796] as runeInfo, price: 80, isNew: true },
     { name: "Coinmark of Riches", item: items[786] as runeInfo, price: 60, isNew: false },
+    { name: "Valkyrie Sigil", item: items[787] as runeInfo, price: 60, isNew: false },
+    { name: "Eirfrost von Neira", item: items[790] as runeInfo, price: 60, isNew: false },
+    { name: "Wailing Lantern", item: items[789] as runeInfo, price: 60, isNew: false },
+    { name: "Thorn's Contender", item: items[792] as runeInfo, price: 60, isNew: false },
+    { name: "The Fated", item: items[793] as runeInfo, price: 60, isNew: false },
 ] as const; // Total cost: 220
 
 const HP_BARS_FOR_SALE = [

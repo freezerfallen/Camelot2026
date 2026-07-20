@@ -37,7 +37,7 @@ function checkEnergy(myStats: any, matchStats: any, notice: string[], cost: numb
             matchStats.sendWarning({ content: `You don't have enough energy! (${myStats.energy}/${cost} <a:energy:1511169619086409829>)\n-# Clicking again this round will instead let you flee the battle.`, ephemeral: true });
         } else {
             myStats.forceLoose = true;
-            notice.push(`\n<:dodge_chance:1047269150948606063> ${charName} fled the fight`);
+            notice.push(`\n<a:exit:1511883591532019804> ${charName} fled the fight`);
         };
         return false;
     };
@@ -187,7 +187,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         return AbilityResponse.SUCCESS;
     }),
-    new PhantasmaStrategy(4, "Chiaroscuro Break", "Critical hits deal **50%** more damage, but non-critical hits deal no damage. When your critical chance is below **50%**, this effect is reversed. Restores **3** energy (<a:energy:1511169619086409829>) every critical / non-critical hit, depending if critical rate is above/equal to, or below **50%**.", "At **200** <a:energy:1511169619086409829>, increases critical damage by **30%**, then loses **30%** critical rate. This can be used up to **5** times. (Timeout false)", "<:crit_rate:1047269144195776512>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new PhantasmaStrategy(4, "Chiaroscuro Break", "Critical hits deal **50%** more damage, but non-critical hits deal no damage. When your critical chance is below **50%**, this effect is reversed. Restores **8** energy (<a:energy:1511169619086409829>) every critical / non-critical hit, depending if critical rate is above/equal to, or below **50%**.", "At **200** <a:energy:1511169619086409829>, increases critical damage by **30%**, then loses **30%** critical rate. This can be used up to **5** times. (Timeout false)", "<:crit_rate:1047269144195776512>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.critExtreme = true;
         notice.push(`\n<a:strategy:1510907688169504788> __Chiaroscuro Break__: The difference between the enemy's weak points seem to be manipulated in extreme degrees...`);
 
@@ -396,9 +396,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
                 myStats.energy = Math.min(myStats.energy + 20, 200);
                 addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.1), {});
                 let dmg = Math.floor(myStats.hp * (myStats.putDamageOnHold === 1 ? 1 : myStats.br));
-                eStats.hp -= dmg;
-                if (eStats.hp < 0) eStats.hp = 0;
-                notice.push(`\n<a:strategy:1510907688169504788> __Form in Tessellation__: Dealt **${dmg}** absolute damage to ${enemy.name}`);
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:strategy:1510907688169504788> __Form in Tessellation__`, { overwriteDamage: dmg, defMultiplier: 0, dodge: false, block: false, canCounter: false, ignoreShield: true });
             };
         });
 
@@ -520,7 +518,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         return AbilityResponse.SUCCESS;
     }),
-    new PhantasmaStrategy(9, "The Final Thread", "The enemy begins loses **20%** `STABILITY` every round (At most 1% from this effect). Upon any STABILITY refresh, boosts own ATK by **3%** permanently. (Max: 20 triggers). Stability refresh grants **200** energy (no <a:energy:1511169619086409829> cap).", "At 200 <a:energy:1511169619086409829>, deals **200%** damage and reduces the enemy's stability by **15%** (Min: 1%). After **10** uses, this effect is triggered twice. (Timeout false)", "<a:stability:1451561886339436675>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new PhantasmaStrategy(9, "The Final Thread", "The enemy loses **20%** `STABILITY` every round (At most 1% from this effect). Upon any STABILITY refresh, boosts own ATK by **3%** permanently. (Max: 20 triggers). Stability refresh grants **200** energy (no <a:energy:1511169619086409829> cap).", "At 200 <a:energy:1511169619086409829>, deals **200%** damage and reduces the enemy's stability by **15%** (Min: 1%). After **10** uses, this effect is triggered twice. (Timeout false)", "<a:stability:1451561886339436675>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         eStats.stability ??= 100;
         myStats.ignoreSTABILITY = false;
 
@@ -666,7 +664,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         return AbilityResponse.SUCCESS;
     }),
-    new PhantasmaStrategy(11, "Indigo Reverberation", "Lightning hits deal **50%** more damage. Every **5** lightning strikes is followed up by a undodgeable uncounterable lightning hit, dealing **10%** damage for every time this was triggered. (Max: 300%). Every lightning hit grants **3** energy (<a:energy:1511169619086409829>).", "At 200 <a:energy:1511169619086409829>, summons an **electric drill**, lasting for **1** round for every **30** successful lightning hits. At the start of every round, the drill decreases the enemy's **DEF**, **MR** & **lightning resistance** by **30%**, while amplifying the next lightning hit to deal **50%** more damage. (Timeout false)", "<:lightning:1340309243827458139>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new PhantasmaStrategy(11, "Indigo Reverberation", "Lightning hits deal **50%** more damage. Every **5** lightning strikes is followed up by a undodgeable uncounterable lightning hit, dealing **10%** damage for every time this was triggered. (Max: 300%). Every lightning hit grants **20** energy (<a:energy:1511169619086409829>).", "At 200 <a:energy:1511169619086409829>, summons an **electric drill**, lasting for **8** rounds (stackable). At the start of every round, the drill decreases the enemy's **DEF**, **MR** & **lightning resistance** by **30%**, while amplifying the next lightning hit to deal **50%** more damage. (Timeout false)", "<:lightning:1340309243827458139>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.lightningMultiplier ??= 0;
         myStats.lightningMultiplier += 0.5;
         myStats.tempLightningBuff ??= 0;
@@ -679,18 +677,25 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
             if (caster === myStats && options.isLightning) {
-                myStats.energy = Math.min(myStats.energy + 3, 200);
+                myStats.energy = Math.min(myStats.energy + 20, 200);
                 if (myStats.lightningcount % 5 === 0) dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:lightning:1340309243827458139> The Thunderer`, { atkMultiplier: Math.min(0.1 * (myStats.lightningcount / 5), 3), dodge: false, canCounter: false, isLightning: true });
             };
         });
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.skipFail = false;
+
             if (myStats.electricDrill > 0) {
                 myStats.electricDrill--;
                 eStats.def = Math.floor(eStats.def * 0.7);
                 eStats.mr = Math.floor(eStats.mr * 0.7);
                 eStats.lightningResistance = (eStats.lightningResistance ?? 0) - 0.3;
                 myStats.tempLightningBuff += 0.5;
+                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    myStats.tempLightningBuff -= 0.5;
+
+                    return AbilityResponse.SUCCESS;
+                }));
                 myStats.tempLightningBuffActive++;
                 notice.push(`\n<a:strategy:1510907688169504788> __Indigo Reverberation__: Electric drill active! **${myStats.electricDrill}** rounds remaining.`);
             };
@@ -707,12 +712,9 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
                 noTimeout(matchStats, myStats);
                 myStats.energy -= cost;
-                eStats.dodge = 0;
-                eStats.br = 0;
-                eStats.counter = 0;
-                eStats.counterChanceDynamic = 0;
+                myStats.electricDrill += 8;
                 notice.push(`\n<a:energy:1511169619086409829> ♁ ₊ ☁️ ｡˚ ₊ ENERGY OVERLOAD!! ₊ ˚｡ ☁️ ₊ ♁ <a:energy:1511169619086409829>`);
-                notice.push(`\n<a:strategy:1510907688169504788> __Coup de Grâce__: The enemy's defenses are stripped — dodge, block, and counter reduced to **0** this round!`);
+                notice.push(`\n<a:strategy:1510907688169504788> __Indigo Reverberation__: Electric drill summoned for **${myStats.electricDrill}** rounds!`);
 
                 return AbilityResponse.SUCCESS;
             },
@@ -788,7 +790,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
                         matchStats.sendWarning({ content: `You don't have enough energy! (${myStats.energy}/${cost} <a:energy:1511169619086409829>)\n-# Clicking again this round will instead let you flee the battle.`, ephemeral: true });
                     } else {
                         myStats.forceLoose = true;
-                        notice.push(`\n<:dodge_chance:1047269150948606063> ${char.name} fled the fight`);
+                        notice.push(`\n<a:exit:1511883591532019804> ${char.name} fled the fight`);
                     };
                     return AbilityResponse.FAILURE;
                 };
@@ -807,11 +809,12 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         return AbilityResponse.SUCCESS;
     }),
-    new PhantasmaStrategy(13, "Cerulean Convergence", "Increases max mana cap by **200**. Upon phase change, gains mana equal to **20%** of mana cap instantly. At the start of every round, for every **500** mana gained, you have **+1%** ATK & MD (Max: 40%). Generates energy (<a:energy:1511169619086409829>) equal to mana regen every round.", "At 25 <a:energy:1511169619086409829>: Converts any energy into reserves, resetting it to **0**. Using **STRATEGY (SKIP)** twice in a row instead expends reserves, dealing **1** hit of **40%** damage for every **100** energy in reserves (Max: **10** hits), before reducing reserves by the expended amount. (Timeout false)", "<:mana_generation:1063215562349629570>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+    new PhantasmaStrategy(13, "Cerulean Convergence", "Increases max mana cap by **200**. Upon phase change, gains mana equal to **20%** of mana cap instantly. At the start of every round, for every **500** mana gained, you have **+1%** ATK & MD (Max: 40%). Generates energy (<a:energy:1511169619086409829>) equal to mana regen every round.", "At 25 <a:energy:1511169619086409829>: Converts any energy into reserves, resetting it to **0**. Using **STRATEGY (SKIP)** twice in a row instead expends reserves, dealing **1** hit of **70%** damage for every **100** energy in reserves (Max: **10** hits), before reducing reserves by the expended amount. (Timeout false)", "<:mana_generation:1063215562349629570>", async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.mana += 200;
         myStats.manaGained ??= 0;
 
         myStats.energy ??= 0;
+        myStats.skipUsed = false;
         myStats.skipFail = false;
         myStats.reserves ??= 0;
 
@@ -831,7 +834,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
                 myStats.md += Math.floor(myStats.md * Math.min(0.01 * (myStats.manaGained / 500), 0.4));
             };
             myStats.energy = Math.min(myStats.energy + (myStats.mg), 200);
-            myStats.skipFail = false;
+            myStats.skipUsed = false;
 
             return AbilityResponse.SUCCESS;
         }, 9999));
@@ -840,13 +843,24 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
         myStats.replaceButton.skip = {
             "emoji": "<a:strategy:1510907688169504788>",
             "run": async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-                if (myStats.reserves > 0) {
+                if (myStats.skipUsed) {
+                    if (myStats.reserves <= 100) {
+                        if (!myStats.skipFail) {
+                            noTimeout(matchStats, myStats);
+                            myStats.skipFail = true;
+                            notice.push(`\nYou can only expend if you have more than **100** reserves. Clicking again will let you flee the battle.`);
+                            return AbilityResponse.FAILURE;
+                        };
+                        myStats.forceLoose = true;
+                        notice.push(`\n<a:exit:1511883591532019804> ${char.name} fled the fight`);
+                        return AbilityResponse.FAILURE;
+                    };
                     let hits = Math.min(Math.floor(myStats.reserves / 100), 10);
                     let expended = hits * 100;
                     noTimeout(matchStats, myStats);
                     notice.push(`\n<a:strategy:1510907688169504788> __Cerulean Convergence__: Expending reserves for **${hits}** hits!`);
                     for (let i = 0; i < hits; i++) {
-                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:strategy:1510907688169504788> __Cerulean Convergence__`, { atkMultiplier: 0.4, dodge: false, canCounter: false });
+                        dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<a:strategy:1510907688169504788> __Cerulean Convergence__`, { atkMultiplier: 0.7, dodge: false, canCounter: false });
                     };
                     myStats.reserves -= expended;
                     if (myStats.reserves < 0) myStats.reserves = 0;
@@ -854,6 +868,7 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
                 };
 
                 // Check energy for conversion
+                myStats.skipUsed = true;
                 if (!checkEnergy(myStats, matchStats, notice, 25, char.name)) return AbilityResponse.FAILURE;
                 noTimeout(matchStats, myStats);
                 myStats.energy -= 25;
@@ -877,6 +892,12 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
         myStats.energy ??= 0;
         myStats.skipFail = false;
 
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.skipFail = false;
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
         matchStats.on("phaseChange", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             if (caster === eStats) {
                 myStats.energy += 25;
@@ -892,9 +913,15 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
                 noTimeout(matchStats, myStats);
                 if (myStats.execBLused >= 10) {
-                    myStats.skipFail = true;
-                    matchStats.sendWarning({ content: `You can only use this 10 times!\n-# Clicking again this round will instead let you flee the battle.`, ephemeral: true });
-                    return AbilityResponse.FAILURE;
+                    if (!myStats.skipFail) {
+                        myStats.skipFail = true;
+                        matchStats.sendWarning({ content: `You can only use this 10 times!\n-# Clicking again this round will instead let you flee the battle.`, ephemeral: true });
+                        return AbilityResponse.FAILURE;
+                    } else {
+                        myStats.forceLoose = true;
+                        notice.push(`\n<a:exit:1511883591532019804> ${char.name} fled the fight`);
+                        return AbilityResponse.FAILURE;
+                    };
                 };
                 myStats.energy -= cost;
                 myStats.execBLused++;
@@ -915,6 +942,12 @@ export const phantasmaStrategies: PhantasmaStrategy[] = [
 
         myStats.energy ??= 0;
         myStats.skipFail = false;
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.skipFail = false;
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
 
         matchStats.on("phaseChange", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }: any) => {
             if (caster === eStats) {

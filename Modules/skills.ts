@@ -1,7 +1,7 @@
 
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { dealDamage, addHeal, noTimeout, procburn } from "./functions";
+import { dealDamage, addHeal, noTimeout, procburn, userLevel } from "./functions";
 import { items } from "./items";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
@@ -2661,12 +2661,14 @@ export const bossAbilities: skillInfo[] = [
         return AbilityResponse.SUCCESS;
     }, [318, "Altered ATKs, rings and runes are disabled", "On **odd** rounds, gains [Cultivation], refusing to ATK but increasing own ATK & MD by **4%** permanently. (Phase 1)", "- On **even** rounds, gains [Letting go...], ATK hits **1** time for every **20%** missing HP, dealing **44%** damage and reducing opponent's max HP by **4%**. A successful hit grants **1-5x** `Indifference`. (Phase 1)", "Upon entering phase 2, evades the next number of lethal hits equal to owned `Indifference`", "Cannot heal or dodge. After every death evasion, steals **5%** crit damage from the opponent. (Phase 2)\n- **Active** (80 :droplet:) : Deals **15%** damage for each death evasion. If round **30+**, ends the fight.\n\n**Lore**:\n> On the path of finding wisdom, Espathera found herself in the field of Stoics. Acknowledging that some things could not be under her control, she focused her way of life on things she could change. Doing so, she obtained an epiphany that allowed her to enter a higher plane of existence."]),
     new skillInfo(55, 100, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        // Iustitia
         matchStats.baneLvl = (matchStats.baneLvl ?? myStats.lvl) + 10;
         notice.push(`\n⚖️ **${enemy.name}** elevates your profile level by **10**`);
         return AbilityResponse.SUCCESS;
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        matchStats.baneClvl ??= myStats.clvl;
-        matchStats.baneLvl ??= myStats.lvl;
+        matchStats.baneClvl ??= myStats.lvl;
+        const baneStats = await getUserSchema(user.id);
+        matchStats.baneLvl ??= baneStats ? userLevel(baneStats.xp) : myStats.lvl;
 
         eStats.rev = 1;
         eStats.maxRevivals = 2;
@@ -2678,14 +2680,11 @@ export const bossAbilities: skillInfo[] = [
                 if (caster === eStats) {
                     matchStats.baneClvl += 10;
                     matchStats.baneLvl += 20;
-                    myStats.maxhp += 60;
-                    myStats.hp += 60;
-                    myStats.atk += 30;
-                    myStats.def += 20;
-                    mybuff.atk.push(new buffInfo("+", 30, 1));
-                    mybuff.def.push(new buffInfo("+", 20, 1));
+                    mybuff.hp.push(new buffInfo("+", 60, 9999));
+                    mybuff.atk.push(new buffInfo("+", 30, 9999, 30, "+"));
+                    mybuff.def.push(new buffInfo("+", 20, 9999, 20, "+"));
                     notice.push(`\n⚖️ Your power grows — clvl +**10**, lvl +**20**`);
-                }
+                };
                 return true;
             }
         });
@@ -2701,7 +2700,60 @@ export const bossAbilities: skillInfo[] = [
         }, 9999));
 
         return AbilityResponse.SUCCESS;
-    }, [319, "- Every round, raises the opponent's character level by **5** (`Bane of the Powerful` curse deals **clvl × 100** damage).\n- Can revive **2** times. On each revival, raises opponent's character level by **10** and profile level by **20**.\n- **Active** (100 :droplet:) : Raises the opponent's profile level by **10**.\n\n**Lore**:\n> Strength. Most people yearn to possess this trait. To protect themselves, to protect people dear to them, to protect other important things dear to them. Or to rule over others. It is neither inherently good or inherently bad. It is up to the respective person what to do with it. But going up in the hierarchy comes with greater responsibilities. Humans tend to leave the righteous path when they amass a lot of this strength. Or rather, their strength corrupted to power. Iustitia is putting humans on trial if they are worthy and responsible enough to possess this trait."]),
+    }, [319, "- Every round, raises the opponent's character level by **5**\n- Can revive **2** times. On each revival, raises opponent's character level by **10** and profile level by **20**.\n- Curse is set to <:Bane_of_the_Powerful:1516679506255937619>\n- **Active** (100 :droplet:) : Raises the opponent's profile level by **10**.\n\n**Lore**:\n> Strength. Most people yearn to possess this trait. To protect themselves, to protect people dear to them, to protect other important things dear to them. Or to rule over others. It is neither inherently good or inherently bad. It is up to the respective person what to do with it. But going up in the hierarchy comes with greater responsibilities. Humans tend to leave the righteous path when they amass a lot of this strength. Or rather, their strength corrupted to power. Iustitia is putting humans on trial if they are worthy and responsible enough to possess this trait."]),
+    new skillInfo(56, 100, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        // Luxuria (alter)
+        myStats.timeFrozen = true;
+        myStats.frozenMessage = `is immobilized by **${enemy.name}**`;
+        myStats.def -= Math.floor(myStats.def * 0.5);
+        myStats.mr -= Math.floor(myStats.mr * 0.5);
+
+        // Reset
+        myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.timeFrozen = false;
+
+            return AbilityResponse.SUCCESS;
+        }));
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.costForAction ??= 0;
+        matchStats.costForAction += 12;
+
+        // Alters ATK
+        eStats.replaceButton = {};
+        eStats.replaceButton.atk = {
+            run: async (myStats: any, myStatsFixed: any, eStats: any, mybuff: any, ebuff: any, char: any, enemy: any, matchStats: any, notice: any, embed: any, user: any, ...list: any[]) => {
+                dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `⚔️ **${enemy.name}**`, { atkMultiplier: 0.9 + (0.04 * matchStats.round), magicDamage: true });
+
+                return AbilityResponse.SUCCESS;
+            }
+        };
+
+        // Skip a round upon healing
+        matchStats.on("heal", {
+            callback: ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (target === myStats) {
+                    myStats.timeFrozen = true;
+                    myStats.frozenMessage = `is immobilized by **${enemy.name}**`;
+
+                    // Reset
+                    myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                        myStats.timeFrozen = false;
+
+                        return AbilityResponse.SUCCESS;
+                    }));
+                };
+            }
+        });
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (Math.random() < 0.4) matchStats.costForAction++;
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, [320, "Every healing instance on the opponent will stun themselves (skip 1 round)", "Every action of the opponent costs **12** 💧. This has a **40%** chance to be increased by **1** every round. If the opponent has insufficient mana, they loose **8%** max HP permanently.", "ATK is altered to deal **90%** damage. The damage-scaling is increased by **4%** after every round.\n\n**Lore**:\n> Agility and protection are important in fights. But where is the right balance? And what if they are used against oneself? Luxuria made it her specialty to exploit the reliance of common sense."]),
 ];
 
 export const eventBossAbilities: skillInfo[] = [

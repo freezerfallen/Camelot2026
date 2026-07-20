@@ -1,18 +1,18 @@
-import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat } from "../types";
+import { Buffs, IbuffInfo, ItemAbility, ItemCategory, ItemRarity, ItemType, PrimaryStat, Emoji } from "../types";
 import { ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
 import buffInfo from "./buffs";
 import delayedBuffs from "./delayedBuffs";
 import { dealDamage, addHeal, noTimeout, procburn } from "./functions";
 import { AbilityResponse } from "./components";
 import { Ability } from "./abilities";
-import { getUserSchema } from "./queries";
+import { getFullUserSchema, getUserSchema } from "./queries";
 
 export class itemInfo {
     private _name: string;
     private _category: ItemCategory;
     private _type: ItemType;
     private _obtain: string[];
-    private _emoji: `<:${string}:${number}>`;
+    private _emoji: Emoji;
     private _image: `https://${string}`;
     private _grade: ItemRarity;
     private _id: number;
@@ -22,7 +22,7 @@ export class itemInfo {
     private _desc: string;
     private _flair: string;
 
-    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: `<:${string}:${number}>`, image: `https://${string}`, grade: ItemRarity, id: number, unique: boolean, tradable: boolean, sellable: boolean, desc: string = "", flair: string = "") {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], emoji: Emoji, image: `https://${string}`, grade: ItemRarity, id: number, unique: boolean, tradable: boolean, sellable: boolean, desc: string = "", flair: string = "") {
         this._name = name;
         this._category = category; // ["weapon", "armor", "fish"]
         this._type = type; // ["sword", ..., "helmet", ..., "fish"]
@@ -357,7 +357,7 @@ export class runeInfo extends itemInfo {
 export class entryInfo extends itemInfo {
     private _floor: number;
 
-    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], floor: number, emoji: `<:${string}:${number}>`, image: `https://${string}`, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = true) {
+    constructor(name: string, category: ItemCategory, type: ItemType, obtain: string[], floor: number, emoji: Emoji, image: `https://${string}`, grade: ItemRarity, id: number, unique: boolean = false, tradable: boolean = true, sellable: boolean = true) {
         super(name, category, type, obtain, emoji, image, grade, id, unique, tradable, sellable);
         this._floor = floor;
     };
@@ -993,7 +993,7 @@ export const items = [
         myStats.mana += 50;
         myStats.sm += 10;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+50**. Start the battle with **+10** mana.", "The legendary sword Dainsleif, passed down through the ages and wielded by only the most worthy warriors, is said to be cursed. Those who draw the blade are doomed to suffer a fate worse than death, as the sword compels its wielder to kill until it is satisfied. Its thirst for blood is insatiable, making it a weapon to be feared by even the bravest of men.", "unique", 170),
@@ -1040,7 +1040,7 @@ export const items = [
     new weaponInfo("Kilineiram", "weapon", "sword", ["crafting", "chest"], "<:kilineiram:1066859983809024000>", "https://i.imgur.com/gg6A2DG.png", "md", 34, 582, "md%", 0.03, 0.12, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.dodge += 0.06;
         mybuff.dodge.push(new buffInfo("+", 0.06, 9999));
-        myStats.mdChance += 1;
+        myStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
     }, "This sword turns all attacks of the wielder into magic damage. Increases dodge chance by **+6%**.", "Kilineiram, also known as the \"Shining Blade of the Sky,\" was crafted by the greatest dwarven smiths of the mountains. Its razor-sharp edge is imbued with the power of the thundering storms, allowing it to strike with the force of a tempest. In the hands of a skilled warrior, Kilineiram is a weapon to be feared on the battlefield.", "unique", 176),
@@ -1083,7 +1083,7 @@ export const items = [
     }, "Decreases enemy mana generation by **-5** per round.", "Safarlisia, a legendary sword said to have been wielded by the great warrior queen Safarlisia herself. Crafted from the finest steel and imbued with ancient magic, this sword is as deadly as it is beautiful. Some say that the spirit of Safarlisia still lingers within the sword, lending its wielder incredible strength and skill in combat. Wield this sword with honor, for it is a true treasure worthy of only the bravest of heroes.", "unique", 181),
     new weaponInfo("Sssssssword of Ssssssssnek", "weapon", "sword", ["crafting", "chest"], "<:sssssssword_of_ssssssssnek:1066861510602793112>", "https://i.imgur.com/VmbU8fb.png", "atk", 31, 564, "cr", 0.04, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += Math.floor(eStats.sm * 0.5);
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += Math.floor(eStats.sm * 0.5);
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += Math.floor(eStats.sm * 0.5);
         eStats.sm -= Math.floor(eStats.sm * 0.5);
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
         myStats.mg += 1;
@@ -1253,7 +1253,7 @@ export const items = [
         myStats.hp = Math.floor(myStats.hp * 0.5);
         myStats.sm += 30;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 30;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 30;
         myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.md += Math.floor(myStats.md * Math.min(((1 - (myStats.hp / myStats.maxhp)) / 2), 0.25));
@@ -1692,7 +1692,7 @@ export const items = [
         myStats.mana += 40;
         myStats.sm += 10;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10;
         myStats.mg += 2;
         mybuff.mg.push(new buffInfo("+", 2, 9999));
 
@@ -1712,7 +1712,7 @@ export const items = [
         myStats.sm += 90;
         if (eStats.sm > eStats.mana) eStats.sm = eStats.mana;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 90;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 90;
 
         return AbilityResponse.SUCCESS;
     }, "The wielder starts with **+90** mana, but your enemy also has half of that.", "The Viresco lance is crafted from the finest elven steel and infused with the essence of life itself. Its polished surface glows with a vibrant green hue. Those who wield it in battle are imbued with strength and vitality, as if the lance itself has become a source of nourishment. With every thrust and parry, the Viresco lance seems to grow stronger, radiating an aura of vitality that can revitalize even the most weary of warriors.", "unique", 248),
@@ -1728,7 +1728,7 @@ export const items = [
         mybuff.br.push(new buffInfo("+", 0.1, 9999));
         mybuff.mr.push(new buffInfo("+", Math.floor(myStats.mr * 0.1), 9999));
         myStats.mr += Math.floor(myStats.mr * 0.1);
-        myStats.mdChance += 1;
+        myStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
     }, "This lance turns all attacks of the wielder into magic damage. Increases block rate and magic resistance by **+10%**.", "The Witherbrand lance is a weapon of great power, imbued with the essence of death. Its mere presence drains the life force of those around it, leaving only a withered husk in its wake. Those who wield it must be strong of will and heart, for the Witherbrand demands a heavy toll on its wielder as well. Only the bravest of warriors dare to wield its dark power.", "unique", 250),
@@ -1937,7 +1937,7 @@ export const items = [
         myStats.mana += 50;
         myStats.sm += 10;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 10;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 10;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+50**. Start the battle with **+10** mana.", "The Recruit's Ebon Ward is the perfect shield for those new to the battlefield. Its sturdy construction and sleek design provide ample protection against incoming attacks, while its dark, menacing appearance strikes fear into the hearts of enemies. As you progress in your training, this shield will become a steadfast companion and a symbol of your growing strength and skill.", "unique", 276),
@@ -1975,7 +1975,7 @@ export const items = [
         myStats.delayedBuffs.push(new delayedBuffs(6, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             myStats.sm += 150;
             if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-            if (typeof myStats.manaGained !== undefined) myStats.manaGained += 150;
+            if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 150;
 
             return AbilityResponse.SUCCESS;
         }));
@@ -2083,7 +2083,7 @@ export const items = [
             if (matchStats.round % 4 === 0) {
                 myStats.sm += 16;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                if (typeof myStats.manaGained !== undefined) myStats.manaGained += 16;
+                if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 16;
                 eStats.sm -= 16;
                 if (eStats.sm < 0) eStats.sm = 0;
             };
@@ -2216,7 +2216,7 @@ export const items = [
     new weaponInfo("Grand Staff of the Cataclysm", "weapon", "staff", ["crafting", "chest"], "<:grand_staff_of_the_cataclysm:1068521918518530058>", "https://i.imgur.com/r68AtLr.png", "md", 55, 857, "mana", 10, 40, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += 30;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 30;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 30;
         myStats.mg += 7;
         mybuff.mg.push(new buffInfo("+", 7, 5));
 
@@ -2234,7 +2234,7 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, "The enemy starts with **0%** dodge chance which lasts for 10 rounds.", "The Nightkiss staff is imbued with the power of the night sky, allowing its wielder to call upon the darkness to envelop their foes. With each swing of the staff, tendrils of shadow dance and writhe, ensnaring those foolish enough to stand in the user's way. But beware, for the Nightkiss staff also has a thirst for life, drawing the very essence from those it touches. Only the strongest and most disciplined can wield its power without succumbing to its deadly allure.", "legendary", 307),
     new weaponInfo("Phantomsong", "weapon", "staff", ["crafting", "chest"], "<:phantomsong:1068524229542285353>", "https://i.imgur.com/DkIK3EX.png", "md", 56, 857, "mr", 26, 148, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        eStats.mdChance += 1;
+        eStats.mdChance = 1;
 
         return AbilityResponse.SUCCESS;
     }, "Forces the enemy to deal magic damage.", "The Phantomsong staff vibrates with a haunting melody that echoes through the minds of those who hear it. It is said to be able to summon the spirits of the dead, allowing the wielder to control and manipulate their essence to do their bidding. But be warned, for the spirits are not always willing and may seek revenge on those who dare to enslave them. Use the Phantomsong wisely, for its power comes with a great cost.", "legendary", 308),
@@ -2414,7 +2414,7 @@ export const items = [
     new weaponInfo("Usurper", "weapon", "axe", ["crafting", "chest"], "<:usurper:1068531154547920926>", "https://i.imgur.com/OpgBaez.png", "atk", 56, 876, "mana", 10, 30, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += 50;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 50;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 50;
         myStats.mg += 2;
         mybuff.mg.push(new buffInfo("+", 2, 9999));
 
@@ -2430,7 +2430,7 @@ export const items = [
     new weaponInfo("Whisper of Woe", "weapon", "axe", ["crafting", "chest"], "<:whisper_of_woe:1068531160126332928>", "https://i.imgur.com/TO09o0Z.png", "atk", 55, 865, "mana", 10, 30, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
         myStats.sm += Math.floor(eStats.sm * 0.5);
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += Math.floor(eStats.sm * 0.5);
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += Math.floor(eStats.sm * 0.5);
         eStats.sm -= Math.floor(eStats.sm * 0.5);
         myStats.mg += 2;
         eStats.mg -= 2;
@@ -4071,7 +4071,7 @@ export const items = [
         myStats.mana += 60;
         myStats.sm += 100;
         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 100;
+        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 100;
 
         return AbilityResponse.SUCCESS;
     }, "Increases the wielders mana cap by **+60**. Start the battle with **+100** mana."),
@@ -4731,7 +4731,7 @@ export const items = [
 
     // Additional Weapons
     new weaponInfo("Sacred Life Salamander", "weapon", "staff", ["chest"], "<:sacred_life_salamander:1274884340840665088>", "https://i.imgur.com/OGnmcD7.png", "md", 173, 976, "mr", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        eStats.mdChance += 1;
+        eStats.mdChance = 1;
 
         myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
             const drain = Math.floor(myStats.maxhp * 0.1);
@@ -4932,7 +4932,7 @@ export const items = [
                 if (myStats.oceanReverie % 3 === 0) {
                     myStats.sm += steal;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += steal;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += steal;
                     eStats.sm -= steal;
                 };
             };
@@ -4946,7 +4946,7 @@ export const items = [
                 if (myStats.oceanReverie % 3 === 0) {
                     myStats.sm += steal;
                     if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += steal;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += steal;
                     eStats.sm -= steal;
                 };
             };
@@ -5152,7 +5152,7 @@ export const items = [
                         eStats.sm -= steal;
                         myStats.sm += steal;
                         if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                        if (typeof myStats.manaGained !== undefined) myStats.manaGained += steal;
+                        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += steal;
                     };
                 };
             };
@@ -5185,7 +5185,7 @@ export const items = [
                 eStats.sm -= steal;
                 myStats.sm += steal;
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                if (typeof myStats.manaGained !== undefined) myStats.manaGained += steal;
+                if (typeof myStats.manaGained !== "undefined") myStats.manaGained += steal;
             };
             if (myStats.maxhp < myStatsFixed.maxhp) myStats.maxhp = myStatsFixed.maxhp;
             return AbilityResponse.SUCCESS;
@@ -6097,7 +6097,7 @@ export const items = [
             };
         });
 
-        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.delayedBuffs.push(new delayedBuffs(0, async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
             // After not using ability for 15/14/13/12/11/10+ turns: recover 50/60/70/80/90/100 mana, +1/1.2/1.4/1.6/1.8/2% lifesteal 
             if (matchStats.round - myStats.geLastAbilityRoundUsed >= [15, 14, 13, 12, 11, 10][level - 1]) {
                 //@ts-expect-error
@@ -6106,7 +6106,7 @@ export const items = [
                 // Recover mana
                 myStats.sm += [30, 34, 38, 42, 46, 50][level - 1];
                 if (myStats.sm > myStats.mana) myStats.sm = myStats.mana;
-                if (typeof myStats.manaGained !== undefined) myStats.manaGained += [30, 34, 38, 42, 46, 50][level - 1];
+                if (typeof myStats.manaGained !== "undefined") myStats.manaGained += [30, 34, 38, 42, 46, 50][level - 1];
 
                 // Selfheal
                 myStats.selfhealChance.push(1);
@@ -6580,7 +6580,7 @@ export const items = [
                         break;
                     case 4:
                         myStats.sm += 5;
-                        if (typeof myStats.manaGained !== undefined) myStats.manaGained += 5;
+                        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += 5;
                         break;
                     case 5:
                         addHeal(myStats, eStats, myStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.05), {});
@@ -6753,7 +6753,7 @@ export const items = [
                         notice.push(`\n✨ **${char.name}** and **${enemy.name}** became intertwined with thorns...`);
                     } else {
                         myStats.sm += 1 * Math.floor(myStats.thorns / 5);
-                        if (typeof myStats.manaGained !== undefined) myStats.manaGained += Math.floor(myStats.thorns / 5);
+                        if (typeof myStats.manaGained !== "undefined") myStats.manaGained += Math.floor(myStats.thorns / 5);
                         myStats.hp -= Math.floor(myStats.hp * 0.005 * Math.floor(myStats.thorns / 5));
                     };
                 };
@@ -6762,7 +6762,7 @@ export const items = [
                     let stealMana = Math.floor(eStats.sm * 0.15);
                     eStats.sm -= stealMana;
                     myStats.sm += stealMana;
-                    if (typeof myStats.manaGained !== undefined) myStats.manaGained += stealMana;
+                    if (typeof myStats.manaGained !== "undefined") myStats.manaGained += stealMana;
                 };
 
                 return AbilityResponse.SUCCESS;
@@ -7016,37 +7016,38 @@ export const items = [
     new lootInfo("Spiritual Bone", "loot", "ascension material", ["dungeon", "floor 7 (extreme)"], "<:Spiritual_Bone:1503563308022894764>", "https://i.ibb.co/ynzsYYCB/Spiritual-Bone.png", "rare", 803),
     new lootInfo("Sin Fragment", "loot", "ascension material", ["dungeon", "floor 3 (extreme)"], "<:Sin_Fragment:1503587839537975377>", "https://i.ibb.co/hxC8RmVG/Sin-Fragment.png", "rare", 804),
 
-    // dungeon accesss [ Extreme Dungeon ]
-    new entryInfo("Ego", "dungeon access", "entry item", ["Quests"], 301, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 805),
-    new entryInfo("Sigil of Singularity", "dungeon access", "entry item", ["Quests"], 302, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 806),
-    new entryInfo("Fading Starlight", "dungeon access", "entry item", ["Quests"], 303, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 807),
-    new entryInfo("Umbral Oculus", "dungeon access", "entry item", ["Quests"], 304, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 808),
-    new entryInfo("Shard of Entropy", "dungeon access", "entry item", ["Quests"], 305, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 809),
-    new entryInfo("Supernova Core", "dungeon access", "entry item", ["Quests"], 306, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 810),
-    new entryInfo("Alignment of Fate", "dungeon access", "entry item", ["Quests"], 307, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 811),
-    new entryInfo("Merciful Ammo", "dungeon access", "entry item", ["Quests"], 308, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 812),
-    new entryInfo("Abyssal Monocle", "dungeon access", "entry item", ["Quests"], 309, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 813),
-    new entryInfo("Obsidian Slash", "dungeon access", "entry item", ["Quests"], 310, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 814),
-    new entryInfo("Glacial Mirage", "dungeon access", "entry item", ["Quests"], 311, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 815),
-    new entryInfo("Flamed Visor", "dungeon access", "entry item", ["Quests"], 312, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 816),
-    new entryInfo("Ashen Shroud", "dungeon access", "entry item", ["Quests"], 313, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 817),
-    new entryInfo("Wanderlust Crystal", "dungeon access", "entry item", ["Quests"], 314, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 818),
-    new entryInfo("Electric Magnifier", "dungeon access", "entry item", ["Quests"], 315, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 819),
-    new entryInfo("Torn Wings", "dungeon access", "entry item", ["Quests"], 316, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 820),
-    new entryInfo("Limial ladder", "dungeon access", "entry item", ["Quests"], 317, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 821),
-    new entryInfo("Dreamless tears", "dungeon access", "entry item", ["Quests"], 318, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 822),
-    new entryInfo("Moonlit Dew", "dungeon access", "entry item", ["Quests"], 319, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 823),
-    new entryInfo("Insignia of Aurora", "dungeon access", "entry item", ["Quests"], 320, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 824),
-    new entryInfo("Voidborn Mirror", "dungeon access", "entry item", ["Quests"], 321, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 825),
-    new entryInfo("Cryptic Melody", "dungeon access", "entry item", ["Quests"], 322, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 826),
-    new entryInfo("Lucky Spark", "dungeon access", "entry item", ["Quests"], 323, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 827),
-    new entryInfo("Petrichor", "dungeon access", "entry item", ["Quests"], 324, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 828),
-    new entryInfo("Glass Heel", "dungeon access", "entry item", ["Quests"], 325, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 829),
-    new entryInfo("Drifting Petal", "dungeon access", "entry item", ["Quests"], 326, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 830),
-    new entryInfo("Scarred Carousel Horse", "dungeon access", "entry item", ["Quests"], 327, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 831),
-    new entryInfo("Last Blood", "dungeon access", "entry item", ["Quests"], 328, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 832),
-    new entryInfo("Visionary Candlelight", "dungeon access", "entry item", ["Quests"], 329, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 833),
-    new entryInfo("Superego", "dungeon access", "entry item", ["Quests"], 330, "<:carp:1028307600128872468>", "https://i.ibb.co/ZB9chS1/c.png", "mythical", 834),
+    // dungeon accesss [ Extreme Dungeon ] x20
+    new entryInfo("Ego", "dungeon access", "entry item", ["Quests"], 1, "<a:ego:1515896270051344475>", "https://i.ibb.co/bjYqZ6dK/Ego.png", "mythical", 805),
+    new entryInfo("Sigil of Singularity", "dungeon access", "entry item", ["Quests"], 2, "<a:Sigil_of_Singularity:1515900656513450145>", "https://i.ibb.co/7d7H9x3f/Sigil-of-Singularity.png", "mythical", 806),
+    new entryInfo("Fading Starlight", "dungeon access", "entry item", ["Quests"], 3, "<a:Fading_Starlight:1515901150270984353>", "https://i.ibb.co/hFbvRG34/Fading-Starlight.png", "mythical", 807),
+    new entryInfo("Umbral Oculus", "dungeon access", "entry item", ["Quests"], 4, "<a:Umbral_Oculus:1515902058874798121>", "https://i.ibb.co/tT5ZRqML/Umbral-Oculus.png", "mythical", 808),
+    new entryInfo("Shard of Entropy", "dungeon access", "entry item", ["Quests"], 5, "<a:Shard_of_Entropy:1515902410944548894>", "https://i.ibb.co/m5qfwDFw/Shard-of-Entropy.png", "mythical", 809),
+    new entryInfo("Supernova Core", "dungeon access", "entry item", ["Quests"], 6, "<a:Supernova_Core:1515902949275209880>", "https://i.ibb.co/BH1CL2pK/Supernova-Core.png", "mythical", 810),
+    new entryInfo("Alignment of Fate", "dungeon access", "entry item", ["Quests"], 7, "<a:Alignment_of_Fate:1515903822294417518>", "https://i.ibb.co/Cp9yNM8z/Alignment-of-Fate.png", "mythical", 811),
+    new entryInfo("Merciful Ammo", "dungeon access", "entry item", ["Quests"], 8, "<a:Merciful_Ammo:1515904161810485378>", "https://i.ibb.co/KpGWb2LH/Merciful-Ammo.png", "mythical", 812),
+    new entryInfo("Abyssal Monocle", "dungeon access", "entry item", ["Quests"], 9, "<a:Abyssal_Monocle:1515904697238814880>", "https://i.ibb.co/Y4mmWHQ0/Abyssal-Monocle.png", "mythical", 813),
+    new entryInfo("Obsidian Slash", "dungeon access", "entry item", ["Quests"], 10, "<a:Obsidian_Slash:1515905231630762134>", "https://i.ibb.co/cc7H3bw9/Obsidian-Slash.png", "mythical", 814),
+    new entryInfo("Glacial Mirage", "dungeon access", "entry item", ["Quests"], 11, "<a:Glacial_Mirage:1515905768627376188>", "https://i.ibb.co/TDxmzZDh/Glacial-Mirage.png", "mythical", 815),
+    new entryInfo("Flamed Visor", "dungeon access", "entry item", ["Quests"], 12, "<a:Flamed_Visor:1515906139114438778>", "https://i.ibb.co/b5HwYwJG/Flaming-Visor.png", "mythical", 816),
+    new entryInfo("Ashen Shroud", "dungeon access", "entry item", ["Quests"], 13, "<a:Ashen_Shroud:1515906627243348058>", "https://i.ibb.co/k6kG1jmn/Ashen-Shroud.png", "mythical", 817),
+    new entryInfo("Wanderlust Crystal", "dungeon access", "entry item", ["Quests"], 14, "<a:Wanderlust_Crystal:1515907256217112677>", "https://i.ibb.co/FL0XVjhW/Wanderlust-Crystal.png", "mythical", 818),
+    new entryInfo("Electric Magnifier", "dungeon access", "entry item", ["Quests"], 15, "<a:Electric_Magnifier:1515907762780114974>", "https://i.ibb.co/gbq55Xpq/Electro-Magnifier.png", "mythical", 819),
+    new entryInfo("Torn Wings", "dungeon access", "entry item", ["Quests"], 16, "<a:Torn_Wings:1515908282836058234>", "https://i.ibb.co/BH5L1DmY/Torn-Wings.png", "mythical", 820),
+    new entryInfo("Limial ladder", "dungeon access", "entry item", ["Quests"], 17, "<a:Limial_Ladder:1515908980625379398>", "https://i.ibb.co/nMs57ycz/Liminal-Ladder.png", "mythical", 821),
+    new entryInfo("Dreamless tears", "dungeon access", "entry item", ["Quests"], 18, "<a:Dreamless_Tears:1515909602955362324>", "https://i.ibb.co/hJSd5fnX/Dreamless-Tears.png", "mythical", 822),
+    new entryInfo("Moonlit Dew", "dungeon access", "entry item", ["Quests"], 19, "<a:Moonlit_Dew:1515912637341237349>", "https://i.ibb.co/hF8VfJXq/Moonlit-Dew.png", "mythical", 823),
+    new entryInfo("Visionary Candlelight", "dungeon access", "entry item", ["Quests"], 20, "<a:Visionary_Candlelight:1515912231366295662>", "https://i.ibb.co/Zz3pmMtd/Visionary-Candlelight.png", "mythical", 824),
+
+    new lootInfo("Cotton Candy", "loot", "ascension material", ["dungeon (extreme)"], "<:cotton_candy:1515345400826167491>", "https://i.ibb.co/23B5hBmc/cotton-candy.png", "mythical", 825),
+    new lootInfo("Cursed grimoire", "loot", "ascension material", ["dungeon (extreme)"], "<:Cursed_Grimoire:1515347183551905924>", "https://i.ibb.co/KxqZL3dK/Cursed-grimoire.png", "mythical", 826),
+    new lootInfo("Petrified Snakes", "loot", "ascension material", ["dungeon (extreme)"], "<:Petrified_Snakes:1515349779805372446>", "https://i.ibb.co/BKrs5qTb/Petrified-Snakes.png", "mythical", 827),
+    new lootInfo("Demonic Heart", "loot", "ascension material", ["dungeon (extreme)"], "<:Demonic_Heart:1515350949441572987>", "https://i.ibb.co/mVmTZzBh/Demonic-Heart.png", "mythical", 828),
+    new lootInfo("Nihility Crystal", "loot", "ascension material", ["dungeon (extreme)"], "<:Nihility_Crystal:1515360310028927006>", "https://i.ibb.co/845SSJmQ/Nihility-Crystal.png", "mythical", 829),
+    new lootInfo("Thalcore", "loot", "ascension material", ["dungeon (extreme)"], "<:Thalcore:1515874257362489387>", "https://i.ibb.co/VYRxqy6W/Thalcore.png", "mythical", 830),
+    new lootInfo("Kamish Fangs", "loot", "ascension material", ["dungeon (extreme)"], "<:Kamish_Fangs:1515874384131264675>", "https://i.ibb.co/WpMPFH55/Kamish-Fangs.png", "mythical", 831),
+    new lootInfo("Silverfrost", "loot", "ascension material", ["dungeon (extreme)"], "<:Silverfrost:1515878148158259210>", "https://i.ibb.co/CKcQTmJY/Silverfrost.png", "mythical", 832),
+    new lootInfo("Purified Venom", "loot", "ascension material", ["dungeon (extreme)"], "<:Purified_Venom:1515892308254523505>", "https://i.ibb.co/4hHzP8v/Purified-Venom.png", "mythical", 833),
+    new lootInfo("Grief Seed", "loot", "ascension material", ["dungeon (extreme)"], "<:Grief_Seed:1515915727712948294>", "https://i.ibb.co/Qjm2HKjk/Grief-Seed.png", "mythical", 834),
 
     new armorInfo("Marguerite Noire Hat", "armor", "helmet", "Marguerite Noire Set", ["crafting", "extreme dungeon drop"], "<:Marguerite_Noire_Hat:1508996761232871534>", "https://i.ibb.co/SwFNB2Xf/Nutcracker-Hat.png", "hp", 78, 1704, "mythical", 835),
     new armorInfo("Marguerite Noire Robe", "armor", "cuirass", "Marguerite Noire Set", ["crafting", "extreme dungeon drop"], "<:Marguerite_Noire_Robe:1508996430768115772>", "https://i.ibb.co/LzLPmgZV/Wudan-Robe.png", "def", 12, 139, "mythical", 836),
@@ -7235,6 +7236,269 @@ export const items = [
         return AbilityResponse.SUCCESS;
     }, (level) => `After dodging, increases own and enemy's damage taken by **1%**, up to **${[8, 12, 16, 20, 24][level - 1]}%** (stackable vulnerability)`, "Spun of smoke and gilded with silver, glimpses of a paradise that never was.\n\nLord, I would want a break.\n*The path is drawn elsewhere.*\n\nLord, may I return?\n*..*\n\nLord?", "mythical", 841),
 
+    new weaponInfo("Ciel's Blessing", "weapon", "staff", ["crafting", "dungeon (extreme)"], "<:Ciels_Blessing:1515357473173798944>", "https://i.ibb.co/zVYM9Vyc/Ciel-s-Blessing.png", "md", 84, 964, "br", 0.03, 0.15, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.mdChance = 1;
+        matchStats.xpboost += 0.28;
+
+        return AbilityResponse.SUCCESS;
+    }, "The wielder always deals magical damage, and gets **+28%** more class XP in the dungeon after a win.", "", "mythical", 842),
+
+    new runeInfo("Silverlux Cascade", ["crafting", "dungeon (extreme)"], "<:Silverlux_Cascade:1515379939787145419>", "https://i.ibb.co/KpPFx2Qq/Silverlux-Cascade.png", {
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.silverLux ??= 0;
+
+            matchStats.on("attack", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats) {
+                    myStats.silverLux += options.element === 1 ? 4 : 1;
+                };
+            });
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.silverLux >= 20) {
+                    //@ts-ignore
+                    this._used++;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Silverlux_Cascade:1515379939787145419> **${char.name}**`, { atkMultiplier: 3, magicDamage: true, dodge: false, block: false, element: 1 });
+                    mybuff.atk.push(new buffInfo("*", 1.12, 9999));
+                    mybuff.md.push(new buffInfo("*", 1.12, 9999));
+                };
+                return AbilityResponse.SUCCESS;
+            }, 9999, 1));
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- After landing any hit, grants **1** Lux (4 if it is a frost hit).\n- Upon reaching **20** Lux, deals **300%** undodgeable unblockable frost damage, and boosts own ATK & MD by **12%** permanently.", "mythical", 843),
+
+    new runeInfo("Sweet Surprise", ["crafting", "dungeon (extreme)"], "<:Sweet_Surprise:1515867196327333899>", "https://i.ibb.co/ZRkq12CP/i.png", {
+        cost: 60,
+        usage: 9999,
+        used: 0,
+        ability: async (myStats, myStatsFixed, eStats, eStatsFixed, mybuff, ebuff, char, enemy, matchStats, notice, embed, message, ...list) => {
+            myStats.sweetSurpUlt = 1;
+            addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.025), {});
+
+            myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 10, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.sweetSurpUlt * 2) : 0;
+                dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Sweet_Surprise:1515867196327333899> ${char.name}`, { overwriteDamage: dmg, magicDamage: true, dodge: false });
+                myStats.sweetSurpUlt = 0;
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+        passive: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            myStats.hp = Math.min(Math.floor(myStats.maxhp * 0.25), myStats.hp);
+            myStats.sweetSurprise = -4;
+            myStats.sweetSurpUlt = 0;
+
+            matchStats.on("heal", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (target === myStats && myStats.sweetSurprise + 4 <= matchStats.round && myStats.hp === myStats.maxhp) {
+                    myStats.sweetSurprise = matchStats.round;
+                    const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * 0.25) : 0;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Sweet_Surprise:1515867196327333899> ${char.name}`, { overwriteDamage: dmg, magicDamage: true });
+                };
+
+                if (myStats.sweetSurpUlt && target === eStats) myStats.sweetSurpUlt += options.heal;
+
+                return AbilityResponse.SUCCESS;
+            });
+
+            myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                if (myStats.sweetSurprise + 4 <= matchStats.round && myStats.hp === myStats.maxhp) {
+                    myStats.sweetSurprise = matchStats.round;
+                    const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * 0.25) : 0;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Sweet_Surprise:1515867196327333899> ${char.name}`, { overwriteDamage: dmg, magicDamage: true });
+                };
+
+                if (myStats.sweetSurpUlt) addHeal(eStats, eStats, eStats, mybuff, ebuff, matchStats, notice, ``, Math.floor(myStats.maxhp * 0.025), {});
+
+                return AbilityResponse.SUCCESS;
+            }, 9999));
+
+            return AbilityResponse.SUCCESS;
+        }
+    }, "- Player starts with **25%** of their max HP. When reaching full HP, deal **25%** of their max HP as absolute damage. (CD: 4)\n\nActive (60 💧): Heals the opponent for **2.5%** of the player's max HP every round for **10** rounds. After the last heal, deal *twice* the healed amount as absolute damage.", "mythical", 844),
+
+    new weaponInfo("Gorgoneion Aegis", "weapon", "shield", ["crafting", "dungeon (extreme)"], "<:Gorgoneion_Aegis:1515880104373391371>", "https://i.ibb.co/ZRdmdR6k/Gorgoneion-Aegis.png", "shield", 200, 1200, "br", 0.04, 0.24, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % (matchStats.interaction.commandName === "rollingcow" ? 8 : 5) === 0) {
+                eStats.timeFrozen = true;
+                let oldMsg = eStats.frozenMessage;
+                eStats.frozenMessage = "is petrified";
+
+                if (Math.random() < 0.1) {
+                    const dmg = (eStats.def + eStats.mr < 100000) ? Math.floor(myStats.maxhp * 2) : 0;
+                    dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Gorgoneion_Aegis:1515880104373391371> **${char.name}**'s shatter`, { overwriteDamage: dmg, magicDamage: true });
+                };
+
+                myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                    eStats.timeFrozen = false;
+                    eStats.frozenMessage = oldMsg;
+
+                    return AbilityResponse.SUCCESS;
+                }));
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "Petrifies the opponent for **1** round every **5** (8 in Rolling Cow) rounds with a **10%** chance to shatter them. Shatter deals **200%** of the player's max HP as absolute damage.", "Forged from the petrified scales and divine wrath of the Gorgon herself, the Gorgoneion Aegis is a testament to Medusa's ~~undying malice~~ unending tragedy. This impenetrable shield turns the horrors of the damned back upon their source, returning any attack with a blinding, stony gaze that halts any foe in their tracks.", "mythical", 845),
+
+    new weaponInfo("Kasaka's Venom Fang", "weapon", "dagger", ["crafting", "dungeon (extreme)"], "<:Kasakas_Venom_Fang:1515886210617442404>", "https://i.ibb.co/v6CqWXqX/Kasaka-s-Venom-Fang.png", "atk", 110, 1150, "cr", 0.04, 0.24, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.critbleed = true;
+        myStats.critbleedlast = 3;
+        myStats.critbleedAmount = 0.01;
+
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 8 === 0) {
+                //@ts-ignore
+                this._used++;
+                myStats.critbleedAmount += 0.01;
+            };
+
+            return AbilityResponse.SUCCESS;
+        }, 9999, 4));
+
+        return AbilityResponse.SUCCESS;
+    }, "Critical strikes inflict a venom, dealing **1%** of the enemy's max HP as damage to the enemy for **3** rounds (or **2%** of own HP if enemy has more than twice your HP). The damage scaling is increased by **1%** every **8** rounds, up to **5%** and **10%** respectively.", "Forged from the razor-sharp fang of the Blue Venom-Fanged Kasaka, this iconic dagger became Sung Jinwoo’s first major breakthrough weapon. Its menacing, curved design hints at its deadly biological origins, as the sinister blade drips with potent serpent venom capable of bleeding and paralyzing its targets.", "mythical", 846),
+
+    new lootInfo("Witch Essence", "loot", "ascension material", ["crafting", "dungeon (extreme)"], "<:Witch_Essence:1515921085152104458>", "https://i.ibb.co/TqdxwYBM/Witch-Essence.png", "mythical", 847),
+
+    new armorInfo("The Chosen One Helmet", "armor", "helmet", "The Chosen One Set", ["crafting", "extreme dungeon drop"], "<:Helmet_of_the_Chosen_One:1516708125397221446>", "https://i.ibb.co/dsPQKVJ0/Helmet-of-the-Chosen-One.png", "hp", 88, 2110, "mythical", 848),
+    new armorInfo("The Chosen One Chestplate", "armor", "cuirass", "The Chosen One Set", ["crafting", "extreme dungeon drop"], "<:Chestplate_of_the_Chosen_One:1516708199078826134>", "https://i.ibb.co/hxJ13LFR/Chestplate-of-the-Chosen-one.png", "hp", 96, 2450, "mythical", 849),
+    new armorInfo("The Chosen One Gloves", "armor", "gloves", "The Chosen One Set", ["crafting", "extreme dungeon drop"], "<:Gloves_of_the_Chosen_One:1516708293442146385>", "https://i.ibb.co/xKM6WWgy/Gloves-of-the-Chosen-one.png", "def", 15, 175, "mythical", 850),
+    new armorInfo("The Chosen One Boots", "armor", "boots", "The Chosen One Set", ["crafting", "extreme dungeon drop"], "<:Boots_of_the_Chosen_One:1516708449516257330>", "https://i.ibb.co/4ZybjkF9/Boots-of-the-Chosen-one.png", "mr", 13, 150, "mythical", 851, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.chosenOneState = 1;
+        myStats.chosenOneLastUsed = -1;
+        const chosenOneStats = await getFullUserSchema(user.id);
+        myStats.chosenOneCharLevel = chosenOneStats?.char_level?.[char.id] ?? 1;
+
+        myStats.replaceButton.def = {
+            "emoji": "<:Helmet_of_the_Chosen_One:1516708125397221446>",
+            "run": async function (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) {
+                noTimeout(matchStats, myStats);
+                myStats.chosenOneState++;
+                if (myStats.chosenOneState === 5) myStats.chosenOneState = 1;
+                myStats.chosenOneLastUsed = matchStats.round;
+                notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}** switches armor effect (**${myStats.chosenOneState}**)`);
+                return AbilityResponse.SUCCESS;
+            },
+        };
+
+        // Effects 1 to 3
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            switch (myStats.chosenOneState) {
+                case 1: {// Disables enemy ability for 3 rounds every 7 rounds
+                    if ((matchStats.round - myStats.chosenOneLastUsed) % 7 === 0) {
+                        matchStats.blockAbilities = 3;
+                        notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> Enemy's abilities are blocked for **3** rounds!`);
+                    };
+                    break;
+                };
+                case 2: {
+                    if ((matchStats.round - myStats.chosenOneLastUsed) % 10 === 0) {
+                        const totalDefMr = eStats.def + eStats.mr;
+                        if (totalDefMr < 100000) {
+                            const dmg = Math.max(1, Math.floor(myStats.lvl * (myStats.chosenOneCharLevel ?? 1) * myStats.clvl * 0.000025));
+                            dealDamage(eStats, myStats, ebuff, mybuff, matchStats, notice, `<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}**`, { overwriteDamage: dmg });
+                        };
+                    };
+                    break;
+                };
+                case 3: {
+                    if (Math.random() < 0.1) {
+                        // Stun for 1 round
+                        eStats.timeFrozen = true;
+                        let oldMsg = eStats.frozenMessage;
+                        eStats.frozenMessage = "is stunned";
+                        myStats.delayedBuffs.push(new delayedBuffs(matchStats.round + 1, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+                            eStats.timeFrozen = false;
+                            eStats.frozenMessage = oldMsg;
+
+                            return AbilityResponse.SUCCESS;
+                        }));
+                    };
+                };
+                default: break;
+            };
+
+            // Effect 4
+            matchStats.on("ATK", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && myStats.chosenOneState === 4 && matchStats.round !== myStats.chosenTimeout) {
+                    myStats.chosenTimeout = matchStats.round;
+                    if (Math.random() < 0.28) {
+                        noTimeout(matchStats, myStats);
+                        notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}** can make another action.`);
+                    };
+                };
+                return AbilityResponse.SUCCESS;
+            });
+
+            matchStats.on("DEF", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && myStats.chosenOneState === 4 && matchStats.round !== myStats.chosenTimeout) {
+                    myStats.chosenTimeout = matchStats.round;
+                    if (Math.random() < 0.28) {
+                        noTimeout(matchStats, myStats);
+                        notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}** can make another action.`);
+                    };
+                };
+                return AbilityResponse.SUCCESS;
+            });
+
+            matchStats.on("CSKILL", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && myStats.chosenOneState === 4 && matchStats.round !== myStats.chosenTimeout) {
+                    myStats.chosenTimeout = matchStats.round;
+                    if (Math.random() < 0.28) {
+                        noTimeout(matchStats, myStats);
+                        notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}** can make another action.`);
+                    }
+                };
+                return AbilityResponse.SUCCESS;
+            });
+
+            matchStats.on("ABILITY", ({ trigger, caster, target, casterBuff, targetBuff, matchStats, options }) => {
+                if (caster === myStats && myStats.chosenOneState === 4 && matchStats.round !== myStats.chosenTimeout) {
+                    myStats.chosenTimeout = matchStats.round;
+                    if (Math.random() < 0.28) {
+                        noTimeout(matchStats, myStats);
+                        notice.push(`\n<:Helmet_of_the_Chosen_One:1516708125397221446> **${char.name}** can make another action.`);
+                    }
+                };
+                return AbilityResponse.SUCCESS;
+            });
+
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "After using ATK, DEF, active (:sparkles:) and Class Skill (:fleur_de_lis:) once each, slows the enemy, where for the round the next **2** actions are timeout false. (CD: 4 rounds). For every round the user doesn't use ATK, increases ATK by **10%** (Max: 30%). This is reset by the end of the slowing round."),
+
+    new runeInfo("Coinflip Trochoid", ["extreme dungeon", "crafting"], "<:Coinflip_Trochoid:1520081150792568832>", "https://i.ibb.co/JwgcnJHC/Coinflip-Trochoid.png", {
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            matchStats.lootm += 0.08;
+            myStats.atk += Math.floor(myStats.atk * 0.08);
+            myStats.def += Math.floor(myStats.def * 0.08);
+            mybuff.atk.push(new buffInfo("*", 0.08, 9999));
+            mybuff.def.push(new buffInfo("*", 0.08, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Increases coins earned from the dungeon by **8%**. The wearer has **+8%** ATK and DEF.", "mythical", 852),
+
+    new runeInfo("Midas' Blessing", ["rune merge"], "<:Midas_Blessing:1520081209852690532>", "https://i.ibb.co/jvVTrfL5/Midas-Blessing.png", {
+        buff: async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            matchStats.lootm += 0.15;
+            myStats.atk += Math.floor(myStats.atk * 0.12);
+            myStats.def += Math.floor(myStats.def * 0.12);
+            mybuff.atk.push(new buffInfo("*", 0.12, 9999));
+            mybuff.def.push(new buffInfo("*", 0.12, 9999));
+
+            return AbilityResponse.SUCCESS;
+        },
+    }, "- Increases coins earned from the dungeon by **15%**. The wearer has **+12%** ATK and DEF.", "mythical", 853),
+
+    new lootInfo("Pyrite", "loot", "ascension material", ["crafting", "dungeon (extreme)"], "<:pyrite:1525886129759584329>", "https://i.ibb.co/C3FxK0Km/pyrite.png", "mythical", 854),
     // new weaponInfo("Abyssal Cleaver", "weapon", "axe", ["chest"], "<:abyssal_cleaver:1403303014936084562>", "https://i.ibb.co/bgVW9Vsn/i.png", "atk", 173, 976, "def", 62, 255, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
     //     myStats.boneCap ??= 30;
     //     myStats.flesh ??= 0;

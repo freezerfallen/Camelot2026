@@ -1,5 +1,5 @@
 // Extreme Floor Item Drops Mapping
-// Maps floors 301-330 to their respective unique item IDs and types
+// Maps hidden floors 1-20 to their respective unique item IDs and types
 // Now supports weapons, armor, rings, and runes
 
 interface ExtremeItemDrop {
@@ -12,41 +12,31 @@ interface ExtremeItemDrop {
 }
 
 export const extremeFloorItemMapping: Record<number, ExtremeItemDrop> = {
-    301: { itemId: 796, itemType: "rune" },  // Ciel: Ciel's Blessing
-    302: { itemId: 797, itemType: "weapon", ascensionMaterialId: 798, ascensionAmount: 240, craftingAmount: 180 }, // McBurn: Angbar
-    303: { itemId: 799, itemType: "weapon", ascensionMaterialId: 804, ascensionAmount: 240, craftingAmount: 180 }, // Father: The Flawed
-    304: { itemId: 292, itemType: "weapon", ascensionMaterialId: undefined, ascensionAmount: 240, craftingAmount: 180 },
-    305: { itemId: 800, itemType: "weapon" },  // Atares: Kamish's Wrath
-    306: { itemId: 801, itemType: "weapon" },  // NereID: Thalokorn
-    307: { itemId: 802, itemType: "weapon", ascensionMaterialId: 803, ascensionAmount: 240, craftingAmount: 180 },  // Ryomen Sukuna: Kamutoke
-    308: { itemId: 296, itemType: "weapon" },  // (next available weapon)
-    309: { itemId: 297, itemType: "weapon" },  // (next available weapon)
-    310: { itemId: 298, itemType: "weapon" },  // (next available weapon)
-    311: { itemId: 837, itemType: "armor" },  // Oktavia von Seckendorff: Marguerite Noire Vambrace
-    312: { itemId: 836, itemType: "armor" },  // Ophelia: Marguerite Noire Robe
-    313: { itemId: 838, itemType: "armor" },  // Candeloro: Marguerite Noire Boots
-    314: { itemId: 835, itemType: "armor" },  // Homulily: Marguerite Noire Hat
-    315: { itemId: 839, itemType: "rune" },  // Kriemhild Gretchen: Soul Gem
-    316: { itemId: 304, itemType: "weapon" },  // (next available weapon)
-    317: { itemId: 305, itemType: "weapon" },  // (next available weapon)
-    318: { itemId: 306, itemType: "weapon" },  // (next available weapon)
-    319: { itemId: 307, itemType: "weapon" },  // (next available weapon)
-    320: { itemId: 308, itemType: "weapon" },  // (next available weapon)
-    321: { itemId: 309, itemType: "weapon" },  // (next available weapon)
-    322: { itemId: 310, itemType: "weapon" },  // (next available weapon)
-    323: { itemId: 311, itemType: "weapon" },  // (next available weapon)
-    324: { itemId: 312, itemType: "weapon" },  // (next available weapon)
-    325: { itemId: 313, itemType: "weapon" },  // (next available weapon)
-    326: { itemId: 314, itemType: "weapon" },  // (next available weapon)
-    327: { itemId: 315, itemType: "weapon" },  // (next available weapon)
-    328: { itemId: 316, itemType: "weapon" },  // (next available weapon)
-    329: { itemId: 317, itemType: "weapon" },  // (next available weapon)
-    330: { itemId: 318, itemType: "weapon" }   // (next available weapon)
+    1: { itemId: 842, itemType: "weapon", ascensionMaterialId: 829, ascensionAmount: 240, craftingAmount: 180 },  // Ciel: Ciel's Blessing
+    2: { itemId: 797, itemType: "weapon", ascensionMaterialId: 798, ascensionAmount: 240, craftingAmount: 180 }, // McBurn: Angbar
+    3: { itemId: 799, itemType: "weapon", ascensionMaterialId: 804, ascensionAmount: 240, craftingAmount: 180 }, // Father: The Flawed
+    4: { itemId: 852, itemType: "weapon", ascensionMaterialId: 854, ascensionAmount: 240, craftingAmount: 180 }, // Eliza (alter) : Coinflip Trochoid
+    5: { itemId: 800, itemType: "weapon", ascensionMaterialId: 831, ascensionAmount: 240, craftingAmount: 180 },  // Atares: Kamish's Wrath
+    6: { itemId: 801, itemType: "weapon", ascensionMaterialId: 830, ascensionAmount: 240, craftingAmount: 180 },  // NereID: Thalokorn
+    7: { itemId: 802, itemType: "weapon", ascensionMaterialId: 803, ascensionAmount: 240, craftingAmount: 180 },  // Ryomen Sukuna: Kamutoke
+    8: { itemId: 843, itemType: "rune", ascensionMaterialId: 832, ascensionAmount: 240, craftingAmount: 180 },  // Aneira (alter): Silverlux Cascade
+    9: { itemId: 844, itemType: "rune", ascensionMaterialId: 825, ascensionAmount: 240, craftingAmount: 180 },  // Rainee (alter): Sweet Surprise
+    10: { itemId: 846, itemType: "weapon", ascensionMaterialId: 833, ascensionAmount: 240, craftingAmount: 180 },  // (next available weapon)
+    11: { itemId: 837, itemType: "armor", ascensionMaterialId: 847, ascensionAmount: 240, craftingAmount: 180 },  // Oktavia von Seckendorff: Marguerite Noire Vambrace
+    12: { itemId: 836, itemType: "armor", ascensionMaterialId: 847, ascensionAmount: 240, craftingAmount: 180 },  // Ophelia: Marguerite Noire Robe
+    13: { itemId: 838, itemType: "armor", ascensionMaterialId: 847, ascensionAmount: 240, craftingAmount: 180 },  // Candeloro: Marguerite Noire Boots
+    14: { itemId: 835, itemType: "armor", ascensionMaterialId: 847, ascensionAmount: 240, craftingAmount: 180 },  // Homulily: Marguerite Noire Hat
+    15: { itemId: 839, itemType: "rune", ascensionMaterialId: 834, ascensionAmount: 240, craftingAmount: 180 },  // Kriemhild Gretchen: Soul Gem
+    16: { itemId: 845, itemType: "weapon", ascensionMaterialId: 827, ascensionAmount: 240, craftingAmount: 180 },  // Medusa: Gorgoneion Aegis
+    17: { itemId: 851, itemType: "armor", ascensionMaterialId: 826, ascensionAmount: 240, craftingAmount: 180 },  // The Chosen One Armor
+    18: { itemId: 848, itemType: "armor", ascensionMaterialId: 826, ascensionAmount: 240, craftingAmount: 180 },  // The Chosen One Armor
+    19: { itemId: 849, itemType: "armor", ascensionMaterialId: 826, ascensionAmount: 240, craftingAmount: 180 },  // The Chosen One Armor
+    20: { itemId: 850, itemType: "armor", ascensionMaterialId: 826, ascensionAmount: 240, craftingAmount: 180 },  // The Chosen One Armor
 };
 
 // Function to check if a floor has an extreme item drop
 export function hasExtremeItemDrop(floor: number): boolean {
-    return floor >= 301 && floor <= 330 && floor in extremeFloorItemMapping;
+    return floor >= 1 && floor <= 20 && floor in extremeFloorItemMapping;
 }
 
 // Function to get the item drop info for a specific floor
@@ -74,5 +64,18 @@ export function isExtremeWeapon(itemId: number): boolean {
 export function getExtremeWeaponConfig(itemId: number): ExtremeItemDrop | null {
     const drop = Object.values(extremeFloorItemMapping)
         .find(drop => drop.itemType === "weapon" && drop.itemId === itemId);
+    return drop || null;
+}
+
+// Function to check if any item (weapon/armor/ring/rune) is an extreme drop
+export function isExtremeItem(itemId: number): boolean {
+    return Object.values(extremeFloorItemMapping)
+        .some(drop => drop.itemId === itemId);
+}
+
+// Function to get material configuration for any extreme item by ID
+export function getExtremeItemConfig(itemId: number): ExtremeItemDrop | null {
+    const drop = Object.values(extremeFloorItemMapping)
+        .find(drop => drop.itemId === itemId);
     return drop || null;
 }

@@ -146,6 +146,11 @@ const lvlupStats = {
 
 const retainItemStats = new Map<string, { timeout: NodeJS.Timeout, stats: WeaponSchema; }>();
 
+export const cacheItemStats = (uniqueid: string, stats: WeaponSchema) => {
+    clearTimeout(retainItemStats.get(uniqueid)?.timeout);
+    retainItemStats.set(uniqueid, { stats, timeout: setTimeout(() => retainItemStats.delete(uniqueid), 10 * 1000) });
+};
+
 export const getDetailedStats = async (id: number, inv: UserSchemaForStats, classLevels: Record<string, number>, lu: number = 0, refine: boolean = false, lvlcap?: number, clvlcap?: number) => {
 
     let dStats: DetailedStats = {
@@ -739,7 +744,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
     attacker.crittedTotal ||= 0;
     attacker.crittedTotal++;
 
-    if (options.element && !options.isLightning) {
+    if (options.element && !options.isLightning && !options.isBurn) {
         switch (options.element) {
             case 1: if (attacker.frostbonus) damage = Math.floor(damage * (1 + attacker.frostbonus)); break;
             default: break;
@@ -917,8 +922,8 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
         notice.push(options.overwriteNotice ? log : `\n${log} has dealt${isCrit ? " a critical hit!" : ""} **${damage}**${options.isLightning ? " <a:lightning1:1466832810005364928><a:lightning2:1466832855190737036><a:lightning3:1466832917014778085>" : options.element === 1 ? " <a:frost1:1504497507185725473><a:frost2:1504497408233705512>" : ""}${(options.magicDamage && options.mdChance < attacker.mdChance) ? " magic" : ""} damage`);
     };
 
-    // Reflect damage
-    if (target.reflectDamage) {
+    // Reflect damage (skip if target already died from the hit)
+    if (target.hp > 0 && target.reflectDamage) {
         attacker.hp = Math.floor(attacker.hp - Math.floor(damage * target.reflectDamage));
         if (attacker.hp < 1) attacker.hp = 0;
     };
@@ -1008,7 +1013,7 @@ export const dealDamage = (target: DetailedStats, attacker: DetailedStats, targe
 
     if (options.element && !options.isLightning) {
         switch (options.element) {
-            case 1: target.frost ??= 0; target.frost++; break;
+            case 1: target.frost ??= 0; target.frost += (1 + (attacker.extraFrost ?? 0)); break;
             default: break;
         };
     };
@@ -1049,13 +1054,13 @@ export const addHeal = (target: DetailedStats, attacker: DetailedStats, caster: 
 
         // 2: General Heal addition/reduction
         if (attacker.reduceHealing || target.increaseHealing) amount *= (1 - (attacker.reduceHealing ? attacker.reduceHealing : 0) + (target.increaseHealing ? target.increaseHealing : 0));
-        if (attacker.invertHealing > Math.random()) attacker.invertHealCrit ? amount = -amount * attacker.cd : amount = -amount;
+        if (attacker.invertHealing > Math.random()) amount = -amount;
         amount = Math.floor(amount);
         target.hp += amount;
         if (target.hp > target.maxhp) target.hp = target.maxhp;
         if (target.hp < 0) target.hp = 0;
 
-        matchStats.trigger("heal", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn });
+        matchStats.trigger("heal", attacker, target, attackerBuff, targetBuff, { turn: matchStats.turn, heal: amount });
     };
     if (log && amount > 0) notice.push(`\n${log} **${target.name}** has healed **${amount}** HP`);
     if (log && amount < 0) notice.push(`\n${log} **${target.name}** has lost **${amount}** HP`);
@@ -1209,7 +1214,9 @@ export const filterItems = (userItems: WeaponSchema[], choice: string[], exclude
         };
 
         const ascItem = getAscensionMaterial(fItem.id, items.filter((e) => e.type === "ascension material"));
-        const craftItem = items.find((e) => e.type === "crafting material" && e.grade === fItem.grade) as lootInfo;
+        const { isExtremeItem, getExtremeItemConfig } = require('./extremeWeaponDrops');
+        const extremeConfig = isExtremeItem(fItem.id) ? getExtremeItemConfig(fItem.id) : null;
+        const craftItem = extremeConfig ? items[extremeConfig.ascensionMaterialId] as lootInfo : items.find((e) => e.type === "crafting material" && e.grade === fItem.grade) as lootInfo;
         const levelItem = items[fItem.category === "weapon" ? 56 : 57];
         const awakenItem = items[683];
 

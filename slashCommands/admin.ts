@@ -4,7 +4,7 @@ import { characters } from "../Modules/chars";
 import { classLevelToXP, search, searchItem, showPage } from "../Modules/functions";
 import { OfferRow, PageRow, cowSettings } from "../Modules/components";
 import { requestVerification, dungeonTempBan } from "../Modules/components";
-import { armorInfo, items, ringInfo, weaponInfo } from "../Modules/items";
+import { armorInfo, entryInfo, items, ringInfo, weaponInfo } from "../Modules/items";
 import { SlashCommand, UserSchema } from '../types';
 import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers, updateUsersAndCache } from '../Modules/queries';
 import { query } from '../postgres';
@@ -29,7 +29,7 @@ const exportCommand: SlashCommand = {
 
         // List all actions
         if (cmd === "list" || cmd === "ls") {
-            return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`reset phantasmagoria`\n`guilds`\n`add vote`\n`set <key> <value>`\n`did`", ephemeral });
+            return interaction.reply({ content: ">>> `list`\n`reset pulls`\n`reset daily`\n`reset weekly`\n`reset dungeon`\n`reset phantasmagoria`\n`guilds`\n`add vote`\n`set <key> <value>`\n`grant entry <name|all>`\n`did`", ephemeral });
         };
 
         // DB size
@@ -170,7 +170,7 @@ const exportCommand: SlashCommand = {
             const promptEmbed = new EmbedBuilder()
                 .setColor(0xff4444)
                 .setTitle("⚠️ Confirm Phantasmagoria Reset")
-                .setDescription(`This will reset the following for ${targetLabel}:\n\n• Damage → \`0\`\n• Phases → \`0\`\n• Purchase History → \`Cleared\`\n• Strategy → \`None\``)
+                .setDescription(`This will reset the following for ${targetLabel}:\n\n• Damage → \`0\`\n• Phases → \`0\`\n• Purchase History → \`Cleared\`\n• Strategy → \`None\`\n• Class → \`None\`\n• Equipment → \`Cleared\``)
                 .setFooter({ text: `Requested by ${interaction.user.tag}` });
             const msg = await interaction.reply({ embeds: [promptEmbed], components: [confirmRow], ephemeral, fetchReply: true });
             const btn = await msg.awaitMessageComponent({ filter: (r) => r.user.id === interaction.user.id, componentType: ComponentType.Button, time: 30000 }).catch(() => null);
@@ -179,10 +179,12 @@ const exportCommand: SlashCommand = {
             };
             const target = user ? user.id : "*";
             await updateUsers(target, {
-                phantasmagoria_best_damage: { type: "set", value: 0 },
-                phantasmagoria_best_phases: { type: "set", value: 0 },
+                phantasmagoria_boss_data: { type: "set", value: {} },
+                phantasmagoria_selected_boss: { type: "set", value: 0 },
                 echo_purchases: { type: "set", value: {} },
                 phantasmagoria_strategy: { type: "set", value: 0 },
+                phantasmagoria_class: { type: "set", value: null },
+                phantasmagoria_equipment: { type: "set", value: {} },
             });
             const resultEmbed = new EmbedBuilder()
                 .setColor(0xbbffff)
@@ -193,6 +195,8 @@ const exportCommand: SlashCommand = {
                     { name: "Phases", value: "`0`", inline: true },
                     { name: "Purchase History", value: "`Cleared`", inline: true },
                     { name: "Strategy", value: "`None`", inline: true },
+                    { name: "Class", value: "`None`", inline: true },
+                    { name: "Equipment", value: "`Cleared`", inline: true },
                 )
                 .setFooter({ text: `Executed by ${interaction.user.tag}` });
             return interaction.editReply({ embeds: [resultEmbed], components: [] });
@@ -414,6 +418,45 @@ const exportCommand: SlashCommand = {
             };
 
             return interaction.reply({ content: `Action Successful: Added all rings to ${user.toString()}`, ephemeral });
+        };
+
+        // Grant entry item(s)
+        if (action.startsWith("grant entry")) {
+            if (!user) return interaction.reply({ content: `Error: missing user object\n\nUsage: \`/admin grant entry <name|all> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the entry item to grant, or \`all\` to grant every entry item`, ephemeral });
+
+            args.shift(); // Remove "entry"
+            const entryArg = args.join(" ").trim().toLowerCase();
+
+            // Grant all entry items
+            if (entryArg === "all") {
+                const entryItems = items.filter((item): item is entryInfo => item instanceof entryInfo);
+                const addItems: Record<string, number> = {};
+                for (const item of entryItems) {
+                    addItems[item.id] = (addItems[item.id] ?? 0) + 1;
+                };
+
+                await updateUsersAndCache(interaction.client, user.id, {
+                    updates: {
+                        items: { type: "merge_json", value: addItems },
+                    },
+                });
+
+                return interaction.reply({ content: `Action Successful: Granted **${entryItems.length}** entry items to ${user.toString()}`, ephemeral });
+            };
+
+            // Grant a specific entry item
+            const item = searchItem(args.join(" "), interaction, true);
+            if (!item) return interaction.reply({ content: `Error: Couldn't find entry item "${args.join(" ")}"\n\nUsage: \`/admin grant entry <name|all> user:@user\`\n\n**Options**\n\`name\`: Name or ID of the entry item to grant`, ephemeral });
+
+            if (!(item instanceof entryInfo)) return interaction.reply({ content: `Error: **${item.name}** is not an entry item`, ephemeral });
+
+            await updateUsersAndCache(interaction.client, user.id, {
+                updates: {
+                    items: { type: "merge_json", value: { [item.id]: 1 } },
+                },
+            });
+
+            return interaction.reply({ content: `Action Successful: Granted ${item.emoji} **${item.name}** to ${user.toString()}`, ephemeral });
         };
 
         // Remove weapon

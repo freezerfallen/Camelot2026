@@ -2,7 +2,7 @@ import { ClassAbility } from "../types";
 import buffInfo from "./buffs";
 import { AbilityResponse } from "./components";
 import delayedBuffs from "./delayedBuffs";
-import { dealDamage, addHeal, procburn } from "./functions";
+import { dealDamage, addHeal, procburn, userLevel } from "./functions";
 import { getUserSchema } from "./queries";
 
 export default class curseInfo {
@@ -380,29 +380,98 @@ export const curses = [
 
         return AbilityResponse.SUCCESS;
     }, "https://i.ibb.co/HTjy80NQ/image0-1.png", "Removes any revival attempts on the opponent. If they have none, instead boosts ATK & MD by **12%** permanently", "Unleashes a sure-hit domain on round **15**, instantly killing the opponent"),
-    // new curseInfo("Bane of the Powerful", 20, "<:Bane_of_the_Powerful:EMOJI>", 2, 60, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //     const baneClvl = matchStats.baneClvl ?? myStats.clvl;
-    //     const dmg = baneClvl * 100;
-    //     if (dmg >= myStats.maxhp) {
-    //         myStats.hp = 1;
-    //     } else {
-    //         myStats.hp -= dmg;
-    //     }
-    //     notice.push(`\n<:Bane_of_the_Powerful:EMOJI> **${enemy.name}** judges your power — **${dmg}** true damage`);
-    //     return AbilityResponse.SUCCESS;
-    // }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //     matchStats.baneClvl ??= myStats.clvl;
-    //     matchStats.baneLvl ??= myStats.lvl;
-    //     myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-    //         if (matchStats.round % 10 === 0) {
-    //             const baneLvl = matchStats.baneLvl ?? myStats.lvl;
-    //             const dmg = baneLvl * 100;
-    //             myStats.hp -= dmg;
-    //             if (myStats.hp < 0) myStats.hp = 0;
-    //             notice.push(`\n<:Bane_of_the_Powerful:EMOJI> The weight of your power crushes you — **${dmg}** true damage`);
-    //         };
-    //         return AbilityResponse.SUCCESS;
-    //     }, 9999));
-    //     return AbilityResponse.SUCCESS;
-    // }, "https://i.ibb.co/bXW0gcv/examiner.png", "Deals **clvl × 100** true, undodgeable, unblockable, absolute damage. If it would kill, leaves the player at **1 HP**.", "Deals **profile level × 100** true, undodgeable, unblockable, absolute damage once every **10** rounds. Can kill."),
+    new curseInfo("Omni Barrier", 20, "<:Omni_Barrier:1514109158134255716>", 2, 80, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.counter += 3;
+        notice.push(`\n<:Omni_Barrier:1514109158134255716> **${enemy.name}** gains **3** counter attempts`);
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        eStats.counter ??= 0;
+        eStats.damageReduction ??= 0;
+        eStats.damageReduction += 0.33;
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/nMnW7jVy/content.png", "Counters the next **3** attacks", "Takes **33%** less damage"),
+    new curseInfo("Despair", 21, "<:Despair:1514117174367621190>", 2, 80, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        dealDamage(myStats, eStats, mybuff, ebuff, matchStats, notice, `${curses[21].emblem} **${eStats.name}**`, { overwriteDamage: myStats.maxhp * 0.05, magicDamage: true });
+        myStats.def -= Math.floor(myStats.def * 0.1);
+        myStats.mr -= Math.floor(myStats.mr * 0.1);
+        mybuff.def.push(new buffInfo("*", 0.9, 9999));
+        mybuff.mr.push(new buffInfo("*", 0.9, 9999));
+        notice.push(`\n<:Despair:1514117174367621190> **${enemy.name}** decreases your DEF and MR by **10%**`);
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 3 === 0) {
+                myStats.def -= Math.floor(myStats.def * 0.1);
+                myStats.mr -= Math.floor(myStats.mr * 0.1);
+                mybuff.def.push(new buffInfo("*", 0.9, 9999));
+                mybuff.mr.push(new buffInfo("*", 0.9, 9999));
+                notice.push(`\n<:Despair:1514117174367621190> The despair continues to eat away your defenses...`);
+            };
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/ynCJ3jsY/despair-1.png", "Deals **5%** of your max HP, then decreases your DEF & MR by **10%** permanently.", "Decreases your DEF & MR by **10%** every **3** rounds."),
+    new curseInfo("Trial of Sagacity", 22, "<:Trial_of_Sagacity:1514782002572955759>", 2, 100, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        if (myStats.sm >= 100) {
+            myStats.sm -= 100;
+            eStats.sm += 100;
+            if (eStats.sm > eStats.mana) eStats.sm = eStats.mana;
+            notice.push(`\n${curses[22].emblem} **${enemy.name}** sapped **100** mana from you`);
+        } else {
+            const hpLoss = Math.floor(myStats.maxhp * 0.1);
+            myStats.maxhp -= hpLoss;
+            if (myStats.hp > myStats.maxhp) myStats.hp = myStats.maxhp;
+            notice.push(`\n${curses[22].emblem} **${enemy.name}** reduced your max HP by **10%**`);
+        };
+
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        myStats.mg += 10;
+        eStats.mg += 20;
+        mybuff.mg.push(new buffInfo("+", 10, 9999));
+        ebuff.mg.push(new buffInfo("+", 20, 9999));
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round === 15) {
+                eStats.mg += myStats.mg;
+                ebuff.mg.push(new buffInfo("+", myStats.mg, 9999));
+                myStats.mg = 0;
+                mybuff.mg.push(new buffInfo("=", 0, 9999));
+                notice.push(`\n${curses[22].emblem} **${enemy.name}** absorbed all your mana-regen!`);
+            };
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/nM7pMPz9/content-1.png", "Saps **100** 💧 from you. If you have less than **100** 💧, instead reduces your max HP by **10%**.", "The monster and you have **+20** and **+10** mana-regen respectively. On round **15**, the monster gains all your mana-regen, while yours is set to **0**."),
+    new curseInfo("Bane of the Powerful", 20, "<:Bane_of_the_Powerful:1516679506255937619>", 2, 60, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        const baneClvl = matchStats.baneClvl ?? myStats.lvl;
+        const dmg = baneClvl * 100;
+        if (dmg >= myStats.hp) {
+            myStats.hp = 1;
+        } else {
+            myStats.hp -= dmg;
+        };
+        notice.push(`\n<:Bane_of_the_Powerful:1516679506255937619> **${enemy.name}** judges your power — **${dmg}** absolute damage`);
+        return AbilityResponse.SUCCESS;
+    }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+        matchStats.baneClvl ??= myStats.lvl;
+        const baneStats = await getUserSchema(user.id);
+        matchStats.baneLvl ??= baneStats ? userLevel(baneStats.xp) : myStats.lvl;
+        myStats.delayedBuffs.push(new delayedBuffs(0, async (myStats, myStatsFixed, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
+            if (matchStats.round % 10 === 0) {
+                const baneLvl = matchStats.baneLvl ?? myStats.lvl;
+                const dmg = baneLvl * 100;
+                myStats.hp -= dmg;
+                if (myStats.hp < 0) myStats.hp = 0;
+                notice.push(`\n<:Bane_of_the_Powerful:1516679506255937619> The weight of your power crushes you, dealing **${dmg}** absolute damage`);
+            };
+            return AbilityResponse.SUCCESS;
+        }, 9999));
+
+        return AbilityResponse.SUCCESS;
+    }, "https://i.ibb.co/TB4q2B0q/Bane-of-the-Powerful.png", "Deals **character level × 100** true, undodgeable, unblockable, absolute damage. If it would kill, leaves the player at **1 HP**.", "Deals **profile level × 100** true, undodgeable, unblockable, absolute damage once every **10** rounds. Can kill."),
 ];

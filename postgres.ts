@@ -171,6 +171,7 @@ async function createTables() {
         dungeon_classes INT[] DEFAULT ARRAY[]::INT[] NOT NULL,      -- renamed from 'classes' to avoid conflicts
         dungeon_classlevels JSONB DEFAULT '{}' NOT NULL,            -- renamed from 'classlevels' to avoid conflicts
         dungeon_responsetime TIMESTAMP[] DEFAULT ARRAY[]::TIMESTAMP[] NOT NULL,              -- renamed from 'responsetime' to avoid conflicts
+        hidden_dungeon JSONB DEFAULT '{}' NOT NULL,                                         -- hidden dungeon (floors 1-20)
         stampede_responsetime TIMESTAMP[] DEFAULT ARRAY[]::TIMESTAMP[] NOT NULL              -- renamed from 's_responsetime' to avoid conflicts
     )`);
 
@@ -502,6 +503,16 @@ async function createTriggers() {
 
 async function alterTables() {
     // Example:
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_supports INT[] DEFAULT ARRAY[]::INT[] NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_boss_data JSONB DEFAULT \'{}\'::jsonb NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_selected_boss INT DEFAULT 0 NOT NULL;');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS echo INT DEFAULT 0 NOT NULL');
+    await query(`UPDATE users SET phantasmagoria_boss_data = jsonb_build_object('0', jsonb_build_object('best_damage', phantasmagoria_best_damage, 'best_phases', phantasmagoria_best_phases)) WHERE phantasmagoria_best_damage > 0 OR phantasmagoria_best_phases > 0`);
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS echo_purchases JSONB DEFAULT \'{}\' NOT NULL');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_strategy INT DEFAULT 0 NOT NULL');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_class INT DEFAULT NULL');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phantasmagoria_equipment JSONB DEFAULT \'{}\'::jsonb NOT NULL');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS hidden_dungeon JSONB DEFAULT \'{}\' NOT NULL');
     // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INT DEFAULT 0 NOT NULL');
 
     // add genesisdupepity INT DEFAULT 0 NOT NULL,
@@ -516,20 +527,20 @@ async function alterTables() {
 
     // await query('ALTER TABLE guilds ADD COLUMN IF NOT EXISTS raid_distribute_equally BOOLEAN DEFAULT FALSE NOT NULL;');
 
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreak INT DEFAULT 0 NOT NULL');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreakhighest INT DEFAULT 0 NOT NULL');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreak INT DEFAULT 0 NOT NULL');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS arenastreakhighest INT DEFAULT 0 NOT NULL');
 
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discovered_via TEXT;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discovered_via TEXT;');
 
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
-    await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_skins JSONB DEFAULT '{}' NOT NULL;`);
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastvoteserver TIMESTAMP;');
+    // await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_skins JSONB DEFAULT '{}' NOT NULL;`);
 
-    // Frostbound Yule event
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter_failed BOOLEAN DEFAULT FALSE NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_timestamp TIMESTAMP;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fire INT DEFAULT 0 NOT NULL;');
-    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fragments INT DEFAULT 0 NOT NULL;');
+    // // Frostbound Yule event
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter INT DEFAULT 0 NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_chapter_failed BOOLEAN DEFAULT FALSE NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS yule_timestamp TIMESTAMP;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fire INT DEFAULT 0 NOT NULL;');
+    // await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS perpetual_fragments INT DEFAULT 0 NOT NULL;');
 
 
 

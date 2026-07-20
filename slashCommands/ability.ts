@@ -7,7 +7,7 @@ import { SlashCommand } from "../types";
 import { getUserSchema } from "../Modules/queries";
 import { enemies, raidBosses, rollingCowMobs } from "../Modules/enemies";
 import { skills, bossAbilities, eventBossAbilities, crazeBossAbilities2023, crazeBossAbilities2024, rollingCowAbilities } from "../Modules/skills";
-import { floors } from "../Modules/enemies";
+import { hiddenFloors } from "../Modules/enemies";
 
 const exportCommand: SlashCommand = {
     name: 'ability',
@@ -31,30 +31,32 @@ const exportCommand: SlashCommand = {
 
         // Combined enemy mapping with skill ID and required floor
         const enemyMap: { [key: string]: { skillId: number; requiredFloor: number; }; } = {
-            'ciel': { skillId: 37, requiredFloor: 301 },
-            'mcburn': { skillId: 38, requiredFloor: 302 },
-            'father': { skillId: 39, requiredFloor: 303 },
-            'eliza (alter)': { skillId: 40, requiredFloor: 304 },
-            'antares': { skillId: 41, requiredFloor: 305 },
-            'nereid': { skillId: 42, requiredFloor: 306 },
-            'ryomen sukuna': { skillId: 43, requiredFloor: 307 },
-            'aneira (alter)': { skillId: 44, requiredFloor: 308 },
-            'rainee (alter)': { skillId: 45, requiredFloor: 309 },
-            'sung jin woo': { skillId: 46, requiredFloor: 310 },
-            'oktavia von seckendorff': { skillId: 47, requiredFloor: 311 },
-            'ophelia': { skillId: 48, requiredFloor: 312 },
-            'candeloro': { skillId: 49, requiredFloor: 313 },
-            'homulily': { skillId: 50, requiredFloor: 314 },
-            'kriemhild gretchen': { skillId: 51, requiredFloor: 315 },
-            'medusa': { skillId: 52, requiredFloor: 316 },
-            'kuronosu': { skillId: 53, requiredFloor: 317 },
-            'espathera (alter)': { skillId: 54, requiredFloor: 318 },
+            'ciel': { skillId: 37, requiredFloor: 1 },
+            'mcburn': { skillId: 38, requiredFloor: 2 },
+            'father': { skillId: 39, requiredFloor: 3 },
+            'eliza (alter)': { skillId: 40, requiredFloor: 4 },
+            'antares': { skillId: 41, requiredFloor: 5 },
+            'nereid': { skillId: 42, requiredFloor: 6 },
+            'ryomen sukuna': { skillId: 43, requiredFloor: 7 },
+            'aneira (alter)': { skillId: 44, requiredFloor: 8 },
+            'rainee (alter)': { skillId: 45, requiredFloor: 9 },
+            'sung jin woo': { skillId: 46, requiredFloor: 10 },
+            'oktavia von seckendorff': { skillId: 47, requiredFloor: 11 },
+            'ophelia': { skillId: 48, requiredFloor: 12 },
+            'candeloro': { skillId: 49, requiredFloor: 13 },
+            'homulily': { skillId: 50, requiredFloor: 14 },
+            'kriemhild gretchen': { skillId: 51, requiredFloor: 15 },
+            'medusa': { skillId: 52, requiredFloor: 16 },
+            'kuronosu': { skillId: 53, requiredFloor: 17 },
+            'espathera (alter)': { skillId: 54, requiredFloor: 18 },
+            'iustitia': { skillId: 55, requiredFloor: 19 },
+            'luxuria (alter)': { skillId: 56, requiredFloor: 20 },
         };
 
-        // Function to check if user has cleared a specific floor
+        // Function to check if user has cleared a specific hidden floor
         function hasClearedFloor(userSchema: any, floor: number): boolean {
-            return userSchema.dungeon_floors &&
-                userSchema.dungeon_floors[floor.toString()] >= floors[floor]?.winsNeeded;
+            return userSchema.hidden_dungeon &&
+                userSchema.hidden_dungeon[floor.toString()] >= hiddenFloors[floor]?.winsNeeded;
         }
 
         function formatEnemyTraits(enemy: any) {
@@ -265,7 +267,7 @@ const exportCommand: SlashCommand = {
                 .setFooter({
                     text: selection === "single"
                         ? (isEnemyView
-                            ? `Dungeon Enemy (Floor 301+) | Raid Boss`
+                            ? `Hidden Dungeon Enemy (Floor 1-20) | Raid Boss`
                             : `Page ${singleCurrPage}/${singlePagesTotal}${isSummary ? " | ⚠️ Compact View is only available for your convenience and may include inaccuracies, please refer to the full version for the most accurate information." : ""}`)
                         : `Page ${currPage}/${pagesTotal}`
                 });
