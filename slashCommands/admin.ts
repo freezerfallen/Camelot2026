@@ -1,15 +1,14 @@
 import fs from 'fs';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder, User } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder, User, ContainerBuilder, MessageFlags } from "discord.js";
 import { characters } from "../Modules/chars";
-import { classLevelToXP, search, searchItem, showPage } from "../Modules/functions";
-import { OfferRow, PageRow, cowSettings } from "../Modules/components";
+import { classLevelToXP, rarityColor, search, searchItem, showPage } from "../Modules/functions";
+import { OfferRow, PageRow, activeAuctions, auctionChannelId, cowSettings } from "../Modules/components";
 import { requestVerification, dungeonTempBan } from "../Modules/components";
 import { armorInfo, entryInfo, items, ringInfo, weaponInfo } from "../Modules/items";
-import { SlashCommand, UserSchema } from '../types';
-import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewWeapon, transferAccount, updateUsers, updateUsersAndCache } from '../Modules/queries';
+import { AuctionSchema, CharacterSchema, SlashCommand, UserSchema } from '../types';
+import { deleteWeapon, doesUserExist, getGuildSchema, getPastStampedes, getResponseTimes, getUserSchema, getUserTransaction, getUserTransactions, insertNewAuction, insertNewCharacter, insertNewWeapon, transferAccount, updateUsers, updateUsersAndCache } from '../Modules/queries';
 import { query } from '../postgres';
 import { createResponseGraph, getResponseData } from '../Modules/responseGraph';
-import { query as sqliteQuery } from '../db_handler';
 
 const exportCommand: SlashCommand = {
     name: 'admin',
@@ -64,29 +63,6 @@ const exportCommand: SlashCommand = {
             return interaction.editReply({ content: `**Total**: ${sum_pretty}\n\n**Breakdown**:\n>>> ` + res.filter((e) => e.bytes !== null).slice(0, 30).map((e) => `${e.column_name}: ${e.total_size}`).join("\n") });
         };
 
-        // Check refunded shard amount
-        if (action === "refunded") {
-            if (!user) return interaction.reply({ content: "missing user object", ephemeral });
-
-            const charactersFromDb = await sqliteQuery('SELECT rowid, * FROM characters');
-
-            const charData = charactersFromDb.find((c: any) => c.id === user?.id) || {
-                chars: '[]',
-                ref: '{}',
-                level: '{}',
-                class: '{}',
-                skin: '{}',
-                equipment: '{}'
-            };
-
-            const shards = Object.entries(JSON.parse(charData.ref) as Record<string, number>)
-                .filter(([key,]) => characters[key as any].rarity === "SS" || characters[key as any].rarity === "EX")
-                .filter(([, value]) => value > 2)
-                .reduce((a, [, b]) => a + (b > 3 ? 4 : 1), 0);
-
-            return interaction.reply({ content: `${shards} shards have been refunded to ${user.toString()}`, ephemeral });
-        };
-
         if (cmd === "repair") {
 
             // Repair backgrounds
@@ -123,7 +99,104 @@ const exportCommand: SlashCommand = {
             return interaction.reply({ content: "Action Successful: Loaded dungeon_responsetime", ephemeral });
         };
 
+        // Auctions
+        if (cmd === "auction" || cmd === "auctions") {
+            if (!(args[0])) return interaction.reply({ content: `**Usage:** \`/admin auction new <id> --t:{hours}\``, ephemeral });
 
+            // Start a new auction
+            if (args[0] === "new") {
+                if (!(args[1])) return interaction.reply({ content: `**Usage:** \`/admin auction new <id> --t:{hours}\``, ephemeral });
+
+                const charId = parseInt(args[1]);
+                const char = characters[charId];
+                if (!char) return interaction.reply({ content: `**Error:** Character with ID \`${charId}\` not found`, ephemeral });
+
+                const duration = args.find(arg => arg.startsWith("--t:"))?.split(":")[1];
+                const hours = duration ? parseFloat(duration) : 0;
+                if (isNaN(hours)) return interaction.reply({ content: `**Usage:** \`/admin auction new <id> --t={hours}\``, ephemeral });
+                if (hours < 0) return interaction.reply({ content: `**Usage:** \`/admin auction new <id> --t={hours}\``, ephemeral });
+
+                // Create print if VIP character
+                let character: CharacterSchema | undefined;
+                if (char.rarity === "VIP") {
+                    try {
+                        character = await insertNewCharacter('706183309943767112', char.id, char.rarityValue);
+                    } catch (error) {
+                        console.error(error);
+                        return interaction.reply({ content: `**Error:** Failed to create VIP character`, ephemeral });
+                    };
+                    if (!character) return interaction.reply({ content: `**Error:** Failed to return VIP character`, ephemeral });
+                };
+
+                // Create auction
+                let auction: AuctionSchema | undefined;
+                try {
+                    const ends_at = hours === 0
+                        ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // default 3 days
+                        : new Date(Date.now() + hours * 60 * 60 * 1000); // custom duration
+                    auction = await insertNewAuction("char", char.id, ends_at, character?.print);
+                } catch (error) {
+                    console.error(error);
+                    return interaction.reply({ content: `**Error:** Failed to create auction`, ephemeral });
+                };
+                if (!auction) return interaction.reply({ content: `**Error:** Failed to return auction`, ephemeral });
+
+                // Prepare auction channel
+                const chnl = interaction.client.channels.cache.get(auctionChannelId);
+                if (!chnl?.isSendable()) return interaction.reply({ content: `**Error:** Failed to find auction channel`, ephemeral });
+
+                // Send auction message
+                const Container = new ContainerBuilder()
+                    .setAccentColor(rarityColor(char.rarity))
+                    .addSectionComponents(section => section
+                        .addTextDisplayComponents(text => text
+                            .setContent(
+                                `-# <:auction:1490459181956726784> New Auction` +
+                                `\n### **${char.name}**${character ? `#${character.print}` : ""}` +
+                                `\n<@&1490459581443342336>`
+                            )
+                        )
+                        .setThumbnailAccessory(thumbnail => thumbnail.setURL(char.rarityImageSquare))
+                    )
+                    // .addSeparatorComponents(separator => separator)
+                    .addMediaGalleryComponents(media => media
+                        .addItems(item => item.setURL(char.image))
+                    )
+                    .addSectionComponents(section => section
+                        .addTextDisplayComponents(text => text
+                            .setContent(
+                                `-# Bid using \`/auction bid\`` +
+                                `\n-# Ends in: <t:${Math.floor(new Date((auction && auction.ends_at) ? auction.ends_at : new Date()).getTime() / 1000)}:R>`
+                            )
+                        )
+                        .setButtonAccessory(button => button
+                            .setCustomId(`auction_help`)
+                            .setLabel('Rules')
+                            .setEmoji({ id: '1506327355608662036' })
+                            .setStyle(ButtonStyle.Secondary)
+                        )
+                    );
+
+                // const ButtonRow = new ActionRowBuilder<ButtonBuilder>()
+                //     .addComponents(
+                //         new ButtonBuilder()
+                //             .setCustomId(`bid_${auction.rowid}`)
+                //             .setEmoji('<:auction:1490459181956726784>')
+                //             .setLabel('Place Bid')
+                //             .setStyle(ButtonStyle.Secondary),
+                //     );
+
+                // Send the auction message
+                await chnl.send({ components: [Container], flags: MessageFlags.IsComponentsV2 });
+
+                // Cache the auction
+                if (auction.ends_at) activeAuctions.set(auction.rowid, new Date(auction.ends_at));
+
+                // Acknowledge the command
+                return interaction.reply({ content: `Action Successful: Created auction for **${char.name}**${character ? `#${character.print}` : ""}`, ephemeral });
+            };
+
+        };
 
         // Reset Pulls
         if (action === "reset pulls") {
@@ -645,7 +718,7 @@ const exportCommand: SlashCommand = {
 
         // Ban Players
         if (cmd === "ban" || cmd === "blacklist" || cmd === "suspend") {
-            if (!user || user.bot || user.id === "489490486734880774") return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(user.id)) return interaction.reply({ content: `No <:kek:927271748385243206>`, ephemeral });
 
             const reason = args.length ? ` ${args.join(" ")}` : "";
 
@@ -660,7 +733,7 @@ const exportCommand: SlashCommand = {
 
         // Unban Players
         if (cmd === "unban") {
-            if (!user || user.bot || user.id === "489490486734880774") return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
+            if (!user || user.bot || process.env.ADMINS.split(",").includes(user.id)) return interaction.reply({ content: `Please specify a valid user to unban\nUsage: \`/admin unban user:<user>\``, ephemeral });
 
             interaction.client.blacklist.delete(user.id);
 

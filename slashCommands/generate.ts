@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, Me
 import { characters } from "../Modules/chars";
 import { formatNumberWithQuotes } from "../Modules/functions";
 import { getUserSchema, updateUsers } from "../Modules/queries";
-import { generateText } from '../Modules/gemini';
+import { generateText } from '../Modules/openrouter';
 import { generateImages, removeBackground } from '../Modules/runwareDirectApi';
 
 type GenType = "weapon" | "armor" | "ring" | "item" | "character";
@@ -32,7 +32,7 @@ const exportCommand: SlashCommand = {
         const stats = author.schema;
         const type = interaction.options.getString('type') as GenType | null;
         const userprompt = interaction.options.getString('prompt') ?? type ?? "";
-        const enhancePrompt = interaction.options.getBoolean('enhance') ?? true;
+        const enhancePrompt = (interaction.options.getBoolean('enhance') ?? true) && !!process.env.OPENROUTER_API_KEY?.trim();
         const outputFormat = (interaction.options.getString('output') as IOutputFormat) ?? "JPG";
         const numberOfImages = type === "armor"
             ? 4
@@ -52,6 +52,10 @@ const exportCommand: SlashCommand = {
                     `-# You can buy credits in the \`/monthly shop\` using coins <:coins:872926669055356939> or jades <:eternal_jade:1256124504141201428>`
                 );
             return interaction.reply({ embeds: [Embed] });
+        };
+
+        if (!process.env.RUNWARE_API_KEY?.trim()) {
+            return interaction.reply({ content: 'Image generation is unavailable because it has not been configured.', flags: MessageFlags.Ephemeral });
         };
 
         try {
@@ -94,6 +98,10 @@ const exportCommand: SlashCommand = {
         };
     },
     async executeButtonInteraction({ interaction }) {
+        if (!process.env.RUNWARE_API_KEY?.trim()) {
+            return interaction.followUp({ content: 'Background removal is unavailable because image generation has not been configured.', flags: MessageFlags.Ephemeral });
+        };
+
         const stats = await getUserSchema(interaction.user.id);
         if (!stats) return interaction.followUp("Couldn't find user");
 

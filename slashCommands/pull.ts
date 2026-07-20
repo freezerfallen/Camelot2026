@@ -286,6 +286,7 @@ const exportCommand: SlashCommand = {
         achievements[4].check(interaction, interaction.user, rarStats["S"]), achievements[5].check(interaction, interaction.user, rarStats["SS"]); // Something Rare
         achievements[15].check(interaction), achievements[16].check(interaction), achievements[17].check(interaction), achievements[18].check(interaction); // Rising
         achievements[19].check(interaction, interaction.user, characters, auniq), achievements[20].check(interaction, interaction.user, characters, auniq), achievements[21].check(interaction, interaction.user, characters, auniq), achievements[22].check(interaction, interaction.user, characters, auniq), achievements[23].check(interaction, interaction.user, characters, auniq); // Diligent
+        for (const id of [113, 114, 115, 116, 117]) await achievements[id].check(interaction);
     },
 };
 

@@ -74,7 +74,20 @@ export default class charInfo implements IcharInfo {
             "A": "<:ATier:869316558013464627>",
             "B": "<:BTier:869316586803179571>",
             "C": "<:CTier:869316602858991657>",
-            "D": "<:DTier:869316616071032843>"
+            "D": "<:DTier:869316616071032843>",
+        }[this._rarity];
+    };
+
+    get rarityImageSquare() {
+        return {
+            "VIP": "https://i.ibb.co/HpV1bbWx/vip.gif",
+            "EX": "https://i.ibb.co/tpJxmw6s/ex.gif",
+            "SS": "https://i.ibb.co/4R6zNZ9D/ss.png",
+            "S": "https://i.ibb.co/wFqn1FjY/s.png",
+            "A": "https://i.ibb.co/VWfnWGY8/a.png",
+            "B": "https://i.ibb.co/LXL6B8g6/b.png",
+            "C": "https://i.ibb.co/YFWy0tXJ/c.png",
+            "D": "https://i.ibb.co/wZ5XsPcF/d.png",
         }[this._rarity];
     };
 
@@ -24090,7 +24103,7 @@ export const characters: charInfo[] = [
     new charInfo("Megumi Ooumi", [], anime[631], "F", "https://i.ibb.co/7xnLhh5K/c.png", 23984, "S"),
     new charInfo("Umamon", [], anime[631], "M", "https://i.ibb.co/Ng0Nq26H/c.png", 23985, "S"),
     new charInfo("Brago", [], anime[631], "M", "https://i.ibb.co/v467DFmq/c.png", 23986, "S"),
-    new charInfo("KanchomÃ©", [], anime[631], "M", "https://i.ibb.co/JjqsQBbR/c.png", 23987, "A"),
+    new charInfo("Kanchomé", ["Kanchome"], anime[631], "M", "https://i.ibb.co/JjqsQBbR/c.png", 23987, "A"),
     new charInfo("Sherry Bellmont", [], anime[631], "F", "https://i.ibb.co/Jj017kbN/c.png", 23988, "A"),
     new charInfo("Riya", [], anime[631], "M", "https://i.ibb.co/QvcdKzFv/c.png", 23989, "A"),
     new charInfo("Momon", [], anime[631], "M", "https://i.ibb.co/Rkkjr963/c.png", 23990, "A"),
@@ -26339,6 +26352,41 @@ export const characters: charInfo[] = [
     new charInfo("Tsubakihime", [], anime[700], "F", "https://i.ibb.co/Kx3vQw1t/c.png", 26234, "D"),
     new charInfo("Mishiro's Sister", [], anime[700], "F", "https://i.ibb.co/zTKF1GD1/c.png", 26235, "D"),
     new charInfo("Mishiro's Agent", [], anime[700], "M", "https://i.ibb.co/GQcPJfc3/c.png", 26236, "D"),
+    new charInfo("Dou", [], anime[701], "F", "https://i.ibb.co/Qj3T39S6/c.png", 26237, "SS"),
+    new charInfo("Jahy (DKD)", [], anime[701], "F", "https://i.ibb.co/3YmJgKq2/c.png", 26238, "SS"),
+    new charInfo("Ahriman", [], anime[701], "M", "https://i.ibb.co/MDXvJ4Y7/c.png", 26239, "S"),
+    new charInfo("Dahaka", [], anime[701], "F", "https://i.ibb.co/9kHc0sPX/c.png", 26240, "S"),
+    new charInfo("Sadie", [], anime[701], "F", "https://i.ibb.co/gZLX4C3j/c.png", 26241, "S"),
+    new charInfo("Merryna", [], anime[701], "F", "https://i.ibb.co/kgWTjZqk/c.png", 26242, "A"),
+    new charInfo("Zareth", [], anime[701], "M", "https://i.ibb.co/9937GNsz/c.png", 26243, "A"),
+    new charInfo("Mus", [], anime[701], "F", "https://i.ibb.co/5h4qShZH/c.png", 26244, "A"),
+    new charInfo("Setia", [], anime[701], "F", "https://i.ibb.co/hxm2YW9K/c.png", 26245, "A"),
+    new charInfo("Salamandra", [], anime[701], "F", "https://i.ibb.co/jkncV9Wh/c.png", 26246, "B"),
+    new charInfo("Yalya", [], anime[701], "F", "https://i.ibb.co/qVsGWrq/c.png", 26247, "B"),
+    new charInfo("Vushu", [], anime[701], "F", "https://i.ibb.co/ZzZv9N1k/c.png", 26248, "B"),
+    new charInfo("Maayu", [], anime[701], "M", "https://i.ibb.co/bfbStDR/c.png", 26249, "A"),
+    new charInfo("Assim", [], anime[701], "M", "https://i.ibb.co/kVKGzgqR/c.png", 26250, "B"),
+    new charInfo("Akoman", [], anime[701], "M", "https://i.ibb.co/vvh9xLy0/c.png", 26251, "C"),
+    new charInfo("Asha Vahista", [], anime[701], "F", "https://i.ibb.co/1Y8fv4Lk/c.png", 26252, "C"),
+    new charInfo("Doruzuuya", [], anime[701], "F", "https://i.ibb.co/hRpG4V2b/c.png", 26253, "C"),
+    new charInfo("Mr Lizard", [], anime[701], "M", "https://i.ibb.co/FbHG6bw2/c.png", 26254, "D"),
+    new charInfo("Ur (DKD)", [], anime[701], "M", "https://i.ibb.co/3mXSTMd8/c.png", 26255, "D"),
+    new charInfo("Tontt", [], anime[701], "F", "https://i.ibb.co/mrfy3xkf/c.png", 26256, "D"),
+    new charInfo("Jang Chae-Rin", ["Joy"], anime[702], "F", "https://i.ibb.co/Kxrfpbfd/c.png", 26257, "SS"),
+    new charInfo("Seo Ye-Eun", ["Esther"], anime[702], "F", "https://i.ibb.co/hFjW2HnW/c.png", 26258, "SS"),
+    new charInfo("Kang Dong-Gu", ["Max (JSL)"], anime[702], "M", "https://i.ibb.co/QF78wNRW/c.png", 26259, "S"),
+    new charInfo("Kang Su-Won", [], anime[702], "F", "https://i.ibb.co/Xrth1SzK/c.png", 26260, "A"),
+    new charInfo("Vicky", [], anime[702], "F", "https://i.ibb.co/4nH8xtpx/c.png", 26261, "B"),
+    new charInfo("Patrick (JSL)", [], anime[702], "M", "https://i.ibb.co/xqDtKqg6/c.png", 26262, "B"),
+    new charInfo("Mickey (JSL)", [], anime[702], "M", "https://i.ibb.co/r2Yt5wzs/c.png", 26263, "C"),
+    new charInfo("Andrew", [], anime[702], "M", "https://i.ibb.co/5xGNqx3n/c.png", 26264, "C"),
+    new charInfo("Jaden (JSL)", [], anime[702], "M", "https://i.ibb.co/60Ckx91q/c.png", 26265, "C"),
+    new charInfo("Young Eun-Soo", [], anime[702], "F", "https://i.ibb.co/KpCjgqwd/c.png", 26266, "C"),
+    new charInfo("Andy (JSL)", [], anime[702], "M", "https://i.ibb.co/XkGv6c1c/c.png", 26267, "D"),
+    new charInfo("Donald", [], anime[702], "M", "https://i.ibb.co/Kjpz5gxP/c.png", 26268, "D"),
+    new charInfo("Hailey (JSL)", [], anime[702], "F", "https://i.ibb.co/1GhTKWYF/c.png", 26269, "D"),
+    new charInfo("Leo (JSL)", [], anime[702], "M", "https://i.ibb.co/fVyVfxrc/c.png", 26270, "D"),
+    new charInfo("Luminous VIP", ["Lumine VIP", "Lumi VIP"], anime[242], "F", "https://i.ibb.co/vbdmBfg/lumi.gif", 26271, "VIP"),
 
 ];
 

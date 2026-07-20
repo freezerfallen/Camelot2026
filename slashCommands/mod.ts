@@ -94,7 +94,7 @@ const exportCommand: SlashCommand = {
             const faq = await getFAQSchemaByName(name);
 
             if (faq) {
-                if (interaction.user.id !== faq.id && interaction.user.id !== "489490486734880774") return interaction.reply({ content: `An FAQ for \`${name}\` has already been created by <@${faq.id}>\nPlease use another name, or ask them or Apollo to edit this one.`, ephemeral });
+                if (interaction.user.id !== faq.id && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply({ content: `An FAQ for \`${name}\` has already been created by <@${faq.id}>\nPlease use another name, or ask them or Apollo to edit this one.`, ephemeral });
                 if (body) {
                     await updateFAQBody(name, body);
                     return interaction.reply({ content: `Successfully edited FAQ with name \`${name}\``, ephemeral });

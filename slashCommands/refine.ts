@@ -3,10 +3,14 @@ import { search, getDetailedStats, rarityColor } from "../Modules/functions";
 import { OfferRow } from "../Modules/components";
 import { SlashCommand } from "../types";
 import { getUserSchema, updateUsers } from '../Modules/queries';
+import { achievements } from '../Modules/achievements';
 
 const exportCommand: SlashCommand = {
     name: 'refine',
     async execute({ interaction, author }) {
+
+        const maxRefinedCount = Object.values(author.schema.char_ref).filter(refinement => refinement >= 6).length;
+        for (const id of [109, 110, 111, 112]) await achievements[id].check(interaction, interaction.user, maxRefinedCount);
 
         const choice = interaction.options.getString('character') ?? "";
 
@@ -91,6 +95,9 @@ const exportCommand: SlashCommand = {
                     char_ref: { type: 'merge_json', value: { [char.id]: 1 } },
                 });
 
+                const updatedMaxRefinedCount = Object.values(invCheck.char_ref).filter(refinement => refinement >= 6).length;
+                for (const id of [109, 110, 111, 112]) await achievements[id].check(interaction, interaction.user, updatedMaxRefinedCount);
+
                 if (interaction.channel?.isSendable()) interaction.channel.send(`Raised **${char.name}**'s refinement level successfully!`);
             });
 
@@ -108,29 +115,3 @@ const exportCommand: SlashCommand = {
 };
 
 export default exportCommand;
-
-
-
-// import { characters } from "../Modules/chars.js";
-// (async () => {
-//     const ids = ["489490486734880774", "386942536314519552", "557223261209886730"];
-
-//     for (const id of ids) {
-//         const inv = await getUserSchema(id);
-//         if (inv) {
-//             console.log(inv.name);
-//             // console.log("Total Refinements:", Object.values(inv.char_ref).reduce((a, b) => a + b, 0));
-//             // console.log("Reduced Refinements:", Object.values(inv.char_ref).filter(x => x > 1).reduce((a, b) => a + b, 0));
-//             // console.log("Reduced Refinements:", Object.values(inv.char_ref).filter(x => x > 2).map(x => x > 4 ? 5 : (x < 4 ? 1 : x)).reduce((a, b) => a + b, 0));
-
-//             const chars = Object.entries(inv.char_ref)
-//                 .filter(([key,]) => characters[key as any].rarity === "SS" || characters[key as any].rarity === "EX")
-//                 .filter(([, value]) => value > 2)
-//                 .reduce((a, [, b]) => a + (b > 3 ? 4 : 1), 0);
-
-//             console.log(`${chars} (${chars / 21})`);
-//         };
-//     };
-// })();
-
-

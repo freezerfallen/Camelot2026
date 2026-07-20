@@ -39,7 +39,7 @@ function getModal(uid: string) {
                     .setStyle(TextInputStyle.Short)
                     .setMinLength(16)
                     .setMaxLength(20)
-                    .setPlaceholder('E.g. 489490486734880774')
+                    .setPlaceholder('E.g. 706183309943767112')
                     .setRequired(true),
             ),
         ]);

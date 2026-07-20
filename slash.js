@@ -73,6 +73,12 @@ const commands = [
 	}.data.toJSON(),
 	{
 		data: new SlashCommandBuilder()
+			.setName('auction')
+			.setDescription('Auction related commands')
+			.addIntegerOption(option => option.setName('bid').setDescription('Choose how much you want to bid').setRequired(false))
+	}.data.toJSON(),
+	{
+		data: new SlashCommandBuilder()
 			.setName('avatar')
 			.setDescription('Display a user\'s profile picture')
 			.addUserOption(option => option.setName('user').setDescription('Get the profile picture of a user')),

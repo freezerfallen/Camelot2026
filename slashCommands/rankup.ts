@@ -16,6 +16,7 @@ import { CompactUserSchema, DetailedStats, SlashCommand } from '../types';
 import { getUserSchema, getWeaponSchemas, updateUsers } from '../Modules/queries';
 import { skillTree } from '../Modules/skillTree';
 import { customHpBars } from '../Modules/customHpBars';
+import { achievements } from '../Modules/achievements';
 
 const dungeonInProgress = new Set();
 
@@ -76,7 +77,15 @@ const exportCommand: SlashCommand = {
     async execute({ interaction, author }) {
 
         const stats = author.schema;
-        if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.editReply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
+        const checkRankAchievements = async () => {
+            const currentRank = getLetterRank(stats.rankscore);
+            for (const id of [99, 100, 101, 102, 103]) await achievements[id].check(interaction, interaction.user, currentRank);
+        };
+        if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) {
+            await interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
+            await checkRankAchievements();
+            return;
+        };
 
         const userItemSchemas = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots].filter((e) => e));
         const userItems = userItemSchemas.map((e) => items[e.itemid]);
@@ -85,7 +94,9 @@ const exportCommand: SlashCommand = {
         stats.dungeon_classlevels = Object.fromEntries(Array.from({ length: classes.length }, (_, i) => [i, Math.max(0, ...Object.values(stats.dungeon_classlevels))]));
 
         // Overview
-        let start = await rankupOverview(interaction, stats, userItems);
+        const startPromise = rankupOverview(interaction, stats, userItems);
+        await checkRankAchievements();
+        let start = await startPromise;
         if (start === -1) return;
 
 
@@ -203,6 +214,9 @@ const exportCommand: SlashCommand = {
                     rankscore: { type: "set", value: score },
                 });
             };
+
+            const highestRank = getLetterRank(Math.max(stats.rankscore, score));
+            for (const id of [99, 100, 101, 102, 103]) await achievements[id].check(interaction, interaction.user, highestRank);
 
             return new EmbedBuilder()
                 .setColor(embedColor)

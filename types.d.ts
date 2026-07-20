@@ -616,6 +616,33 @@ export interface RaidSchema {
     end_date: Date | null;
 }
 
+export interface CharacterSchema {
+    rowid: number;
+    id: string;
+    charid: number;
+    print: number;
+    rarity: number;
+    is_tradeable: boolean;
+}
+
+export interface AuctionSchema {
+    rowid: number;
+    type: string;
+    itemid: number;
+    print: number | null;
+    starts_at: Date;
+    ends_at: Date | null;
+}
+
+export interface AuctionBidSchema {
+    rowid: number;
+    auctionid: number;
+    userid: string;
+    amount: number;
+    created_at: Date;
+}
+
+
 export type RankShopTransaction = {
     authorization?: string;
     txn_id: string;
@@ -876,24 +903,27 @@ declare global {
 
             CLIENT_ID: string,
 
-            PATREON_TOKEN: string,
-            PATREON_CAMPAIGN_ID: string,
+            PATREON_TOKEN?: string,
+            PATREON_CAMPAIGN_ID?: string,
 
-            RANK_AUTH: string,
-            RANK_API_KEY: string,
+            RANK_AUTH?: string,
+            RANK_API_KEY?: string,
 
-            TOPGG_AUTH: string,
-            TOPGG_TOKEN: string,
+            TOPGG_AUTH?: string,
+            TOPGG_TOKEN?: string,
 
             GEMINI_API_KEY: string,
 
-            RUNWARE_SOURCE: string,
-            RUNWARE_API_KEY: string,
+            OPENROUTER_API_KEY?: string,
+
+            RUNWARE_SOURCE?: string,
+            RUNWARE_API_KEY?: string,
 
             PG_USER: string,
             PG_DATABASE: string,
             PG_PASSWORD: string,
             PG_PORT: string,
+            STAMPS_PORT?: string,
 
             ADMINS: string,
             VERSION: string,

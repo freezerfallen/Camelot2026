@@ -1,8 +1,9 @@
 import fs from "fs";
 import { Client, Collection } from "discord.js";
 import { BotHandler } from "../types";
-import { loadPullResets, loadRanking, updateUsersAndCache } from "../Modules/queries";
+import { getActiveAuctions, loadPullResets, loadRanking, updateUsersAndCache } from "../Modules/queries";
 import { getDetailedStats, pullsToResetList, RoK, sleep } from "../Modules/functions";
+import { activeAuctions } from "../Modules/components";
 
 async function indexRanking() {
     let pass = 0, batchSize = 500;
@@ -30,13 +31,19 @@ const handler: BotHandler = {
         const blacklist = JSON.parse(fs.readFileSync('Storage/blacklist.json', 'utf8')) as Record<string, string>;
         client.blacklist = new Collection(Object.entries(blacklist));
 
+        // Load Active Auctions
+        const auctions = await getActiveAuctions();
+        for (const auction of auctions) {
+            if (auction.ends_at) activeAuctions.set(auction.rowid, new Date(auction.ends_at));
+        };
+
         // Load Pull Resets
         const users = await loadPullResets();
         for (const user of users) {
             if (user.lastpull) {
                 let pullTimer = 45 * 60 * 1000;
                 switch (user.premium) {
-                    case 0: false; break;
+                    case 0: break;
                     case 1: pullTimer = 40 * 60 * 1000; break;
                     case 2: pullTimer = 40 * 60 * 1000; break;
                     case 3: pullTimer = 40 * 60 * 1000; break;
@@ -44,7 +51,7 @@ const handler: BotHandler = {
                     case 5: pullTimer = 30 * 60 * 1000; break;
                     case 6: pullTimer = 30 * 60 * 1000; break;
                     case 7: pullTimer = 30 * 60 * 1000; break;
-                    default: false; break;
+                    default: break;
                 };
 
                 pullsToResetList.add(user.id);
@@ -56,7 +63,7 @@ const handler: BotHandler = {
                     });
 
                     pullsToResetList.delete(user.id);
-                }, Math.abs(pullTimer + user.lastpull.getTime() - new Date().getTime()));
+                }, Math.max(0, pullTimer + user.lastpull.getTime() - Date.now()));
             };
         };
 

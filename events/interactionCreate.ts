@@ -10,12 +10,21 @@ const event: BotEvent = {
     name: "interactionCreate",
     execute: async (interaction: Interaction) => {
 
-        // if (interaction.user.id === "489490486734880774") {
-        //     interaction.user.id = "447160532286570509";
-        // };
-
         // Defer Buttons
         if (interaction.isButton()) {
+            if (interaction.customId?.startsWith("auction_help")) {
+                return interaction.reply({
+                    content: `## Auction Rules` +
+                        `\n1. You can bid any amount of coins by using the \`/auction bid\` command` +
+                        `\n2. Your highest bid will be binding and cannot be withdrawn` +
+                        `\n3. Your bids will be hidden from other players` +
+                        `\n4. There will be a **3%** fee on your bids regardless of whether you win or lose` +
+                        `\n5. Only the fee is paid upfront when bidding. The full amount will only be deducted from the winner` +
+                        `\n  - If the highest bidder does not have enough coins in their balance + bank at the end of the auction, it will go to the 2nd highest bidder etc.`
+                    , ephemeral: true
+                });
+            };
+
             if (interaction.customId?.startsWith("ignore_defer")) return;
             await interaction.deferUpdate().catch(() => {
                 console.log(`ERROR Interaction Failed 'deferUpdate()' on "${interaction.customId}"`);
@@ -37,15 +46,6 @@ const event: BotEvent = {
             };
             return;
         };
-
-        // return setTimeout(async () => {
-        //     try {
-        //         await interaction.reply({content:"test failed messages", ephemeral:true});
-        //     } catch (err) {
-        //         console.log("err");
-        //         interaction.channel.send("There has been an error sending the response")
-        //     };
-        // }, 5000);
 
         if (interaction.isChatInputCommand()) {
             // Exit and stop if it's not there

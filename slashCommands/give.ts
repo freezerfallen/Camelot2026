@@ -4,8 +4,39 @@ import { achievements } from "../Modules/achievements";
 import charInfo, { characters } from "../Modules/chars";
 import { userLevel, search, formatNumberWithQuotes } from "../Modules/functions";
 import { OfferRow } from "../Modules/components";
-import { SlashCommand } from '../types';
-import { getUserSchema, insertNewTrade, updateUsersAndCache } from '../Modules/queries';
+import { CharacterSchema, CompactUserSchema, SlashCommand } from '../types';
+import { getCharacterSchemasOfUser, getUserSchema, insertNewTrade, transferCharacter, updateUsersAndCache } from '../Modules/queries';
+
+type GiftCharacter = {
+    char: charInfo;
+    print?: number;
+    isTradeable?: boolean;
+};
+
+function parsePrintChoice(choice: string) {
+    const match = choice.trim().match(/^(.*?)`?\s*#\s*(\d+)`?$/);
+    if (!match) return { name: choice.trim() };
+    return { name: match[1].trim(), print: Number(match[2]) };
+};
+
+function formatGiftCharacter(entry: GiftCharacter) {
+    return `${entry.char.name}${entry.print !== undefined ? `#${entry.print}` : ""}`;
+};
+
+function resolveGiftCharacter(choice: string, stats: CompactUserSchema, vipChars: CharacterSchema[], interaction: Parameters<SlashCommand["execute"]>[0]["interaction"], silent = true): GiftCharacter | undefined {
+    const parsed = parsePrintChoice(choice);
+    const char = search(choice, stats.chars, interaction, silent);
+    if (!char) return;
+
+    if (parsed.print !== undefined) {
+        if (char.rarity !== "VIP") return;
+        const vipChar = vipChars.find((e) => e.charid === char.id && e.print === parsed.print);
+        if (vipChar) return { char, print: parsed.print, isTradeable: vipChar.is_tradeable };
+        return;
+    };
+
+    if (stats.chars.includes(char.id)) return { char };
+};
 
 const exportCommand: SlashCommand = {
     name: 'give',
@@ -83,18 +114,22 @@ const exportCommand: SlashCommand = {
             const stats = author.schema;
 
             let hasLockedCharacters = false;
-            const chars: charInfo[] = [];
+            let hasUntradeableCharacters = false;
+            const vipChars = await getCharacterSchemasOfUser(interaction.user.id);
+            const chars: GiftCharacter[] = [];
             for (const c of choice) {
-                const char = search(c, stats.chars, interaction, true);
-                if (!char) continue;
-                if (stats.charlock.includes(char.id) || stats.animelock.includes(char.animeInfo.id)) hasLockedCharacters = true;
-                if (stats.chars.includes(char.id) && !chars.includes(char) && !stats.charlock.includes(char.id) && !stats.animelock.includes(char.animeInfo.id)) chars.push(char);
+                const entry = resolveGiftCharacter(c, stats, vipChars, interaction, true);
+                if (!entry) continue;
+                if (stats.charlock.includes(entry.char.id) || stats.animelock.includes(entry.char.animeInfo.id)) hasLockedCharacters = true;
+                if (entry.isTradeable === false) hasUntradeableCharacters = true;
+                if (!chars.some((e) => e.char.id === entry.char.id && e.print === entry.print) && !stats.charlock.includes(entry.char.id) && !stats.animelock.includes(entry.char.animeInfo.id) && entry.isTradeable !== false) chars.push(entry);
             };
 
-            if (chars.length === 0) return interaction.reply(hasLockedCharacters ? "⚠️ You're trying to give locked characters, please unlock them first." : `No match found`);
+            if (chars.length === 0) return interaction.reply(hasLockedCharacters ? "⚠️ You're trying to give locked characters, please unlock them first." : hasUntradeableCharacters ? "⚠️ You're trying to give VIP characters that are not tradeable." : `No match found`);
             if (chars.length > 200) return interaction.reply(`You can't give more than 200 chars at once`);
 
-            return interaction.reply({ content: `Are you sure you want to give **${chars.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (chars.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : chars.map((c) => c.name.slice(0, 20)).join(", ")}** to **${user.username}**?${hasLockedCharacters ? "\n⚠️ You're trying to give locked characters, please unlock them first." : ""}${userLevel(_stats.xp) < 25 ? `\n⚠️ **${user.username}** is below level 25 and won't be able to use \`/give\` commands until then.` : ""}`, components: [OfferRow] }).then(msg => {
+            const charList = chars.map((c) => formatGiftCharacter(c).slice(0, 24)).join(", ");
+            return interaction.reply({ content: `Are you sure you want to give **${charList.length > 1800 ? (charList + " __+ more__") : charList}** to **${user.username}**?${hasLockedCharacters ? "\n⚠️ You're trying to give locked characters, please unlock them first." : ""}${hasUntradeableCharacters ? "\n⚠️ Some VIP characters were skipped because they are not tradeable." : ""}${userLevel(_stats.xp) < 25 ? `\n⚠️ **${user.username}** is below level 25 and won't be able to use \`/give\` commands until then.` : ""}`, components: [OfferRow] }).then(msg => {
 
                 const confirm = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "confirm", componentType: ComponentType.Button, time: 15000 });
                 const cancel = msg.createMessageComponentCollector({ filter: (r) => r.user.id === interaction.user.id && r.customId === "cancel", componentType: ComponentType.Button, time: 15000 });
@@ -105,40 +140,54 @@ const exportCommand: SlashCommand = {
                     const stats = await getUserSchema(interaction.user.id);
                     if (!stats) return;
 
-                    const chars: charInfo[] = [];
+                    const vipChars = await getCharacterSchemasOfUser(interaction.user.id);
+                    const chars: GiftCharacter[] = [];
                     for (const c of choice) {
-                        const char = search(c, stats.chars, interaction, true);
-                        if (!char) continue;
-                        if (stats.chars.includes(char.id) && !chars.includes(char) && !stats.charlock.includes(char.id) && !stats.animelock.includes(char.animeInfo.id)) chars.push(char);
+                        const entry = resolveGiftCharacter(c, stats, vipChars, interaction, true);
+                        if (!entry) continue;
+                        if (!chars.some((e) => e.char.id === entry.char.id && e.print === entry.print) && !stats.charlock.includes(entry.char.id) && !stats.animelock.includes(entry.char.animeInfo.id) && entry.isTradeable !== false) chars.push(entry);
                     };
 
-                    if (chars.length === 0) return interaction.reply(hasLockedCharacters ? "⚠️ You've tried giving locked characters, please unlock them first." : `No match found`);
+                    if (chars.length === 0) {
+                        if (interaction.channel?.isSendable()) interaction.channel.send(hasLockedCharacters ? "⚠️ You've tried giving locked characters, please unlock them first." : `No match found`);
+                        return;
+                    };
                     if (chars.length > 200) return interaction.reply(`You can't give more than 200 chars at once`);
 
                     // Achievements
-                    achievements[30].check(interaction, interaction.user, chars.some((e) => e.rarity === "S")), achievements[31].check(interaction, interaction.user, chars.some((e) => e.rarity === "SS")); // Shared Happiness
-                    achievements[32].check(interaction, interaction.user, chars.some((e) => stats.chars[stats.chars.length - 1] === e.id && e.rarity === "SS")); // Shared Happiness
+                    achievements[30].check(interaction, interaction.user, chars.some((e) => e.char.rarity === "S")), achievements[31].check(interaction, interaction.user, chars.some((e) => e.char.rarity === "SS")); // Shared Happiness
+                    achievements[32].check(interaction, interaction.user, chars.some((e) => stats.chars[stats.chars.length - 1] === e.char.id && e.char.rarity === "SS")); // Shared Happiness
 
                     for (const char of chars) {
                         // Log Trades
-                        if (char.rarity === "SS" || char.rarity === "EX") {
-                            await insertNewTrade(interaction.user.id, user.id, "char", char.id);
+                        if (char.char.rarity === "SS" || char.char.rarity === "EX" || char.print !== undefined) {
+                            await insertNewTrade(interaction.user.id, user.id, "char", char.char.id);
                         };
                     };
 
-                    // Update users table
-                    await updateUsersAndCache(interaction.client, interaction.user.id, {
-                        updates: {
-                            chars: { type: 'remove', value: chars.map((e) => e.id) },
-                        },
-                    });
-                    await updateUsersAndCache(interaction.client, user.id, {
-                        updates: {
-                            chars: { type: 'append', value: chars.map((e) => e.id) },
-                        },
-                    });
+                    const normalChars = chars.filter((e) => e.print === undefined);
+                    const printedChars = chars.filter((e) => e.print !== undefined);
 
-                    if (interaction.channel?.isSendable()) interaction.channel.send(`**${chars.map((c) => c.name.slice(0, 20)).join(", ").length > 1800 ? (chars.map((c) => c.name.slice(0, 20)).join(", ") + " __+ more__") : chars.map((c) => c.name.slice(0, 20)).join(", ")}** ${chars.length === 1 ? "was" : "were"} gifted to **${user.toString()}**`);
+                    // Update users table
+                    if (normalChars.length > 0) {
+                        await updateUsersAndCache(interaction.client, interaction.user.id, {
+                            updates: {
+                                chars: { type: 'remove', value: normalChars.map((e) => e.char.id) },
+                            },
+                        });
+                        await updateUsersAndCache(interaction.client, user.id, {
+                            updates: {
+                                chars: { type: 'append', value: normalChars.map((e) => e.char.id) },
+                            },
+                        });
+                    };
+
+                    for (const entry of printedChars) {
+                        await transferCharacter(user.id, entry.char.id, entry.print!);
+                    };
+
+                    const charList = chars.map((c) => formatGiftCharacter(c).slice(0, 24)).join(", ");
+                    if (interaction.channel?.isSendable()) interaction.channel.send(`**${charList.length > 1800 ? (charList + " __+ more__") : charList}** ${chars.length === 1 ? "was" : "were"} gifted to **${user.toString()}**`);
 
                     // Achievements
                     achievements[1].check(interaction, user), achievements[2].check(interaction, user), achievements[3].check(interaction, user); // Collector
@@ -148,7 +197,7 @@ const exportCommand: SlashCommand = {
                     const chnl = interaction.client.channels.cache.find(channel => channel.id === "1042922243933622362");
                     const Embed = new EmbedBuilder()
                         .setColor(0xbbffff)
-                        .setDescription(`${interaction.user.tag} sent ${chars.map((char) => `**${characters[char.id].rarity}** **${characters[char.id].name.slice(0, 18)}**`).join(", ")} to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
+                        .setDescription(`${interaction.user.tag} sent ${chars.map((entry) => `**${characters[entry.char.id].rarity}** **${formatGiftCharacter(entry).slice(0, 22)}**`).join(", ")} to **${user.tag}**\n${interaction.user.toString()} ➜ ${interaction.user.id}\n${user.toString()} ➜ ${user.id}`);
                     if (chnl?.isSendable()) chnl.send({ embeds: [Embed] });
                 });
 
@@ -174,8 +223,8 @@ const exportCommand: SlashCommand = {
 
             const stats = [author.schema, stats2];
 
-            // If the gifter has no T3+ and isn't Apollo return
-            if (stats[0].premium < 3 && interaction.user.id !== "489490486734880774") return interaction.reply("You need to have at least T3 Premium to gift others premium. See our `/patreon` for more information.");
+            // If the gifter has no T3+ and isn't an admin return
+            if (stats[0].premium < 3 && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply("You need to have at least T3 Premium to gift others premium. See our `/patreon` for more information.");
             if (!premiumGifted[interaction.user.id]) premiumGifted[interaction.user.id] = 0;
             let giftLimit = 0;
             let giftTier = 1;
@@ -188,8 +237,8 @@ const exportCommand: SlashCommand = {
                 case 7: giftLimit = 2, giftTier = 2; break;
                 default: false; break;
             };
-            if (interaction.user.id === "489490486734880774") giftLimit = 999999;
-            if (tier !== giftTier && interaction.user.id !== "489490486734880774") return interaction.reply(`You can't gift **T${tier}** premium. Try gifting **T${giftTier}**`);
+            if (process.env.ADMINS.split(",").includes(interaction.user.id)) giftLimit = 999999;
+            if (tier !== giftTier && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply(`You can't gift **T${tier}** premium. Try gifting **T${giftTier}**`);
 
             if (premiumGifted[interaction.user.id] >= giftLimit) return interaction.reply(`You can only give ${giftLimit} premium away. Premium gifts are resetted on every 1st of the month.${giftLimit === 5 ? "" : ` You can look up our \`/patreon\` if you need more.`}`);
 
@@ -197,11 +246,11 @@ const exportCommand: SlashCommand = {
             if (tier < 1 || tier > 7) return interaction.reply("Invalid tier");
 
             if (stats[1].premium > tier) return interaction.reply(`**${user.username}** already has premium.`);
-            if (stats[1].premium >= tier && interaction.user.id !== "489490486734880774") return interaction.reply(`**${user.username}** already has premium.`);
+            if (stats[1].premium >= tier && !process.env.ADMINS.split(",").includes(interaction.user.id)) return interaction.reply(`**${user.username}** already has premium.`);
 
             // Stack if Apollo is gifting
             let isStack = false;
-            if (stats[1].premium === tier && interaction.user.id === "489490486734880774") {
+            if (stats[1].premium === tier && process.env.ADMINS.split(",").includes(interaction.user.id)) {
                 if (premiumGift[user.id]?.date && ((new Date().getTime() - premiumGift[user.id].date) < 1000 * 60 * 60 * 24 * 30)) {
                     premiumGift[user.id] = { "method": "gift", "date": (premiumGift[user.id].date + 1000 * 60 * 60 * 24 * 30) };
                     isStack = true;

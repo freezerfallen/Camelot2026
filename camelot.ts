@@ -1,9 +1,11 @@
 import fs from 'fs';
 import { join } from "path";
+import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, Partials, Options, Collection } from 'discord.js';
 import { ServerSchema, CompactUserSchema, SlashCommand } from './types';
-import dotenv from 'dotenv';
+import { bootstrapApplication } from './Modules/startup';
 dotenv.config();
+bootstrapApplication();
 
 // Create Client
 const client = new Client({ // GatewayIntentBits.GuildMembers

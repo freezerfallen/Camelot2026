@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ContainerBuilder, MessageFlags, AttachmentBuilder } from "discord.js";
 import { CompactUserSchema, SlashCommand } from "../types";
-import { botPfp, currencyEmojis, OfferRow } from "../Modules/components";
+import { ExternalLinks, currencyEmojis, OfferRow } from "../Modules/components";
 import { customHpBars } from "../Modules/customHpBars";
 import { profileSets } from "../Modules/profileDecorations";
 import { skins } from "../Modules/skins";
@@ -13,35 +13,30 @@ type SeasonalShopTab = 'runes' | 'hpbars' | 'backgrounds' | 'skins';
 
 const EMBED_COLOR = 0x2aad9d;
 
-const SEASON_END_DATE = new Date('2026-06-04 00:00:00');
+const SEASON_END_DATE = new Date('2026-08-15 00:00:00');
 
 const loadedImages: Record<string | number, Image> = {};
 
 const RUNES_FOR_SALE = [
-    { name: "Hunt of the Leporine", item: items[795] as runeInfo, price: 80, isNew: true },
-    { name: "Unravelling", item: items[796] as runeInfo, price: 80, isNew: true },
-    { name: "Coinmark of Riches", item: items[786] as runeInfo, price: 60, isNew: false },
     { name: "Valkyrie Sigil", item: items[787] as runeInfo, price: 60, isNew: false },
-    { name: "Eirfrost von Neira", item: items[790] as runeInfo, price: 60, isNew: false },
+    { name: "Hollow Crown", item: items[788] as runeInfo, price: 60, isNew: false },
     { name: "Wailing Lantern", item: items[789] as runeInfo, price: 60, isNew: false },
-    { name: "Thorn's Contender", item: items[792] as runeInfo, price: 60, isNew: false },
-    { name: "The Fated", item: items[793] as runeInfo, price: 60, isNew: false },
 ] as const; // Total cost: 220
 
 const HP_BARS_FOR_SALE = [
-    { name: "Bunny Dash", id: 15, price: 80, isNew: true },
-    { name: "Floating Easter", id: 14, price: 70, isNew: true },
-    { name: "Poison Silk", id: 7, price: 50, isNew: false },
-    { name: "Lucky Ribbon", id: 10, price: 50, isNew: false },
-] as const; // Total cost: 250
+    { name: "Beach Break", id: 16, price: 100, isNew: true },
+    { name: "Neon Heartbeats", id: 12, price: 70, isNew: false },
+    { name: "Cupid's Pulse", id: 13, price: 70, isNew: false },
+    { name: "Pinkish Fantasy", id: 2, price: 70, isNew: false },
+] as const; // Total cost: 310
 
 const BACKGROUNDS_FOR_SALE = [
-    { name: "Eternal Petals", id: 25, price: 70, isNew: true },
-    { name: "Petals and Promises", id: 26, price: 70, isNew: true },
-    { name: "Easter Slumber", id: 24, price: 70, isNew: true },
-] as const; // Total cost: 210
+    { name: "Summer Fun", id: 29, price: 90, isNew: true },
+    { name: "Silken Currents", id: 27, price: 70, isNew: true },
+    { name: "Project: SUN", id: 28, price: 70, isNew: true },
+] as const; // Total cost: 230
 
-const SKIN_SEASON = "easter season 2026"; // Total cost: 680
+const SKIN_SEASON = "summer season 2026"; // Total cost: 640
 
 const BuyKeysRow = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
@@ -85,8 +80,8 @@ async function getSeasonalSkinsImage({ columns }: { columns: number; }): Promise
     const ctx = canvas.getContext('2d');
 
     // Background
-    ctx.fillStyle = '#393a41';
-    ctx.fillRect(0, 0, width, height);
+    // ctx.fillStyle = '#393a41';
+    // ctx.fillRect(0, 0, width, height);
 
     // Seasonal key emoji (fall)
     const keyId = currencyEmojis.season_keys.match(/<:([^:]+):(\d+)>/)?.[2];
@@ -101,6 +96,43 @@ async function getSeasonalSkinsImage({ columns }: { columns: number; }): Promise
 
         loadedImages[skin.id] ||= await loadImage(skin.image);
         ctx.drawImage(loadedImages[skin.id], x, y, tileW, tileH);
+
+        // Visual indicator if image is a gif
+        if (typeof skin.image === "string" && skin.image.toLowerCase().endsWith(".gif")) {
+            // Draw a "GIF" badge in the top-right corner of the tile
+            const badgeWidth = 46, badgeHeight = 26;
+            const badgeX = x + tileW - badgeWidth - 8;
+            const badgeY = y + 8;
+
+            // Draw rounded rectangle
+            ctx.save();
+            ctx.beginPath();
+            const radius = 10;
+            ctx.moveTo(badgeX + radius, badgeY);
+            ctx.lineTo(badgeX + badgeWidth - radius, badgeY);
+            ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + radius);
+            ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - radius);
+            ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - radius, badgeY + badgeHeight);
+            ctx.lineTo(badgeX + radius, badgeY + badgeHeight);
+            ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - radius);
+            ctx.lineTo(badgeX, badgeY + radius);
+            ctx.quadraticCurveTo(badgeX, badgeY, badgeX + radius, badgeY);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(45, 230, 170, 0.80)';
+            ctx.fill();
+            ctx.restore();
+
+            // Draw GIF text
+            ctx.save();
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'rgba(16,0,0,0.4)';
+            ctx.shadowBlur = 3;
+            ctx.fillText('GIF', badgeX + badgeWidth / 2, badgeY + badgeHeight / 2 + 1);
+            ctx.restore();
+        }
 
         // Bottom overlay with character name
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -128,8 +160,8 @@ async function getSeasonalSkinsImage({ columns }: { columns: number; }): Promise
         };
     };
 
-    const buffer = canvas.toBuffer('image/jpeg');
-    return new AttachmentBuilder(buffer, { name: 'file.jpg' });
+    const buffer = canvas.toBuffer('image/webp');
+    return new AttachmentBuilder(buffer, { name: 'file.webp' });
 };
 
 const getSeasonalShopButtonRow = (currentTab: SeasonalShopTab) => {
@@ -162,7 +194,7 @@ const getShopPage = (currentTab: SeasonalShopTab, stats: CompactUserSchema): Con
                     `Welcome to the seasonal shop, available for a limited time! You can earn seasonal keys by: </quests:1087099255652622433> (5x ${currencyEmojis.season_keys}), [vote for Camelot](<https://rank.top/bot/camelot/vote>) (5x ${currencyEmojis.season_keys}, once per day), [vote for Camelot OS](<https://rank.top/server/camelot/vote>) (5x ${currencyEmojis.season_keys}, once per day)`
                 ),
             )
-            .setThumbnailAccessory(thumbnail => thumbnail.setURL(botPfp))
+            .setThumbnailAccessory(thumbnail => thumbnail.setURL(ExternalLinks.BotPfp))
         )
         .addSeparatorComponents(separator => separator);
 
@@ -217,7 +249,7 @@ const getShopPage = (currentTab: SeasonalShopTab, stats: CompactUserSchema): Con
         // The composed image will be attached to the message
         shopContainer.addMediaGalleryComponents(media => media
             .addItems(item =>
-                item.setURL("attachment://file.jpg")
+                item.setURL("attachment://file.webp")
             )
         );
 

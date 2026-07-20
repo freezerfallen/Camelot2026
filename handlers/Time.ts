@@ -1,9 +1,10 @@
 import fs from 'fs';
 import { Client } from "discord.js";
 import { BotHandler, UpdateUserOptions } from "../types";
-import { getPlayerbaseStats, insertNewStampede, resetDailyResponses, resetDungeonLimit, updateUsersAndCache } from '../Modules/queries';
+import { getAuctionSchema, getAuctionWinner, getPlayerbaseStats, insertNewStampede, resetDailyResponses, resetDungeonLimit, transferCharacter, updateUsersAndCache } from '../Modules/queries';
 import { isStampedeMonth } from '../Modules/functions';
-import { isEventOngoing } from '../Modules/components';
+import { activeAuctions, auctionChannelId, isEventOngoing } from '../Modules/components';
+import { characters } from '../Modules/chars';
 
 const handler: BotHandler = {
     name: "Time",
@@ -78,14 +79,50 @@ const handler: BotHandler = {
             // Every 10 minutes
             if (now.getMinutes() % 10 === 0) {
                 // Frostbound Yule Event
-                if (isEventOngoing()) {
-                    await updateUsersAndCache(client, "*", {
-                        updates: {
-                            perpetual_fire: { type: "increment", value: -1 }
-                        },
-                        condition: "perpetual_fire > 0",
-                    });
-                }
+                // if (isEventOngoing()) {
+                //     await updateUsersAndCache(client, "*", {
+                //         updates: {
+                //             perpetual_fire: { type: "increment", value: -1 }
+                //         },
+                //         condition: "perpetual_fire > 0",
+                //     });
+                // }
+
+                // Auction End Check
+                const auctions = activeAuctions.entries();
+                for (const [auctionId, auctionEndDate] of auctions) {
+                    if (auctionEndDate <= now) {
+                        activeAuctions.delete(auctionId);
+
+                        const auction = await getAuctionSchema(auctionId);
+                        if (!auction) continue;
+
+                        const winner = await getAuctionWinner(auctionId);
+                        if (winner) {
+                            const totalAmount = Math.ceil(winner.amount * 0.97);
+                            const deductCoins = Math.min(totalAmount, winner.coins) || 0;
+                            const deductBank = Math.max(0, totalAmount - deductCoins) || 0;
+                            await updateUsersAndCache(client, winner.userid, {
+                                updates: {
+                                    coins: { type: "increment", value: -deductCoins },
+                                    bank: { type: "increment", value: -deductBank },
+                                    ...((auction.type === "char" && !auction.print) ? { chars: { type: "append", value: [auction.itemid] } } : {}),
+                                },
+                            });
+
+                            // If VIP character, transfer to winner
+                            if (auction.type === "char" && auction.print) {
+                                await transferCharacter(winner.userid, auction.itemid, auction.print);
+                            };
+
+                            // Send auction end message
+                            const chnl = client.channels.cache.get(auctionChannelId);
+                            if (chnl?.isSendable()) {
+                                chnl.send(`Congratulations <@${winner.userid}>, you have won the auction for **${characters[auction.itemid].name}**${auction.print ? `#${auction.print}` : ""}! <a:party:1516764283135066122>`);
+                            };
+                        };
+                    };
+                };
             };
 
             // Every 5 Minutes

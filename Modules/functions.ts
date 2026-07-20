@@ -56,6 +56,7 @@ export const strCode = (id: number) => {
 export const baseHP = (id: number) => {
     let hash = strCode(id) % 10;
     switch (characters[id].rarity) {
+        case "VIP": hash = Math.floor(430 + (10 * (hash / 9))); break; // 430-440
         case "EX": hash = Math.floor(420 + (20 * (hash / 9))); break; // 420-440
         case "SS": hash = Math.floor(380 + (60 * (hash / 9))); break; // 380-440
         case "S": hash = Math.floor(300 + (60 * (hash / 9))); break;  // 300-360
@@ -72,6 +73,7 @@ export const baseHP = (id: number) => {
 export const baseATK = (id: number) => {
     let hash = Math.round(((strCode(id) % 100) / 10) + 0.01);
     switch (characters[id].rarity) {
+        case "VIP": hash = Math.floor(75 + (0.5 * hash)); break;  // 75-80
         case "EX": hash = Math.floor(70 + (1 * hash)); break;  // 70-80
         case "SS": hash = Math.floor(60 + (2 * hash)); break;  // 60-80
         case "S": hash = Math.floor(48 + (1.2 * hash)); break; // 48-60
@@ -95,6 +97,7 @@ export const baseDEF = (id: number) => {
     hash = sum % 10;
 
     switch (characters[id].rarity) {
+        case "VIP": hash = Math.floor(64 + (6 / (hash + 1))); break; // 65-70
         case "EX": hash = Math.floor(59 + (11 / (hash + 1))); break; // 60-70
         case "SS": hash = Math.floor(48 + (22 / (hash + 1))); break; // 50-70
         case "S": hash = Math.floor(39 + (11 / (hash + 1))); break;  // 40-50
@@ -1262,7 +1265,10 @@ export const search = (name: string | number, inv: number[], interaction: ChatIn
     name = name.toString().toLowerCase().split(" ").filter((e) => e).join(" ");
     if (name === "last" || name === "latest") name = inv[inv.length - 1].toString();
 
-    if (!isNaN(Number(name))) {
+    const printSearch = name.match(/^(.*?)\s*#\s*\d+$/);
+    if (printSearch) name = printSearch[1].trim();
+
+    if (!printSearch && !isNaN(Number(name))) {
         if (parseInt(name) < 0) {
             if (!silent) interaction.reply("The ID can't be negative.");
             return;
@@ -1274,12 +1280,14 @@ export const search = (name: string | number, inv: number[], interaction: ChatIn
         if (!(name[0] === "0" && name.length > 1)) return characters[parseInt(name)];
     };
 
+    const searchableCharacters = printSearch ? characters.filter((e) => e.rarity === "VIP") : characters;
+
     // Full Name Search
-    let fastCheck = characters.filter((e) => e.name.toLowerCase() === name || e.alias.some((a) => a.toLowerCase() === name));
+    let fastCheck = searchableCharacters.filter((e) => e.name.toLowerCase() === name || e.alias.some((a) => a.toLowerCase() === name));
     if (fastCheck[0] !== undefined) return fastCheck[0];
 
     // Filter
-    const fArray = characters.filter((e) => e.name.toLowerCase().startsWith(`${name}`) || e.alias.some((a) => a.toLowerCase().startsWith(`${name}`)));
+    const fArray = searchableCharacters.filter((e) => e.name.toLowerCase().startsWith(`${name}`) || e.alias.some((a) => a.toLowerCase().startsWith(`${name}`)));
 
     if (fArray.length === 0) {
         if (!silent) interaction.reply("No match found");
@@ -1343,7 +1351,7 @@ export const rarityColor = (rar: CharacterRarity) => {
 
 export const rarityEmoji = (rar: CharacterRarity): string => {
     switch (rar) {
-        case "VIP": return "<a:EXTRA:1138530846144462968>";
+        case "VIP": return "<a:vip1:1488516064982597732><a:vip2:1488516143307161811>";
         case "EX": return "<a:EXTRA:1138530846144462968>";
         case "SS": return "<:SSTier:869316489931546644>";
         case "S": return "<:STier:869316518675095552>";
@@ -1517,7 +1525,7 @@ export const formatNumberWithQuotes = (num: number) => {
 };
 
 export const searchClass = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false): classInfo | undefined => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {
@@ -1563,7 +1571,7 @@ export const searchClass = (name: string | number, interaction: ChatInputCommand
 };
 
 export const searchCurse = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false) => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {
@@ -1609,7 +1617,7 @@ export const searchCurse = (name: string | number, interaction: ChatInputCommand
 };
 
 export const searchItem = (name: string | number, interaction: ChatInputCommandInteraction, silent: boolean = false, options: { returnSet: boolean; } = { returnSet: false }) => {
-    name = name.toString().toLowerCase();
+    name = name.toString().toLowerCase().replace(/’/g, "'");
 
     if (!isNaN(Number(name))) {
         if (Number(name) < 0) {

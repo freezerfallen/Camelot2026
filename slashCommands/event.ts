@@ -1,5 +1,5 @@
 import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, AttachmentBuilder, ComponentType, ButtonStyle } from 'discord.js';
-import { PageRow, OfferRow, ongoingEvent, isEventOngoing, seasonalEventEnd, seasonalEventStart, botPfp } from "../Modules/components";
+import { PageRow, OfferRow, ongoingEvent, isEventOngoing, seasonalEventEnd, seasonalEventStart, ExternalLinks } from "../Modules/components";
 import { showPage } from "../Modules/functions";
 import { characters } from "../Modules/chars";
 import { skins } from "../Modules/skins";
@@ -722,7 +722,7 @@ const exportCommand: SlashCommand = {
             const Embed = new EmbedBuilder()
                 .setTitle('Valentine\'s Event Rewards')
                 .setColor(0x2aad9d)
-                .setThumbnail(botPfp) // "https://i.imgur.com/swyb84q.jpg"
+                .setThumbnail(ExternalLinks.BotPfp)
                 .setDescription(`Your balance: **${stats.eventpts}**<:valentines_choco_2026:1472686937277071442>\n\n` + showF.join("\n"))
                 .setFooter({ text: `Page ${currPage}/${pagesTotal}` });
             interaction.reply({ embeds: [Embed], components: [PageRow] }).then(msg => {

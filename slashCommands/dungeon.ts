@@ -9,18 +9,14 @@ import { armorInfo, entryInfo, items, ringInfo, runeInfo, weaponInfo } from "../
 import { skills, bossAbilities } from "../Modules/skills";
 import { characters } from "../Modules/chars";
 import { dailies } from "../Modules/dailyQuests";
-
 import { getDetailedStats, customEmojis, dealDamage, generateCaptcha, formatNumberWithQuotes, getClassLvl, classLevelToXP } from "../Modules/functions";
-
+import { addGuildDonation, getCachedUserSchema, getGuildSchema, getUserSchema, updateUsersAndCache, insertNewWeapon, updateUsers } from '../Modules/queries';
 import { requestVerification, dungeonTempBan, AbilityResponse, isEventOngoing } from "../Modules/components";
+import { customHpBars } from '../Modules/customHpBars';
+import { skillTree } from '../Modules/skillTree';
 import Avalon from "../Modules/avalon";
 import buffInfo from "../Modules/buffs";
 import _ from 'lodash';
-
-import { addGuildDonation, getCachedUserSchema, getGuildSchema, getUserSchema, updateUsersAndCache, insertNewWeapon, updateUsers } from '../Modules/queries';
-
-import { skillTree } from '../Modules/skillTree';
-import { customHpBars } from '../Modules/customHpBars';
 
 import { hasExtremeItemDrop, getExtremeItemDrop, hasExtremeWeaponDrop, getExtremeWeaponId } from "../Modules/extremeWeaponDrops";
 
@@ -630,6 +626,9 @@ const exportCommand: SlashCommand = {
 
             // David versus Goliath
             achievements[88].check(interaction, interaction.user, eStats.ep >= myStats.ep * 5);
+
+            // No Rest for the Strong
+            for (const id of [104, 105, 106, 107, 108]) await achievements[id].check(interaction, interaction.user, stats.dungeon_limit);
 
             //* Daily Quests
             // Increasing Danger

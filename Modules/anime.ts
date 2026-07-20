@@ -733,7 +733,8 @@ export const anime: animeInfo[] = [
     new animeInfo("The Extra's Academy Survival Guide", ["How to Survive at the Academy", "Surviving the Academy"], 698),
     new animeInfo("Webtoon Character Na Kang Lim", ["Suyo Webtoon-ui Na Kang Lim"], 699),
     new animeInfo("SHIBOYUGI: Playing Death Games to Put Food on the Table", ["Shibou Yuugi de Meshi wo Kuu", "Shibouyugi", "SYMK"], 700),
-
+    new animeInfo("The Demon King's Daughter is Too Kind!!", ["Maou no Musume wa Yasashi Sugiru!!",], 701),
+    new animeInfo("Job Switch Log;", ["Ctrl+Alt+Resign", "Job Change Log;",], 702),
 
 ];
 

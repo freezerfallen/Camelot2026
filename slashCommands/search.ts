@@ -30,7 +30,7 @@ const exportCommand: SlashCommand = {
         fastCheck.forEach((b) => {
             if (searchflag !== "missing" || !stats.chars.includes(b.id)) sorted[b.rarity].push(b);
         });
-        let allChars = sorted["EX"].concat(sorted["SS"]).concat(sorted["S"]).concat(sorted["A"]).concat(sorted["B"]).concat(sorted["C"]).concat(sorted["D"]);
+        let allChars = sorted["VIP"].concat(sorted["EX"]).concat(sorted["SS"]).concat(sorted["S"]).concat(sorted["A"]).concat(sorted["B"]).concat(sorted["C"]).concat(sorted["D"]);
         let charsOwned = chars.filter((b) => b.anime === animeName);
 
         if (allChars.length === 0) return interaction.reply(`You have all characters from **${fastCheck[0].anime}**`);

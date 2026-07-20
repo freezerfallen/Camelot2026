@@ -16,6 +16,7 @@ import { CompactUserSchema, DetailedStats, GuildSchema, RaidRank, RaidSchema, Sl
 import { cancelRaid, getGuildSchema, getLatestRaid, getRaidByRaidRowId, getUserSchemas, getWeaponSchemas, insertNewRaid, updateGuilds, updateRaidEnded, updateRaidParticipation, updateRaidPhase, updateUsers } from '../Modules/queries';
 import { customHpBars } from '../Modules/customHpBars';
 import { skillTree } from '../Modules/skillTree';
+import { achievements } from '../Modules/achievements';
 
 const dungeonInProgress = new Set();
 
@@ -1028,7 +1029,10 @@ const exportCommand: SlashCommand = {
             const damageDealt = (eStats.hp - eStatsC.hp) < 0 ? 0 : (eStats.hp - eStatsC.hp);
 
             // Participation
-            if (!isTestRun) await updateRaidParticipation(raid.rowid, interaction.user.id, damageDealt);
+            if (!isTestRun) {
+                await updateRaidParticipation(raid.rowid, interaction.user.id, damageDealt);
+                for (const id of [89, 90, 91, 92, 93]) await achievements[id].check(interaction, interaction.user, damageDealt);
+            };
 
             //* LOOT DROPS
 

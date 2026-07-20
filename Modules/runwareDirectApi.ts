@@ -391,7 +391,7 @@ class RunwareDirectApi {
     };
 };
 
-export const runwareApi = new RunwareDirectApi(process.env.RUNWARE_API_KEY);
+export const runwareApi = new RunwareDirectApi(process.env.RUNWARE_API_KEY ?? '');
 export const generateImages = runwareApi.generateImages.bind(runwareApi);
 export const removeBackground = runwareApi.removeBackground.bind(runwareApi);
 

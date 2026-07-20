@@ -2,7 +2,8 @@ import { characters, auniq } from "./chars.js";
 import { ChatInputCommandInteraction, User } from "discord.js";
 import { getCachedUserSchema, updateUsersAndCache } from "./queries.js";
 import { items } from "./items.js";
-import { UpdateUserOptions } from "../types.js";
+import { raidRankIndices } from "./components.js";
+import { RaidRank, UpdateUserOptions } from "../types.js";
 
 // Set to track ongoing achievement checks (userId:achievementId)
 const achvmLock = new Set<string>();
@@ -144,6 +145,11 @@ export default class achievInfo {
         if (interaction.channel?.isSendable()) interaction.channel.send(notification);
     };
 
+    private async unlock(interaction: ChatInputCommandInteraction, user: User) {
+        await this.addRewards(interaction, user);
+        this.notify(interaction);
+    };
+
     async check(interaction: ChatInputCommandInteraction, user: User | undefined = undefined, ...list: any[]) {
         user ||= interaction.user;
 
@@ -158,25 +164,25 @@ export default class achievInfo {
             if (stats.achievements.includes(this.id)) return;
 
             switch (this.id) {
-                case 0: if (stats.pullstotal >= 1) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 1: if (new Set(stats.chars).size >= 500) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 2: if (new Set(stats.chars).size >= 2000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 3: if (new Set(stats.chars).size >= 5000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 4: if (list[0] > 0) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 5: if (list[0] > 0) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 6: if (stats.arenawins >= 1) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 7: if (stats.arenawins >= 20) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 8: if (stats.arenawins >= 100) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 9: if (list[0] >= 3) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 10: if (list[0] >= 7) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 11: if (list[0] >= 14) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 12: if (list[0] >= 30) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 13: if (list[0] === 3) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 14: if (list[0] === 5) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 15: if (stats.xp > 659) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 16: if (stats.xp > 9046) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 17: if (stats.xp > 27863) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 18: if (stats.xp > 115211) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 0: if (stats.pullstotal >= 1) await this.unlock(interaction, user); break;
+                case 1: if (new Set(stats.chars).size >= 500) await this.unlock(interaction, user); break;
+                case 2: if (new Set(stats.chars).size >= 2000) await this.unlock(interaction, user); break;
+                case 3: if (new Set(stats.chars).size >= 5000) await this.unlock(interaction, user); break;
+                case 4: if (list[0] > 0) await this.unlock(interaction, user); break;
+                case 5: if (list[0] > 0) await this.unlock(interaction, user); break;
+                case 6: if (stats.arenawins >= 1) await this.unlock(interaction, user); break;
+                case 7: if (stats.arenawins >= 20) await this.unlock(interaction, user); break;
+                case 8: if (stats.arenawins >= 100) await this.unlock(interaction, user); break;
+                case 9: if (list[0] >= 3) await this.unlock(interaction, user); break;
+                case 10: if (list[0] >= 7) await this.unlock(interaction, user); break;
+                case 11: if (list[0] >= 14) await this.unlock(interaction, user); break;
+                case 12: if (list[0] >= 30) await this.unlock(interaction, user); break;
+                case 13: if (list[0] === 3) await this.unlock(interaction, user); break;
+                case 14: if (list[0] === 5) await this.unlock(interaction, user); break;
+                case 15: if (stats.xp > 659) await this.unlock(interaction, user); break;
+                case 16: if (stats.xp > 9046) await this.unlock(interaction, user); break;
+                case 17: if (stats.xp > 27863) await this.unlock(interaction, user); break;
+                case 18: if (stats.xp > 115211) await this.unlock(interaction, user); break;
                 case 19:
                 case 20:
                 case 21:
@@ -185,62 +191,62 @@ export default class achievInfo {
                     let completed = 0;
                     let chars = [...new Set(stats.chars)].map((e) => characters[e]);
                     auniq.forEach((a) => { if (characters.filter((e) => e.anime === a).length === chars.filter((e) => e.anime === a).length) completed++; });
-                    if (this.id === 19) if (completed) this.addRewards(interaction, user), this.notify(interaction);
-                    if (this.id === 20) if (completed >= 10) this.addRewards(interaction, user), this.notify(interaction);
-                    if (this.id === 21) if (completed >= 30) this.addRewards(interaction, user), this.notify(interaction);
-                    if (this.id === 22) if (completed >= 100) this.addRewards(interaction, user), this.notify(interaction);
-                    if (this.id === 23) if (completed >= 250) this.addRewards(interaction, user), this.notify(interaction);
+                    if (this.id === 19) if (completed) await this.unlock(interaction, user);
+                    if (this.id === 20) if (completed >= 10) await this.unlock(interaction, user);
+                    if (this.id === 21) if (completed >= 30) await this.unlock(interaction, user);
+                    if (this.id === 22) if (completed >= 100) await this.unlock(interaction, user);
+                    if (this.id === 23) if (completed >= 250) await this.unlock(interaction, user);
                     break;
                 }
-                case 24: if (list[0] === 1) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 25: if (list[0] === 2) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 26: if (list[0] === 3) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 27: if (list[0] >= 5) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 28: if (list[0] >= 30) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 29: if (list[0] >= 100) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 30: if (list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 31: if (list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 32: if (list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 33: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 34: if (list[0] === 6) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 35: if (list[0] === 11) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 36: if (list[0] === 26) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 37: if (list[0] === 51) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 38: if (list[0] === 71) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 39: if (list[0] <= 10) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 40: if (list[0] <= 3) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 41: if (list[0] === 1) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 42: if (list[0] >= 30) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 43: if (list[0] >= 50) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 44: if (list[0] >= 80) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 45: if (list[0] >= 100) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 46: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 47: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 48: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 49: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 50: this.addRewards(interaction, user), this.notify(interaction); break;
-                case 51: this.addRewards(interaction, user), this.notify(interaction); break;
+                case 24: if (list[0] === 1) await this.unlock(interaction, user); break;
+                case 25: if (list[0] === 2) await this.unlock(interaction, user); break;
+                case 26: if (list[0] === 3) await this.unlock(interaction, user); break;
+                case 27: if (list[0] >= 5) await this.unlock(interaction, user); break;
+                case 28: if (list[0] >= 30) await this.unlock(interaction, user); break;
+                case 29: if (list[0] >= 100) await this.unlock(interaction, user); break;
+                case 30: if (list[0]) await this.unlock(interaction, user); break;
+                case 31: if (list[0]) await this.unlock(interaction, user); break;
+                case 32: if (list[0]) await this.unlock(interaction, user); break;
+                case 33: await this.unlock(interaction, user); break;
+                case 34: if (list[0] === 6) await this.unlock(interaction, user); break;
+                case 35: if (list[0] === 11) await this.unlock(interaction, user); break;
+                case 36: if (list[0] === 26) await this.unlock(interaction, user); break;
+                case 37: if (list[0] === 51) await this.unlock(interaction, user); break;
+                case 38: if (list[0] === 71) await this.unlock(interaction, user); break;
+                case 39: if (list[0] <= 10) await this.unlock(interaction, user); break;
+                case 40: if (list[0] <= 3) await this.unlock(interaction, user); break;
+                case 41: if (list[0] === 1) await this.unlock(interaction, user); break;
+                case 42: if (list[0] >= 30) await this.unlock(interaction, user); break;
+                case 43: if (list[0] >= 50) await this.unlock(interaction, user); break;
+                case 44: if (list[0] >= 80) await this.unlock(interaction, user); break;
+                case 45: if (list[0] >= 100) await this.unlock(interaction, user); break;
+                case 46: await this.unlock(interaction, user); break;
+                case 47: await this.unlock(interaction, user); break;
+                case 48: await this.unlock(interaction, user); break;
+                case 49: await this.unlock(interaction, user); break;
+                case 50: await this.unlock(interaction, user); break;
+                case 51: await this.unlock(interaction, user); break;
 
-                case 52: if (list[0] === "unique") this.addRewards(interaction, user), this.notify(interaction); break;
-                case 53: if (list[0] === "legendary") this.addRewards(interaction, user), this.notify(interaction); break;
-                case 54: if (list[0] === "mythical") this.addRewards(interaction, user), this.notify(interaction); break;
+                case 52: if (list[0] === "unique") await this.unlock(interaction, user); break;
+                case 53: if (list[0] === "legendary") await this.unlock(interaction, user); break;
+                case 54: if (list[0] === "mythical") await this.unlock(interaction, user); break;
 
-                case 55: if (list[0] === 100 && list[1]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 56: if (list[0] === 150 && list[1]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 57: if (list[0] === 200 && list[1]) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 58: if (list[0] === 270 && list[1]) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 55: if (list[0] === 100 && list[1]) await this.unlock(interaction, user); break;
+                case 56: if (list[0] === 150 && list[1]) await this.unlock(interaction, user); break;
+                case 57: if (list[0] === 200 && list[1]) await this.unlock(interaction, user); break;
+                case 58: if (list[0] === 270 && list[1]) await this.unlock(interaction, user); break;
 
                 // Guild Donation Achievements
-                case 59: if (stats.donatedtotal >= 50000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 60: if (stats.donatedtotal >= 250000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 61: if (stats.donatedtotal >= 1000000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 62: if (stats.donatedtotal >= 5000000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 63: if (stats.donatedtotal >= 20000000) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 59: if (stats.donatedtotal >= 50000) await this.unlock(interaction, user); break;
+                case 60: if (stats.donatedtotal >= 250000) await this.unlock(interaction, user); break;
+                case 61: if (stats.donatedtotal >= 1000000) await this.unlock(interaction, user); break;
+                case 62: if (stats.donatedtotal >= 5000000) await this.unlock(interaction, user); break;
+                case 63: if (stats.donatedtotal >= 20000000) await this.unlock(interaction, user); break;
 
                 // Levelup spend Achievements
-                case 64: if (list[0] >= 100000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 65: if (list[0] >= 500000) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 66: if (list[0] >= 1000000) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 64: if (list[0] >= 100000) await this.unlock(interaction, user); break;
+                case 65: if (list[0] >= 500000) await this.unlock(interaction, user); break;
+                case 66: if (list[0] >= 1000000) await this.unlock(interaction, user); break;
 
                 // Ascension Material Achievements
                 case 67:
@@ -253,25 +259,25 @@ export default class achievInfo {
 
                     const threshold = { 67: 2000, 68: 10000, 69: 50000, 70: 200000 }[this.id];
 
-                    if (totalAscensionMaterials >= threshold) this.addRewards(interaction, user), this.notify(interaction);
+                    if (totalAscensionMaterials >= threshold) await this.unlock(interaction, user);
                     break;
                 }
 
-                case 71: if (list[0] >= 300) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 72: if (list[0] >= 500) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 73: if (list[0] >= 700) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 74: if (list[0] >= 1000) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 71: if (list[0] >= 300) await this.unlock(interaction, user); break;
+                case 72: if (list[0] >= 500) await this.unlock(interaction, user); break;
+                case 73: if (list[0] >= 700) await this.unlock(interaction, user); break;
+                case 74: if (list[0] >= 1000) await this.unlock(interaction, user); break;
 
-                case 75: if (list[0] === 100 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
-                case 76: if (list[0] === 200 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
-                case 77: if (list[0] === 300 && list[1] === "D") this.addRewards(interaction, user), this.notify(interaction); break;
+                case 75: if (list[0] === 100 && list[1] === "D") await this.unlock(interaction, user); break;
+                case 76: if (list[0] === 200 && list[1] === "D") await this.unlock(interaction, user); break;
+                case 77: if (list[0] === 300 && list[1] === "D") await this.unlock(interaction, user); break;
 
-                case 78: if (list[0] >= 40) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 79: if (list[0] >= 80) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 80: if (list[0] >= 120) this.addRewards(interaction, user), this.notify(interaction); break;
-                case 81: if (list[0] >= 170) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 78: if (list[0] >= 40) await this.unlock(interaction, user); break;
+                case 79: if (list[0] >= 80) await this.unlock(interaction, user); break;
+                case 80: if (list[0] >= 120) await this.unlock(interaction, user); break;
+                case 81: if (list[0] >= 170) await this.unlock(interaction, user); break;
 
-                case 82: if (stats.bank >= list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 82: if (stats.bank >= list[0]) await this.unlock(interaction, user); break;
 
                 case 83:
                 case 84:
@@ -284,11 +290,71 @@ export default class achievInfo {
 
                     const threshold = { 83: 100, 84: 200, 85: 500, 86: 1000, 87: 2000 }[this.id];
 
-                    if (totalFish >= threshold) this.addRewards(interaction, user), this.notify(interaction);
+                    if (totalFish >= threshold) await this.unlock(interaction, user);
                     break;
                 }
 
-                case 88: if (list[0]) this.addRewards(interaction, user), this.notify(interaction); break;
+                case 88: if (list[0]) await this.unlock(interaction, user); break;
+
+                case 89:
+                case 90:
+                case 91:
+                case 92:
+                case 93: {
+                    const threshold = { 89: 250000, 90: 1000000, 91: 5000000, 92: 10000000, 93: 50000000 }[this.id];
+                    if (list[0] >= threshold) await this.unlock(interaction, user);
+                    break;
+                }
+
+                case 94:
+                case 95:
+                case 96:
+                case 97:
+                case 98: {
+                    const threshold = { 94: 1, 95: 5, 96: 10, 97: 20, 98: 50 }[this.id];
+                    if (list[0] >= threshold) await this.unlock(interaction, user);
+                    break;
+                }
+
+                case 99:
+                case 100:
+                case 101:
+                case 102:
+                case 103: {
+                    const currentRank = list[0] as RaidRank;
+                    const requiredRank = ({ 99: "A", 100: "S", 101: "SS", 102: "SSS", 103: "SSS+" } as const)[this.id];
+                    if (currentRank in raidRankIndices && raidRankIndices[currentRank] >= raidRankIndices[requiredRank]) await this.unlock(interaction, user);
+                    break;
+                }
+
+                case 104:
+                case 105:
+                case 106:
+                case 107:
+                case 108: {
+                    const threshold = { 104: 100, 105: 250, 106: 500, 107: 800, 108: 1200 }[this.id];
+                    if (list[0] >= threshold) await this.unlock(interaction, user);
+                    break;
+                }
+
+                case 109:
+                case 110:
+                case 111:
+                case 112: {
+                    const threshold = { 109: 1, 110: 5, 111: 10, 112: 20 }[this.id];
+                    if (list[0] >= threshold) await this.unlock(interaction, user);
+                    break;
+                }
+
+                case 113:
+                case 114:
+                case 115:
+                case 116:
+                case 117: {
+                    const threshold = { 113: 100, 114: 500, 115: 2500, 116: 10000, 117: 50000 }[this.id];
+                    if (stats.pullstotal >= threshold) await this.unlock(interaction, user);
+                    break;
+                }
 
                 default: false; break;
             };
@@ -418,5 +484,40 @@ export const achievements = [ // Type 1: xp, 2: coins, 3: shards, 4: tickets, 5:
     new achievInfo("Something's Fishy", "Catch 2000 fish", 87, 27, "1,4", "xp|100", "ss ticket|2"),
 
     new achievInfo("David vs. Goliath", "Defeat an enemy with 500% of your EP", 88, 28, "1,2,4", "xp|50", "coins|3000", "ss ticket|1"),
+
+    new achievInfo("Raidbreaker", "Deal 250'000 damage in a single raid attempt", 89, 29, "1,2,3", "xp|50", "coins|3000", "s shard|4"),
+    new achievInfo("Raidbreaker", "Deal 1'000'000 damage in a single raid attempt", 90, 29, "1,2,3", "xp|60", "coins|5000", "s shard|8"),
+    new achievInfo("Raidbreaker", "Deal 5'000'000 damage in a single raid attempt", 91, 29, "1,2,3", "xp|70", "coins|10000", "s shard|12"),
+    new achievInfo("Raidbreaker", "Deal 10'000'000 damage in a single raid attempt", 92, 29, "1,2,3", "xp|80", "coins|15000", "ss shard|16"),
+    new achievInfo("Raidbreaker", "Deal 50'000'000 damage in a single raid attempt", 93, 29, "1,2,4", "xp|100", "coins|25000", "ss ticket|3"),
+
+    new achievInfo("Path to Mastery", "Upgrade skills a total of 1 time", 94, 30, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("Path to Mastery", "Upgrade skills a total of 5 times", 95, 30, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("Path to Mastery", "Upgrade skills a total of 10 times", 96, 30, "1,2", "xp|75", "coins|10000"),
+    new achievInfo("Path to Mastery", "Upgrade skills a total of 20 times", 97, 30, "1,2", "xp|100", "coins|15000"),
+    new achievInfo("Path to Mastery", "Upgrade skills a total of 50 times", 98, 30, "1,2", "xp|150", "coins|25000"),
+
+    new achievInfo("The Ranker", "Reach rank A", 99, 31, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("The Ranker", "Reach rank S", 100, 31, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("The Ranker", "Reach rank SS", 101, 31, "1,2", "xp|75", "coins|10000"),
+    new achievInfo("The Ranker", "Reach rank SSS", 102, 31, "1,2", "xp|100", "coins|15000"),
+    new achievInfo("The Ranker", "Reach rank SSS+", 103, 31, "1,2", "xp|150", "coins|25000"),
+
+    new achievInfo("No Rest for the Strong", "Complete 100 dungeon runs in one interval", 104, 32, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("No Rest for the Strong", "Complete 250 dungeon runs in one interval", 105, 32, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("No Rest for the Strong", "Complete 500 dungeon runs in one interval", 106, 32, "1,2", "xp|75", "coins|10000"),
+    new achievInfo("No Rest for the Strong", "Complete 800 dungeon runs in one interval", 107, 32, "1,2", "xp|100", "coins|15000"),
+    new achievInfo("No Rest for the Strong", "Complete 1'200 dungeon runs in one interval", 108, 32, "1,2", "xp|150", "coins|25000"),
+
+    new achievInfo("Masterwork", "Max-refine 1 character", 109, 33, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("Masterwork", "Max-refine 5 characters", 110, 33, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("Masterwork", "Max-refine 10 characters", 111, 33, "1,2", "xp|100", "coins|15000"),
+    new achievInfo("Masterwork", "Max-refine 20 characters", 112, 33, "1,2", "xp|150", "coins|25000"),
+
+    new achievInfo("Summoner's Obsession", "Pull 100 characters", 113, 34, "1,2", "xp|25", "coins|1000"),
+    new achievInfo("Summoner's Obsession", "Pull 500 characters", 114, 34, "1,2", "xp|50", "coins|5000"),
+    new achievInfo("Summoner's Obsession", "Pull 2'500 characters", 115, 34, "1,2", "xp|75", "coins|10000"),
+    new achievInfo("Summoner's Obsession", "Pull 10'000 characters", 116, 34, "1,2", "xp|100", "coins|15000"),
+    new achievInfo("Summoner's Obsession", "Pull 50'000 characters", 117, 34, "1,2", "xp|150", "coins|25000"),
 
 ];

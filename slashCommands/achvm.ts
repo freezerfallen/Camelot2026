@@ -2,9 +2,9 @@ import { EmbedBuilder, ComponentType, APIEmbedField } from "discord.js";
 import achievInfo, { achievements } from "../Modules/achievements";
 import { characters, auniq } from "../Modules/chars";
 import { enemies } from "../Modules/enemies";
-import { userLevel } from "../Modules/functions";
-import { PageRow } from "../Modules/components";
-import { SlashCommand } from '../types';
+import { getLetterRank, userLevel } from "../Modules/functions";
+import { PageRow, raidRankIndices } from "../Modules/components";
+import { RaidRank, SlashCommand } from '../types';
 import { getCachedUserSchema } from "../Modules/queries";
 import { items } from '../Modules/items';
 
@@ -219,6 +219,54 @@ const exportCommand: SlashCommand = {
                     return achvmBar(totalFish / threshold, ` (${totalFish}/${threshold})\n`);
                 }
                 case 88: return achvmBar(0);
+                case 89:
+                case 90:
+                case 91:
+                case 92:
+                case 93: return achvmBar(0);
+                case 94:
+                case 95:
+                case 96:
+                case 97:
+                case 98: {
+                    const totalSkillUpgrades = Object.values(stats.skill_tree).reduce((sum, level) => sum + level, 0);
+                    const threshold = { 94: 1, 95: 5, 96: 10, 97: 20, 98: 50 }[id];
+                    return achvmBar(totalSkillUpgrades / threshold, ` (${totalSkillUpgrades}/${threshold})\n`);
+                }
+                case 99:
+                case 100:
+                case 101:
+                case 102:
+                case 103: {
+                    const currentRank = getLetterRank(stats.rankscore);
+                    const requiredRank = ({ 99: "A", 100: "S", 101: "SS", 102: "SSS", 103: "SSS+" } as const)[id] as RaidRank;
+                    const progress = (raidRankIndices[currentRank] + 1) / (raidRankIndices[requiredRank] + 1);
+                    return achvmBar(progress, ` (${currentRank}/${requiredRank})\n`);
+                }
+                case 104:
+                case 105:
+                case 106:
+                case 107:
+                case 108: {
+                    const threshold = { 104: 100, 105: 250, 106: 500, 107: 800, 108: 1200 }[id];
+                    return achvmBar(stats.dungeon_limit / threshold, ` (${stats.dungeon_limit}/${threshold})\n`);
+                }
+                case 109:
+                case 110:
+                case 111:
+                case 112: {
+                    const maxRefinedCount = Object.values(stats.char_ref).filter(refinement => refinement >= 6).length;
+                    const threshold = { 109: 1, 110: 5, 111: 10, 112: 20 }[id];
+                    return achvmBar(maxRefinedCount / threshold, ` (${maxRefinedCount}/${threshold})\n`);
+                }
+                case 113:
+                case 114:
+                case 115:
+                case 116:
+                case 117: {
+                    const threshold = { 113: 100, 114: 500, 115: 2500, 116: 10000, 117: 50000 }[id];
+                    return achvmBar(stats.pullstotal / threshold, ` (${stats.pullstotal}/${threshold})\n`);
+                }
                 default: return achvmBar(0);
             };
         };

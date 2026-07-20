@@ -2,7 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import { achievements } from "../Modules/achievements";
 import { rarityColor, search } from "../Modules/functions";
 import { SlashCommand } from '../types';
-import { getPartyMembers, getLatestStampede, updateUsersAndCache } from '../Modules/queries';
+import { getCharacterSchemasOfUser, getPartyMembers, getLatestStampede, updateUsersAndCache } from '../Modules/queries';
 
 const dungeonInProgress = new Set();
 
@@ -19,7 +19,14 @@ const exportCommand: SlashCommand = {
 
         const char = search(choice, stats.chars, interaction);
         if (!char) return;
-        if (!stats.chars.includes(char.id)) return interaction.reply(`You don't have a copy of **${char.name}**`);
+
+        // Check ownership: normal chars from stats.chars[], VIP from characters table
+        if (char.rarity === "VIP") {
+            const vipChars = await getCharacterSchemasOfUser(interaction.user.id);
+            if (!vipChars.some((e) => e.charid === char.id)) return interaction.reply(`You don't have a copy of **${char.name}**`);
+        } else {
+            if (!stats.chars.includes(char.id)) return interaction.reply(`You don't have a copy of **${char.name}**`);
+        }
 
         let thumbnail = char.image;
         if (stats.favchar !== null) thumbnail = char.getImage(stats.premium, stats.custom_skins[char.id], stats.char_skin[char.id]);

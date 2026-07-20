@@ -4,12 +4,15 @@ import { skillTree } from '../Modules/skillTree';
 import { CompactUserSchema, SlashCommand } from '../types';
 import { showPage } from '../Modules/functions';
 import { PageRow } from '../Modules/components';
+import { achievements } from '../Modules/achievements';
 
 const exportCommand: SlashCommand = {
     name: 'skill',
     async execute({ interaction, author }) {
 
         const subcommand = interaction.options.getSubcommand();
+        const totalSkillUpgrades = Object.values(author.schema.skill_tree).reduce((acc, curr) => acc + curr, 0);
+        for (const id of [94, 95, 96, 97, 98]) await achievements[id].check(interaction, interaction.user, totalSkillUpgrades);
 
         if (subcommand === 'view') {
             const user = interaction.options.getUser('user') ?? interaction.user;
@@ -141,6 +144,9 @@ const exportCommand: SlashCommand = {
                         skill_tree: { type: "set", value: stats.skill_tree },
                         skill_points: { type: "increment", value: -cost }
                     });
+
+                    const updatedSkillUpgrades = Object.values(stats.skill_tree).reduce((acc, curr) => acc + curr, 0);
+                    for (const id of [94, 95, 96, 97, 98]) await achievements[id].check(interaction, interaction.user, updatedSkillUpgrades);
 
                     const { Embed, row } = createComponents(stats);
                     if (!Embed || !row) interaction.editReply({ components: [] });
