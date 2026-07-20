@@ -146,7 +146,7 @@ const echoShopItems: EchoShopItem[] = [
     { id: "cxp_large", name: "Large Instant XP Potion", price: 25, maxPurchases: 10, emoji: "<:large_instant_xp_potion:1411713396260339873>", desc: "Grants **2,400** class XP" },
     { id: "cxp_huge", name: "Huge Instant XP Potion", price: 80, maxPurchases: 5, emoji: "<:huge_instant_xp_potion:1411713671977107496>", desc: "Grants **8,000** class XP" },
     { id: "coins_exchange", name: "10 Coins", price: 1, emoji: "<:coins:872926669055356939>", desc: "Exchange 1 echo for 10 coins (unlimited)" },
-    { id: "hpbar_liminal", name: "Liminal Clover", price: 1000, maxPurchases: 1, emoji: "🍀", desc: "Blade of Liminality, stylish for battles!\n" + customHpBars[16].getHpBar(0.7, 0.4), hpbarId: 16 },
+    { id: "hpbar_liminal", name: "Liminal Clover", price: 1000, maxPurchases: 1, emoji: "🍀", desc: "Blade of Liminality, stylish for battles!\n" + customHpBars[17].getHpBar(0.7, 0.4), hpbarId: 17 },
 ];
 
 function raidOverview({ interaction, stats, userItems }: { interaction: ChatInputCommandInteraction, stats: CompactUserSchema, userItems: itemInfo[]; }): Promise<number> {
@@ -247,7 +247,7 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
             ranking.on('collect', async (rr) => {
                 tab = "ranking";
                 const bossId = String(stats.phantasmagoria_selected_boss ?? 0);
-                const rows = await query("SELECT id, name, phantasmagoria_boss_data FROM users WHERE phantasmagoria_boss_data != '{}'::jsonb") as { id: string; name: string; phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number }> }[];
+                const rows = await query("SELECT id, name, phantasmagoria_boss_data FROM users WHERE phantasmagoria_boss_data != '{}'::jsonb") as { id: string; name: string; phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number; }>; }[];
                 const myFresh = rows.find((p) => p.id === interaction.user.id);
                 stats.phantasmagoria_boss_data = myFresh?.phantasmagoria_boss_data ?? {};
                 const ranked = rows
@@ -754,7 +754,7 @@ const exportCommand: SlashCommand = {
 
             // Echo reward: 100 per new phase defeated (max 200 phases per battle)
             const bossId = stats.phantasmagoria_selected_boss ?? 0;
-            const [freshUser] = await query('SELECT phantasmagoria_boss_data, echo FROM users WHERE id = $1', [interaction.user.id]) as { phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number }>; echo: number }[];
+            const [freshUser] = await query('SELECT phantasmagoria_boss_data, echo FROM users WHERE id = $1', [interaction.user.id]) as { phantasmagoria_boss_data: Record<string, { best_damage: number; best_phases: number; }>; echo: number; }[];
             const freshBossData = freshUser?.phantasmagoria_boss_data ?? {};
             const freshEcho = freshUser?.echo ?? 0;
             const prevBest = freshBossData[String(bossId)] ?? { best_damage: 0, best_phases: 0 };

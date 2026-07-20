@@ -8,7 +8,7 @@ const exportCommand: SlashCommand = {
     async execute({ interaction, author }) {
 
         // Command can only be used in the test bot
-        if (interaction.client.user.id !== "1283335641563926559") return interaction.reply("This command can only be used in Elder");
+        if (interaction.client.user.id !== "1283335641563926559" && interaction.client.user.id !== "695286837568340119") return interaction.reply("This command can only be used in Elder");
 
         const subcommand = interaction.options.getSubcommand();
 
