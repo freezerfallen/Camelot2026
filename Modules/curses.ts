@@ -284,7 +284,7 @@ export const curses = [
         notice.push(`\n${curses[16].emblem} **${eStats.name}**'s boosted their burn damage by **5%** permanently and inflicted **+2** burn`);
         return AbilityResponse.SUCCESS;
     }, async (myStats, eStats, mybuff, ebuff, char, enemy, matchStats, notice, embed, user, ...list) => {
-        eStats.burnbonus ?? - 0;
+        eStats.burnbonus ??= 0;
         // Burn SETUP
         myStats.burntype ??= 1;
         if (typeof myStats.burnduration !== "number") {// Trigger burn every round

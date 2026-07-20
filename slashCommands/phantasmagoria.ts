@@ -142,9 +142,9 @@ const echoShopItems: EchoShopItem[] = [
     { id: "expull", name: "EX Pull", price: 80, maxPurchases: 10, emoji: "<a:EXTRA:1138530846144462968>", desc: "A chance to pull an EX-rated character" },
     { id: "item_1", name: item1.name + ` (${item1.type})`, price: 800, maxPurchases: 5, emoji: item1.emoji, desc: `${item1.buffdesc}`, grantItemId: 840, grantItemType: "weapon" },
     { id: "item_2", name: item2.name, price: 300, maxPurchases: 10, emoji: item2.emoji, desc: `${item2.getBuffDesc()}`, grantItemId: 841, grantItemType: "ring" },
-    { id: "cxp_small", name: "Small Instant XP Potion", price: 10, maxPurchases: 20, emoji: "<:small_instant_xp_potion:1411713377511800842>", desc: "Grants **800** class XP" },
-    { id: "cxp_large", name: "Large Instant XP Potion", price: 25, maxPurchases: 10, emoji: "<:large_instant_xp_potion:1411713396260339873>", desc: "Grants **2,400** class XP" },
-    { id: "cxp_huge", name: "Huge Instant XP Potion", price: 80, maxPurchases: 5, emoji: "<:huge_instant_xp_potion:1411713671977107496>", desc: "Grants **8,000** class XP" },
+    { id: "cxp_small", name: "Small Instant XP Potion", price: 10, maxPurchases: 20, xp: 800, emoji: "<:small_instant_xp_potion:1411713377511800842>", desc: "Grants **800** class XP" },
+    { id: "cxp_large", name: "Large Instant XP Potion", price: 25, maxPurchases: 10, xp: 2400, emoji: "<:large_instant_xp_potion:1411713396260339873>", desc: "Grants **2,400** class XP" },
+    { id: "cxp_huge", name: "Huge Instant XP Potion", price: 80, maxPurchases: 5, xp: 8000, emoji: "<:huge_instant_xp_potion:1411713671977107496>", desc: "Grants **8,000** class XP" },
     { id: "coins_exchange", name: "10 Coins", price: 1, emoji: "<:coins:872926669055356939>", desc: "Exchange 1 echo for 10 coins (unlimited)" },
     { id: "hpbar_liminal", name: "Liminal Clover", price: 1000, maxPurchases: 1, emoji: "🍀", desc: "Blade of Liminality, stylish for battles!\n" + customHpBars[17].getHpBar(0.7, 0.4), hpbarId: 17 },
 ];
@@ -539,6 +539,14 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                     await modalSubmit.deferUpdate();
                     if (adjusted) await modalSubmit.followUp({ content: `Quantity adjusted to **${qty}** (max affordable with current balance).`, ephemeral: true });
 
+                    // Re-fetch actual echo from DB to avoid stale-cache overspend
+                    const [userRow] = await query('SELECT echo FROM users WHERE id = $1', [interaction.user.id]) as [{ echo: number; }];
+                    const actualEcho = userRow?.echo ?? 0;
+                    if (actualEcho < totalCost) {
+                        await modalSubmit.followUp({ content: `Your balance changed! Need **${totalCost}** but you only have **${actualEcho}**.`, ephemeral: true });
+                        return;
+                    }
+
                     let update: Record<string, any> = {
                         echo: { type: "increment", value: -totalCost },
                     };
@@ -568,20 +576,21 @@ function raidOverview({ interaction, stats, userItems }: { interaction: ChatInpu
                         update.echo_purchases = { type: "set_json", value: newEchoPurchases };
                     };
 
-                    // Re-fetch actual echo from DB to avoid stale-cache overspend
-                    const [userRow] = await query('SELECT echo FROM users WHERE id = $1', [interaction.user.id]) as [{ echo: number; }];
-                    const actualEcho = userRow?.echo ?? 0;
-                    if (actualEcho < totalCost) {
-                        await modalSubmit.followUp({ content: `Your balance changed! Need **${totalCost}** but you only have **${actualEcho}**.`, ephemeral: true });
+                    await updateUsersAndCache(interaction.client, interaction.user.id, {
+                        updates: update,
+                        condition: `echo >= ${totalCost}`,
+                    });
+
+                    // Verify the atomic deduction succeeded (no concurrent purchase stole echo)
+                    const [verifyRow] = await query('SELECT echo FROM users WHERE id = $1', [interaction.user.id]) as [{ echo: number; }];
+                    if (verifyRow.echo === actualEcho) {
+                        await modalSubmit.followUp({ content: `Purchase failed due to a concurrent transaction. Please try again.`, ephemeral: true });
                         return;
                     }
-                    update.echo = { type: "set", value: actualEcho - totalCost };
-
-                    await updateUsersAndCache(interaction.client, interaction.user.id, { updates: update });
 
                     if (!stats.echo_purchases) stats.echo_purchases = {};
                     stats.echo_purchases[itemId] = currentPurchases + qty;
-                    stats.echo = actualEcho - totalCost;
+                    stats.echo = verifyRow.echo;
 
                     await modalSubmit.followUp({ content: `Successfully purchased **${qty}x** ${shopItem.emoji} **${shopItem.name}** for **${totalCost}** <a:echo:1510653732029857802>!`, ephemeral: true });
                     await interaction.editReply({ embeds: [Embed.setDescription(getDesc())], components: [...getRaidButtonRow(tab, false), getShopSelectRow()] });
@@ -617,7 +626,7 @@ const exportCommand: SlashCommand = {
 
         // Check if user has a battle character
         const stats = { ...author.schema };
-        if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.reply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
+        if (stats.battlechar === null || !stats.chars.includes(stats.battlechar)) return interaction.editReply("You have to choose a battle character first. Use `/select <char name>` to choose one.");
 
         const myWeapons = await getWeaponSchemas([stats.equipment.weapon, stats.equipment.shield, stats.equipment.helmet, stats.equipment.cuirass, stats.equipment.gloves, stats.equipment.boots, stats.equipment.ring1, stats.equipment.ring2, stats.equipment.ring3]);
         const userItems = myWeapons.map((e) => items[e.itemid]);
